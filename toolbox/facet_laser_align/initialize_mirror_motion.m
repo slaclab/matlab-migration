@@ -1,0 +1,5 @@
+function initialize_mirror_motion(handles)
+set(handles.M1X,'String',num2str(handles.mirrormotion.M1X))
+set(handles.M1Y,'String',num2str(handles.mirrormotion.M1Y))
+set(handles.M2X,'String',num2str(handles.mirrormotion.M2X))
+set(handles.M2Y,'String',num2str(handles.mirrormotion.M2Y))

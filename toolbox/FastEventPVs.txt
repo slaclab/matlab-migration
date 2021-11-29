@@ -1,0 +1,345 @@
+% This file lists the names of EPICS process variables (PVs) to be
+% recorded in a circular buffer with beam-synchronous acquisition
+% at 120 Hz. Only BSA devices are allowed.
+%
+% Leave out any event specifiers like 'HST1H' for 1-Hz history data
+% and 'HST3' for data from event-code 3. The Matlab routines
+% FastEventMonitor or FastEventHiddenLogger will append them.
+%
+% The lines contain optional fields describing how this PV will be
+% used. All items are separated by commas. Both leading and trailing
+% white space is removed by the program.
+%
+% There are three optional fields in each line after the PV name.
+% Fields 2 and 3 can be a conversion factor and a unit. Many items
+% are received from analog sources in raw volts. The Matlab program
+% can first convert them to physically meaningful units by multiplying
+% by the conversion factor before comparing or plotting. The default
+% factor is 1 if none is given,and the default unit is then taken
+% from the EPICS ".EGU" value.
+%
+% Low-rate data from these devices is polled every few seconds by
+% FastEventMonitor. Each line can end with an optional threshold
+% value (the 4th item if the conversion factor and unit are included,
+% otherwise the 2nd item). The threshold must be preceded by either
+% ">" or "<". If any threshold is exceeded, the circular buffer is
+% paused and the full BSA records for all listed PVs are written
+% to a file.
+%
+% FastEventLogger also plots events as they happen, or events already
+% saved in files. The PVs below are listed in sections separated by
+% blank lines. The PVs in each group are plotted together on the same
+% axes. If a group startes with a line containing only "LOG", then
+% that plot's vertical axis will be logarithmic.
+%
+% Some PVs (such as RF PVs) are read only at beam rate. These must be
+% grouped at the end of the list, following a line containing only "BR".
+%
+% Alan Fisher, 2010 July 17
+
+LOG
+VPIO:IN20:111:FASTP, 1, Torr, >1e-8
+VPIO:IN20:113:FASTP, 1, Torr, >1e-8
+VPIO:IN20:213:FASTP, 1, Torr, >1e-8
+VPIO:IN20:235:FASTP, 1, Torr, >1e-8
+
+LOG
+VPIO:IN20:301:FASTP, 1, Torr, >1e-8
+VPIO:IN20:303:FASTP, 1, Torr, >1e-8
+VPIO:IN20:375:FASTP, 1, Torr, >1e-8
+VPIO:IN20:377:FASTP, 1, Torr, >1e-8
+
+LOG
+%VPIO:IN20:465:FASTP, 1, Torr, >1e-8
+VPIO:IN20:605:FASTP, 1, Torr, >1e-8
+VPIO:IN20:705:FASTP, 1, Torr, >2e-8
+VPIO:IN20:811:FASTP, 1, Torr, >1e-8
+VPIO:IN20:965:FASTP, 1, Torr, >1e-8
+
+LOG
+VPIO:IN20:L205:FASTP, 1, Torr, >2e-8
+VPIO:IN20:L255:FASTP, 1, Torr, >5e-6
+
+LOG
+VPIO:IN20:W550:FASTP, 1, Torr, >3e-8
+VPIO:IN20:W555:FASTP, 1, Torr, >1e-8
+VPIO:IN20:W565:FASTP, 1, Torr, >1e-8
+VPIO:IN20:W600:FASTP, 1, Torr, >1e-8
+VPIO:IN20:W605:FASTP, 1, Torr, >1e-8
+
+LOG
+VPIO:IN20:W615:FASTP, 1, Torr, >1e-8
+VPIO:IN20:W630:FASTP, 1, Torr, >4e-7
+VPIO:IN20:W650:FASTP, 1, Torr, >2.5e-8
+VPIO:IN20:W675:FASTP, 1, Torr, >1e-7
+VPIO:IN20:W700:FASTP, 1, Torr, >1e-8
+
+LOG
+VPIO:IN20:W720:FASTP, 1, Torr, >1e-8
+VPIO:IN20:W750:FASTP, 1, Torr, >1e-7
+VPIO:IN20:W770:FASTP, 1, Torr, >1e-8
+VPIO:IN20:W800:FASTP, 1, Torr, >1e-8
+VPIO:IN20:W820:FASTP, 1, Torr, >1e-8
+VPIO:IN20:W865:FASTP, 1, Torr, >2e-8
+
+LOG
+VPIO:LI21:W200:FASTP, 1, Torr, >1e-8
+VPIO:LI21:W220:FASTP, 1, Torr, >1e-8
+VPIO:LI21:W230:FASTP, 1, Torr, >1e-8
+VPIO:LI21:W270:FASTP, 1, Torr, >1e-8
+
+LOG
+VGPR:IN20:L100:FASTP, 1, Torr
+VGPR:IN20:113:FASTP, 1, Torr
+VGPR:IN20:221:FASTP, 1, Torr
+VGPR:IN20:365:FASTP, 1, Torr
+VGPR:IN20:469:FASTP, 1, Torr
+
+LOG
+VGPR:IN20:605:FASTP
+VGPR:IN20:W685:FASTP
+VGPR:IN20:775:FASTP
+VGPR:IN20:935:FASTP
+
+LOG
+VGCC:IN20:113:FASTP, 1, Torr, >1e-8
+VGCC:IN20:221:FASTP, 1, Torr, >1e-8
+VGCC:IN20:365:FASTP, 1, Torr, >2e-8
+VGCC:IN20:469:FASTP, 1, Torr, >1e-8
+
+LOG
+VGCC:IN20:605:FASTP, 1, Torr, >1e-8
+VGCC:IN20:W685:FASTP, 1, Torr, >5e-9
+VGCC:IN20:775:FASTP, 1, Torr, >4e-8
+VGCC:IN20:935:FASTP, 1, Torr, >2e-8
+
+BR
+GUN:IN20:1:A,        1, MV, <1
+ACCL:IN20:300:L0A_A, 1, MV, <10
+ACCL:IN20:400:L0B_A, 1, MV, <10
+ACCL:LI21:1:L1S_A,   1, MV, <10
+
+GUN:IN20:1:P
+ACCL:IN20:300:L0A_P
+ACCL:IN20:400:L0B_P
+ACCL:LI21:1:L1S_P
+
+SBST:LI21:1:BVLT_FAST,  1, kV
+KLYS:LI21:11:BVLT_FAST, 1, kV
+KLYS:LI21:21:BVLT_FAST, 1, kV
+KLYS:LI21:31:BVLT_FAST, 1, kV
+KLYS:LI21:41:BVLT_FAST, 1, kV
+
+KLYS:LI21:51:BVLT_FAST, 1, kV
+KLYS:LI21:61:BVLT_FAST, 1, kV
+KLYS:LI21:71:BVLT_FAST, 1, kV
+KLYS:LI21:81:BVLT_FAST, 1, kV
+
+SBST:LI21:1:PHAS_FAST,  1, deg
+KLYS:LI21:11:PHAS_FAST, 1, deg
+KLYS:LI21:21:PHAS_FAST, 1, deg
+KLYS:LI21:31:PHAS_FAST, 1, deg
+KLYS:LI21:41:PHAS_FAST, 1, deg
+
+KLYS:LI21:51:PHAS_FAST, 1, deg
+KLYS:LI21:61:PHAS_FAST, 1, deg
+KLYS:LI21:71:PHAS_FAST, 1, deg
+KLYS:LI21:81:PHAS_FAST, 1, deg
+
+SBST:LI22:1:BVLT_FAST,  1, kV
+KLYS:LI22:11:BVLT_FAST, 1, kV
+KLYS:LI22:21:BVLT_FAST, 1, kV
+KLYS:LI22:31:BVLT_FAST, 1, kV
+KLYS:LI22:41:BVLT_FAST, 1, kV
+
+KLYS:LI22:51:BVLT_FAST, 1, kV
+KLYS:LI22:61:BVLT_FAST, 1, kV
+KLYS:LI22:71:BVLT_FAST, 1, kV
+KLYS:LI22:81:BVLT_FAST, 1, kV
+
+SBST:LI22:1:PHAS_FAST,  1, deg
+KLYS:LI22:11:PHAS_FAST, 1, deg
+KLYS:LI22:21:PHAS_FAST, 1, deg
+KLYS:LI22:31:PHAS_FAST, 1, deg
+KLYS:LI22:41:PHAS_FAST, 1, deg
+
+KLYS:LI22:51:PHAS_FAST, 1, deg
+KLYS:LI22:61:PHAS_FAST, 1, deg
+KLYS:LI22:71:PHAS_FAST, 1, deg
+KLYS:LI22:81:PHAS_FAST, 1, deg
+
+SBST:LI23:1:BVLT_FAST,  1, kV
+KLYS:LI23:11:BVLT_FAST, 1, kV
+KLYS:LI23:21:BVLT_FAST, 1, kV
+KLYS:LI23:31:BVLT_FAST, 1, kV
+KLYS:LI23:41:BVLT_FAST, 1, kV
+
+KLYS:LI23:51:BVLT_FAST, 1, kV
+KLYS:LI23:61:BVLT_FAST, 1, kV
+KLYS:LI23:71:BVLT_FAST, 1, kV
+KLYS:LI23:81:BVLT_FAST, 1, kV
+
+SBST:LI23:1:PHAS_FAST,  1, deg
+KLYS:LI23:11:PHAS_FAST, 1, deg
+KLYS:LI23:21:PHAS_FAST, 1, deg
+KLYS:LI23:31:PHAS_FAST, 1, deg
+KLYS:LI23:41:PHAS_FAST, 1, deg
+
+KLYS:LI23:51:PHAS_FAST, 1, deg
+KLYS:LI23:61:PHAS_FAST, 1, deg
+KLYS:LI23:71:PHAS_FAST, 1, deg
+KLYS:LI23:81:PHAS_FAST, 1, deg
+
+SBST:LI24:1:BVLT_FAST,  1, kV
+KLYS:LI24:11:BVLT_FAST, 1, kV
+KLYS:LI24:21:BVLT_FAST, 1, kV
+KLYS:LI24:31:BVLT_FAST, 1, kV
+KLYS:LI24:41:BVLT_FAST, 1, kV
+
+KLYS:LI24:51:BVLT_FAST, 1, kV
+KLYS:LI24:61:BVLT_FAST, 1, kV
+KLYS:LI24:71:BVLT_FAST, 1, kV
+KLYS:LI24:81:BVLT_FAST, 1, kV
+
+SBST:LI24:1:PHAS_FAST,  1, deg
+KLYS:LI24:11:PHAS_FAST, 1, deg
+KLYS:LI24:21:PHAS_FAST, 1, deg
+KLYS:LI24:31:PHAS_FAST, 1, deg
+KLYS:LI24:41:PHAS_FAST, 1, deg
+
+KLYS:LI24:51:PHAS_FAST, 1, deg
+KLYS:LI24:61:PHAS_FAST, 1, deg
+KLYS:LI24:71:PHAS_FAST, 1, deg
+KLYS:LI24:81:PHAS_FAST, 1, deg
+
+SBST:LI25:1:BVLT_FAST,  1, kV
+KLYS:LI25:11:BVLT_FAST, 1, kV
+KLYS:LI25:21:BVLT_FAST, 1, kV
+KLYS:LI25:31:BVLT_FAST, 1, kV
+KLYS:LI25:41:BVLT_FAST, 1, kV
+
+KLYS:LI25:51:BVLT_FAST, 1, kV
+KLYS:LI25:61:BVLT_FAST, 1, kV
+KLYS:LI25:71:BVLT_FAST, 1, kV
+KLYS:LI25:81:BVLT_FAST, 1, kV
+
+SBST:LI25:1:PHAS_FAST,  1, deg
+KLYS:LI25:11:PHAS_FAST, 1, deg
+KLYS:LI25:21:PHAS_FAST, 1, deg
+KLYS:LI25:31:PHAS_FAST, 1, deg
+KLYS:LI25:41:PHAS_FAST, 1, deg
+
+KLYS:LI25:51:PHAS_FAST, 1, deg
+KLYS:LI25:61:PHAS_FAST, 1, deg
+KLYS:LI25:71:PHAS_FAST, 1, deg
+KLYS:LI25:81:PHAS_FAST, 1, deg
+
+SBST:LI26:1:BVLT_FAST,  1, kV
+KLYS:LI26:11:BVLT_FAST, 1, kV
+KLYS:LI26:21:BVLT_FAST, 1, kV
+KLYS:LI26:31:BVLT_FAST, 1, kV
+KLYS:LI26:41:BVLT_FAST, 1, kV
+
+KLYS:LI26:51:BVLT_FAST, 1, kV
+KLYS:LI26:61:BVLT_FAST, 1, kV
+KLYS:LI26:71:BVLT_FAST, 1, kV
+KLYS:LI26:81:BVLT_FAST, 1, kV
+
+SBST:LI26:1:PHAS_FAST,  1, deg
+KLYS:LI26:11:PHAS_FAST, 1, deg
+KLYS:LI26:21:PHAS_FAST, 1, deg
+KLYS:LI26:31:PHAS_FAST, 1, deg
+KLYS:LI26:41:PHAS_FAST, 1, deg
+
+KLYS:LI26:51:PHAS_FAST, 1, deg
+KLYS:LI26:61:PHAS_FAST, 1, deg
+KLYS:LI26:71:PHAS_FAST, 1, deg
+KLYS:LI26:81:PHAS_FAST, 1, deg
+
+SBST:LI27:1:BVLT_FAST,  1, kV
+KLYS:LI27:11:BVLT_FAST, 1, kV
+KLYS:LI27:21:BVLT_FAST, 1, kV
+KLYS:LI27:31:BVLT_FAST, 1, kV
+KLYS:LI27:41:BVLT_FAST, 1, kV
+
+KLYS:LI27:51:BVLT_FAST, 1, kV
+KLYS:LI27:61:BVLT_FAST, 1, kV
+KLYS:LI27:71:BVLT_FAST, 1, kV
+KLYS:LI27:81:BVLT_FAST, 1, kV
+
+SBST:LI27:1:PHAS_FAST,  1, deg
+KLYS:LI27:11:PHAS_FAST, 1, deg
+KLYS:LI27:21:PHAS_FAST, 1, deg
+KLYS:LI27:31:PHAS_FAST, 1, deg
+KLYS:LI27:41:PHAS_FAST, 1, deg
+
+KLYS:LI27:51:PHAS_FAST, 1, deg
+KLYS:LI27:61:PHAS_FAST, 1, deg
+KLYS:LI27:71:PHAS_FAST, 1, deg
+KLYS:LI27:81:PHAS_FAST, 1, deg
+
+SBST:LI28:1:BVLT_FAST,  1, kV
+KLYS:LI28:11:BVLT_FAST, 1, kV
+KLYS:LI28:21:BVLT_FAST, 1, kV
+KLYS:LI28:31:BVLT_FAST, 1, kV
+KLYS:LI28:41:BVLT_FAST, 1, kV
+
+KLYS:LI28:51:BVLT_FAST, 1, kV
+KLYS:LI28:61:BVLT_FAST, 1, kV
+KLYS:LI28:71:BVLT_FAST, 1, kV
+KLYS:LI28:81:BVLT_FAST, 1, kV
+
+SBST:LI28:1:PHAS_FAST,  1, deg
+KLYS:LI28:11:PHAS_FAST, 1, deg
+KLYS:LI28:21:PHAS_FAST, 1, deg
+KLYS:LI28:31:PHAS_FAST, 1, deg
+KLYS:LI28:41:PHAS_FAST, 1, deg
+
+KLYS:LI28:51:PHAS_FAST, 1, deg
+KLYS:LI28:61:PHAS_FAST, 1, deg
+KLYS:LI28:71:PHAS_FAST, 1, deg
+KLYS:LI28:81:PHAS_FAST, 1, deg
+
+SBST:LI29:1:BVLT_FAST,  1, kV
+KLYS:LI29:11:BVLT_FAST, 1, kV
+KLYS:LI29:21:BVLT_FAST, 1, kV
+KLYS:LI29:31:BVLT_FAST, 1, kV
+KLYS:LI29:41:BVLT_FAST, 1, kV
+
+KLYS:LI29:51:BVLT_FAST, 1, kV
+KLYS:LI29:61:BVLT_FAST, 1, kV
+KLYS:LI29:71:BVLT_FAST, 1, kV
+KLYS:LI29:81:BVLT_FAST, 1, kV
+
+SBST:LI29:1:PHAS_FAST,  1, deg
+KLYS:LI29:11:PHAS_FAST, 1, deg
+KLYS:LI29:21:PHAS_FAST, 1, deg
+KLYS:LI29:31:PHAS_FAST, 1, deg
+KLYS:LI29:41:PHAS_FAST, 1, deg
+
+KLYS:LI29:51:PHAS_FAST, 1, deg
+KLYS:LI29:61:PHAS_FAST, 1, deg
+KLYS:LI29:71:PHAS_FAST, 1, deg
+KLYS:LI29:81:PHAS_FAST, 1, deg
+
+SBST:LI30:1:BVLT_FAST,  1, kV
+KLYS:LI30:11:BVLT_FAST, 1, kV
+KLYS:LI30:21:BVLT_FAST, 1, kV
+KLYS:LI30:31:BVLT_FAST, 1, kV
+KLYS:LI30:41:BVLT_FAST, 1, kV
+
+KLYS:LI30:51:BVLT_FAST, 1, kV
+KLYS:LI30:61:BVLT_FAST, 1, kV
+KLYS:LI30:71:BVLT_FAST, 1, kV
+KLYS:LI30:81:BVLT_FAST, 1, kV
+
+SBST:LI30:1:PHAS_FAST,  1, deg
+KLYS:LI30:11:PHAS_FAST, 1, deg
+KLYS:LI30:21:PHAS_FAST, 1, deg
+KLYS:LI30:31:PHAS_FAST, 1, deg
+KLYS:LI30:41:PHAS_FAST, 1, deg
+
+KLYS:LI30:51:PHAS_FAST, 1, deg
+KLYS:LI30:61:PHAS_FAST, 1, deg
+KLYS:LI30:71:PHAS_FAST, 1, deg
+KLYS:LI30:81:PHAS_FAST, 1, deg

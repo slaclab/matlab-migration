@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+#==============================================================
+#
+#  Abs:  Trims log files to 0 when greater than 5MB
+#
+#  Name: cronjon_matlab
+#
+#  Facility:  SLAC
+#
+#  Auth: 10-Nov-2008; Brobeck
+#        
+#==============================================================
+
+tfile=/tmp/file_test.junk
+
+# find *.log files greater than 5MB
+#
+find /u1/lcls/physics/log/matlab/*.log -size +5000k > $tfile
+
+#
+# If NOT and empty file; cycle thru the list and if 
+# present then trim log file to empty.
+#
+
+if [ -s $tfile ]; then  
+
+  mlist="archive_LLRF_ampl_phase  \
+         phase_cavity_monitor     \   
+         L23_set_phase            \
+	 phase_control            \
+	 laser_camera             \
+	 multiknob                \
+         watcher"
+
+
+  for x in $mlist
+  do
+	ans=`cat $tfile | grep $x.log > /dev/null; echo $?`
+	if [ "$ans" = 0 ]
+	  then
+		cat /dev/null > /u1/lcls/physics/log/matlab/$x.log
+        fi
+  done
+
+fi
+
+/bin/rm -f $tfile

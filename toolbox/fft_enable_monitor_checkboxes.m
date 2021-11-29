@@ -1,0 +1,26 @@
+%
+% fft_enable_monitor_checkboxes(handles)
+%
+% Enable the appropriate monitor check boxes in the GUI.
+%
+% Package: FFT GUI, Lars Froehlich
+%
+function fft_enable_monitor_checkboxes(handles)
+    global data;
+
+    for i = 1:length(handles.checkMonitor)
+        if (i <= length(data.monitors))
+            set(handles.checkMonitor(i), ...
+                'Enable', 'on', ...
+                'Visible', 'on', ...
+                'ForegroundColor', fft_get_plot_color(i), ...
+                'String', data.monitors(i).desc, ...
+                'Value', 1);
+        else
+            set(handles.checkMonitor(i), ...
+                'Enable', 'off', ...
+                'Visible', 'off', ...
+                'Value', 0);
+        end
+    end
+return

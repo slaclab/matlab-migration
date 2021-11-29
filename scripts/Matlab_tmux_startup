@@ -1,0 +1,128 @@
+#!/bin/bash
+#==============================================================
+#
+#  Abs:  Starts  Matlab scripts
+#
+#  Name: Matlab_tmux_startup
+#   $1  :  matlab script to start
+#  [$2] :  optional matlab function arguments
+#
+# ------------------------------------------------------------
+# This script gets called from Matlab_tmux_session which 
+# launches an instance of matlab within a tmux session.
+# Ensure that this script is run using Matlab_tmux_session
+# as that guarantees the correct user for the facility
+# ------------------------------------------------------------
+#
+#  Facility:  SLAC
+#
+#  Auth: 26-June-2018, J. Morad (jmorad)
+#         created from Matlab_startup by K. Brobek
+#
+#  Rev: 
+#     15-Nov-2019, P. Pascual (ppascual)
+#     Fixed issue with local variable call
+#     15-Nov-2019, P. Pascual (ppascual)
+#     Added complete 32-bit environment setup
+#     18-Sept-2018, G. Gregoric (ggreg)
+#	  Added user/host checking.
+#==============================================================
+
+
+#==============================================================
+# Check current user/host
+#==============================================================
+if  ! [ "$USER" = "physics" ] && [ `uname -n` = "lcls-srv03" ]
+  then
+     echo ""
+     echo "This script must be run from the physics or softegr account"
+     echo "on lcls-srv03 - Preferably from lclshome"
+     echo ""
+     exit
+fi
+
+#==============================================================
+# Setup LCLS Environment
+#==============================================================
+
+export DISPLAY=:1.0
+
+# 32-bit environment setup scripts 
+if [ -f $TOOLS/oracle/oracleSetup.bash ]; then
+    source $TOOLS/oracle/oracleSetup.bash
+fi
+
+if [ -f $PHYSICS_TOP/setup/javaSetup.bash ]; then
+    source $PHYSICS_TOP/setup/javaSetup.bash
+fi
+
+if [ -f $EPICS_SETUP/fixed-epics-setup.bash ]; then
+    source $EPICS_SETUP/fixed-epics-setup.bash
+    if [ -f ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash ]; then
+        source ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash
+    fi
+fi
+
+if [ -e ${TOOLS}/matlab/setup/matlabSetup.bash ]
+then
+    export MATLAB_VER=2012a
+    export EPICS_HOST_ARCH=linux-x86
+    . ${TOOLS}/matlab/setup/matlabSetup.bash
+
+
+#TODO: Remove this line when production testing is done 
+export MATLABPATH=$MATLABPATH:$MAT/test/
+
+#==============================================================
+# Log files are stored in IOC_DATA through iocConsole
+# Log file on nfs -rename old one
+#==============================================================
+    
+    if [ -e $PHYSICS_DATA/log/matlab ]
+    then
+        log_file=$PHYSICS_DATA/log/matlab/$1$3.log
+    else 
+        log_file=$1$3.log
+    fi
+
+    MDATE=`date '+%d_%b_%Y_%H_%M'`
+    if [ -e $log_file ]; then
+        /bin/mv -f ${log_file} ${log_file}-$MDATE
+    fi
+
+#==============================================================
+# For accounting purposes (see startup.m)
+#==============================================================
+
+    export MATLAB_STARTUP_SCRIPT=$1
+    export MATLAB_LOG_FILE_NAME=$log_file
+
+#==============================================================
+# Start the Matlab script
+#==============================================================
+
+    if [ "$2" = "" ]; then
+        matlab -glnx86 -nodesktop -nosplash -r $1  -logfile $log_file
+    else
+        matlab -glnx86 -nodesktop -nosplash -r lcaInit,"$1('$2')"  -logfile $log_file
+    fi
+
+    sleep 1
+ 
+#==============================================================
+# log file cleanup -keep 5 log files
+#==============================================================
+    
+    LOGCNT=`ls -t $PHYSICS_DATA/log/matlab/$1$3.log* | wc -l`
+    if [ "$LOGCNT" -gt 5 ]
+    then
+        y=`expr $LOGCNT - 5`
+        for x in `ls -t  $PHYSICS_DATA/log/matlab/$1$3.log* | tail -n$y`
+        do
+            /bin/rm -f $x
+        done
+    fi
+
+else
+    echo "Sorry, can't find LCLS environment setup"
+fi

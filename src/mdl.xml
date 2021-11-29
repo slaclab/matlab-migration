@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Main_Drive_Line><!--this is the configuration file for the Injector_Launch feedback system-->
+   <feedback_system acro="MDL" name="Main_Drive_Line" num="0"><!--the feedback system name--></feedback_system>
+   <config_file name="mdl.xml"><!--this configuration file name--></config_file>
+   <ref_orbit_file name="reforbit.mat"><!--the reference orbit file name--></ref_orbit_file>
+   <initloop_function name="fbInitMDLLoop"><!--the initloop function name--></initloop_function>
+   <timer_function name="fbMDLTimerFcn"><!--the timer function name--></timer_function>
+   <timer_period seconds="30"><!--the timer period (can be any value > 0.001)--></timer_period>
+   <timer_iterations count="Inf"><!--the timer iteration count (Inf = forever)--></timer_iterations>
+   <matrixF_function name="fbGetMDLFmatrix"><!--the F matrix calculation function--></matrixF_function>
+   <FMatrix><!--edit the following F Matrix values as necessary-->
+      <row1 F11="0"/>
+      <row2 F21="-2.656"/>
+      <row3 F31="0.7"/>
+      <row4 F41="0"/>
+      <row5 F51="0"/>
+   </FMatrix>
+   <matrixG_function name="fbGetMDLGmatrix"><!--the G matrix calculation function--></matrixG_function>
+   <GMatrix><!--edit the following G Matrix values as necessary-->
+      <row1 G11="1"/>
+      <row2 G21="1"/>
+      <row3 G31="1"/>
+      <row4 G41="1"/>
+      <row5 G51="1"/>
+   </GMatrix>
+   <allstateSPs><!--edit the following State Setpoint values as necessary-->
+      <stateSP name="signal"/>
+      <stateSP name="command"/>
+   </allstateSPs>
+   <allstatePVs><!--state storage PVs must correspond to states in the same order-->
+      <statePV name="FBCK:MDL0:1:SGNL"/>
+      <statePV name="FBCK:MDL0:1:CMND"/>
+   </allstatePVs>
+   <allspPVs><!--state setpoint storage PVs must correspond to states in the same order-->
+      <spPV name="FBCK:MDL0:1:SGNLSP"/>
+      <spPV name="FBCK:MDL0:1:CMNDSP"/>
+   </allspPVs>
+   <fbck_state_PV name="FBCK:MDL0:1:STATE"><!--name of overall ON/OFF state PV--></fbck_state_PV>
+   <proportional_gain value="1"><!--value of proportional gain--></proportional_gain>
+   <integral_gain value="0.1"><!--value of integral gain--></integral_gain>
+   <err_data_buffer size="50"><!--size of error data buffer for integral gain calc.--></err_data_buffer>
+   <allctrlPVs><!--control PVs must correspond to actuator PVs in the same order-->
+      <ctrlPV name="SONYASBST:LI25:1:FBCKENABLE"/>
+      <ctrlPV name="SONYASBST:LI26:1:FBCKENABLE"/>
+      <ctrlPV name="SONYASBST:LI27:1:FBCKENABLE"/>
+      <ctrlPV name="SONYASBST:LI28:1:FBCKENABLE"/>
+      <ctrlPV name="SONYASBST:LI29:1:FBCKENABLE"/>
+      <ctrlPV name="SONYASBST:LI30:1:FBCKENABLE"/>
+   </allctrlPVs>
+   <allactPVs><!--edit the following list of actuator PVs as necessary-->
+      <actPV name="SONYASBST:LI25:1:PMDL"/>
+      <actPV name="SONYASBST:LI26:1:PMDL"/>
+      <actPV name="SONYASBST:LI27:1:PMDL"/>
+      <actPV name="SONYASBST:LI28:1:PMDL"/>
+      <actPV name="SONYASBST:LI29:1:PMDL"/>
+      <actPV name="SONYASBST:LI30:1:PMDL"/>
+   </allactPVs>
+   <allrbPVs><!--readback PVs must correspond to actuator PVs in the same order-->
+      <rbPV name="SONYASBST:LI25:1:PMDL"/>
+      <rbPV name="SONYASBST:LI26:1:PMDL"/>
+      <rbPV name="SONYASBST:LI27:1:PMDL"/>
+      <rbPV name="SONYASBST:LI28:1:PMDL"/>
+      <rbPV name="SONYASBST:LI29:1:PMDL"/>
+      <rbPV name="SONYASBST:LI30:1:PMDL"/>
+   </allrbPVs>
+   <allactStorePVs><!--actuator storage PVs must correspond to actuator PVs in the same order-->
+      <storePV name="SONYASBST:LI25:1:PMDLMDL0"/>
+      <storePV name="SONYASBST:LI26:1:PMDLMDL0"/>
+      <storePV name="SONYASBST:LI27:1:PMDLMDL0"/>
+      <storePV name="SONYASBST:LI28:1:PMDLMDL0"/>
+      <storePV name="SONYASBST:LI29:1:PMDLMDL0"/>
+      <storePV name="SONYASBST:LI30:1:PMDLMDL0"/>
+   </allactStorePVs>
+   <allmeasPVs><!--edit the following list of measurement PVs as necessary-->
+      <measPV name="SONYAMC00:ASTS:BARO_MTR"/>
+      <measPV name="SONYALI07:ASTS:MDL_PABS"/>
+      <measPV name="SONYALI07:ASTS:M_D_LINE"/>
+      <measPV name="SONYALI07:ASTS:ISOPLAN0"/>
+      <measPV name="SONYALI25:ASTS:M_D_LINE"/>
+   </allmeasPVs>
+   <allresPVs><!--resolution PVs must correspond to measurement PVs in the same order--></allresPVs>
+   <allmeasStorePVs><!--measurement storage PVs must correspond to measurement PVs in the same order-->
+      <storePV name="MC00:ASTS:BARO_MTRMDL0"/>
+      <storePV name="LI07:ASTS:MDL_PABSMDL0"/>
+      <storePV name="LI07:ASTS:M_D_LINEMDL0"/>
+      <storePV name="LI07:ASTS:ISOPLAN0MDL0"/>
+      <storePV name="LI25:ASTS:M_D_LINEMDL0"/>
+   </allmeasStorePVs>
+</Main_Drive_Line>

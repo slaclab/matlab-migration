@@ -1,0 +1,154 @@
+#!/bin/bash -norc
+#==============================================================
+#
+#  Abs:  Starts Matlab GUIs from an edm button push
+#
+#  Name: MatlabGUI.prelaunch
+#
+#  Facility:  SLAC
+#
+#  Auth: 13-Nov-2007, Mike Zelazny (zelazny@slac.stanford.edu)
+#
+#  Rev: 06-Aug-2009, Mike Zelazny:
+#         Optional EPICS_CA_MAX_ARRAY_BYTES arg in $2
+#
+#       04-Jan-2016, Thomas Kurty:
+#         Added Matlab Prelaunch Support
+#
+#==============================================================
+#
+# Setup LCLS Environment
+#
+#  if [ -e ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+#     . ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+
+# 
+# Fix logfile name, change startMATPRE to GUI name
+#
+fix_logfile_name () {
+    # Find GUI name
+    gui_name=`grep -o "Running .*\.\.\." $1`
+
+    # Update timestamp
+    date=`date +"%a %b %e %T.%3N %Z %Y"`
+    year=`echo $date | cut -d" " -f6`-
+    month=`echo $date | cut -d" " -f2`-
+    day=`echo $date | cut -d" " -f3`-
+    time=`echo $date | cut -d" " -f4 | cut -c1-12`
+
+    if [ -n "$gui_name" ] ; then
+        gui_name=${gui_name#"Running "}
+        gui_name=${gui_name%"..."}
+
+        new_logfile=${1/startMATPRE/$gui_name}
+        new_logfile=${new_logfile/$2/$year$month$day$time}
+        # Rename logfile
+        mv $1 $new_logfile
+    fi
+}
+
+#
+# Log file on nfs
+#
+    if [ -z $PHYSICS_USER ]
+    then
+        user=`whoami`
+    else
+        if [ none = $PHYSICS_USER ]
+        then
+            user=`whoami`
+        else
+            user=$PHYSICS_USER
+        fi
+    fi
+    date=`date +"%a %b %e %T.%3N %Z %Y"`
+    year=`echo $date | cut -d" " -f6`-
+    month=`echo $date | cut -d" " -f2`-
+    day=`echo $date | cut -d" " -f3`-
+    time=`echo $date | cut -d" " -f4 | cut -c1-12`
+
+    if [ -e $MATLABDATAFILES/log ]; then
+        log_file=$MATLABDATAFILES/log/$1-$user-$year$month$day$time-$HOSTNAME-$DISPLAY.log
+    else
+        log_file=$1GUI-$user-$year$month$day$time-$HOSTNAME-$DISPLAY.log
+    fi
+#
+# Put the startup script name(s) into the environment for Counting.  See startup.m
+#
+    if [ $# -gt 0 ]; then
+        export MATLAB_STARTUP_SCRIPT=$1
+    fi
+#
+# Check to see if optional EPICA_CA_MAX_ARRAY_BYTES was specified on the command line
+#
+    if [ $# -gt 1 ]; then
+        export EPICS_CA_MAX_ARRAY_BYTES=$2
+    fi
+#
+# add FACET EXP gateway to EPICS_CA_ADDR_LIST
+#
+    export EPICS_CA_ADDR_LIST="lcls-prod01:5062 $EPICS_CA_ADDR_LIST"
+
+#
+# Put the log file name in an environment variable for Matlab unit('printenv')
+#
+    export MATLAB_LOG_FILE_NAME=$log_file
+
+#
+# Start the Matlab script
+#
+# Check for waiting Matlab sessions
+#
+
+    if [ $# -eq 1 ] && [ -n "$MATLAB_STARTUP_SCRIPT" ] && [ "$MATLAB_STARTUP_SCRIPT" != "startMATPRE" ] ; then
+
+        # Returns 0 if successful,
+        # 1 if unsuccessful,
+        # 2 if there are too many matlab sessions
+        findWaitingMatlab.sh $MATLAB_STARTUP_SCRIPT
+
+        PRELAUNCH_STATUS=$?
+
+        # If successful, launch a new session to replace the old one
+        if [ "$PRELAUNCH_STATUS" = "0" ] ; then
+
+            # Update log file
+            if [ -e $MATLABDATAFILES/log ]; then
+                log_file=$MATLABDATAFILES/log/startMATPRE-$user-$year$month$day$time-$HOSTNAME-$DISPLAY.log
+            else
+                log_file=startMATPREGUI-$user-$year$month$day$time-$HOSTNAME-$DISPLAY.log
+            fi
+
+            export MATLAB_LOG_FILE_NAME=$log_file
+
+            # Update xterm title
+            echo -ne "\033]0;MatlabGUI.prelaunch - DO NOT PRESS [X]\007"
+
+            # Launch waiting matlab
+            echo startMATPRE $log_file
+            matlab -glnx86 -nosplash -nodesktop -r startLCLS,startMATPRE -logfile $log_file
+
+            fix_logfile_name $log_file $year$month$day$time
+            exit
+
+        # If too many sessions are running
+        elif [ "$PRELAUNCH_STATUS" = "2" ] ; then
+            exit
+
+        fi
+    fi
+
+#
+# If the prelaunch method doesn't work, run script in the current window using a new matlab session
+#
+
+    echo $1 $log_file
+    echo "Starting new Matlab session"
+    matlab -glnx86 -nosplash -nodesktop -r startLCLS,$1 -logfile $log_file
+
+    fix_logfile_name $log_file $year$month$day$time
+
+#  else
+#    echo "Sorry, can't find LCLS environment setup"
+#  fi
+

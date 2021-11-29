@@ -1,0 +1,167 @@
+{
+  "IssuesWithNoWorkaround": [
+    "UnsupportedComponentWithNoWorkaround",
+    "UnsupportedComponentPredefinedUitool",
+    "UnsupportedCallbackWithNoWorkaround",
+    "UnsupportedPropertyWithNoWorkaround",
+    "UnsupportedAPIWithNoWorkaround"
+  ],
+  "Issues": {
+    "UnsupportedComponentWithNoWorkaround": {
+      "DetailsMessageId": "UnsupportedComponentWithNoWorkaround",
+      "WorkaroundMessageId": "NoWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedComponentPredefinedUitool": {
+      "DetailsMessageId": "UnsupportedComponentPredefinedUitool",
+      "WorkaroundMessageId": "NoWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedCallbackWithNoWorkaround": {
+      "DetailsMessageId": "UnsupportedCallbackWithNoWorkaround",
+      "WorkaroundMessageId": "NoWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedCallbackCreateFcn": {
+      "DetailsMessageId": "UnsupportedCallbackWithNoWorkaround",
+      "WorkaroundMessageId": "UnsupportedCallbackCreateFcnWorkaround",
+      "WorkaroundMessageHoleId": "OpeningFcn",
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedCallbackOutputFcn": {
+      "DetailsMessageId": "UnsupportedCallbackOutputFcn",
+      "WorkaroundMessageId": "UnsupportedCallbackOutputFcnWorkaround",
+      "WorkaroundMessageHoleId": "OpeningFcn",
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedPropertyCData": {
+      "DetailsMessageId": "UnsupportedPropertyCData",
+      "WorkaroundMessageId": "UnsupportedPropertyCDataWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedPropertyWithNoWorkaround": {
+      "DetailsMessageId": "UnsupportedPropertyWithNoWorkaround",
+      "WorkaroundMessageId": "NoWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedAPIWithNoWorkaround": {
+      "DetailsMessageId": "UnsupportedAPIWithNoWorkaround",
+      "WorkaroundMessageId": "NoWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "FindComponentAPI": {
+      "DetailsMessageId": "FindComponentAPI",
+      "WorkaroundMessageId": "FindComponentAPIWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "NarginAPI": {
+      "DetailsMessageId": "NarginAPI",
+      "WorkaroundMessageId": "NarginAPIWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "InvalidParentUicontrolRadioButton": {
+      "DetailsMessageId": "InvalidParentUicontrolRadioButton",
+      "WorkaroundMessageId": "InvalidParentUicontrolRadioButtonWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "PixelSupportOnlyForSizeChangedFcn": {
+      "DetailsMessageId": "PixelSupportOnlyForSizeChangedFcn",
+      "WorkaroundMessageId": "PixelSupportOnlyForSizeChangedFcnWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnrecommendedUsingCallbackProgrammatically": {
+      "DetailsMessageId": "UnrecommendedUsingCallbackProgrammatically",
+      "WorkaroundMessageId": "UnrecommendedUsingCallbackProgrammaticallyWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnrecommendedAPIPlotyy": {
+      "DetailsMessageId": "UnrecommendedAPI",
+      "WorkaroundMessageId": "UnrecommendedAPIWorkaround",
+      "WorkaroundMessageHoleId": "HoleArray",
+      "WorkaroundMessageHoleData": ["yyaxis"]
+    },
+    "UnrecommendedAPIPolar": {
+      "DetailsMessageId": "UnrecommendedAPI",
+      "WorkaroundMessageId": "UnrecommendedAPIWithDetailedInstructionsWorkaround",
+      "WorkaroundMessageHoleId": "HoleArray",
+      "WorkaroundMessageHoleData": ["polarplot"]
+    },
+    "UnrecommendedAPIRose": {
+      "DetailsMessageId": "UnrecommendedAPI",
+      "WorkaroundMessageId": "UnrecommendedAPIWithDetailedInstructionsWorkaround",
+      "WorkaroundMessageHoleId": "HoleArray",
+      "WorkaroundMessageHoleData": ["polarhistogram"]
+    },
+    "UnsupportedComponentActivex": {
+      "DetailsMessageId": "UnrecommendedAPIToBeRemoved",
+      "WorkaroundMessageId": "UnrecommendedAPIActivexJavaWorkaround",
+      "WorkaroundMessageHoleId": "HoleArray",
+      "WorkaroundMessageHoleData": ["https://www.mathworks.com/pi_app_designer_R2019b_migration_tool_activex"]
+    },
+    "UnsupportedAPIActivex": {
+      "DetailsMessageId": "UnrecommendedAPIToBeRemoved",
+      "WorkaroundMessageId": "UnrecommendedAPIActivexJavaWorkaround",
+      "WorkaroundMessageHoleId": "HoleArray",
+      "WorkaroundMessageHoleData": ["https://www.mathworks.com/pi_app_designer_R2019b_migration_tool_activex"]
+    },
+    "UnsupportedAPIJavacomponent": {
+      "DetailsMessageId": "UnrecommendedAPIToBeRemoved",
+      "WorkaroundMessageId": "UnrecommendedAPIActivexJavaWorkaround",
+      "WorkaroundMessageHoleId": "HoleArray",
+      "WorkaroundMessageHoleData": ["https://www.mathworks.com/pi_app_designer_R2019b_migration_tool_javacomponent"]
+    },
+    "UnsupportedAPIJavaframe": {
+      "DetailsMessageId": "UnrecommendedAPIToBeRemoved",
+      "WorkaroundMessageId": "UnrecommendedAPIActivexJavaWorkaround",
+      "WorkaroundMessageHoleId": "HoleArray",
+      "WorkaroundMessageHoleData": ["https://www.mathworks.com/pi_app_designer_R2019b_migration_tool_javaframe"]
+    },
+    "UnsupportedAPIUicontrol": {
+      "DetailsMessageId": "UnsupportedAPIUicontrol",
+      "WorkaroundMessageId": "UnsupportedAPIUicontrolWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedAPILinkaxes": {
+      "DetailsMessageId": "UnsupportedAPIRequiresAdditionalCode",
+      "WorkaroundMessageId": "UnsupportedAPIRequiresAdditionalCodeWorkaround",
+      "WorkaroundMessageHoleId": "HoleArray",
+      "WorkaroundMessageHoleData": ["linkaxes"]
+    },
+    "UnsupportedAPILinkprop": {
+      "DetailsMessageId": "UnsupportedAPIRequiresAdditionalCode",
+      "WorkaroundMessageId": "UnsupportedAPIRequiresAdditionalCodeWorkaround",
+      "WorkaroundMessageHoleId": "HoleArray",
+      "WorkaroundMessageHoleData": ["linkprop"]
+    },
+    "UnsupportedAPIRequiresConfiguration": {
+      "DetailsMessageId": "UnsupportedAPIRequiresConfiguration",
+      "WorkaroundMessageId": "UnsupportedAPIRequiresConfigurationWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedCallbackUicontrolInButtonGroup": {
+      "DetailsMessageId": "UnsupportedCallbackUicontrolInButtonGroup",
+      "WorkaroundMessageId": "UnsupportedCallbackUicontrolInButtonGroupWorkaround",
+      "WorkaroundMessageHoleId": null,
+      "WorkaroundMessageHoleData": null
+    },
+    "UnsupportedCallbackTypeAdditionalArgs": {
+      "DetailsMessageId": "UnsupportedCallbackTypeAdditionalArgs",
+      "WorkaroundMessageId": "UnsupportedCallbackTypeAdditionalArgsWorkaround",
+      "WorkaroundMessageHoleId": "OpeningFcn",
+      "WorkaroundMessageHoleData": null
+    }
+  }
+}

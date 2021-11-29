@@ -1,0 +1,73 @@
+function profmon_setupNLCTA(varargin)
+%PROFMON_SETUP
+%  PROFMON_SETUPNLCTA() initializes NLCTA profile monitor
+
+% Features:
+
+% Input arguments:
+%    OPTS: options struct
+%          GAIN: Camera gain, default 0
+%          expTime: Exposure time (ms), default 0.05
+
+% Output arguments: none
+
+% Compatibility: Version 2007b, 2012a
+% Called functions: util_parseOptions, lcaPut
+
+% Author: J. Rzepiela, SLAC
+
+% --------------------------------------------------------------------
+% Set default options.
+PVList={ ...
+        '13PS10:cam1' '13PS4:cam1' '13PS2:cam1' '13PS9:cam1' '13PS5:cam1' ...
+        '13PS11:cam1' '13PS12:cam1' ...
+        '13PS1:cam1' '13PS8:cam1' '13PS7:cam1' '13PS6:cam1'%NLCTA
+        };
+lcaPut(strcat(PVList',':RESOLUTION.UDF'),0);
+optsdef=struct( ...
+    'camera', '13PS4:cam1', ...
+    'gain',0, ...
+    'expTime',0.05, ...
+    'xpixelbin',1, ...
+    'ypixelbin',1);
+
+% Use default options if OPTS undefined.
+opts=util_parseOptions(varargin{:},optsdef);
+
+% Set profile monitor properties.
+propsDef={'X_RTCL_CTR' 'Y_RTCL_CTR' 'RESOLUTION'};
+pvProps={ ...
+    '13PS4:cam1'  647 485.782 16.23; ...
+    '13PS2:cam1'  2.25 5.270 250; ...
+    '13PS9:cam1'  2.25 5.270 0.75; ...
+    '13PS5:cam1'  2.25 5.270 250; ...
+    '13PS1:cam1'  2.25 5.270 250; ...
+    '13PS3:cam1'  2.25 5.270 250; ...
+    '13PS6:cam1'  2.25 5.270 250; ...
+    '13PS7:cam1'  2.25 5.270 250; ...
+    '13PS8:cam1'  2.25 5.270 250; ...
+    '13PS10:cam1'  2.25 5.270 0.75; ...
+%     'BASL1:cam1'  2.25 5.270 250; ...
+%     'BASL3:cam1'  2.25 5.270 250; ...
+%     'BASL4:cam1'  2.25 5.270 250; ...
+    };
+
+
+for j=1:3
+    lcaPut(strcat(pvProps(:,1),':',propsDef{j}),[pvProps{:,j+1}]');
+end
+
+% Set profile monitor properties.
+lcaPut([opts.camera ':Gain'],opts.gain);
+lcaPut([opts.camera ':AcquireTime'],opts.expTime);
+lcaPut([opts.camera ':BinX'],opts.xpixelbin);
+lcaPut([opts.camera ':BinY'],opts.ypixelbin);
+
+      
+    
+
+
+ 
+
+
+

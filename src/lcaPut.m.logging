@@ -1,0 +1,96 @@
+function lcaPut(varargin)
+% Zelazny - lcaPut with optional logging
+
+persistent sys;
+persistent accelerator;
+persistent pvs;
+persistent mdf;
+persistent Logger;
+
+lcaPutOrig(varargin{:});
+
+try
+    pv = []; % in case I need to catch immediately
+    if isempty(accelerator)
+        [ sys, accelerator ] = getSystem;
+    end
+    ok2log = lcaGet([ 'SIOC:' sys ':ML01:AO000' ]);
+    if (ok2log)
+        stack=dbstack();
+        for i=1:size(varargin{1},1)
+            if iscell(varargin{1})
+                pv = varargin{1}{i};
+            else
+                pv = varargin{1};
+            end
+            if isempty(pvs)
+                pvs = cell(0);
+            end
+            for j=1:size(pvs,2)
+                if (ok2log)
+                    if strmatch(pvs{j},pv,'exact')
+                        ok2log = 0;
+                    end
+                end
+            end
+            if (ok2log)
+                pvs{end+1} = pv;
+                s = datestr(now);
+                for j=length(stack):-1:1
+                    s = sprintf('%s %s:%d',s,stack(j).file,stack(j).line);
+                end
+                s = sprintf('%s %s',s,pv);
+                disp(s);
+                if isempty(mdf)
+                    mdf = getenv('MATLABDATAFILES');
+                end
+                fname = sprintf('%s/log/lcaPut/%s.lcaPut',mdf,stack(length(stack)).name);
+                fid = fopen(fname,'a');
+                if (-1 ~= fid)
+                    fprintf(fid, [ s '\n' ]);
+                    fclose(fid);
+                end % valid fid
+            end % ok2log first time reporting PV
+        end % for each pv
+    end % ok2log PV check
+    pv2log = lcaGet([ 'SIOC:' sys ':ML01:SO0999' ]);
+    if ~isempty(pv2log{1})
+        stack=dbstack();
+        if isempty(Logger)
+            try
+                Logger = edu.stanford.slac.err.Err.getInstance();
+            catch
+                Logger = edu.stanford.slac.err.Err.getInstance(stack(length(stack)).file);
+            end % try getting Logger
+        end % Logger empty
+        for i=1:size(varargin{1},1)
+            if iscell(varargin{1})
+                pv = varargin{1}{i};
+                if iscell(varargin{2})
+                    val = varargin{2}{i};
+                else
+                    val = varargin{2}(i);
+                end
+            else
+                pv = varargin{1};
+                val = varargin{2};
+            end
+            if strmatch(pv2log,pv,'exact')
+                fname = stack(length(stack)).file;
+                if ischar(val) && (1==length(val))
+                    Logger.logl(sprintf('%s lcaPut %s=%s', char(fname), char(pv), char(val)));
+                elseif isinteger(val) && (1==length(val))
+                    Logger.logl(sprintf('%s lcaPut %s=%d', char(fname), char(pv), val));
+                elseif isfloat(val) && (1==length(val))
+                    Logger.logl(sprintf('%s lcaPut %s=%f', char(fname), char(pv), val));
+                else
+                    Logger.logl(sprintf('%s lcaPut %s',fname, char(pv)));
+                end
+            end % PV matched
+        end % for each PV
+    end % pv2log not empty
+catch
+    if ~isempty(pv)
+        disp(sprintf('lcaPut.m had trouble trying to log PV "%s"',pv));
+    end
+end

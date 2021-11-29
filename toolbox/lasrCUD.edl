@@ -1,0 +1,1535 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 1230
+y 266
+w 1078
+h 1000
+font "utopia-medium-r-24.0"
+ctlFont "utopia-medium-r-24.0"
+btnFont "utopia-medium-r-18.0"
+fgColor index 6
+bgColor index 14
+textColor index 14
+ctlFgColor1 index 14
+ctlFgColor2 index 0
+ctlBgColor1 index 0
+ctlBgColor2 index 14
+topShadowColor index 0
+botShadowColor index 14
+title "LCLS Photo-Injector Laser Systems CUD"
+showGrid
+snapToGrid
+endScreenProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 80
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 77
+visPv "LASR:IN20:100:POS_FDBK_STS"
+visMin "11"
+visMax "13"
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 110
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 77
+visPv "LASR:IN20:400:POS_FDBK_STS"
+visMin "5"
+visMax "7"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 690
+y 80
+w 107
+h 27
+font "helvetica-medium-r-24.0"
+fgColor index 6
+bgColor index 14
+useDisplayBg
+value {
+  "Laser Fbk"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 690
+y 110
+w 120
+h 27
+font "helvetica-medium-r-24.0"
+fgColor index 6
+bgColor index 14
+useDisplayBg
+value {
+  "Heater Fbk"
+}
+autoSize
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 80
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 35
+visPv "LASR:IN20:100:POS_FDBK_STS"
+visMin "1"
+visMax "11"
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 110
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 35
+visPv "LASR:IN20:400:POS_FDBK_STS"
+visMin "1"
+visMax "6"
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 80
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 15
+visPv "LASR:IN20:100:POS_FDBK_STS"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 110
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 15
+visPv "LASR:IN20:400:POS_FDBK_STS"
+visMin "0"
+visMax "1"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 860
+y 80
+w 114
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 81
+bgColor index 14
+useDisplayBg
+visPv "WPLT:LR20:110:LSR_ANGLE.RBV"
+visMin "140.1"
+visMax "139.9"
+value {
+  "Check Tripler"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 850
+y 160
+w 143
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 82
+bgColor index 14
+useDisplayBg
+visPv "WPLT:LR20:116:WP2_ANGLE.RBV"
+visInvert
+visMin "95"
+visMax "105"
+value {
+  "Laser  Waveplate"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 840
+y 180
+w 155
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 82
+bgColor index 14
+useDisplayBg
+visPv "WPLT:LR20:117:LHWP_ANGLE.RBV"
+visInvert
+visMin "55"
+visMax "70"
+value {
+  "Heater  Waveplate"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 860
+y 120
+w 112
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 63
+bgColor index 14
+useDisplayBg
+visPv "WPLT:LR20:116:WP2_ANGLE.RBV"
+visMin "116"
+visMax "118"
+value {
+  "UV Wplt Max"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 860
+y 140
+w 112
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 63
+bgColor index 14
+useDisplayBg
+visPv "WPLT:LR20:117:LHWP_ANGLE.RBV"
+visMin "101"
+visMax "103"
+value {
+  "HT Wplt Max"
+}
+autoSize
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 140
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 20
+visPv "CAMR:LR20:113:DARKIMG"
+visMin "1"
+visMax "10"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 690
+y 140
+w 98
+h 27
+font "helvetica-medium-r-24.0"
+fgColor index 5
+bgColor index 14
+useDisplayBg
+value {
+  "Cameras"
+}
+autoSize
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 140
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 20
+visPv "CAMR:LR20:114:DARKIMG"
+visMin "1"
+visMax "10"
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 140
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 20
+visPv "CAMR:LR20:119:DARKIMG"
+visMin "1"
+visMax "10"
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 140
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 20
+visPv "CAMR:IN20:186:DARKIMG"
+visMin "1"
+visMax "10"
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 140
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 20
+visPv "CAMR:IN20:469:DARKIMG"
+visMin "1"
+visMax "10"
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 140
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 20
+visPv "CAMR:IN20:461:DARKIMG"
+visMin "1"
+visMax "10"
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 650
+y 140
+w 25
+h 25
+lineColor index 9
+fill
+fillColor index 15
+visPv "CAMR:IN20:186:DARKIMG"
+visInvert
+visMin "1"
+visMax "10"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 850
+y 200
+w 148
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 35
+bgColor index 0
+useDisplayBg
+visPv "LASR:BCIS:1:PCTRL"
+visMin "69"
+visMax "100.1"
+value {
+  "Laser Power High"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 860
+y 100
+w 118
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 81
+bgColor index 14
+useDisplayBg
+visPv "FBCK:LPS0:1:STATE"
+visInvert
+visMin "1"
+visMax "10"
+value {
+  "Laser Pwr Fbk"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 860
+y 220
+w 129
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 35
+bgColor index 14
+useDisplayBg
+visPv "FBCK:BCI0:1:STATE"
+visInvert
+visMin "1"
+visMax "10"
+value {
+  "Bunch Chg Fbk"
+}
+autoSize
+endObjectProperties
+
+# (Meter)
+object activeMeterClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 40
+y 370
+w 260
+h 170
+caseColor index 14
+caseAlarm
+scaleColor index 1
+scaleAlarm
+labelColor index 5
+fgColor index 56
+fgAlarm
+bgColor index 14
+topShadowColor index 14
+botShadowColor index 14
+readPv "LASR:IN20:1:LSR_0_S_PA"
+label "Laser Phase (2856 MHz)"
+showScale
+scaleFormat "FFloat"
+scalePrecision "1"
+useDisplayBg
+labelIntervals "4"
+majorIntervals "5"
+complexNeedle
+3d
+scaleMin "-45"
+scaleMax "-5"
+labelFontTag "helvetica-medium-r-18.0"
+scaleFontTag "helvetica-medium-r-18.0"
+endObjectProperties
+
+# (Meter)
+object activeMeterClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 310
+y 370
+w 240
+h 170
+caseColor index 14
+caseAlarm
+scaleColor index 1
+scaleAlarm
+labelColor index 5
+fgColor index 64
+fgAlarm
+bgColor index 14
+topShadowColor index 14
+botShadowColor index 14
+readPv "LASR:IN20:1:LSR_2_S_PA"
+label "Laser Phase (119 MHz)"
+showScale
+scaleFormat "FFloat"
+scalePrecision "1"
+useDisplayBg
+labelIntervals "4"
+majorIntervals "5"
+complexNeedle
+3d
+scaleMin "-2"
+scaleMax "2"
+labelFontTag "helvetica-medium-r-18.0"
+scaleFontTag "helvetica-medium-r-18.0"
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 590
+y 0
+w 480
+h 350
+lineColor index 11
+fillColor index 0
+lineWidth 2
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 690
+y 10
+w 271
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "System Warnings:"
+}
+autoSize
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 10
+y 0
+w 520
+h 350
+lineColor index 11
+fillColor index 0
+lineWidth 2
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 170
+y 10
+w 218
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "System Status:"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 110
+y 60
+w 179
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "Master Osc."
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 160
+y 90
+w 20
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "E"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 110
+y 140
+w 184
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "Laser Power"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 110
+y 180
+w 181
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "Pulse Width"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 180
+y 250
+w 20
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "E"
+}
+autoSize
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 300
+y 60
+w 80
+h 37
+controlPv "PMTR:LR20:166:PWR"
+font "utopia-medium-r-32.0"
+fgColor index 16
+fgAlarm
+bgColor index 14
+useDisplayBg
+autoHeight
+precision 1
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 300
+y 100
+w 80
+h 37
+controlPv "LASR:IN20:196:PWRTH"
+font "utopia-medium-r-32.0"
+fgColor index 16
+fgAlarm
+bgColor index 14
+useDisplayBg
+autoHeight
+precision 2
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 300
+y 140
+w 80
+h 37
+controlPv "LASR:BCIS:1:PCTRL"
+font "utopia-medium-r-32.0"
+fgColor index 16
+fgAlarm
+bgColor index 14
+useDisplayBg
+autoHeight
+precision 2
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 300
+y 180
+w 50
+h 37
+controlPv "SIOC:SYS0:ML00:AO468"
+font "utopia-medium-r-32.0"
+fgColor index 16
+fgAlarm
+bgColor index 14
+useDisplayBg
+autoHeight
+precision 2
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 300
+y 260
+w 80
+h 37
+controlPv "LASR:IN20:475:PWRTH"
+font "utopia-medium-r-32.0"
+fgColor index 16
+fgAlarm
+bgColor index 14
+useDisplayBg
+autoHeight
+precision 2
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 390
+y 140
+w 28
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 15
+bgColor index 14
+useDisplayBg
+value {
+  "%"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 390
+y 60
+w 62
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 15
+bgColor index 14
+useDisplayBg
+value {
+  "mW"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 390
+y 100
+w 32
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 15
+bgColor index 14
+useDisplayBg
+value {
+  "uJ"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 390
+y 180
+w 35
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 15
+bgColor index 14
+useDisplayBg
+value {
+  "ps"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 390
+y 260
+w 32
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 15
+bgColor index 14
+useDisplayBg
+value {
+  "uJ"
+}
+autoSize
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 5
+release 0
+x 300
+y 220
+w 60
+h 37
+controlPv "LASR:LR20:101:PWR"
+font "utopia-medium-r-32.0"
+fgColor index 15
+bgColor index 14
+useDisplayBg
+autoHeight
+precision 3
+nullColor index 0
+useHexPrefix
+newPos
+objType "monitors"
+noExecuteClipMask
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 390
+y 220
+w 32
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 15
+bgColor index 14
+useDisplayBg
+value {
+  "uJ"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 180
+y 210
+w 20
+h 37
+font "utopia-medium-r-32.0"
+fgColor index 15
+bgColor index 14
+useDisplayBg
+value {
+  "E"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 170
+y 120
+w 36
+h 28
+font "utopia-medium-r-24.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "UV"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 210
+y 230
+w 77
+h 28
+font "utopia-medium-r-24.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "X-Corr"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 200
+y 270
+w 78
+h 28
+font "utopia-medium-r-24.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "Heater"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 220
+y 100
+w 68
+h 28
+font "utopia-medium-r-24.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "(VCC)"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 810
+y 240
+w 224
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 35
+bgColor index 14
+useDisplayBg
+visPv "SHTR:LR20:117:SARM_STS"
+visMin "2"
+visMax "10"
+value {
+  "Stretcher S-Arm Shutter IN"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 810
+y 260
+w 225
+h 22
+font "utopia-medium-r-18.0"
+fgColor index 35
+bgColor index 14
+useDisplayBg
+visPv "SHTR:LR20:117:PARM_STS"
+visMin "2"
+visMax "10"
+value {
+  "Stretcher P-Arm Shutter IN"
+}
+autoSize
+endObjectProperties
+
+# (Meter)
+object activeMeterClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 560
+y 370
+w 240
+h 170
+caseColor index 14
+caseAlarm
+scaleColor index 1
+scaleAlarm
+labelColor index 6
+fgColor index 41
+fgAlarm
+bgColor index 14
+topShadowColor index 14
+botShadowColor index 14
+readPv "LASR:IN20:1:LSR_1_S_PA"
+label "Laser Pulse Phase"
+showScale
+scaleFormat "FFloat"
+scalePrecision "1"
+useDisplayBg
+labelIntervals "4"
+majorIntervals "5"
+complexNeedle
+3d
+scaleMin "20"
+scaleMax "90"
+labelFontTag "helvetica-medium-r-18.0"
+scaleFontTag "helvetica-medium-r-18.0"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 160
+y 620
+w 233
+h 28
+font "utopia-medium-i-24.0"
+fgColor index 2
+bgColor index 14
+useDisplayBg
+visInvert
+visMin "0"
+visMax "1"
+value {
+  "Coherent Drive Laser"
+}
+autoSize
+endObjectProperties
+
+# (X-Y Graph)
+object xyGraphClass
+beginObjectProperties
+major 4
+minor 6
+release 0
+# Geometry
+x 10
+y 660
+w 517
+h 307
+# Appearance
+plotAreaBorder
+graphTitle "Inj. Laser Diagnostics"
+xLabel "Time (ns)"
+fgColor index 60
+bgColor index 14
+gridColor index 61
+font "helvetica-medium-r-14.0"
+# Operating Modes
+nPts 100
+updateTimerMs 100
+# X axis properties
+showXAxis
+xAxisSrc "fromUser"
+xMin 0
+xMax 500
+xLabelIntervals 10
+xMajorsPerLabel 2
+# Y axis properties
+showYAxis
+yAxisSrc "fromUser"
+yMin -3.5
+yMax 5
+yLabelIntervals 10
+yMajorsPerLabel 2
+# Y2 axis properties
+y2AxisSrc "AutoScale"
+y2Max 1
+# Trace Properties
+numTraces 4
+yPv {
+  0 "SCOP:LR20:LS02:GS_CH1_WFORM.VALA"
+  1 "SCOP:LR20:LS02:GS_CH2_WFORM.VALA"
+  2 "SCOP:LR20:LS02:GS_CH3_WFORM.VALA"
+  3 "SCOP:LR20:LS02:GS_CH4_WFORM.VALA"
+}
+ySigned {
+  0 1
+  1 1
+  2 1
+  3 1
+}
+plotColor {
+  0 index 40
+  1 index 32
+  2 index 46
+  3 index 18
+}
+endObjectProperties
+
+# (X-Y Graph)
+object xyGraphClass
+beginObjectProperties
+major 4
+minor 6
+release 0
+# Geometry
+x 550
+y 660
+w 517
+h 307
+# Appearance
+plotAreaBorder
+graphTitle "Inj. Laser Pulse Diagnostics"
+xLabel "Time (ns)"
+fgColor index 60
+bgColor index 14
+gridColor index 61
+font "helvetica-medium-r-14.0"
+# Operating Modes
+nPts 100
+updateTimerMs 100
+# X axis properties
+showXAxis
+xAxisSrc "fromUser"
+xMin 0
+xMax 500
+xLabelIntervals 10
+xMajorsPerLabel 2
+# Y axis properties
+showYAxis
+yAxisSrc "fromUser"
+yMin -3.5
+yMax 5
+yLabelIntervals 10
+yMajorsPerLabel 2
+# Y2 axis properties
+y2AxisSrc "AutoScale"
+y2Max 1
+# Trace Properties
+numTraces 4
+yPv {
+  0 "SCOP:LR20:LS01:GS_CH1_WFORM.VALA"
+  1 "SCOP:LR20:LS01:GS_CH2_WFORM.VALA"
+  2 "SCOP:LR20:LS01:GS_CH3_WFORM.VALA"
+  3 "SCOP:LR20:LS01:GS_CH4_WFORM.VALA"
+}
+ySigned {
+  0 1
+  1 1
+  2 1
+  3 1
+}
+plotColor {
+  0 index 40
+  1 index 32
+  2 index 46
+  3 index 18
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 710
+y 620
+w 205
+h 28
+font "utopia-medium-i-24.0"
+fgColor index 2
+bgColor index 14
+useDisplayBg
+visInvert
+visMin "1"
+visMax "10"
+value {
+  "Thales Drive Laser"
+}
+autoSize
+endObjectProperties
+
+# (Meter)
+object activeMeterClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 810
+y 370
+w 240
+h 170
+caseColor index 14
+caseAlarm
+scaleColor index 1
+scaleAlarm
+labelColor index 5
+fgColor index 34
+fgAlarm
+bgColor index 14
+topShadowColor index 14
+botShadowColor index 14
+readPv "LASR:IN20:1:LSR_3_S_PA"
+label "LCLS 119 MHz"
+showScale
+scaleFormat "FFloat"
+scalePrecision "1"
+useDisplayBg
+labelIntervals "4"
+majorIntervals "5"
+complexNeedle
+3d
+scaleMin "-2"
+scaleMax "2"
+labelFontTag "helvetica-medium-r-18.0"
+scaleFontTag "helvetica-medium-r-18.0"
+endObjectProperties
+
+# (Text Update)
+object TextupdateClass
+beginObjectProperties
+major 10
+minor 0
+release 0
+x 1010
+y 630
+w 50
+h 30
+controlPv "SCOP:LR20:LS01:COUNT"
+fgColor index 17
+bgColor index 14
+colorPv "LASR:IN20:100:POS_FDBK_STS"
+fill
+font "helvetica-bold-r-18.0"
+lineWidth 2
+lineAlarm
+endObjectProperties
+
+# (Text Update)
+object TextupdateClass
+beginObjectProperties
+major 10
+minor 0
+release 0
+x 470
+y 630
+w 50
+h 30
+controlPv "SCOP:LR20:LS02:COUNT"
+fgColor index 17
+bgColor index 14
+colorPv "LASR:IN20:100:POS_FDBK_STS"
+fill
+font "helvetica-bold-r-18.0"
+lineWidth 2
+lineAlarm
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 50
+y 300
+w 234
+h 28
+font "utopia-medium-r-24.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+value {
+  "RF Fbk Input Source"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 300
+y 300
+w 169
+h 28
+font "utopia-medium-r-24.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+visPv "LASR:IN20:1:LSR_SOURCE"
+visMin "0"
+visMax "1"
+value {
+  "2856 MHz Osc."
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 310
+y 300
+w 156
+h 28
+font "utopia-medium-r-24.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+visPv "LASR:IN20:1:LSR_SOURCE"
+visMin "1"
+visMax "2"
+value {
+  "119 MHz Osc."
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 310
+y 300
+w 142
+h 28
+font "utopia-medium-r-24.0"
+fgColor index 16
+bgColor index 14
+useDisplayBg
+visPv "LASR:IN20:1:LSR_SOURCE"
+visMin "2"
+visMax "10"
+value {
+  "Phase Cav. 1"
+}
+autoSize
+endObjectProperties
+

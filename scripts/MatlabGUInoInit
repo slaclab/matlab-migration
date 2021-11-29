@@ -1,0 +1,58 @@
+#!/bin/bash -norc
+#===============================================================================
+#
+#  Abs     : Starts Matlab GUIs from an edm button push without doing startLCLS
+#            initialization
+#
+#  Name    : MatlabGUInoInit
+#
+#  Facility: SLAC/LCLS
+#
+#  Auth    : 15-Dec-2007, Mark Woodley (mdw@slac.stanford.edu)
+#
+#  Comment : From MatlabGUI: remove call to startLCLS; add second argument to
+#            the Matlab startup run list (NOTE: it is the user's responsibility
+#            to do any required initializations explicitly!)
+#
+#===============================================================================
+#
+# Setup LCLS Environment
+#
+#  if [ -e ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+#     . ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+
+#
+# Log file on nfs
+#
+    if [ -z $PHYSICS_USER ]
+    then
+      user=`whoami`
+    else
+      if [ none = $PHYSICS_USER ]
+      then
+        user=`whoami`
+      else
+        user=$PHYSICS_USER
+      fi
+    fi
+    date=`date`
+    year=`echo $date | cut -d" " -f6`-
+    month=`echo $date | cut -d" " -f2`-
+    day=`echo $date | cut -d" " -f3`-
+    time=`echo $date | cut -d" " -f4 | cut -c1-5`
+
+    if [ -e $MATLABDATAFILES/log ]; then
+      log_file=$MATLABDATAFILES/log/$1-$user-$year$month$day$time.log
+    else
+      log_file=$1GUI$user$year$month$day$time.log
+    fi 
+#
+# Start the Matlab script
+#
+    echo $1 $log_file
+    matlab -nosplash -nodesktop -r $1,$2 -logfile $log_file
+
+#  else
+#    echo "Sorry, can't find LCLS environment setup"
+#  fi
+

@@ -1,0 +1,7 @@
+Place where LCLS physicists place their shared Matlab .m files.
+ASTA UED uses the same place for their Matlab .m files
+
+Files in this directory are under CVS version control.  
+Do not edit files in this directory!  Use CVS.
+
+Use cvs2prod to update this area.

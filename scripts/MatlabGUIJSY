@@ -1,0 +1,63 @@
+#!/bin/bash -norc
+#==============================================================
+#
+#  Abs:  Starts Matlab GUIs from an edm button push
+#
+#  Name: MatlabGUI
+#
+#  Facility:  SLAC
+#
+#  Auth: 13-Nov-2007, Mike Zelazny (zelazny@slac.stanford.edu)
+#
+#  Rev: 06-Aug-2009, Mike Zelazny:
+#         Optional EPICS_CA_MAX_ARRAY_BYTES arg in $2
+#
+#==============================================================
+#
+# Setup LCLS Environment
+#
+#  if [ -e ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+#     . ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+
+#
+# Log file on nfs
+#
+    if [ -z $PHYSICS_USER ]
+    then
+      user=`whoami`
+    else
+      if [ none = $PHYSICS_USER ]
+      then
+        user=`whoami`
+      else
+        user=$PHYSICS_USER
+      fi
+    fi
+    date=`date`
+    year=`echo $date | cut -d" " -f6`-
+    month=`echo $date | cut -d" " -f2`-
+    day=`echo $date | cut -d" " -f3`-
+    time=`echo $date | cut -d" " -f4 | cut -c1-5`
+
+    if [ -e $MATLABDATAFILES/log ]; then
+      log_file=$MATLABDATAFILES/log/$1-$user-$year$month$day$time.log
+    else
+      log_file=$1GUI$user$year$month$day$time.log
+    fi 
+#
+# Check to see if optional EPICA_CA_MAX_ARRAY_BYTES was specified on the command line
+#
+    if [ $# -gt 1 ]; then
+      export EPICS_CA_MAX_ARRAY_BYTES=$2
+    fi
+#
+# Start the Matlab script
+#
+export LD_ASSUME_KERNEL=2.4.1
+    echo $1 $log_file
+    matlab -nosplash -nodesktop -r startLCLS,$1 -logfile $log_file
+
+#  else
+#    echo "Sorry, can't find LCLS environment setup"
+#  fi
+

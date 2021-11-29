@@ -1,0 +1,51 @@
+#!/bin/bash -norc
+#==============================================================
+#
+#  Abs:  Stops  Matlab scripts
+#
+#  Name: Matlab_stop_facet
+#  $1 :  matlab script to stop
+#
+# ------------------------------------------------------------
+# This script gets called from facethome which performs an
+# SSH call to facet-srv02 and kills the matlab script provided
+# ------------------------------------------------------------
+#
+#  Facility:  SLAC
+#
+#  Auth: 31-Oct-2008, Brobeck
+#         created from MatlabGUI by M. Zelazny
+#        22-Jun-2011, jrock
+#         created FACET version
+#==============================================================
+#
+# Make sure physics is running the script on facet-srv02
+#
+
+if  ! [ "$USER" = "fphysics" ] && [ `uname -n` = "facet-srv02" ]
+  then 
+     echo ""
+     echo "This script must be run from the physics account"
+     echo "on facet-srv02 - Preferably from facethome"
+     echo ""
+     exit
+fi
+
+#
+# kill the process ID
+#
+PID=`ps awwx | grep "MATLAB.*$1" | grep -v grep | awk '{print $1}'`
+if [ ! "$PID" = "" ]; then
+   kill -kill $PID
+   echo "****************************************" >> $PHYSICS_DATA/log/matlab/$1.log
+   echo "`date` : $1 stopped" >> $PHYSICS_DATA/log/matlab/$1.log
+fi
+
+sleep 5
+#
+# kill the tail files
+#
+TPID=` ps awwx | grep "tail.*$1" | grep -v grep | awk '{print $1}'`
+if [ ! "$TPID" = "" ]; then
+   kill -kill $TPID
+fi

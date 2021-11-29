@@ -1,0 +1,43 @@
+8/21/09 dayle:
+These matlab files are not used.
+They have been phased out by the JavaLEM.
+
+> -----Original Message-----
+> From: Woodley, Mark D.
+> Sent: Thursday, August 20, 2009 4:50 PM
+> To: Kotturi, Dayle
+> Cc: Chu, Paul
+> Subject: RE: current LEM code
+>
+> Hi Dayle,
+>
+> The Matlab-based LEM code for LCLS that you found was a prototype
+> package whose primary purpose was to provide a starting point for the
+> Java-based application that's currently being used.  I'd be surprised
+> if anyone is still using the Matlab version of LEM ... maybe it's time
+> to retire it?  Paul, what do you think?
+>
+> -Mark
+>
+> > -----Original Message-----
+> > From: Dayle Kotturi [mailto:dayle@slac.stanford.edu]
+> > Sent: Thursday, August 20, 2009 2:47 PM
+> > To: Woodley, Mark D.
+> > Subject: current LEM code
+> >
+> > Hi Mark,
+> >
+> > I am designing a tool to automate the changeover of CAMAC control
+> from
+> > SLC micro to EPICS VME. I need to figure out all the different ways
+> > users get/set SLC parameters.
+> >
+> > Is the LEM code in lcls-builder:/usr/local/lcls/tools/matlab/src/LEM
+> > current?
+> >
+> > [iocegr@lcls-builder src]$ pwd
+> > /usr/local/lcls/tools/matlab/src
+> > [iocegr@lcls-builder src]$ cd LEM
+
+	 
+

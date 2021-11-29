@@ -1,0 +1,74 @@
+#!/bin/bash -norc
+#==============================================================
+#
+#  Abs:  Starts Matlab GUIs from an edm button push
+#
+#  Name: MatlabGUI
+#
+#  Facility:  SLAC
+#
+#  Auth: 13-Nov-2007, Mike Zelazny (zelazny@slac.stanford.edu)
+#
+#  Rev: 06-Aug-2009, Mike Zelazny:
+#         Optional EPICS_CA_MAX_ARRAY_BYTES arg in $2
+#       29-Oct-2012, William Colocho
+#         Remove () from log file names.
+#
+#==============================================================
+#
+# Setup LCLS Environment
+#
+#  if [ -e ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+#     . ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+
+#
+# Log file on nfs
+#
+    if [ -z $PHYSICS_USER ]
+    then
+      user=`whoami`
+    else
+      if [ none = $PHYSICS_USER ]
+      then
+        user=`whoami`
+      else
+        user=$PHYSICS_USER
+      fi
+    fi
+    date=`date`
+    year=`echo $date | cut -d" " -f6`-
+    month=`echo $date | cut -d" " -f2`-
+    day=`echo $date | cut -d" " -f3`-
+    time=`echo $date | cut -d" " -f4 | cut -c1-5`
+    logf=`echo $1 | awk -F\( '{print $1}'`
+    if [ -e $MATLABDATAFILES/log ]; then
+      log_file=$MATLABDATAFILES/log/$logf-$year$month$day$time-$user-$HOSTNAME-$DISPLAY.log
+    else
+      log_file=$logf-$year$month$day$time-$user-$HOSTNAME-$DISPLAY.log
+    fi 
+#
+# Put the startup script name(s) into the environment for Counting.  See startup.m
+#
+    if [ $# -gt 0 ]; then
+      export MATLAB_STARTUP_SCRIPT=$1
+    fi
+#
+# Check to see if optional EPICA_CA_MAX_ARRAY_BYTES was specified on the command line
+#
+    if [ $# -gt 1 ]; then
+      export EPICS_CA_MAX_ARRAY_BYTES=$2
+    fi
+#
+# Put the log file name in an environment variable for Matlab unit('printenv')
+#
+    export MATLAB_LOG_FILE_NAME=$log_file
+#
+# Start the Matlab script
+#
+    echo $1 $log_file
+    matlab.new -nosplash -nodesktop -r startLCLS,$1 -logfile $log_file
+
+#  else
+#    echo "Sorry, can't find LCLS environment setup"
+#  fi
+

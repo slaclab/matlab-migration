@@ -1,0 +1,84 @@
+#!/bin/bash -norc
+#==============================================================
+#
+#  Abs:  Start the BSA Checker Matlab script.  Meant to be used
+#        by the daily cron job run by flaci on facet-daemon02
+#
+#  Name: BSAChecker
+#
+#  Facility:  SLAC/FACET
+#
+#  Auth: 06-Apr-2009, Mike Zelazny (zelazny@slac.stanford.edu)
+#
+#  Mod: 
+#       26-Apr-2010 Mike Zelazny:
+#         Better log file
+#       06-Aug-2009 Mike Zelazny:
+#         Setup EPICS_CA_MAX_ARRAY_BYTES appropriate for large BSA waveforms
+#       07-Apr-2009, Brobeck: 
+#         added mail functionality
+#==============================================================
+#
+DT=`date "+%D - %T"`
+SLAC="@mccdev-dmz.slac.stanford.edu"
+MAILLIST="controls-software-reports$SLAC"
+#
+date=`date`
+year=`echo $date | cut -d" " -f6`-
+month=`echo $date | cut -d" " -f2`-
+day=`echo $date | cut -d" " -f3`-
+time=`echo $date | cut -d" " -f4 | cut -c1-5`
+log_file=BSAChecker-$user-$year$month$day$time.log
+#
+# Setup FACET Environment
+#
+  if [ -f /usr/local/facet/tools/script/ENVS_facet.bash ]; then
+    . /usr/local/facet/tools/script/ENVS_facet.bash
+  fi
+
+  if [ -e ${FACET_ROOT}/tools/matlab/setup/matlabSetup_facet.bash ]; then
+    . ${FACET_ROOT}/tools/matlab/setup/matlabSetup_facet.bash
+
+#
+# Set appropriate EPICS_CA_MAX_ARRAY_BYTES for BSA
+#
+    export EPICS_CA_MAX_ARRAY_BYTES=300000
+
+#
+# For accounting purposes
+#
+    export MATLAB_STARTUP_SCRIPT=BSAChecker
+
+#
+# Log file
+#
+    if [ -z $PHYSICS_USER ]
+    then
+      user=`whoami`
+    else
+      if [ none = $PHYSICS_USER ]
+      then
+        user=`whoami`
+      else
+        user=$PHYSICS_USER
+      fi
+    fi
+
+    if [ -e $MATLABDATAFILES/log ]; then
+      log_file=$MATLABDATAFILES/log/BSAChecker-$user-$year$month$day$time.log
+    fi 
+#
+# Put the log file name in an environment variable for Matlab unit('printenv')
+#
+    export MATLAB_LOG_FILE_NAME=$log_file
+
+#
+# Start the Matlab script
+#
+    matlab -nosplash -nodesktop -glnx86 -r startLCLS,BSAChecker -logfile $log_file
+
+  else
+    echo "Sorry, can't find FACET environment setup" | tee $log_file
+  fi
+
+cat $log_file | mailx -s "FACET BSAChecker ($DT)" $MAILLIST 

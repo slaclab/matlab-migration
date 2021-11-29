@@ -1,0 +1,47 @@
+#!/bin/bash -norc
+#==============================================================
+#
+#  Abs:  Invokes the fbUndPolysFile.m script that generates 
+#        polynomials for the Undulator Launch feedback.
+#        It is used by the java configuration app. 
+#
+#  Name: FeedbackLaunchUndPolys 
+#
+#  Facility:  SLAC
+#
+#  Auth: 19-Apr-2007,LPiccoli (lpiccoli@slac.stanford.edu)
+#         created from FeedbackGUI by D. Fairley 
+#==============================================================
+#
+# Setup LCLS Environment
+#
+  if [ -e ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+     . ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+
+#
+# Log file on nfs
+#
+    user=`whoami`-
+    date=`date`
+    year=`echo $date | cut -d" " -f6`-
+    month=`echo $date | cut -d" " -f2`-
+    day=`echo $date | cut -d" " -f3`-
+    time=`echo $date | cut -d" " -f4 | cut -c1-5`
+
+    if [ -e $MATLABDATAFILES/Feedback/log ]; then
+      log_file=$MATLABDATAFILES/Feedback/log/UndPolys-$user$year$month$day$time.log
+    else
+      log_file=UndPolys-$user$year$month$day$time.log
+    fi 
+#
+# Start the Matlab script
+#
+  xterm -e "matlab -nosplash -nodesktop -r fbUndPolysFile -logfile $log_file"
+  mv ${MATLABDATAFILES}/Feedback/UndPolys.txt ${MATLABDATAFILES}/Feedback/UndPolys-before.txt
+  sed 's/^  *//g' < ${MATLABDATAFILES}/Feedback/UndPolys-before.txt |  sed 's/  */,/g' > ${MATLABDATAFILES}/Feedback/UndPolys.txt
+  rm -f ${MATLABDATAFILES}/Feedback/UndPolys-before.txt
+
+  else
+    echo "Sorry, can't find LCLS environment setup"
+  fi
+

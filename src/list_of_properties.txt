@@ -1,0 +1,31 @@
+'algIndex';
+'applyIp';
+'camera';
+'cameraIndex';
+'cancel';
+'centroid'
+'colormap';
+'crop';
+'dataset';
+'disableMeasure';
+'dock';
+'dsLabel;
+'enableMeasure';
+'filter';
+'fitPlane';
+'imgOffset';
+'imgValidity';
+'imgIndex';
+'liveImg';                      live image
+'nrBgImgs';
+'nrBeamImgs';
+'pos';                          screen position
+'processLiveImg';
+'savedBgImgTs';
+'showLiveImg';
+'slice';
+'start';
+'stop';
+'subtractBg';
+'validDsIndex';
+'validDsOffset';

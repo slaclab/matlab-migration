@@ -1,0 +1,5 @@
+function initialize_current_point(handles)
+set(handles.current_x1,'String',num2str(handles.current.x1))
+set(handles.current_y1,'String',num2str(handles.current.y1))
+set(handles.current_x2,'String',num2str(handles.current.x2))
+set(handles.current_y2,'String',num2str(handles.current.y2))

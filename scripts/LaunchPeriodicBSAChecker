@@ -1,0 +1,5 @@
+#/bin/bash
+while true; do
+BSAChecker
+sleep 3600
+done

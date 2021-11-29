@@ -1,0 +1,60 @@
+function [ val , ts ] = lcaGet(varargin)
+% Zelazny - lcaGet with optional logging
+
+persistent sys;
+persistent accelerator;
+persistent pvs;
+persistent mdf;
+
+try
+    pv = []; % in case error is thrown innediately
+    if isempty(accelerator)
+        [ sys, accelerator ] = getSystem;
+    end
+    ok2log = lcaGetOrig([ 'SIOC:' sys ':ML01:AO000' ]);
+    if (ok2log)
+        stack=dbstack();
+        for i=1:size(varargin{1},1)
+            if iscell(varargin{1})
+                pv = varargin{1}{i};
+            else
+                pv = varargin{1};
+            end
+            if isempty(pvs)
+                pvs = cell(0);
+            end
+            for j=1:size(pvs,2)
+                if (ok2log)
+                    if strmatch(pvs{j},pv,'exact')
+                        ok2log = 0;
+                    end
+                end
+            end
+            if (ok2log)
+                pvs{end+1} = pv;
+                s = datestr(now);
+                for j=length(stack):-1:1
+                    s = sprintf('%s %s:%d',s,stack(j).file,stack(j).line);
+                end
+                s = sprintf('%s %s',s,pv);
+                disp(s);
+                if isempty(mdf)
+                    mdf = getenv('MATLABDATAFILES');
+                end
+                fname = sprintf('%s/log/lcaGet/%s.lcaGet',mdf,stack(length(stack)).name);
+                fid = fopen(fname,'a');
+                if (-1 ~= fid)
+                    fprintf(fid, [ s '\n' ]);
+                    fclose(fid);
+                end % valid fid
+            end % ok2log first time reporting PV
+        end % for each pv
+    end % ok2log PV check
+catch
+    if ~isempty(pv)
+        disp(sprintf('lcaGet.m had trouble trying to log PV "%s"',pv));
+    end
+end
+
+[ val , ts ] = lcaGetOrig(varargin{:});
+

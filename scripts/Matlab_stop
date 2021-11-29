@@ -1,0 +1,58 @@
+#!/bin/bash -norc
+#==============================================================
+#
+#  Abs:  Stops  Matlab scripts
+#
+#  Name: Matlab_stop
+#  $1 :  matlab script to stop
+#
+# Current scripts it stops:
+#     L23_set_phase
+#     multiknob
+#     phase_cavity_monitor
+#     watcher
+#     phase_control
+#     laser_camera
+#     archive_LLRF_ampl_phase
+#
+# ------------------------------------------------------------
+# This script gets called from lclshome which performs an
+# SSH call to lcls-srv03 and kills the matlab script provided
+# ------------------------------------------------------------
+#
+#  Facility:  SLAC
+#
+#  Auth: 31-Oct-2008, Brobeck
+#         created from MatlabGUI by M. Zelazny
+#==============================================================
+#
+# Make sure physics is running the script on lcls-srv03
+#
+
+if  ! [ "$USER" = "physics" ] && [ `uname -n` = "lcls-srv03" ]
+  then 
+     echo ""
+     echo "This script must be run from the physics account"
+     echo "on lcls-srv03 - Preferably from lclshome"
+     echo ""
+     exit
+fi
+
+#
+# kill the process ID
+#
+PID=`ps awwx | grep "MATLAB.*$1" | grep -v grep | awk '{print $1}'`
+if [ ! "$PID" = "" ]; then
+   kill -kill $PID
+   echo "****************************************" >> $PHYSICS_DATA/log/matlab/$1.log
+   echo "`date` : $1 stopped" >> $PHYSICS_DATA/log/matlab/$1.log
+fi
+
+sleep 5
+#
+# kill the tail files
+#
+TPID=` ps awwx | grep "tail.*$1" | grep -v grep | awk '{print $1}'`
+if [ ! "$TPID" = "" ]; then
+   kill -kill $TPID
+fi

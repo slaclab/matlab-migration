@@ -1,0 +1,77 @@
+#!/bin/bash -norc
+#==============================================================
+#
+#  Abs:  Starts Matlab GUIs from an edm button push
+#
+#  Name: MatlabGUI
+#
+#  Facility:  SLAC
+#
+#  Auth: 13-Nov-2007, Mike Zelazny (zelazny@slac.stanford.edu)
+#
+#  Rev: 06-Aug-2009, Mike Zelazny:
+#         Optional EPICS_CA_MAX_ARRAY_BYTES arg in $2
+#
+#==============================================================
+#
+# Setup LCLS Environment
+#
+#  if [ -e ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+#     . ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+
+#
+# Log file on nfs
+#
+    if [ -z $PHYSICS_USER ]
+    then
+      user=`whoami`
+    else
+      if [ none = $PHYSICS_USER ]
+      then
+        user=`whoami`
+      else
+        user=$PHYSICS_USER
+      fi
+    fi
+    date=`date`
+    year=`echo $date | cut -d" " -f6`-
+    month=`echo $date | cut -d" " -f2`-
+    day=`echo $date | cut -d" " -f3`-
+    time=`echo $date | cut -d" " -f4 | cut -c1-5`
+
+    if [ -e $MATLABDATAFILES/log ]; then
+      log_file=$MATLABDATAFILES/log/$1-$user-$year$month$day$time.log
+    else
+      log_file=$1GUI-$user-$year$month$day$time.log
+    fi 
+#
+# Put the startup script name(s) into the environment for Counting.  See startup.m
+#
+    if [ $# -gt 0 ]; then
+      export MATLAB_STARTUP_SCRIPT=$1
+    fi
+#
+# Check to see if optional EPICA_CA_MAX_ARRAY_BYTES was specified on the command line
+#
+    if [ $# -gt 1 ]; then
+      export EPICS_CA_MAX_ARRAY_BYTES=$2
+    fi
+#
+# add FACET EXP gateway to EPICS_CA_ADDR_LIST
+#
+export EPICS_CA_ADDR_LIST="lcls-prod01:5062 $EPICS_CA_ADDR_LIST"
+
+#
+# Put the log file name in an environment variable for Matlab unit('printenv')
+#
+    export MATLAB_LOG_FILE_NAME=$log_file
+#
+# Start the Matlab script
+#
+    echo $1 $log_file
+    matlab.old -nosplash -nodesktop -r startLCLS,$1 -logfile $log_file
+
+#  else
+#    echo "Sorry, can't find LCLS environment setup"
+#  fi
+

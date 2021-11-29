@@ -1,0 +1,42 @@
+#!/bin/bash -norc
+#==============================================================
+#
+#  Abs:  Starts Matlab GUIs from an edm button push
+#
+#  Name: MatlabGUI
+#
+#  Facility:  SLAC
+#
+#  Auth: 16-Nov-2007,DFAIRLEY (dfairley@slac.stanford.edu)
+#         created from MatlabGUI by M. Zelazny
+#==============================================================
+#
+# Setup FACET Environment
+#
+  if [ -e ${FACET_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+     . ${FACET_ROOT}/tools/matlab/setup/matlabSetup.bash
+
+#
+# Log file on nfs
+#
+    user=`whoami`-
+    date=`date`
+    year=`echo $date | cut -d" " -f6`-
+    month=`echo $date | cut -d" " -f2`-
+    day=`echo $date | cut -d" " -f3`-
+    time=`echo $date | cut -d" " -f4 | cut -c1-5`
+
+    if [ -e $MATLABDATAFILES/Feedback/log ]; then
+      log_file=$MATLABDATAFILES/Feedback/log/$3/$1GUI$user$year$month$day$time.log
+    else
+      log_file=$1GUI$user$year$month$day$time.log
+    fi 
+#
+# Start the Matlab script
+#
+  matlab -nosplash -nodesktop -glnx86 -r lcaInit,"$1('$2')" -logfile $log_file
+
+  else
+    echo "Sorry, can't find FACET environment setup"
+  fi
+

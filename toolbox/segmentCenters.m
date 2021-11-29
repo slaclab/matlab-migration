@@ -1,0 +1,45 @@
+function zpos = segmentCenters(segmentNo)
+% zpos = segmentCenters()
+%
+% With no input argument, it returns a 33x1 array of the z positions [m] of
+% the segment centers in the LCLS (based on ST100) coordinate system. 
+%
+
+zpos = [...
+517.059292
+520.929292
+524.799292
+529.097292
+532.967292
+536.837292
+541.135292
+545.005292
+548.875292
+553.173292
+557.043292
+560.913292
+565.211292
+569.081292
+572.951292
+577.249292
+581.119292
+584.989292
+589.287292
+593.157292
+597.027292
+601.325292
+605.195292
+609.065292
+613.363292
+617.233292
+621.103292
+625.401292
+629.271292
+633.141292
+637.439292
+641.309292
+645.179292];
+
+if nargin==1
+    zpos = zpos(segmentNo);
+end

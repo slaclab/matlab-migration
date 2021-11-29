@@ -1,0 +1,53 @@
+#==============================================================
+#
+#  Abs:  README file for matlab source m files.
+#
+#  Rem:  See also  /home/physics/cheat-sheet 
+#
+#  Auth: 31-Mar-2008, Greg White (greg)
+#  Rev:  
+#--------------------------------------------------------------
+#  Mod:
+#
+#==============================================================
+
+Check out matlab 
+	CVSROOT should have been set in your login, but you can check it.
+	It should be: :ext:<YOURAFSUSERNAME>@lcls-prod02:/afs/slac/g/lcls/cvs
+
+	Chage dir to somewhere where you can do development, eg
+        cd ~/greg/dev/lclscvs
+	
+	cvs co matlab/src
+
+cvs add new file:
+	cvs add xalsetup.m
+
+cvs status. Eg to check that you're not going to overwrite someone
+when you commit, if you commit the whole dir.
+	cvs status
+     or cvs status | awk '/Status/&&!/Up/'
+
+cvs update, to merge any changes other people made with yours:
+	cvs update
+ 
+cvs commit when done:
+	cvs commit -m 'comment' xalsetup.m
+
+Go update the production:
+	cd /usr/local/lcls/tools/matlab/src
+        cvs status | awk '/Status/&&!/Up-to-date/'
+	chmod +w *  [1]
+	cvs update
+	chmod -w *  [1]
+	cd
+
+For an initial checkout to production (for a new file):
+	cd /usr/local/lcls/tools/
+	cvs co matlab/src/<your file>
+	chmod -w matlab/src/<your-file>  [1] 
+
+
+[1] Note, this may fail with permission denied on files which were 
+previously created (eg cvs co) with the "other" username (softegr or physics).
+We do't have too much consistency right now.

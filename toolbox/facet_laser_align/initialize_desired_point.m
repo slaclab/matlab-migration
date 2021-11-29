@@ -1,0 +1,5 @@
+function initialize_desired_point(handles)
+set(handles.desired_x1,'String',num2str(handles.desired.x1))
+set(handles.desired_y1,'String',num2str(handles.desired.y1))
+set(handles.desired_x2,'String',num2str(handles.desired.x2))
+set(handles.desired_y2,'String',num2str(handles.desired.y2))
