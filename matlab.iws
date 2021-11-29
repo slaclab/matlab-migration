@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="85dfcf6d-7530-482e-ab07-63f7ea9e9f05" name="Changes" comment="" />
+    <list default="true" id="85dfcf6d-7530-482e-ab07-63f7ea9e9f05" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/matlab.iws" beforeDir="false" afterPath="$PROJECT_DIR$/matlab.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup/java.opts_facet" beforeDir="false" afterPath="$PROJECT_DIR$/setup/java.opts_facet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/aidainit.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/aidainit.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/aidasetup.m" beforeDir="false" afterPath="$PROJECT_DIR$/src/aidasetup.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/toolbox/facet_daq/java.opts" beforeDir="false" afterPath="$PROJECT_DIR$/toolbox/facet_daq/java.opts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,7 +57,8 @@
     <ui_properties converted="true" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/setup" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -60,6 +67,19 @@
       <filtered-out-file-type name="TAG" />
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/setupjavapath.m" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/scripts/Matlab_startup" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/XAL/LEMLite.m" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/aidaget.m" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/toolbox/emat/eget.m" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/aidaquicktests.m" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/aidainit.m" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/toolbox/emat/erpc.m" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/toolbox/emat/easypvademo.m" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/aidalist.m" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/setup/matlabSetup.bash" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="KubernetesApiPersistence">
     <option name="context" value="george@LMSDev.eu-west-1.eksctl.io" />
@@ -176,7 +196,8 @@
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
     <MESSAGE value="Original Version" />
-    <option name="LAST_COMMIT_MESSAGE" value="Original Version" />
+    <MESSAGE value="Add the aida-pvalist executable but don't verify as we expect this branch to be deleted.&#10;If it is not deleted we need to set path to script when calling it." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add the aida-pvalist executable but don't verify as we expect this branch to be deleted.&#10;If it is not deleted we need to set path to script when calling it." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
 </project>
