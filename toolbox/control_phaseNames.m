@@ -78,8 +78,8 @@ isMTC=strcmp(name,'LI28:KLYS:21') & ...       % uTCA controlled
       0; % PV broken
 %      lcaGetSmart('LLRF:LI28:21:MTCAON',0,'double') == 1; % Catches NaN
 isNew=strncmp(name,'TCAV:LI20',9) | ...
-      strncmp(name,'TCAV:DMPH',9);            % New naming standard
-isMK2=strncmp(name,'TCAV:DMPH',9);            % Uses MKSU-II
+      strncmp(name,'TCAV:DMP',8);            % New naming standard
+isMK2=strncmp(name,'TCAV:DMP',8);            % Uses MKSU-II
 name(isKLY)=nameSLC(isKLY);namePAD(isKLY)=nameSLC(isKLY);
 
 % Store original name

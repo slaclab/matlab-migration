@@ -26,7 +26,120 @@ function fh=CVCRCI_ScanFunctions
     fh.HXRSS_StandardScanFunction=@HXRSS_StandardScanFunction;
     fh.CalculateXLEAP_Delay_andK_ScanPoints=@CalculateXLEAP_Delay_andK_ScanPoints;
     fh.Delay_andK_ScanPoints_Set=@Delay_andK_ScanPoints_Set;
+    fh.CalculateBOD_WireScanPoints=@CalculateBOD_WireScanPoints;
+    fh.SetBOD_Wire=@SetBOD_Wire;
+    fh.ParseTableRange=@ParseTableRange;
     
+end
+
+function Table=ParseTableRange(Table)
+    CentralValues=lcaGetSmart(Table(1,:));
+    Table{2,1}=num2str(CentralValues(1)-0.003); Table{2,2}=num2str(CentralValues(2)-0.003);
+    Table{3,1}=num2str(CentralValues(1)+0.003); Table{3,2}=num2str(CentralValues(2)+0.003);
+end
+
+function ScanSetting=SetBOD_Wire(ScanSetting,PositionOrValues, usePvValue)
+    if(nargin<3)
+       usePvValue=1; 
+    end
+    if(usePvValue)
+       % Set the PVs and forget
+       ScanSetting.OldDestination=lcaGetSmart(ScanSetting.LcaPutNoWaitList);
+       Target=PositionOrValues;
+       lcaPutSmart(ScanSetting.LcaPutNoWaitList,Target);
+    else
+       % Set the "Position within the scan"
+       ScanSetting.OldDestinations=lcaGetSmart(ScanSetting.LcaPutNoWaitList);
+       Target=ScanSetting.PVValues(:,PositionOrValues);
+       lcaPutSmart(ScanSetting.LcaPutNoWaitList,Target);
+    end
+    %Manage destination arrival status and pause.
+    CurrentValues=lcaGetSmart(ScanSetting.PvsWithReadOut); 
+    Distance=abs(CurrentValues-Target); Re_Read=0;
+    DoneMoving=lcaGetSmart(ScanSetting.ScanSetting.DoneMovingPV); 
+    while((Distance>ScanSetting.Condition_TOLERANCE) || ~DoneMoving)
+       pause(0.25);
+       CurrentValues=lcaGetSmart(ScanSetting.PvsWithReadOut); DoneMoving=lcaGetSmart(ScanSetting.ScanSetting.DoneMovingPV); 
+       NewDistance=abs(CurrentValues-Target);
+       if((Distance>ScanSetting.Condition_TOLERANCE) && DoneMoving)
+           lcaPutSmart(ScanSetting.KillProcPV{1},1);pause(0.05);
+           lcaPutSmart(ScanSetting.LcaPutNoWaitList,Target);
+           Re_Read=0;
+       else
+       Re_Read=Re_Read+1;
+       if(any(NewDistance>=Distance) && Re_Read>5) %this seems stuck.
+          Re_Read=0;
+          lcaPutSmart(ScanSetting.LcaPutNoWaitList,Target); %issue command again
+          disp(['Currently= ',num2str(CurrentValues),' * Target= ', num2str(Target),' * Distance = ',num2str(NewDistance)]);
+       end
+       end
+       Distance=NewDistance;
+    end
+end
+
+function [ScanSetting, ErrorString] =CalculateBOD_WireScanPoints(Table, Options)
+    Options.Normal=1; Options.ZigZag=0;
+    
+    Table2{1,1}='SIOC:SYS0:ML02:AO314'; Table2{2,1}=Table{1,1}; Table2{2,1}=Table{1,1}; Table2{3,1}=Table{2,1};
+    Table2{4,1}=Table{3,1}; Table2{5,1}='SIOC:SYS0:ML02:AO314'; Table2{6,1}='0.005'; Table2{7,1}='0'; Table2{8,1}='1'; Table2{9,1}='';
+    
+    [ScanSetting, ErrorString] = CVCRCI5_StandardScanFunction(Table2, Options);
+    ScanSetting.ssh=SXRSS_functions();
+    ScanSetting.SXRSS_Struct=ScanSetting.ssh.GetNames();
+    if(any(strfind(Table{5},'BOD 1'))) %BOD1
+        if(any(strfind(Table{6},'X')) || any(strfind(Table{6},'x')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'BOD1X'));
+        elseif(any(strfind(Table{6},'Y')) || any(strfind(Table{6},'y')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'BOD1Y'));
+        end
+    elseif(any(strfind(Table{5},'BOD 2')))
+        if(any(strfind(Table{6},'X')) || any(strfind(Table{6},'x')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'BOD2X'));
+        elseif(any(strfind(Table{6},'Y')) || any(strfind(Table{6},'y')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'BOD2X'));
+        end
+    elseif(any(strfind(Table{5},'G1')))
+        if(any(strfind(Table{6},'X')) || any(strfind(Table{6},'x')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'G1X'));
+        elseif(any(strfind(Table{6},'Y')) || any(strfind(Table{6},'y')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'G1Y'));
+        end
+    elseif(any(strfind(Table{5},'M1')))
+        if(any(strfind(Table{6},'X')) || any(strfind(Table{6},'x')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'M1X'));
+        elseif(any(strfind(Table{6},'P')) || any(strfind(Table{6},'p')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'M1PITCH'));
+        end
+    elseif(any(strfind(Table{5},'M2')))
+        if(any(strfind(Table{6},'X')) || any(strfind(Table{6},'x')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'M2X'));
+        end
+    elseif(any(strfind(Table{5},'M3')))
+        if(any(strfind(Table{6},'X')) || any(strfind(Table{6},'x')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'M3X'));
+        elseif(any(strfind(Table{6},'P')) || any(strfind(Table{6},'p')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'M3PITCH'));
+        elseif(any(strfind(Table{6},'Y')) || any(strfind(Table{6},'y')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'M3YAW'));
+        end
+    elseif(any(strfind(Table{5},'Slit')))
+        if(any(strfind(Table{6},'X')) || any(strfind(Table{6},'x')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'SLITX'));
+        elseif(any(strfind(Table{6},'Y')) || any(strfind(Table{6},'y')))
+            ID=find(strcmp(ScanSetting.SXRSS_Struct.Names,'IDY'));
+        end
+    end
+    ScanSetting.PhysicalVariables=ScanSetting.SXRSS_Struct.Names;
+    ScanSetting.PhysicalValues=NaN*ones(length(ScanSetting.PVValues),numel(ScanSetting.PhysicalVariables));
+    
+    SetPointPV=ScanSetting.SXRSS_Struct.PVSet{ID};
+    ReadOutPV=ScanSetting.SXRSS_Struct.PVGet{ID};
+    
+    ScanSetting.LcaPutNoWaitList={SetPointPV};
+    ScanSetting.PvsWithReadOut={ReadOutPV};
+    ScanSetting.MovingPV=strcat(ScanSetting.LcaPutNoWaitList,'.MOVN');
+    ScanSetting.DoneMovingPV=strcat(ScanSetting.LcaPutNoWaitList,'.DMOV');
+    ScanSetting.KillProcPV=strcat(ScanSetting.LcaPutNoWaitList,':KILL.PROC');
 end
 
 function [ScanSetting, ErrorString] = CalculateXLEAP_Delay_andK_ScanPoints(Table, Options)
@@ -725,6 +838,7 @@ ScanSetting.Knob=Knob;
 ScanSetting.Condition_TOLERANCE=Condition_TOLERANCE;
 ScanSetting.PhysicalVariables={};
 ScanSetting.PhysicalValues=[];
+ScanSetting.RestoreValues=lcaGetSmart(ScanSetting.LcaPutNoWaitList);
 
 end
 

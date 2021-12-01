@@ -97,12 +97,14 @@ handles.kmap(6:10,:) = 4; % 15-1, ..., 19-8 -> BPMS:LI20:2147:X
 
 % define available bpm parameters
 %handles.bpms        = {'BPMS:DR11:854:X'    'BPMS:LI10:3448:X'  'BPMS:LI10:3448:X'  'BPMS:EP01:185:X'   'BPMS:LI20:2050:X'}';
-handles.bpms        = {'BPMS:IN10:731:X' 'BPMS:LI11:333:X' 'BPMS:LI14:801:X' 'BPMS:LI20:2147:X' 'BPMS:LI20:2050:X'  'BPMS:EP01:185:X'}';
+%handles.bpms        = {'BPMS:IN10:731:X' 'BPMS:LI11:333:X' 'BPMS:LI14:801:X' 'BPMS:LI20:2147:X' 'BPMS:LI20:2050:X'  'BPMS:EP01:185:X'}';
+handles.bpms        = {'BPMS:IN10:731:X' 'BPMS:LI11:333:X' 'BPMS:LI14:801:X' 'BPMS:LI20:2050:X' 'BPMS:LI20:2147:X'  'BPMS:EP01:185:X'}';
 
 handles.measdefs    = {''  ''  ''  'FACET-II'  'FACET-II'  'ELECEP01'}';
 %handles.measdefs    = {''           ''          ''           'NDRFACET'    'ELECEP01'}';
 handles.bpmds       = {'' '' '' '57' '57' '8'}';
 handles.feedbacks   = {'LI01:FBCK:5:HSTA';  'LI09:FBCK:201:HSTA'; 'LI09:FBCK:201:HSTA'; 'SIOC:SYS1:ML00:AO060'; 'SIOC:SYS1:ML00:AO084'};
+handles.buffAcqs    = [false, false, false, true, true, true];
 
 % put these things in the defaults thingy
 set(handles.popupmenu_region, 'String', handles.regions);
@@ -287,7 +289,8 @@ else
 end
 set(handles.edit_range, 'String', num2str(handles.range));
 
-handles.buffacq = handles.config.buffacq;
+%handles.buffacq = handles.config.buffacq;
+handles.buffacq = handles.buffAcqs(handles.r);
 set(handles.checkbox_buffacq, 'Value', handles.buffacq);
 
 handles.zigzag = handles.config.zigzag;

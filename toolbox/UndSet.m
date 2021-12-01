@@ -67,41 +67,39 @@ function success = UndSet ( undulatorLine, desCellList, desKvalues, desTaperMode
 %           PSdata
 % - 'PSconst', values: true or false; default: false;
 %        true means that the phase shifter will not be moved.
-% - 'PSgaps', values: array of gap valaues; Not yet implemented.
-%        true means that the phase shifter will not be moved.
+% - 'PSvalues, structure with members
+%           undulatorLine
+%           cellList
+%           gap
+%           PI
+%           phase
+%    If PSvalues and PSconst are both given, the latter will be ignored.
+%    Not yet implemented.
 %
-% Last changed by Heinz-Dieter Nuhn, 7/3/2021
-
-%addpath ( '/home/physics/nuhn/wrk/matlab/Ks', ...
-%          '/home/physics/nuhn/wrk/matlab/cams', ...
-%          '/home/physics/nuhn/wrk/matlab/RFBPMs', ...
-%          '/home/physics/nuhn/wrk/matlab/RADFETs' ...
-%          );
-      
-%addpath ( '/home/physics/wolf/PhaseShifterManagerNew/HXR', ...
-%          '/home/physics/wolf/PhaseShifterManagerNew/SXR', ...
-%          '/home/physics/wolf/PhaseShifterManagerNew/Lib', ...
-%          '/home/physics/wolf/PhaseShifterManagerNew/Lib/CellData', ...
-%          '/home/physics/wolf/PhaseShifterManagerNew/Lib/EscanData', ...
-%          '/home/physics/wolf/PhaseShifterManagerNew/Lib/HXRControl', ...
-%          '/home/physics/wolf/PhaseShifterManagerNew/Lib/JumpAnal', ...
-%          '/home/physics/wolf/PhaseShifterManagerNew/Lib/PhaseData', ...
-%          '/home/physics/wolf/PhaseShifterManagerNew/Lib/SXRControl', ...
-%          '/home/physics/wolf/PhaseShifterManagerNew/Lib/TunnelFieldMeas' ...
-%          );
-
-addpath ( genpath ( '/home/physics/nuhn/wrk/matlab' ), genpath ( '/home/physics/wolf/PhaseShifterManagerR2' ) );
-%addpath ( genpath ( '/home/physics/nuhn/wrk/matlab' ), genpath ( '/home/physics/wolf/PhaseShifterManagerNew' ) );
-%addpath ( genpath ( '/home/physics/wolf/PhaseShifterManagerNew' ) );
+% Last changed by Heinz-Dieter Nuhn, 11/15/2021
 
 lcaSetSeverityWarnLevel ( 5 );
+
+tUndSet = tic;
+fprintf('UndSet - Starting: tUndset = %.3f s\n', toc(tUndSet) );
+%addpath ( genpath ( '/home/physics/nuhn/wrk/matlab' ), genpath ( '/home/physics/wolf/PhaseShifterManager' ) );
+if ~contains(path, '/home/physics/nuhn/wrk/matlab')
+    addpath ( genpath ( '/home/physics/nuhn/wrk/matlab' ) );
+end
+fprintf('UndSet - Finished first path assignment: tUndSet = %.3f s\n', toc(tUndSet) );
+
+if ~contains(path,'/home/physics/wolf/PhaseShifterManager')
+    addpath ( genpath ( '/home/physics/wolf/PhaseShifterManager' ) );
+end
+
+fprintf('UndSet - Finished path assignments: tUndSet = %.3f s\n', toc(tUndSet) );
 
 useGapsPermit  = true; % Are we allowed to move gap motors?
 success        = true;
 updateCoffsets = true;
 updateEFCs     = false; % This is now done in EPICS 6/4/2020
-verbose        = true;
 updateCorrs    = false; % Not yet implemented
+verbose        = true;
 
 if ( useGapsPermit )
     saveData   = false;
@@ -120,8 +118,8 @@ end
 
 %plotKconfig          = true;
 plotinit             = true;
-PSconst              = false;
-PSgiven              = false;
+DeviceParms.PSconst  = false;
+PSinput              = false;
 const.stepMode       = 1;
 const.contMode       = 2;
 const.keepMode       = 3;
@@ -187,7 +185,7 @@ if ( isfield ( inputParms, 'PSfiles' ) )
         param      = inputParms.PSfiles.param; 
         PSdata     = inputParms.PSfiles.PSdata; 
     else
-        fprintf ( 'PSfiles are for the other undulatorLine.\n' );
+        fprintf ( 'Provided PSfiles are for the other undulatorLine.\n' );
         gotPSfiles = false;
     end
 else
@@ -196,23 +194,40 @@ end
 
 %gotPSfiles = false;
 
-if ( ~gotPSfiles )
-    param                = cell_data_param ( );
+if ( isfield ( inputParms, 'PSconst' ) )
+    DeviceParms.PSconst = inputParms.PSconst;
 end
 
-if ( isfield ( inputParms, 'PSconst' ) )
-    PSconst = inputParms.PSconst;
+if ( isfield ( inputParms, 'PSvalues' ) )
+    if ( strcmp ( inputParms.PSvalues.undulatorLine, undulatorLine ) )
+        gotPSvalues = true;
+        DeviceParms.PSconst     = false;
+        PSvalues    = inputParms.PSvalues;
+    else
+        fprintf ( 'Provided PSvalues are for the other undulatorLine.\n' );
+        gotPSvalues = false;
+    end
+else
+    gotPSvalues = false;
+end
+
+if ( ~gotPSfiles && ~DeviceParms.PSconst && ~gotPSvalues )
+        fprintf ( 'UndSet - Collecting PS base parameters: tUndSet = %.3f s\n', toc(tUndSet) );
+        param                = cell_data_param ( );
+        fprintf ( 'UndSet - Finished collecting PS base parameters: tUndSet = %.3f s\n', toc(tUndSet) );
 end
 
 % construct PVs
 if ( Line == 'H' )
     UndConsts               = util_HXRUndulatorConstants;
     
-    if ( ~gotPSfiles && ~PSconst )
-        PSdata                  = hxr_ps_manage_init ( );
+    if ( ~gotPSfiles && ~DeviceParms.PSconst && ~gotPSvalues )
+        fprintf ( 'UndSet - Gathering PS base data: tUndSet = %.3f s\n', toc(tUndSet) );
+        PSdata                  = hxr_ps_manage_init ( param );
+        fprintf ( 'UndSet - Finished gathering PS base data: tUndSet = %.3f s\n', toc(tUndSet) );
     end
     
-    if ( ~PSconst )
+    if ( ~DeviceParms.PSconst && ~gotPSvalues )
         PSmanage                = @hxr_ps_manage_update;
         DeviceParms.PS_CELL_NUM = param.hxps_cell_num;
     end
@@ -232,11 +247,13 @@ if ( Line == 'H' )
 else
     UndConsts               = util_SXRUndulatorConstants;
 
-    if ( ~gotPSfiles  && ~PSconst )
-        PSdata                  = sxr_ps_manage_init ( );
+    if ( ~gotPSfiles  && ~DeviceParms.PSconst && ~gotPSvalues )
+        fprintf('UndSet - Gathering PS base data: tUndSet = %.3f s\n', toc(tUndSet) );
+        PSdata                  = sxr_ps_manage_init ( param );
+        fprintf('UndSet - Finished gathering PS base data: tUndSet = %.3f s\n', toc(tUndSet) );
     end
     
-    if ( ~PSconst )
+    if ( ~DeviceParms.PSconst && ~gotPSvalues )
         PSmanage                = @sxr_ps_manage_update;
         DeviceParms.PS_CELL_NUM = param.sxps_cell_num;
     end
@@ -260,35 +277,40 @@ else
     fmtMPS                  = 'PHAS:UNDS:%d70:Motr.DMOV';    
 end
 
+%if ( exist ( 'PSgaps', 'var' ) && length ( PSgaps) ~= length ( UndConsts.currentPSCells ) )
+%    Display ( PSgaps );
+%    Display ( UndConsts.currentPSCells );
+%    error ( 'Wrong number of PSgaps provided ' );
+%end
 
-splineFileName                     = '/u1/lcls/matlab/ULT_GuiData/UL.mat';
+splineFileName                 = '/u1/lcls/matlab/ULT_GuiData/UL.mat';
 
 if ( exist ( splineFileName, 'file' ) )
     load ( splineFileName, '-mat', 'ul' );
     
     if ( Line == 'H' )
-        SplineData.USEG        = ul ( 1 ).SplineData.USEG ( UndConsts.currentSegmentCells );
-        PhasCells = UndConsts.currentSegmentCells;
+        SplineData.USEG               = ul ( 1 ).SplineData.USEG ( UndConsts.currentSegmentCells );
+        PhasCells                     = UndConsts.currentSegmentCells;
         PhasCells ( PhasCells == 46 ) = [];
-        SplineData.PHAS = ul ( 1 ).SplineData.PHAS ( PhasCells );
+        SplineData.PHAS               = ul ( 1 ).SplineData.PHAS ( PhasCells );
     else
-        SplineData.USEG = ul ( 2 ).SplineData.USEG ( UndConsts.currentSegmentCells );
-        PhasCells = UndConsts.currentSegmentCells;
+        SplineData.USEG               = ul ( 2 ).SplineData.USEG ( UndConsts.currentSegmentCells );
+        PhasCells                     = UndConsts.currentSegmentCells;
         PhasCells ( PhasCells == 47 ) = [];
-        SplineData.PHAS = ul ( 2 ).SplineData.PHAS ( PhasCells );
+        SplineData.PHAS               = ul ( 2 ).SplineData.PHAS ( PhasCells );
     end
     
-    SplineData.USEGentries = length ( SplineData.USEG );
-    SplineData.PHASentries = length ( SplineData.PHAS );
+    SplineData.USEGentries            = length ( SplineData.USEG );
+    SplineData.PHASentries            = length ( SplineData.PHAS );
 else
-    SplineData                    = getSplineData ( undulatorLine, UndConsts.currentSegmentCells );
+    SplineData                        = getSplineData ( undulatorLine, UndConsts.currentSegmentCells );
 end
 
-initU                             = UndRead ( undulatorLine );
+initU                                 = UndRead ( undulatorLine );
 
-T.mean                            = lcaGetSmart ( strcat ( fmtPVbase, num2str ( UndConsts.currentSegmentCells', '%-d' ), { '50:MeanTemp' } ) );
-T.MMF                             = lcaGetSmart ( strcat ( fmtPVbase, num2str ( UndConsts.currentSegmentCells', '%-d' ), { '50:MMFTemp' } ) );
-T.Kcoeff                          = lcaGetSmart ( strcat ( fmtPVbase, num2str ( UndConsts.currentSegmentCells', '%-d' ), { '50:KTempCoeff' } ) );
+T.mean                                = lcaGetSmart ( strcat ( fmtPVbase, num2str ( UndConsts.currentSegmentCells', '%-d' ), { '50:MeanTemp' } ) );
+T.MMF                                 = lcaGetSmart ( strcat ( fmtPVbase, num2str ( UndConsts.currentSegmentCells', '%-d' ), { '50:MMFTemp' } ) );
+T.Kcoeff                              = lcaGetSmart ( strcat ( fmtPVbase, num2str ( UndConsts.currentSegmentCells', '%-d' ), { '50:KTempCoeff' } ) );
 
 if ( DeviceParms.plotMode == const.plotK )
     figName = sprintf ( '%s_%s_Undulator_K_change', datestr ( now,'yyyy-dd-mm_HHMMSS' ), undulatorLine );    
@@ -346,7 +368,7 @@ if ( ~taperMode )
             taperMode = const.stepMode;
         end    
     else
-        taperMode = const.stepMode;
+        taperMode = const.stepMode; % use step taper as default
     end
 end
 
@@ -651,7 +673,6 @@ end
 DeviceParms.UndEnd_z                 = DeviceParms.UndStart_z + UndConsts.SegmentLength;
 DS_targetK                           = DS_initK;
 
-
 if ( taperMode == const.keepMode )
     targettaper                      = inittaper;
 else
@@ -731,12 +752,14 @@ if ( Line == 'S' )
     end
 end
 
-lcaPutSmart ( S_PVs, 1 ); pause ( 0.1 );
-lcaPutSmart ( T_PVs, newtvalues );
-lcaPutSmart ( K_PVs, newKvalues ); pause ( 0.1 );
-lcaPutSmart ( C_PVs, 1 ); pause ( 0.1 );
-lcaPutSmart ( Gap_PVs, newgvalues ); pause ( 0.1 ); % Overwriting EPICS gap calculation
-pause ( 1.0 );
+fprintf ( 'UndSet - Requesting undulator gaps to move: tUndSet = %.3f s\n', toc(tUndSet) );
+lcaPutSmart ( S_PVs, 1 ); %pause ( 0.1 );
+lcaPutSmart ( T_PVs, newtvalues ); %pause ( 0.1 );
+lcaPutSmart ( K_PVs, newKvalues ); %pause ( 0.1 );
+lcaPutSmart ( C_PVs, 1 ); %pause ( 0.1 );
+%lcaPutSmart ( Gap_PVs, newgvalues ); % pause ( 0.01 ); % Overwriting EPICS gap calculation
+%pause ( 1.0 );
+fprintf ( 'UndSet - Finished requesting undulator gaps to move: tUndSet = %.3f s\n', toc(tUndSet) );
 
 %if ( useGapsPermit )
 %     % Instruct the undulators to start moving their gaps    
@@ -747,12 +770,21 @@ pause ( 1.0 );
 
 %US.targetgap
 
-if ( ~PSconst )
+if ( ~DeviceParms.PSconst && ~gotPSvalues )
 % calculate phase shifter gaps
+    fprintf ( 'UndSet - Calculating PS gaps: tUndSet = %.3f s\n', toc(tUndSet) );
     PSdata             = PSmanage ( param, PSdata );
+    fprintf ( 'UndSet - Finished calculating PS gaps: tUndSet = %.3f s\n', toc(tUndSet) );
     DeviceParms.PS_GAP = [ PSdata(DeviceParms.PS_CELL_NUM).ps_gap_des ] * 1000; % [mm] 
     DeviceParms.PS_PI  = [ PSdata(DeviceParms.PS_CELL_NUM).ps_pi_des ]  * 10^9; % [T^2mm^3]
     DeviceParms.PS_DES = [ PSdata(DeviceParms.PS_CELL_NUM).ps_phase_des ];
+end
+
+if ( gotPSvalues )
+% calculate phase shifter gaps
+    DeviceParms.PS_GAP = PSvalues.gap * 1000; % [mm] 
+    DeviceParms.PS_PI  = PSvalues.PI  * 10^9; % [T^2mm^3]
+    DeviceParms.PS_DES = PSvalues.phase;
 end
 
 if ( makePlots )
@@ -824,14 +856,16 @@ if ( makePlots )
     for p = 1 : DeviceParms.currentSegmentCellCount
         ftn { 1, 02 } = plot ( [ Ax(p) Bx(p) ], [ Aty(p) Bty(p) ], '-r', 'linewidth', 2  );
     end
-        
+
+    set ( gca, 'fontsize', 9 );
+    
     if ( DeviceParms.plotMode == const.plotK )
 %        ytickformat('%.5f');
-        title ( sprintf ( 'LCLS-II %s K changes on %s', undulatorLine, datestr ( now, 'mmmm dd, yyyy HH:MM:SS.FFF AM') ) );
+        title ( sprintf ( 'LCLS-II %s K changes on %s', undulatorLine, datestr ( now, 'mmmm dd, yyyy HH:MM:SS.FFF AM') ), 'fontsize', 12  );
         ylabel ( 'K values' );
     else
 %        ytickformat('%.4f');
-        title ( sprintf ( 'LCLS-II %s gap changes on %s', undulatorLine, datestr ( now, 'mmmm dd, yyyy HH:MM:SS.FFF AM') ) );
+        title ( sprintf ( 'LCLS-II %s gap changes on %s', undulatorLine, datestr ( now, 'mmmm dd, yyyy HH:MM:SS.FFF AM') ), 'fontsize', 12 );
         ylabel ( 'gap values (mm)' );
     end
     
@@ -894,7 +928,7 @@ end
 dUNDgvalues                      = abs ( newgvalues - US_initgap ( isdesListMember_in_currentSegmentCells ) );
 currentSegmentCellIndex          = 1 : DeviceParms.currentSegmentCellCount;
 
-if ( ~PSconst )
+if ( ~DeviceParms.PSconst )
     lastP                            = PSRead  ( undulatorLine );
     monitorPS_in_currentPSCell_Index = currentSegmentCellIndex ( ismember ( currentPSCells, monitorPS_List ) );
     dPHAgvalues                      = abs ( DeviceParms.PS_GAP ( monitorPS_in_currentPSCell_Index ) - lastP ( monitorPS_in_currentPSCell_Index, 4 )' )';
@@ -908,7 +942,7 @@ text2_handle = 0;
 text3_handle = 0;
 
 if ( useGapsPermit )
-    if ( ~PSconst )
+    if ( ~DeviceParms.PSconst )
         desPScellList                                 = DeviceParms.PS_CELL_NUM;
 %        isdesPSListMember_in_currentPSCells           = ismember ( currentPSCellList, desPSCellList );
     
@@ -918,7 +952,9 @@ if ( useGapsPermit )
 
         % Instruct phase shifters to change their phase integrals to the new
         % values
+        fprintf ( 'UndSet - Requesting phaseshifters to move: tUndSet = %.3f s\n', toc(tUndSet) );
         PSSet ( undulatorLine, desPScellList, DeviceParms.PS_PI, 'nowait' );
+        fprintf ( 'UndSet - Finished requesting phaseshifters to move: tUndSet = %.3f s\n', toc(tUndSet) );
     end
     
     % Instruct the undulators to start moving their gaps    
@@ -929,41 +965,49 @@ if ( useGapsPermit )
         
         undMovingStarted = 0;
         maxabsdK         = 1;
-        maxabsdPI        = 1;
-
+        
+        if ( ~DeviceParms.PSconst )
+            maxabsdPI        = 1;
+        end
+        
         if ( Line == 'H' )
             Kprecision = 0.5 * min ( newKvalues ) * 2.3e-4;
         else
             Kprecision = 0.5 * min ( newKvalues ) * 3.0e-4;
         end
         
-        if ( ~PSconst && max ( DeviceParms.PS_GAP ) < 30 )
+        if ( ~DeviceParms.PSconst && max ( DeviceParms.PS_GAP ) < 30 )
             PIprecision = 0.6;
         else 
             PIprecision = 1.0;
         end
             
         currentSegmentCellIndex = 1 : DeviceParms.currentSegmentCellCount;
-%        currentPSCellIndex      = 1 : DeviceParms.currentPSCellCount;
+        currentPSCellIndex      = 1 : DeviceParms.currentPSCellCount;
 
         monitorUndulatorList                             = intersect ( monitorUndulatorList, DeviceParms.currentSegmentCells );
         monitorUndulatorList_in_currentSegmentCell_Index = currentSegmentCellIndex ( ismember ( DeviceParms.currentSegmentCells, monitorUndulatorList ) );
 
         monitorUndulatorList_in_desList_Index            = currentSegmentCellIndex ( ismember ( desCellList, monitorUndulatorList ) );
 
-        monitorPS_List                                   = intersect ( monitorPS_List, DeviceParms.currentSegmentCells );
-%        monitorPS_in_currentSegmentCell_Index            = currentSegmentCellIndex ( ismember ( DeviceParms.currentSegmentCells, monitorPS_List ) );
-        monitorPS_in_currentPSCell_Index                 = currentSegmentCellIndex ( ismember ( currentPSCells, monitorPS_List ) );
-
+        if ( ~DeviceParms.PSconst )
+            monitorPS_List                                   = intersect ( monitorPS_List, DeviceParms.currentSegmentCells );
+%            monitorPS_in_currentSegmentCell_Index            = currentSegmentCellIndex ( ismember ( DeviceParms.currentSegmentCells, monitorPS_List ) );
+            monitorPS_in_currentPSCell_Index                 = currentSegmentCellIndex ( ismember ( currentPSCells, monitorPS_List ) );
+        end
+        
         moving = 1;
         
         while ( moving )
             pause ( monitorDelay );
             
             seconds                           = ( now - startTime ) * 24 * 3600;
-            lastU                             = UndRead ( undulatorLine );            
-            lastP                             = PSRead  ( undulatorLine );
-
+            lastU                             = UndRead ( undulatorLine );
+            
+            if ( ~DeviceParms.PSconst )
+                lastP                             = PSRead  ( undulatorLine );
+            end
+            
             if ( makePlots )
                 figure ( fig );
                 [ ftn, plotHandles ]          = plotDataPoints ( undulatorLine, DeviceParms, const, UndConsts, SplineData, T, ftn, 3, 6, 3, '-b', 'xb', plotHandles );
@@ -975,21 +1019,20 @@ if ( useGapsPermit )
             end            
             
 %            dK                                = newKvalues  - lastU ( monitorUndulatorList_in_currentSegmentCell_Index, 2 );
-            dK                                = newKvalues ( monitorUndulatorList_in_desList_Index )  - lastU ( monitorUndulatorList_in_currentSegmentCell_Index, 2 );
-            dPI                               = DeviceParms.PS_PI ( monitorPS_in_currentPSCell_Index ) - lastP ( monitorPS_in_currentPSCell_Index, 2 )';
-            
+            dK                                = newKvalues ( monitorUndulatorList_in_desList_Index )  - lastU ( monitorUndulatorList_in_currentSegmentCell_Index, 2 );           
             monitordK                         = dK;
-            monitordPI                        = dPI;
-
             maxabsdK                          = max ( abs ( monitordK ) );
-            maxabsdPI                         = max ( abs ( monitordPI ) );
-            
             maxabsdKid                        = find ( abs ( monitordK )  == maxabsdK,  1 ); 
-            maxabsdPIid                       = find ( abs ( monitordPI ) == maxabsdPI, 1 );
-
             maxabsdKcellNo                    = monitorUndulatorList ( maxabsdKid );            
-            maxabsdPIcellNo                   = monitorPS_List ( maxabsdPIid )'; 
-
+            
+            if ( ~DeviceParms.PSconst )
+                dPI                               = DeviceParms.PS_PI ( monitorPS_in_currentPSCell_Index ) - lastP ( monitorPS_in_currentPSCell_Index, 2 )';
+                monitordPI                        = dPI;
+                maxabsdPI                         = max ( abs ( monitordPI ) );
+                maxabsdPIid                       = find ( abs ( monitordPI ) == maxabsdPI, 1 );
+                maxabsdPIcellNo                   = monitorPS_List ( maxabsdPIid )'; 
+            end
+            
             if ( makePlots )
                 fprintf ( repmat ( '\b', 1, 66 ) );
                 textStr1                          = sprintf ( 'max |dK| %7.5f (%2.2d);',         maxabsdK,   maxabsdKcellNo );
@@ -998,14 +1041,23 @@ if ( useGapsPermit )
                 fprintf ( '%s%s[%s]', textStr1, textStr2, textStr3 );
             
                 figure ( fig );
+                
                 axes_handle = get ( gcf, 'CurrentAxes' );
-                textPos1                          = estimatePosition ( -14, -10,  axis ( axes_handle ) );
-                textPos2                          = estimatePosition ( 111, -10,  axis ( axes_handle ) );
-                textPos3                          = estimatePosition (  99,   3,  axis ( axes_handle ) );
-%                textStr                           = sprintf ( 'End Photon Energy:   %.1f eV', PhEnergyEnd );
-
+                
                 v = ver ( 'MATLAB' );
                 
+                if ( strcmp ( v.Release, '(R2012a)' ) )
+                    textPos1                          = estimatePosition ( -14, -10,  axis ( axes_handle ) );
+                    textPos2                          = estimatePosition ( 111, -10,  axis ( axes_handle ) );
+                    textPos3                          = estimatePosition (  99,   3,  axis ( axes_handle ) );
+%                    textStr                           = sprintf ( 'End Photon Energy:   %.1f eV', PhEnergyEnd );
+                else
+                    textPos1                          = estimatePosition ( -14, -11,  axis ( axes_handle ) );
+                    textPos2                          = estimatePosition (  25, -11,  axis ( axes_handle ) );
+                    textPos3                          = estimatePosition (  82,   3,  axis ( axes_handle ) );
+%                    textStr                           = sprintf ( 'End Photon Energy:   %.1f eV', PhEnergyEnd );                    
+                end
+
                 if ( strcmp ( v.Release, '(R2012a)' ) )
                     if ( text1_handle )
                         delete ( text1_handle );
@@ -1023,27 +1075,33 @@ if ( useGapsPermit )
                     text2_handle                  = text ( textPos2 ( 1 ), textPos2 ( 2 ), textStr2, 'HorizontalAlignment', 'right', 'FontSize', 9, 'Parent', axes_handle );
                     text3_handle                  = text ( textPos3 ( 1 ), textPos3 ( 2 ), textStr3, 'HorizontalAlignment', 'right', 'FontSize', 9, 'Parent', axes_handle );
                 else                    
-                    if ( ~isstruct( text1_handle ) )
-                        text1_handle              = text ( textPos1 ( 1 ), textPos1 ( 2 ), textStr1, 'HorizontalAlignment', 'left',  'FontSize', 9, 'FontName', 'FixedWidth', 'Parent', axes_handle );
-                    else
-%                        text1_handle.String       = textStr1;
+%whos text1_handle
+                    if ( isstruct( text1_handle ) )
                         delete ( text1_handle );
-                        text1_handle              = text ( textPos1 ( 1 ), textPos1 ( 2 ), textStr1, 'HorizontalAlignment', 'left',  'FontSize', 9, 'FontName', 'FixedWidth', 'Parent', axes_handle );
                     end
                     
-                    if ( ~isstruct ( text2_handle ) )
-                        text2_handle              = text ( textPos2 ( 1 ), textPos2 ( 2 ), textStr2, 'HorizontalAlignment', 'left',  'FontSize', 9, 'Parent', axes_handle );
-                    else
-                        text2_handle.String       = textStr2;
+                    text1_handle              = text ( textPos1 ( 1 ), textPos1 ( 2 ), textStr1, 'HorizontalAlignment', 'left',  'FontSize', 9, 'FontName', 'FixedWidth', 'Parent', axes_handle );
+                    
+                    if ( isstruct ( text2_handle ) )
+                        delete ( text2_handle );
                     end
                     
-                    if ( ~isstruct ( text3_handle ) )
-                        text3_handle              = text ( textPos3 ( 1 ), textPos3 ( 2 ), textStr3, 'HorizontalAlignment', 'left',  'FontSize', 9, 'Parent', axes_handle );
-                    else
-                        text3_handle.String       = textStr3;
+%text2_handle
+
+%if ( exist ( 'text2_handle', 'var' ) )
+%    text2_handle.String = '';
+%end
+
+%text2_handle.String = '';
+                    text2_handle              = text ( textPos2 ( 1 ), textPos2 ( 2 ), textStr2, 'HorizontalAlignment', 'left',  'FontSize', 9, 'FontName', 'FixedWidth', 'Parent', axes_handle );
+                    
+                    if ( isstruct ( text3_handle ) )
+                        delete ( text3_handle );
                     end
                     
-                    text1_handle
+                    text3_handle              = text ( textPos3 ( 1 ), textPos3 ( 2 ), textStr3, 'HorizontalAlignment', 'left',  'FontSize', 9, 'FontName', 'FixedWidth', 'Parent', axes_handle );
+                    
+%                    text1_handle
                 end
             end
             
@@ -1068,9 +1126,11 @@ if ( useGapsPermit )
                 movingPhaseShifters           = 0;
             end
             
-            PSmoving                          = max ( movingPhaseShifters );
-            moving                            = max ( PSmoving, moving );
-            allAtDest                         = min ( allAtDest, ~moving );
+            if ( ~DeviceParms.PSconst )
+                PSmoving                          = max ( movingPhaseShifters );
+                moving                            = max ( PSmoving, moving );
+                allAtDest                         = min ( allAtDest, ~moving );
+            end
             
             if ( ~undMovingStarted && seconds > 20 )
                 success                       = false;
@@ -1107,37 +1167,40 @@ if ( useGapsPermit )
         
         if ( saveData )
             fn_USEG  = sprintf ( '%s_UndSet_test_USEG.txt', undulatorLine );
-            fn_PHAS  = sprintf ( '%s_UndSet_test_PHAS.txt', undulatorLine );
             fid_USEG = fopen ( fn_USEG, 'a' );
-            fid_PHAS = fopen ( fn_PHAS, 'a' );
 
             if ( ~fid_USEG )
                 error ( 'unable to save USEG data' );
             end
-    
-            if ( ~fid_PHAS )
-                error ( 'unable to save PHAS data' );
-            end
-            
+
             for c = 1 : desPScells
                 cel = desCellList ( c );
     
                 fprintf ( fid_USEG, '%s;cell %2.2d;Kreq:%7.5f;Kstart:%7.5f;Kend:%7.5f;Kerr:%+7.5f;gstart:%7.5f mm;gend:%7.5f mm;(%.1f s)\n', datestr ( now(), 'mm/dd/yyyy HH:MM' ), cel, newKvalues ( c ), initU ( c, 2 ), lastU ( c, 2 ), lastU ( c, 2 ) - newKvalues ( c ), initU ( c, 4 ), lastU ( c, 4 ), seconds ); 
             end
+            
+            fclose ( fid_USEG );
 
-            if ( ~PSconst )
+            fprintf ( 'Saved data in %s\n', fn_USEG );
+
+            if ( ~DeviceParms.PSconst )            
+                fn_PHAS  = sprintf ( '%s_UndSet_test_PHAS.txt', undulatorLine );
+                fid_PHAS = fopen ( fn_PHAS, 'a' );
+    
+                if ( ~fid_PHAS )
+                    error ( 'unable to save PHAS data' );
+                end
+            
                 for c = 1 : length ( DeviceParms.PS_GAP )
                     cel = DeviceParms.PS_CELL_NUM ( c );
     
                     fprintf ( fid_PHAS, '%s;cell %2.2d;PIreq:%6.1f T^2mm^3;PIstart:%6.1f T^2mm^3;PIend:%6.1f T^2mm^3;PIerr:%+5.2f T^2mm^3;gstart:%7.5f mm;gend:%7.5f mm;(%.1f s)\n', datestr ( now(), 'mm/dd/yyyy HH:MM' ), cel, DeviceParms.PS_PI ( c ), initP ( c, 2 ), lastP ( c, 2 ), lastP ( c, 2 ) - DeviceParms.PS_PI ( c ), initP ( c, 4 ), lastP ( c, 4 ), seconds ); 
                 end
-            end
-            
-            fclose ( fid_USEG );
-            fclose ( fid_PHAS );
 
-            fprintf ( 'Saved data in %s\n', fn_USEG );
-            fprintf ( 'Saved data in %s\n', fn_PHAS );
+                fclose ( fid_PHAS );
+
+                fprintf ( 'Saved data in %s\n', fn_PHAS );
+            end
         end
     end
     
@@ -1161,7 +1224,7 @@ else
 end
 
 if ( updateCoffsets && Line == 'H' )
-    fprintf ( 'Updating RFBPM .C offsets.\n' );
+    fprintf ( 'UndSet - Updating RFBPM .C offsets.: tUndSet = %.3f s\n', toc(tUndSet) );
     
     Csplines   = getHXR_BPMpos_vs_gap;   
     lastU      = UndRead ( undulatorLine );
@@ -1186,6 +1249,8 @@ if ( updateCoffsets && Line == 'H' )
     
     setRFBPMoffsets ( undulatorLine, USEG_cells, 'X', 'C', Xvalues );
     setRFBPMoffsets ( undulatorLine, USEG_cells, 'Y', 'C', Yvalues );
+
+    fprintf ( 'UndSet - Finished Updating RFBPM .C offsets.: tUndSet = %.3f s\n', toc(tUndSet) );
 end
 
 if ( updateCorrs )
@@ -1194,12 +1259,13 @@ if ( updateCorrs )
     tic
 
     lastU                = UndRead ( undulatorLine );
-    lastP                = PSRead  ( undulatorLine );
-
     USEG_gap             = lastU ( isdesListMember_in_currentSegmentCells, 4 );
+
+    URgap                = 100; % mm; undulator BBA gap
+    
+    lastP                = PSRead  ( undulatorLine );
     PHAS_gap             = lastP ( : , 4 );
         
-    URgap                = 100; % mm; undulator BBA gap
     PRgap                = 100; % mm; phase shifter BBA gap
 
     Correctors           = { 'XCOR', 'YCOR' };
@@ -1306,7 +1372,7 @@ if ( updateEFCs )
             fprintf ( 'EFCs did not reach requested values.\n' );
         end
 %    else
-%        fprintf ( 'Pipe correction data is currently not available for the SXR line.\n' );
+%        fprintf ( 'Pipe correction or the SXR line has not been implemented in this function.\n' );
 %    end
 
     toc
@@ -1556,30 +1622,32 @@ for p = 1 : DeviceParms.currentSegmentCellCount
     plotHandles.h ( plotsCount ) = plot ( [ Ax(p) Bx(p) ], [ Ay(p) By(p) ], lineUnd );
 end
 
-ftn { 1, a } = plotHandles.h ( plotsCount );
+if ( ~DeviceParms.PSconst )
+    ftn { 1, a } = plotHandles.h ( plotsCount );
 
-for c = 1 : length ( DeviceParms.PS_GAP )
-    p = DeviceParms.PS_CELL_NUM ( c );     
+    for c = 1 : length ( DeviceParms.PS_GAP )
+        p = DeviceParms.PS_CELL_NUM ( c );     
         
-    if ( DeviceParms.plotMode == const.plotgap )
-        plotsCount = plotsCount + 1;
+        if ( DeviceParms.plotMode == const.plotgap )
+            plotsCount = plotsCount + 1;
         
-        if ( DeviceParms.axisMode == const.zaxis )
-            PS_z = DeviceParms.PSStart_z ( c );
+            if ( DeviceParms.axisMode == const.zaxis )
+                PS_z = DeviceParms.PSStart_z ( c );
 
-            plotHandles.h ( plotsCount ) = plot ( PS_z, DeviceParms.last_PS_GAP ( c ),   linePS );
-        else
-            if ( Line == 'H' )
-                PS_c = ( UndConsts.Z_PS { p - UndConsts.cellOffset } - UndConsts.firstQuadz ) / UndConsts.CellLength + 0.98 + UndConsts.cellOffset;
+                plotHandles.h ( plotsCount ) = plot ( PS_z, DeviceParms.last_PS_GAP ( c ),   linePS );
             else
-                PS_c = ( UndConsts.Z_PS { p - DeviceParms.PS_CELL_NUM ( 1 ) + 1 } - UndConsts.firstQuadz ) / UndConsts.CellLength + 2.14 + UndConsts.cellOffset;
-            end
+                if ( Line == 'H' )
+                    PS_c = ( UndConsts.Z_PS { p - UndConsts.cellOffset } - UndConsts.firstQuadz ) / UndConsts.CellLength + 0.98 + UndConsts.cellOffset;
+                else
+                    PS_c = ( UndConsts.Z_PS { p - DeviceParms.PS_CELL_NUM ( 1 ) + 1 } - UndConsts.firstQuadz ) / UndConsts.CellLength + 2.14 + UndConsts.cellOffset;
+                end
 
-            plotHandles.h ( plotsCount ) = plot ( PS_c, DeviceParms.last_PS_GAP ( c ),   linePS );
-        end        
-    end
+                plotHandles.h ( plotsCount ) = plot ( PS_c, DeviceParms.last_PS_GAP ( c ),   linePS );
+            end        
+        end
     
-    ftn { 1, b } = plotHandles.h ( plotsCount );
+        ftn { 1, b } = plotHandles.h ( plotsCount );
+    end
 end
 
 end 
@@ -1702,6 +1770,8 @@ for i = 1 : 2 : n
                    s.PSconst = false;
                end
             end
+        case 'PSvalues'
+            s.PSvalues = value;
         otherwise
             display ( validParameters );
             error ( 'Parameter ''%s'' is not valid.', name );

@@ -1,6 +1,10 @@
 % lattice.m gives the betatron lattice, dispersion function, 
 % expected oscillations (R12s), beam sizes of a region
-% type:   reg='SC_SXR'; lattice  or:  reg='CU_HXR'; lattice  or:  reg='F2_ELEC'; lattice 
+%
+% type:   reg='SC_SXR'; lattice  or:  reg='CU_HXR'; lattice 
+% or:  reg='F2_ELEC'; lattice ... 
+% others: reg='SC_HXR'; reg='CU_SXR'; reg='SC_DIAG0';  ...
+% 
 names0 = model_nameRegion([], reg);
 namebpm=model_nameRegion('BPMS', reg);
 
@@ -9,7 +13,8 @@ load BPM_F2inj
 load BPM_F2li14
 %load QUAD_F2inj
 load namF2
-names = names0; 
+%names = names0; 
+names = [names0; namebpm]; 
 if strcmp(reg, 'FACET')
     names =[BPM_F2inj; BPM_F2li14; namF2; names0];
     [Rdum, z,Ldum, twiss, ener]= model_rMatGet(names, [],{'BEAMPATH=F2_ELEC','TYPE=DESIGN'});
@@ -17,26 +22,21 @@ if strcmp(reg, 'FACET')
     z(55) = 4.4124;   % hard coded quad 361
     z(56) = 4.7408;   %            quad 371
 else 
-   [Rdum, z,Ldum, twiss, ener]    = model_rMatGet(names, [],{['BEAMPATH=' reg],'TYPE=DESIGN'});
+   [Rdum, z,Ldum, twiss, ener]    = model_rMatGet(names, [],{'POS=MID',['BEAMPATH=' reg],'TYPE=DESIGN'});  % 'POS=MID''POSB=MID', 'SelPosUse=BBA'
    [Rbpm, zb,Ldumb, twissb, enerb]= model_rMatGet(namebpm, [],{['BEAMPATH=' reg],'TYPE=DESIGN'});  
 end
 [zz,ii]=sort(z);
 [zzb,iib]=sort(zb);
 
 % for plotting reasons
-if strcmp(reg,'SC_SXR')
-    regp = 'SC SXR';
-elseif strcmp(reg,'SC_HXR')
-    regp = 'SC HXR';
-  elseif strcmp(reg,'CU_SXR')
-    regp = 'CU SXR';
-  elseif strcmp(reg,'CU_HXR')
-    regp = 'CU HXR';
- elseif strcmp(reg,'F2_ELEC')
-    regp = 'F2 ELEC';
-else 
-    regp = reg;
+regp = reg;
+
+for i = 1:length(reg)
+    if strcmp(reg(i),'_')
+        regp(i) = ' ';
+    end
 end
+
     
 sigx = sqrt(twiss(3,:)*1./twiss(1,:)/1000*0.511);
 sigy = sqrt(twiss(8,:)*1./twiss(1,:)/1000*0.511);
@@ -114,7 +114,30 @@ plot(zzb,twissb(3,iib),'bx')
 plot(zzb,twissb(8,iib),'r+')
 xlabel('z [m]')
 ylabel('Beta_x (b), Beta_y (r) [m]')
-title([regp ' Betatron Function'])
+title([regp ' Design Betatron Function'])
 plotfj18
+
+
+% Getting to a matched lattice at a certain point, e.g. z0=371.41787
+z0=371.41787;
+z0=1620.3677;
+z0=410.05749;
+%z0=1640.45;
+z0=1471.42;
+%z0=535;
+[mi, im] = min(abs(z-z0));
+names((im));
+ba4 = [twiss(3,im) twiss(4,im) twiss(8,im) twiss(9,im)];
+
+[mib, imb] = min(abs(zb-z0));
+namebpm((imb));
+ba4b = [twissb(3,imb) twissb(4,imb) twissb(8,imb) twissb(9,imb)];
+
+ba0=[30.8576   -0.0017   69.1007    0.0011];
+
+% r, zn, twi can be now from a CURRENT model, e.g.:
+% load model_7625MeV_08jul2020_1050
+
+% matched_lat(ba4, z0, r, zn, twi, regp);
 
 

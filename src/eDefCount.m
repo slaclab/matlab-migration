@@ -42,7 +42,7 @@ else
     
     numSteps = lcaGetSmart (sprintf('EDEF:%s:%d:CNT',sys,eDefNumber));
     numPerStep = lcaGetSmart (sprintf('EDEF:%s:%d:AVGCNT',sys,eDefNumber));
-    count = double(numSteps)/double(numPerStep);
+    count = min(2800,double(numSteps)/double(numPerStep));
     if isempty(whos('global','eDefQuiet'))
         put2log(sprintf('%s eDefCount(%d)=%d reserved by ''%s''',caller, eDefNumber, count, char(reservedBy)));
     end

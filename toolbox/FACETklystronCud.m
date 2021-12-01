@@ -324,7 +324,7 @@ while(1)
     end
     counter = counter + 1;
     if (counter > 50000), counter = 2; end
-    lcaPut(['SIOC:' sys ':ML00:AO001'],counter) % Update FACET watcher counter
+    lcaPut(['PHYS:SYS1:1:KLYSCUD'],counter) % Update FACET watcher counter
     toc
 end % End of main loop
 end

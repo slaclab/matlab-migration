@@ -13,8 +13,27 @@
 #
 # Setup LCLS Environment
 #
-  if [ -e ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
-     . ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+        if [ -f ${LCLS_ROOT}/tools/oracle/oracleSetup.bash ]; then
+            source ${LCLS_ROOT}/tools/oracle/oracleSetup.bash
+        fi
+
+        if [ -f ${LCLS_ROOT}/physics/setup/javaSetup.bash ]; then
+            source ${LCLS_ROOT}/physics/setup/javaSetup.bash 2>&1 > /dev/null
+        fi
+
+        if [ -f ${LCLS_ROOT}/epics/setup/fixed-epics-setup.bash ]; then
+            source ${LCLS_ROOT}/epics/setup/fixed-epics-setup.bash
+            if [ -f ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash ]; then
+                source ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash
+            fi
+        fi
+
+        export MATLAB_VER=2012a
+        export EPICS_HOST_ARCH=linux-x86
+        if [ -f ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+            source ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+            export PATH=${MATLAB_ROOT}/bin:$PATH
+        fi
 
 #
 # Log file on nfs

@@ -73,7 +73,7 @@ while 1;
 
     for i=1:cutoff
         lcaPutSmart(COUNTER_PV, i);
-        disp(i)
+        
         if i== cutoff 
             i=1;
         end
@@ -93,7 +93,7 @@ while 1;
         try
             data=profmon_measure('VCC',1,'nBG',0,'doPlot',0);
         catch err
-            disp(err);
+            disp(err.message);
             pause(10)
             continue
         end
@@ -104,7 +104,7 @@ while 1;
             [ratios, balance]= profmon_gaussRatio(data);
 
         catch err
-            disp(err)
+            disp(err.message)
         end
         
         try
@@ -112,13 +112,15 @@ while 1;
             [coeff,imgB,imgC,pow]=beamAnalysis_imgCircleFit(data.img,45);  
             [coefs,psym, pasym,~] = beamAnalysis_Zernike(data.img);
         catch  err
-            disp(err)
+            disp(err.message)
+            disp('Maybe no beam/image?')
         end
         
         try 
             [coefs,psym, pasym,~] = beamAnalysis_Zernike(data.img);
         catch err
-            disp(err)
+            disp(err.message)
+            disp('Maybe no beam/image?')
         end
         
         %{
@@ -127,28 +129,32 @@ while 1;
         disp('pasym')
         disp(pasym)
         %}
-        lcaPutSmart('CAMR:IN20:186:ZERNIKE_COEFF_210', coefs)
-        lcaPutSmart('SIOC:SYS0:ML02:AO241',psym);
-        lcaPutSmart('SIOC:SYS0:ML02:AO242',pasym);
+        try
+            lcaPutSmart('CAMR:IN20:186:ZERNIKE_COEFF_210', coefs)
+            lcaPutSmart('SIOC:SYS0:ML02:AO241',psym);
+            lcaPutSmart('SIOC:SYS0:ML02:AO242',pasym);
+        end
+        try
+            lcaPutSmart(PWR_RADSYM_PV, pow(1));
+            lcaPutSmart(PWR_NONRADSYM_PV, pow(2));
+            lcaPutSmart(COEF_WFPV, coeff);
+            lcaPutSmart(X_RATIO_PV, ratios(1));
+            lcaPutSmart(Y_RATIO_PV, ratios(2));
+            lcaPutSmart(Z_RATIO_PV, ratios(3));
+            lcaPutSmart(W_RATIO_PV, ratios(4));
+        end
         
-        lcaPutSmart(PWR_RADSYM_PV, pow(1));
-        lcaPutSmart(PWR_NONRADSYM_PV, pow(2));
-        lcaPutSmart(COEF_WFPV, coeff);
-        lcaPutSmart(X_RATIO_PV, ratios(1));
-        lcaPutSmart(Y_RATIO_PV, ratios(2));
-        lcaPutSmart(Z_RATIO_PV, ratios(3));
-        lcaPutSmart(W_RATIO_PV, ratios(4));
-        
-        lcaPutSmart(X_BALANCE_PV, balance(1));
-        lcaPutSmart(Y_BALANCE_PV, balance(2));
-        lcaPutSmart(Z_BALANCE_PV, balance(3));
-        lcaPutSmart(W_BALANCE_PV, balance(4));
-
+        try
+            lcaPutSmart(X_BALANCE_PV, balance(1));
+            lcaPutSmart(Y_BALANCE_PV, balance(2));
+            lcaPutSmart(Z_BALANCE_PV, balance(3));
+            lcaPutSmart(W_BALANCE_PV, balance(4));
+        end
         try
             data1=profmon_measure('VHC',1,'nBG',0,'doPlot',0);
             control_profDataSet('VHC',data1.beam);
         catch err
-            disp(err)
+            disp(err.message)
         end
         
         pause(delay)

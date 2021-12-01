@@ -97,7 +97,6 @@ endClth1 = model_rMatGet('ENDCLTH_1',[],[],'Z');
 % Run indefinite loop.
 tic;
 while 1
-
     % Read LEM server control & status PVs.
     is=lcaGetSmart(statPVs);
 
@@ -172,10 +171,12 @@ while 1
 
     % Update klystrons.
     nameXAL=model_nameXAL(static_h.klys.name);
-    lcaPutSmart(strcat(nameXAL,':ALEM'),static_h.klys.ampF);
-    lcaPutSmart(strcat(nameXAL,':PLEM'),static_h.klys.phF);
-    lcaPutSmart(strcat(nameXAL,':EGLEM'),static_h.klys.gainF);
-    lcaPutSmart(strcat(nameXAL,':CHLEM'),static_h.klys.ampF.*sind(static_h.klys.phF));
+    % Don't put missing PVs for 26-3
+    incl = ~strcmp(nameXAL,'KLYS:LI26:31');
+    lcaPutSmart(strcat(nameXAL(incl),':ALEM'),static_h.klys.ampF(incl));
+    lcaPutSmart(strcat(nameXAL(incl),':PLEM'),static_h.klys.phF(incl));
+    lcaPutSmart(strcat(nameXAL(incl),':EGLEM'),static_h.klys.gainF(incl));
+    lcaPutSmart(strcat(nameXAL(incl),':CHLEM'),static_h.klys.ampF(incl).*sind(static_h.klys.phF(incl)));
     
     %lcaPutSmart(strcat(nameXAL,':ALEM_BCD2'),static_s.klys.ampF);
     %lcaPutSmart(strcat(nameXAL,':PLEM_BCD2'),static_s.klys.phF);

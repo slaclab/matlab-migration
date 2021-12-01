@@ -104,7 +104,7 @@ switch str
         ptrim = 1.461293;
         isTrim = logical([1 1 0 0]);
     case {'BCSS' 'HXRSS'}
-        pvList={'BEND:UND1:1630'; 'BEND:UND1:1640'; 'BEND:UND1:1660'; 'BEND:UND1:1670'};
+        pvList={'BEND:UNDH:2810';'BEND:UNDH:2830';'BEND:UNDH:2850';'BEND:UNDH:2870'};
         lcaPut(strcat(pvList,':IVB.UDF'),0);
         coeffs=lcaGet(strcat(pvList,':IVB'));
         p1 = coeffs(1,:);   % BDES to I polynomial for BXHS1 (A, A/kG-m, A/kG-m^2, ...)
@@ -112,7 +112,8 @@ switch str
         p3 = coeffs(3,:);   % BDES to I polynomial for BXHS3 (A, A/kG-m, A/kG-m^2, ...)
         p4 = coeffs(4,:);   % BDES to I polynomial for BXHS4 (A, A/kG-m, A/kG-m^2, ...)
         ptrim = 68.5;       % BTRM linear polynomial coeff. (N_main/N_trim) (measured)
-        pMain = p2;
+        pMain = p1;
+        isTrim=logical([0 1 1 1]);
     case {'SXRSS'}
         pvList={'BEND:UNDS:3510'; 'BEND:UNDS:3530'; 'BEND:UNDS:3550'; 'BEND:UNDS:3570'};
         lcaPut(strcat(pvList,':IVB.UDF'),0);
@@ -122,16 +123,17 @@ switch str
         p3 = coeffs(3,:);   % BDES to I polynomial for BCXSS3 (A, A/kG-m, A/kG-m^2, ...)
         p4 = coeffs(4,:);   % BDES to I polynomial for BCXSS4 (A, A/kG-m, A/kG-m^2, ...)
         ptrim = 68.5;       % BTRM linear polynomial coeff. (N_main/N_trim) (measured)
-        pMain = p2;
+        pMain = p1;
+        isTrim=logical([0 1 1 1]);
     case {'XLEAP'}
-        pvList={'BEND:LTU1:866'; 'BEND:LTU1:868'; 'BEND:LTU1:870'; 'BEND:LTU1:872'};
+        pvList={'BEND:LTUS:763'; 'BEND:LTUS:764'; 'BEND:LTUS:765'; 'BEND:LTUS:766'};
         lcaPut(strcat(pvList,':IVB.UDF'),0);
         coeffs=lcaGet(strcat(pvList,':IVB'));
         p1 = coeffs(1,:);   % BDES to I polynomial for BXSS1 (A, A/kG-m, A/kG-m^2, ...)
         p2 = coeffs(2,:);   % BDES to I polynomial for BXSS2 (A, A/kG-m, A/kG-m^2, ...)
         p3 = coeffs(3,:);   % BDES to I polynomial for BXSS3 (A, A/kG-m, A/kG-m^2, ...)
         p4 = coeffs(4,:);   % BDES to I polynomial for BXSS4 (A, A/kG-m, A/kG-m^2, ...)
-        ptrim = 38.4;       % BTRM linear polynomial coeff. (N_main/N_trim) (measured)
+        ptrim = 40.12;       % BTRM linear polynomial coeff. (N_main/N_trim) (measured)
         pMain = p2;
         
 end
@@ -139,7 +141,7 @@ p=fliplr([p1;p2;p3;p4]); % Make Matlab polynomial order
 nTrim=size(p,1);
 
 iMain = polyval(pMain(end:-1:1),bMain); % current needed in BXn2 (A) (no trim on BXn2 - use this for main supply)
-iMain = max(0,iMain); % can't have negative main currents (A)
+%iMain = max(0,iMain); % can't have negative main currents (A)
 
 bOff=zeros(nTrim,1);
 
@@ -148,33 +150,11 @@ if iMain == 0 && ~all(isTrim) && ismember(str,{'BX1' 'BC1'})
     bOff(3) = bMain + pMain(1)/pMain(2);    % J. Welch, Dec. 9, 2007
 end
 
-if ismember(str,{'BCSS' 'HXRSS'})
-%    bOff(1,:) = polyval([-0.001246952066002  0.004888910006052  0.000023532228580],bMain); % (Measured fudge 3/26/12 -HL)
-%    bOff(4,:) = polyval([-0.000043769003605  0.002396326791752 -0.000003031903106],bMain); % (Measured fudge 3/26/12 -HL)
-%    bOff(1,:) = bOff(1,:)+polyval([0.000100426244060 -0.001640795321436 -0.000008289898936],bMain); % (Measured fudge 3/26/12 -HL)
-%    bOff(4,:) = bOff(4,:)+polyval([0.000146281232809  0.000264115196680  0.000016724421921],bMain); % (Measured fudge 3/26/12 -HL)
-%    bOff(1,:) = bOff(1,:)+polyval([-0.108328148200166  0.608148228707427  0.007794665984392]*1e-3,bMain); % (Measured fudge 3/26/12 -HL)
-%    bOff(4,:) = bOff(4,:)+polyval([0.001190152065322 -0.316352962279092 -0.004561531027326]*1e-3,bMain); % (Measured fudge 3/26/12 -HL)
-    bOff(1,:) = polyval([-0.001254853970142   0.003856262913323   0.000023036995628],bMain); % (Measured fudge 3/26/12 -HL)
-    bOff(4,:) = polyval([0.000103702381269   0.002344089026153   0.000009130987788],bMain); % (Measured fudge 3/26/12 -HL)
-end
-
 if ismember(str,{'SXRSS'})
-%    bOff(1,:) = -polyval([-0.001815479249768   0.001243412052621   0.000238962594457],bMain); % (Measured fudge 9/24/13 -HL)
-%    bOff(4,:) = -polyval([-0.002065065995651   0.002876433779041   0.000583345375528],bMain); % (Measured fudge 9/24/13 -HL)
-    bOff(1,:) = -polyval(1.0e-03*[-0.761123437213851   0.416926515645104   0.185687230696375],bMain); % (Measured fudge 9/24/13 -HL)
-    bOff(3,:) =  polyval([-0.002283370311642   0.001250779546935   0.000557061692089],bMain); % (Measured fudge 9/24/13 -HL)
-    bOff(4,:) = -polyval([-0.000433564583510   0.001375048911181   0.000683191125070],bMain); % (Measured fudge 9/24/13 -HL)
-%    bOff(1,:) = bOff(1,:)-polyval([-0.004601314812232   0.028854920984860  -0.067740350227287   0.072940207512270  -0.034123377927459   0.004641538674457   0.000073583105158],bMain); % (Measured fudge 3/26/12 -HL)
-%    bOff(4,:) = bOff(4,:)-polyval([-0.001926407562100   0.011142481935263  -0.025012295383084   0.027520846892072  -0.014451163001203   0.002242412561180   0.000238152506252],bMain); % (Measured fudge 3/26/12 -HL)
-    bOff(1,:) = bOff(1,:)-polyval([-0.002062574420324   0.012898720478231  -0.029904620302491   0.031157561488558  -0.013590635205716   0.001742507995570  -0.000079682970914],bMain);
+    %bOff(1,:) = bOff(1,:)-polyval([-0.002062574420324   0.012898720478231  -0.029904620302491   0.031157561488558  -0.013590635205716   0.001742507995570  -0.000079682970914],bMain);
     bOff(3,:) = bOff(3,:)+polyval([-0.004399633817511   0.026241087813191  -0.058365115754246   0.058676111621590  -0.024435991283630   0.002441209436189  -0.000057190478200],bMain);
     bOff(4,:) = bOff(4,:)-polyval([0.001192059628974  -0.008303382414334   0.020899163435485  -0.023197715229390   0.010890609555678  -0.001857543033682   0.000121238956362],bMain);
-%    bOff(1,:) = bOff(1,:)-polyval([-0.000963768992056   0.006734152287015    -0.017502665704089   0.021189335720621  -0.012301762641900    0.002995734798954  -0.000150445140667],bMain); % Made things worse (SXRSSScan--2013-10-08-144842.mat)
-%    bOff(3,:) = bOff(3,:)+polyval([0     0     0     0     0     0     0],bMain);
-%    bOff(4,:) = bOff(4,:)-polyval([-0.001795828653806   0.011328933970503  -0.026516489881639   0.028089277773913  -0.012859239941921   0.001881590898436   0.000080387161455],bMain)
 end
-
 
 
 if ismember(str,{'XLEAP'})
@@ -203,8 +183,30 @@ if ismember(str,{'BX1' 'BC1'})
     BDES(1) = 1.16*BDES(1); % (1.16 factor to get BPMS:LI21:278:X at zero - 3/28/09 -PE)
 end
 
+%if ismember(str,{'BCSS' 'HXRSS'})
+% SAVING JUST INCASE
+    %bOff(1,:) = polyval([-0.001254853970142   0.003856262913323   0.000023036995628],bMain); % (Measured fudge 3/26/12 -HL)
+    %bOff(4,:) = polyval([0.000103702381269   0.002344089026153   0.000009130987788],bMain); % (Measured fudge 3/26/12 -HL)
+%end
+
 if ismember(str,{'BCSS' 'HXRSS'})
-%    BDES(3) =.0039*bMain+4e-7; % (factor to get flat und orbit - 11/6/11 -JR)
+    %BDES =BDES*1/6.85.*[-1; -1; 1]; % (factor to get flat und orbit - 11/6/11 -JR)
+    %BDES([1,3]) = BDES([1,3])+0.0172*bMain;
+    
+    %empirically taken corrections, trim current versus main coil field:
+    
+    %mainVal = [0,0.751369845,1.062596782,1.301409171,1.5027369,1.68010998]; 
+    %trimVal = zeros(3,numel(mainVal));
+    %trimVal(1,:) = [0,0.0056763, 0.0087905, 0.0128635, 0.0178679, 0.020918];
+    %trimVal(2,:) = [0,0.00161028468702229,0.00101425481827100,-5.60207413986547e-05,-0.00146765721672271,-0.00315716969937263];
+    %trimVal(3,:) = [0,0.0171344, 0.0181158, 0.0202293, 0.0232844, 0.0232844];
+    % for k = 1:3
+    %     pp(k,:) = polyfit(mainVal,trimVal(k,:),4);
+    % end
+    %BDES(1) = polyval(pp(1,:),bMain);
+    %BDES(3) = polyval(pp(3,:),bMain);
+    BDES(1) = 0.0038822*bMain + 0.0022004;
+    BDES(3) = 0.0056247*bMain + 0.003434;
 end
 
 iTrim = BDES*ptrim;   % trim current (trim-coil Amperes) to get field in BXn1,3,4 = field in BXn2 (A)

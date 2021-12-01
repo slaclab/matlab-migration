@@ -305,10 +305,11 @@ while 1
         comp = 1;
 %        continue;
     end
-    if output_charge / input_charge < min_charge_ratio  % beam loss
-        beam_bad= 1;
-        beam_lost = 1;
-    end
+% Temporarily disabling this for two bunch running 11/29/2021:
+%     if output_charge / input_charge < min_charge_ratio  % beam loss
+%         beam_bad= 1;
+%         beam_lost = 1;
+%     end
 
     try
         lcaPut(pv([tcav_bad_num tcav_on_num beam_bad_num]), ...

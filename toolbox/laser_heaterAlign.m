@@ -128,12 +128,13 @@ function handles = appSetup(hObject, handles)
 handles.dataDevice.nVal=4;
 handles=acquireSampleNumControl(hObject,handles,[]);
 handles=posValNumControl(hObject,handles,[]);
-handles=profmonNumBGControl(hObject,handles,[]);
+
 handles=dataPlaneControl(hObject,handles,[]);
 handles=dataMethodControl(hObject,handles,[],6);
 handles=mirrRangeControl(hObject,handles,[],1:2);
 handles=deltaControl(hObject,handles,[],1:4);
 handles=acquireReset(hObject,handles);
+handles=profmonNumBGControl(hObject,handles,1);
 
 
 % ------------------------------------------------------------------------
@@ -313,7 +314,7 @@ handles=acquireUpdate(hObject,handles);
 d=dataList(1);
 if d.roiXN == d.nCol && d.roiYN == d.nRow && ~handles.profmonNumBG
     uiwait(warndlg(['No background or full ROI selected.  Image processing likely to fail.  ' ...
-        'Select 1/2 ROI with ProfMon GUI!'],'Image Processing Problem'));
+        'Choose an ROI around the electron beam in Prof Mon GUI'],'Image Processing Problem'));
 end
 
 

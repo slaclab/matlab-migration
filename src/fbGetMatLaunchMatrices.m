@@ -23,6 +23,11 @@ isXcor = strcmpi(a,'XCOR');
 isYcor = strcmpi(a,'YCOR');
 
 [a,bB,c,xy] = model_nameSplit(BPMs);
+for k = 1:numel(xy)
+    if length(xy{k})>1
+        xy{k} = xy{k}(1);
+    end
+end
 BPMs = strcat(a,':',bB,':',c);
 isXbpm = strcmpi(xy,'X');
 isYbpm = strcmpi(xy,'Y');

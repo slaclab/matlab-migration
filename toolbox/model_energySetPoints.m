@@ -115,4 +115,6 @@ end
 
 % Get desired energy set points.
 energy(1:numel(enPV),1)=lcaGet(enPV); % in GeV
-fudge(1:numel(fudgePV),1)=lcaGetSmart(fudgePV);
+todo = ~ismember(fudgePV,{'ACCL:LI30:901:FUDGELAST','ACCL:DMPH:400:FUDGELAST','ACCL:DMPS:400:FUDGELAST'});
+fudge(todo,1)=lcaGetSmart(fudgePV(todo));
+fudge(~todo) = 1;

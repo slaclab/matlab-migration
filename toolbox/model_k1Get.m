@@ -38,7 +38,7 @@ else
     [bAct,bDes]=control_magnetGet(name); % kG
 end
 %disp('name(isnan(bAct))) in model_k1Get.m')
-name(isnan(bAct))
+%name(isnan(bAct))
 if modelUseBDES, bAct=bDes;end
 if nargin < 2
     [lEff,energy]=model_rMatGet(name,[],[],{'LEFF' 'EN'});

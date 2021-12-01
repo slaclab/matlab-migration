@@ -137,7 +137,7 @@ for n=1:klysCount
     otherwise
       statQuery=sprintf('KLYS:LI%s:%s1//TACT',name(2:3),name(5));
   end
-
+  
 % construct KLYS amplitude query
 
   s=klysList(n).dbAName;
@@ -167,22 +167,10 @@ for n=1:klysCount
 % get the data
 
   try
-%----
-%      Legacy AIDA
     da.setParam('BEAM',BEAM)
     da.setParam('DGRP',DGRP)
-
     stat=da.get(statQuery,10);
     da.reset
-
-%      AIDA-PVA Client
-    stat=request(statQuery, "Short")
-            .with("BEAM", BEAM)
-            .with("DGRP", DGRP)
-            .returning(AidaType.SHORT)
-            .get()
-
-%----
     ampl=da.get(amplQuery,4);
     if (isempty(phasQuery))
       phas=0;

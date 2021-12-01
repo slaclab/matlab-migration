@@ -3,7 +3,7 @@
 function BunchLengthGUIWindowName (handle, windowName)
 
 global gBunchLength;
-aidainit
+
 if nargin < 2
 else
     gBunchLength.windowName = windowName;

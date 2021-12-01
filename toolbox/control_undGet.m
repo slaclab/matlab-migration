@@ -70,10 +70,14 @@ id=(strncmp(name,'PSHXH',5)| ... % HXR phase shifter
 
 % construct PV's
 dname=model_nameConvert(name,'EPICS');
-if (nargout>=1),uAct=lcaGetSmart(strcat(dname,':',ACTsecn));end
-if (nargout>=2),uDes=lcaGetSmart(strcat(dname,':',DESsecn));end
-if (nargout>=3),uMax=lcaGetSmart(strcat(dname,':',MAXsecn));end
-if (nargout>=4),uMin=lcaGetSmart(strcat(dname,':',MINsecn));end
+uAct = zeros(size(dname));
+uDes = uAct; uMax = uAct; uMin = uAct;
+% XLEAP wiggler u values are done using gap, below
+todo = ~strncmp(name,'UMXL',4) & ~strncmp(name,'WIGXL',5);
+if (nargout>=1),uAct(todo)=lcaGetSmart(strcat(dname(todo),':',ACTsecn(todo)));end
+if (nargout>=2),uDes(todo)=lcaGetSmart(strcat(dname(todo),':',DESsecn(todo)));end
+if (nargout>=3),uMax(todo)=lcaGetSmart(strcat(dname(todo),':',MAXsecn(todo)));end
+if (nargout>=4),uMin(todo)=lcaGetSmart(strcat(dname(todo),':',MINsecn(todo)));end
 if (nargout==5)
   nameEDES=control_energyNames(name);
   eDes=lcaGetSmart(strcat(nameEDES,':EDES'));

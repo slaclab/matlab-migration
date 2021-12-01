@@ -12,6 +12,9 @@
 #  Auth: 22-Apr-2013, Mike Zelazny (zelazny@slac.stanford.edu)
 #
 #  Mod: 
+#       29-Oct-2021 Mike Zelazny:
+#         Convert to MATLAB 2020a using run_matlab.bash.
+#         Generalize to multiple SCORE configs for Sonya.
 #       16-Nov-2015 Mike Zelazny:
 #         CATER 128683 - mailx doesn't like certain characters.
 #         Use -v option for cat resolves this problem.
@@ -19,66 +22,19 @@
 #         Added -glnx86 option to matlab
 #==============================================================
 #
-DT=`date "+%D - %T"`
-SLAC="@slac.stanford.edu"
-MAILLIST="controls-software-reports$SLAC"
-#
-# Setup LCLS Environment
-#
-  if [ -f /usr/local/lcls/tools/script/ENVS.bash ]; then
-    . /usr/local/lcls/tools/script/ENVS.bash
-  fi
-
-  if [ -e ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
-    . ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+source /usr/local/lcls/tools/script/ENVS64.bash
 
 #
 # Set appropriate EPICS_CA_MAX_ARRAY_BYTES
 #
-    export EPICS_CA_MAX_ARRAY_BYTES=32000
+export EPICS_CA_MAX_ARRAY_BYTES=32000
 
 #
 # For accounting purposes - used to track how many times this script is run.
 #
-    export MATLAB_STARTUP_SCRIPT=CAMAC-Timing-BC1
-
-#
-# Log file
-#
-    if [ -z $PHYSICS_USER ]
-    then
-      user=`whoami`
-    else
-      if [ none = $PHYSICS_USER ]
-      then
-        user=`whoami`
-      else
-        user=$PHYSICS_USER
-      fi
-    fi
-    date=`date`
-    year=`echo $date | cut -d" " -f6`-
-    month=`echo $date | cut -d" " -f2`-
-    day=`echo $date | cut -d" " -f3`-
-    time=`echo $date | cut -d" " -f4 | cut -c1-5`
-
-    if [ -e $MATLABDATAFILES/log ]; then
-      log_file=$MATLABDATAFILES/log/$MATLAB_STARTUP_SCRIPT-$user-$year$month$day$time.log
-    else
-      log_file=$MATLAB_STARTUP_SCRIPT-$user-$year$month$day$time.log
-    fi 
-#
-# Put the log file name in an environment variable for Matlab unit('printenv')
-#
-    export MATLAB_LOG_FILE_NAME=$log_file
+export MATLAB_STARTUP_SCRIPT=Daily-SCORE-Save
 
 #
 # Start the Matlab script
 #
-    matlab -nosplash -nodesktop -glnx86 -r "startLCLS,SaveCAMACTimingBeamcode1ToSCORE" -logfile $log_file
-
-  else
-    echo "Sorry, can't find LCLS environment setup"
-  fi
-
-cat -v $log_file | mailx -s "CAMAC BC1 Timing -> SCORE ($DT)" $MAILLIST 
+/usr/local/lcls/tools/script/run_matlab.bash -m 2020a -r DailyScoreSave

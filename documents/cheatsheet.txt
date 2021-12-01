@@ -1,0 +1,1365 @@
+	CHEATSHEEAT FOR LCLS ACCEL COMPLEX PHYSICS ENVIRONMENT
+
+	Greg White, SLAC, 2017
+
+
+LOGIN TO PROD
+=============
+
+Authentication
+--------------
+To log into Production, you need to be "authenticated" on the production network. That is, teh production computers have to be taught to recognize that you are a legitimate user. Regular SLAC login is not sufficient. Authentication needs to be set up just once, after which ssh commands to production will work:
+
+1. Run the following command on any SLAC Public (aka AFS) unix machine:
+
+   ssh-keygen -t dsa
+
+2. email Jingchen at SLAC, saying you have done so. Then he will take the file your command created, and use it to authenticate you to the production accelerator computers. 
+   
+After Jingchen has replaied that you are authenticated, ssh commands like the following will work.
+
+SSH to production
+-----------------
+
+Tunnel ssh from a laptop to prod. This long lines works without using VPN or SLAC network (just visitor net is fine):
+
+ssh rhel6-64.stac.stanford.edu -t -K -Y -C -c arcfour256 -A ssh -A -t -YC -c arcfour256 mcclogin ssh -t -YC -c arcfour256 physics@lcls-srv01
+
+On systems supporting ssh -J, this also works and may be a bit more efficient:
+
+
+Once on Production:
+-------------------
+Fast B&W xterm (no antialiasing)
+
+  $ xterm -bg grey20 -fg white -fa 'Monospace' -fs 10 -geom 100x60 -xrm 'XTerm*selectToClipboard: true' &
+  eg alias xtermmono='xterm -fg white -bg grey20 -geom 120x70 -fa "Monospaced" -fs 9 -xrm "XTerm*selectToClipboard: true" -xrm "XTerm*vt100.renderFont: false"'
+
+Fast emacs (in an xterm w/o TrueFont antialiasing) 
+
+  $ xterm -fa 'Monospace' -fs 8 -geom 120x40 -xrm 'XTerm*selectToClipboard: true' -e emacs -nw & 
+  eg alias emacsx='xterm -fa Monospace -fs 8 -geom 120x40 -xrm "XTerm*selectToClipboard: true" -xrm "XTerm*vt100.renderFont: false" -e emacs -nw'
+
+To set you personal environment (if you have been so set up to have a
+persosnal profile on prod)
+ 
+  $ set_profile greg
+
+If you get a new terminal by simply "$ xterm &" then you'll have to
+set that on up with set_profile.
+
+
+
+ 2. CONTROL SYSTEM DISPLAYS
+ ==========================
+
+    * All the basic displays and apps of the control system can be viewed or started
+      from "lclshome". Just type lclshome from the command line.
+
+      $ lclshome &
+
+    * Overhead displays. You can also start (aka "Launch") an overhead display on your own
+    computer.  Ans: From lclshome -> [Applications] Global Displays... ->
+    ACR Cud Launcher; then select the Display Name from the panel on the
+    right, and hit button Display Locally. NOTES: Different displays are
+    available for Large and Small monitor sizes (LM and SM). Eg the
+    "Python Fat BPMs" display is under Monitor Size SM.  The path to the
+    executed file is on the launch display, under the main tabel of
+    displays.
+
+    * Where's the beam?
+    A2. See BPM display CUD. See above for how to launch locally.
+    A1. See EDM panels for "BPM/Toro/FC/BLen". On each area's display you
+    see a beamline graphic. If the line linking the devices is dark blue,
+    there is beam in that line segment. If it's grey, there isn't beam.
+
+    Apps
+    ----
+    Most physics apps (aka "HLA's", or "GUIs") are located on the 
+    "Matlab GUIs" panel, launch "lclshome" ($ lclshome) then click
+    Matlab GUIs.
+
+    LEM Server. Launch LEM control panel lclshome -> (Applications)
+    Operator Tools... -> LEM Server.
+
+
+
+
+   Set your development path.
+   -------------------------
+
+   You can either put a single startup.m in your physics-user "home"
+   directory, eg ~/physics/greg/startup.m, or you can can put a startup.m
+   in the directory tree of an individual development project. In either
+   case, you can then edit the startup.m to point to the project you want
+   to put in the path. Near the top of startup.m edit and uncomment the
+   line assigning USERPATHROOT, and assign it to the name of your
+   "matlab" directory (the one containing toolbox, src etc).
+
+   More details in Appendix A: Startup.m and the Matlab path for development.   
+
+   Control System Names
+   --------------------
+   >> model_nameConvert('YCBSY37')
+   YCOR:BSY0:37
+
+   MEME Directory Service accessible with meme_names.m.
+   >> help meme_names
+
+
+    Fake Data in Matlab
+    -------------------
+
+    Lets you use fake EPICS PVs in the control system. It works by
+    interposing fake implementations of lcaGet and lcaPut into the
+    path. These fake lca functions interact with a accelerator simulation
+    engine defined in scripts epicsSimul_*.m.
+
+    One time setup:
+
+       1. Get a copy of lcaWrapper. I have one in prod at
+	  ~physics/greg/Development/lcaWrapper.  
+
+       2. edit epicsSimul_init.m to set the location of your lcaWrapper. Default is Henrik's.
+	  Mine on Mac wraps more lca functions, but not released. 
+	  eg pLca='/home/physics/loos/matlab/lcaWrapper';
+
+    To use fake PV values:
+       1. epicsSimul_init
+       2. after setup, check whether you're using real or fake lca
+	  >> which lcaGet   % should be the one in lcaWrapper/ dir
+	  >> lcaGet('')     % should be 0, not complaint.
+
+
+     MATLAB GETTING CONTROL SYSTEM DATA
+     ==================================
+
+     lca for Channel Access (EPICS v3) PVs
+     -------------------------------------
+
+     lcaGet
+     ------
+     bacts=meme_names('XCOR:LI23:%:BACT')
+     lcaGet(bacts)
+
+     Eg
+     >> bacts=meme_names('name','XCOR:LI23:%:BACT') 
+     bacts = 
+	  'XCOR:LI23:202:BACT'
+	  'XCOR:LI23:302:BACT' 
+	  'XCOR:LI23:402:BACT'                                                                                              
+
+     >> lcaGet(bacts)
+	-0.0001
+	 0.0062                           
+
+     monitors
+     --------
+     "Monitors" are a way your matlab program can check whether new data in available in a PV.
+
+     >> bacts=meme_names('name','XCOR:LI23:%:BACT');   % meme_names gets a list of things to monitor
+     >> lcaSetMonitor(bacts);                          % set the monitor on them
+     >> lcaNewMonitorValue(xcorBacts)                  % possibly elsewhere in yur code, see if they've changed.
+     ans =
+		1
+		1
+	     ...
+     >> lcaGet(bacts);       % If any are valued 1 (and in this case they all were) then get them
+
+     Or get the new values of only the individual PVs whos value changed:
+
+     >> changed=lcaNewMonitorValue(xcorBacts);
+     >> lcaGet(xcorBacts(find(changed)))         % find returns indexes of 1 values
+     ans = 
+	 0.0000
+	 0.0053                           
+
+
+
+
+MATLAB MAD MODEL
+================
+
+XAL Model
+
+* Get the Twiss of all elements in LCLS
+twiss_efm=rdbGet('MODEL:TWISS:EXTANT:FULLMACHINE')
+
+* Get the Rmatrices of all elements in LCLS
+rmat_efm=rdbGet('MODEL:RMATS:EXTANT:FULLMACHINE')
+
+* see the fill list of all such table PVs of model data with:
+meme_names('name','MODEL:%')
+
+% Find the row in the table of rmats corresponding to some given BPM:
+>> find(strcmp(rmat_efm.value.epics_channel_access_name,'BPMS:LI21:233'))
+
+ans =
+
+   244
+
+% Confirm 244 is teh index of BPMS:LI21:233
+>> rmat_efm.value.epics_channel_access_name(244)
+
+ans = 
+
+    'BPMS:LI21:233'
+
+% Extract BPMS:LI21:233's R56 from the table
+>> rmat_efm.value.r56(244)
+
+ans =
+
+    0.0082
+
+
+      MAD MATLAB modelling
+      ====================
+
+      Extant R-MATs
+      -------------
+
+      * The Rmat of a given device, from the MAD MATLAB model (the default)
+      >> model_rMatGet('BPMS:LI21:233')  % or model_rMatGet('BPMS11')
+
+      ans =                                                            
+
+	 -0.6720   -0.2513         0         0    5.0546    0.0513     
+	  0.0226   -0.0314         0         0   -0.0321   -0.0002     
+	       0         0    1.4268    3.5996         0         0     
+	       0         0    0.4279    1.0985         0         0     
+	 -0.0034    0.0090         0         0    0.5375    0.0068     
+	 -0.0406   -0.0326         0         0  -20.5741   -0.2111     
+
+      * The Rmat of a given device from the XAL GOLD EXTANT model
+
+      >> model_rMatGet('BPMS:LI21:233',[], 'TYPE=EXTANT')                   
+
+      ans =                                                                 
+
+	 -0.6733   -0.2519         0         0    5.0560    0.0513          
+	  0.0228   -0.0313         0         0   -0.0321   -0.0002          
+	       0         0    1.4261    3.5967         0         0          
+	       0         0    0.4276    1.0977         0         0          
+	 -0.0035    0.0089         0         0    0.5374    0.0068          
+	 -0.0405   -0.0325         0         0  -20.5800   -0.2111          
+                                                                      
+
+      * The Rmat of a given device from the XAL DESIGN model.
+	[Note there is no support for design from the Matlab MAD model,
+	 so this is necessarily from XAL]
+
+      >> model_rMatGet('BPMS:LI21:233',[], 'TYPE=DESIGN')
+
+      * The Rmats of a given Run:
+      >> model_rMatGet('BPMS:LI21:233',[],'RUN=45881')                 
+
+      ans =                                                            
+
+	 -0.6738   -0.2509         0         0    5.0580    0.0513     
+	  0.0227   -0.0313         0         0   -0.0321   -0.0002     
+	       0         0    1.4280    3.5952         0         0     
+	       0         0    0.4282    1.0972         0         0     
+	 -0.0035    0.0089         0         0    0.5372    0.0068     
+	 -0.0405   -0.0323         0         0  -20.5881   -0.2112   
+
+      * The Rmat from A to B (by default from MATLAB extant model):
+
+      >> model_rMatGet('BPMS:LI21:233','BPMS:LI21:301')
+
+      * The Rmat from A to B from DESIGN or from a given XAL run:
+
+      >> model_rMatGet('BPMS:LI21:233','BPMS:LI21:301','TYPE=DESIGN')
+      >> model_rMatGet('BPMS:LI21:233','BPMS:LI21:301','RUNID=45881')
+
+
+      Extant Twiss
+      ------------
+
+      >> model_twissGet('BPMS:LI21:233')
+
+      ans =
+
+	  0.0000    0.0000
+	 73.4498  857.5393
+	 -1.6339 -283.7548
+
+      Design twiss
+      ------------
+      >> model_twissGet('BPMS:LI21:233','TYPE=DESIGN') % from XAL
+
+
+
+Adding and removing devices from MAD Matlab model
+-------------------------------------------------
+* Edit the model_beamLine*.m file that defines the devices in the line, eg
+model_beamLineUnd.m.
+* Edit model_nameList.m file. It defines the association of element names
+to device names (the prefix of PVs).
+
+
+
+USING EPICS ON YOUR OWN LAPTOP WITH PROD CS
+=================================================
+
+* Download an install EPICS V4 for Java on your machine.
+* edit classpath and java.opts to point to EPICS V4.
+* Set PVA addr list in java.opts
+* Check your Java Help space is large enough. 
+See File->Preferences... - Java Heap Space.
+The as shipped default on prod was 128 MB. Increase to at least 2032 MB.
+VPN of course.
+
+MATLAB PATTERNS
+===============
+
+      Matlab GUI Launch from EDM
+      ---------------------------
+
+      1. EDM (from LCLSHOME) buttons execute Matlab using xterm commands of the form:
+	"xterm -iconic -T \"LiTrack GUI xterm\" -e MatlabGUI run_LiTrack_GUI"
+
+      2. MatlabGUI is a bash script (tools/matlab/scripts/MatlabGUI) which
+	 runs matlabSetup.bash, sets logging, and
+	 EPICS_CA_ADDR_LIST="lcls-prod01:5062 $EPICS_CA_ADDR_LIST" (so
+	 launched GUIs all use the lcls-prod01 gateway), and then executes:
+
+	 $ matlab -glnx86 -nosplash -nodesktop -r startLCLS,$1 -logfile $log_file
+
+      3. You can simulate what MatlabGUI will do with your development
+	 GUI easily). This is useful for instance to test logging since the
+	 environment variable MATLAB_LOG_FILE_NAME is assigned by MatlogGUI 
+	 prior to starting matlab for an app (without the .m).
+
+	 $ MatlabGUI <yourgui> [epics_max_array_size_specification]
+
+
+MATLAB GUI WRITING
+==================
+
+Adding Menus
+
+Pattern for Matlab error handling
+---------------------------------
+
+The following pattern works for GUIs and functions and scripts called
+outside the context of a GUI.
+
+1. When your code detects an error, immediately issue a message using
+the Matlab "error" function. 
+
+The error() function's first argument should be a message code
+string, in the Matlab style, using a prefix id specific to your app 
+that you use in the callback function to identify your app's exceptions. Your
+app's exceptions should not cause stacktraces in the log. All others, ie matlab's
+own, exceptions should. In that way, errors like "division by 0" get a
+stacktrace, useful for debugging, whereas errors like "Couldn't move
+wire scan motor" do not, since that's not a bug in matlab, it's just something
+it wasn't able to do but handled gracefully.
+
+2. In every GUI Callback function, use try/catch, with 
+uiwait(errdlg(lprintf())) in the catch block:
+
+3. In every other (non-callback method), especailly API methods,  
+“throw exception”. That is, whenever teh program can't go on because of
+a functional problem like you detect from EPICS that a wie stuck, call error(). 
+The method SHOULD also lprintf what happened .
+
+Example of error handing pattern:
+---------------------------------
+[NOTE: constants below eg STDERR, WS_EXID_PREFIX etc, are defined in
+wirescan_const.m).
+
+function scanWireName_pmu_Callback(hObject, eventdata, handles) 
+wirescan_const;
+try
+    scanWireInit(hObject,handles,get(hObject,'Value'));
+catch ex
+    if ~strncmp(ex.identifier,WS_EXID_PREFIX,3)  
+        fprintf(STDERR, '%s\n', getReport(ex,'extended'));
+    end
+    uiwait(errordlg(...
+        lprintf(STDERR, 'Problem changing wire. %s', ex.message)));
+end
+
+function handles = scanWireInit(hObject, handles, wireId)
+…
+   initFWS(handles);   % API method can call other methods
+   …
+   function initFWS( handles )
+      status = lcaPutSmart( pvName_reinit, initcode, 'short' );
+      if ( status ~= LCA_SUCCESS )
+         msgtext=lprintf(STDERR, 'Motor init failed', pvName_reinit );
+         error('WS:MOTORINITFAILED', msgtext );
+
+*The message text SHOULD end in a period*. The period is important
+because using the try catch scheme and using matlab's builtin argument
+processing, messages are chained together.
+ 
+error() in one line example:
+if any(~data.status & data.use)
+    error('EM:NOGOODDATAREMAINS', lprintf(STDOUT,...
+        ['No data remaining that has both good measurement status' ...
+           ' and user approved for use. Please include more scanned ' ...
+           ' device setpoints (Quad values or wires), or check "Use"'...
+           ' to allow inclusion of more in processing.']));
+end
+
+
+MATAB TECHNIQUES
+================
+
+Closing a Matlab GUI
+--------------------
+
+Eg, the callback for the File->Exit menu choice shoudl execute a line like this:
+
+delete(findall(0,'type','figure'))
+
+
+Pattern for Matlab hashmap
+--------------------------
+Ref Hashmap  (http://stackoverflow.com/questions/3591942/hash-tables-in-matlab)
+
+    >> keys = {'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', ...
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Annual'};
+
+    >> values = {327.2, 368.2, 197.6, 178.4, 100.0,  69.9, ...
+      32.3,  37.3,  19.0,  37.0,  73.2, 110.9, 1551.0};
+
+    >> rainfallMap = containers.Map(keys, values)
+
+      Lookup: x = rainfallMap('Jan');
+      Assign: rainfallMap('Jan') = 0;
+      Add: rainfallMap('Total') = 999;
+      Remove: rainfallMap.remove('Total')
+
+
+Get list of matching rows of a matlab table
+-------------------------------------------
+Eg get rows of table lclsdevs_tbl where the column EPICS_DEVICE_NAME is TORO:BSY0:34.
+
+  lclsdevs_tbl(ismember(lclsdev.EPICS_DEVICE_NAME,{'TORO:BSY0:34'}),:)
+
+Matlab - load and plot with 3 different figures, all against pulse-id
+  >> load -ascii t1.dat
+  >> plot(t1(:,1),t1(:,3))
+  >> figure
+  >> plot(t1(:,1),t1(:,2))
+  >> figure
+  >> plot(t1(:,1),t1(:,4))
+
+
+       TIMING AND BSA DATA ACQUISITION
+       ===============================
+       A 360Hz fundamental fiducial is issued by the timing system. Each cycle == 1 pulse id.
+       This is multiplexed by 3 AC sinusoid, equidistant (so 120 degrees separated w.r.t. each other). 
+       The 6 zero-crossings of these mark the boundaries of the timing intervals of each of 6 "time slots".
+       Operating on 2 such time slots then gives a repetition rate of 120 Hz (2*360/6).
+       See [3], slide 22.
+
+       BSA PVs are of the general form:
+
+	     <devicename>:<propertyname>[CNT,RMS,PID]HST<edefn>       [NOTE, PID only available in upgraded BSA modules] 
+
+	 eg  BPMS:LI23:201:XHST7                            - values. An array. If number of measured points  
+							      to average was > 1 as requested by edef measurement 
+							      definition then each element value will be mean of data
+							      collected. 
+	       eg $ caget -# 4 BPMS:LI23:201:XHST7
+		  BPMS:LI23:201:XHST7 4 0.018005 0.0250633 0.0180283 0.0227487
+
+	     BPMS:LI23:201:XCNTHST7                         - CNT - the number of measurements made to establish the value of 
+							      corresponding value element above. 
+	       eg $ caget -# 4 BPMS:LI23:201:XCNTHST7
+		  BPMS:LI23:201:XCNTHST7 4 1 1 1 1            valued 1 when eDef Navg = 1.
+
+	     BPMS:LI23:201:XRMSHST7                         - RMS - the variance of measured data making up each element of value if
+							      number of measured points to average was > 1. Called "RMS"
+							      for historical reasons. 
+	      eg  $ caget -# 4 BPMS:LI23:201:XRMSHST7
+		  BPMS:LI23:201:XRMSHST7 4 0 0 0 0            valued 0 when eDef Navg = 1.
+
+	     Where a BSA module has been upgraded to new BSA (inserting NaNs where no data was acquired), 
+	     then PIDHST PV is also available. At the time of writing no BPMs have been so 
+	     upgraded ( eget -s ds -a names BPMS:%:%:XPIDHST% is null set)
+	     So, not available on BPMS:LI23:201 but is available eg KLYS:LI20:K5:
+
+		  $ caget -# 4 KLYS:LI20:K5:FWD_PPIDHST9 
+		  KLYS:LI20:K5:FWD_PPIDHST9 4 6348 6351 6354 6357 
+
+       what if number of measured points to average was > 1?] 
+
+       Persently: Max length of all arrays = 2800.
+		  Max number of measurements to average = 1000.
+
+
+       PATT:SYS0:1:PULSEID        - presently broadcast pulseid
+       PATT:SYS0:1:PULSEID<edef>  - pulse ids being broadcast for a given edef
+       PATT:SYS0:1:PULSEIDHSTBR 4 30954 30957 30960 30963   - BSA buffer of pulseid. Note Beam Rate values increment 
+							      in steps of 3, since pulseid issued at 360 Hz, and beam
+							      rate (at time of writing) is 120 Hz.
+
+	    [physics@lcls-srv01 ~/greg]$ eget -p ca EVNT:SYS0:1:LCLSBEAMRATE
+       120 
+
+       Event Definitions
+       -----------------
+       See LCLS Event System API doc [4].
+
+       There are 20 event definition "slots", defined by EDEF:SYS0:<edefnum>:%. 
+       1-14 are user reservable. 15-20 are reserved. 16=1Hz, 17=10Hz. 18=Beam Rate, or full rate. 
+       [physics@lcls-srv01 ~/greg]$ eget -Tts ds -a name EDEF:SYS0:%:NAME | pvget -p ca -f -
+       EDEF:SYS0:100:NAME             
+       EDEF:SYS0:10:NAME              tcav_feedback
+       EDEF:SYS0:11:NAME              Fast Event Logger 143
+       EDEF:SYS0:12:NAME              Wait For MPS Trip
+       EDEF:SYS0:13:NAME              Feedback TS4 & ~30Hz
+       EDEF:SYS0:14:NAME              VOM_buffer_2_2989
+       EDEF:SYS0:15:NAME              Feedback TS1 & ~30Hz
+       EDEF:SYS0:16:NAME              1HZ
+       EDEF:SYS0:17:NAME              10HZ
+       EDEF:SYS0:18:NAME              FULL
+       EDEF:SYS0:19:NAME              bunch-charge-feedback
+       EDEF:SYS0:1:NAME               ESA PM Orbit Check
+       EDEF:SYS0:20:NAME              FBCK2
+       EDEF:SYS0:2:NAME               
+       EDEF:SYS0:3:NAME               
+       EDEF:SYS0:4:NAME               Feedback TS4 & 30Hz
+       EDEF:SYS0:5:NAME               
+       EDEF:SYS0:6:NAME               VOM_buffer_1_3194
+       EDEF:SYS0:7:NAME               Feedback TS1 & 30Hz
+       EDEF:SYS0:8:NAME               OrbitDisplay 20473
+       EDEF:SYS0:9:NAME               BPM Dispersion/RMS
+
+
+       BSA References
+       --------------
+       [1] Beam Synchronous Acquisition forIOC Engineers, S. Allison, 2008. https://slacspace.slac.stanford.edu/sites/controls/wfo/lcls_timing/Documents/lclsBsa.pdf [Good summary of function and implementation]
+       [2] BSA Upgrade, https://slacspace.slac.stanford.edu/sites/controls/Controls%20Operations%20and%20Maintenance%20Documents/Timing/BSA/BSA_Upgrade.pptx [Description of plans for upgrade to fix missing data issues].
+       [3] How to use the Timing System as a Client, Kukhee Kim, https://slacspace.slac.stanford.edu/sites/controls/Controls%20Operations%20and%20Maintenance%20Documents/Timing/BSA/2012_0406%20(rev.4)%20How%20to%20use%20the%20Timing%20System%20as%20a%20Client.pdf
+       [4] LCLS Event System API doc, https://slacspace.slac.stanford.edu/sites/LCLS%20Document%20Storage/01%20-%20LCLS%20Systems/electronbeamsys/controls/Shared%20Documents/Timing/LCLS%20Event%20System%20API.doc
+
+
+Issues with BSA
+---------------
+* Missing data are (often) not marked. SOME (not all) BSA records in IOCs have been upgraded so that 
+  .VAL elements of the BSA PVs that correspond to missing measurement on a pulse-id, or incomplete 
+  average computation, have NaN value. So all corresponding val.CNT,RMS,PID waveforms have equal
+  .NUSE field value. Note though, that since not all BSA records in all IOCs are so updated, if you
+  do a BSA acq across IOCs, you still don't know whether all same index elements of PV waveforms 
+  correspond to the same pulseid. 
+* Pulse-ids missing, particularly for averaged data. If data is averaged over non-contiguous pulses, then very
+  dofficult to recover information about what the machine was actually doing at the time.
+* Timing frame elements aren't archived, so even if you had the pulse ids, you still wouldn't know after the 
+  fact what the machine state was at the time BSA data was taken. 
+
+
+
+      ACCESS TO DATA AND LOG FILES
+      ============================
+      * All matlab physics DATA that is logged by Matlab apps is logged under 
+	$MATLABDATAFILES/data/<year>/ - /u1/lcls/matlab/data/<year>/  
+
+      * All EXECUTION logs are logged under
+	$PHYSICS_DATA - /u1/lcls/physics
+	/u1/lcls/physics/log/matlab   - Matlab apps
+	/u1/lcls/physics/log/python/  - Python apps 
+	/u1/lcls/physics/log/ (Java apps and others).
+
+      * It's available on the web at addresses below.
+      * You MUST be on the SLAC network (VPN or some other trick if not)
+
+	http://mccas0.slac.stanford.edu/u1/lcls/matlab/data/ data files
+	http://mccas0.slac.stanford.edu/u1/lcls/matlab/log/  Matlab app log files
+	http://mccas0.slac.stanford.edu/u1/lcls/physics/log/ Java app log file
+
+      To order files listed by the brower by date/time, click on "Modified date" 
+      twice.
+
+      * Getting a file to your computer, if it's under /u1/lcls, is then
+	a simple matter of using a web getter, like wget or curl. E.g.
+
+       wget http://mccas0.slac.stanford.edu/u1/lcls/matlab/data/2016/2016-09/2016-09-20/WireScan-WIRE_LTU0_122-2016-09-20-171523.mat
+
+      * Finding log files from a particular time period:
+
+       find /u1/lcls/physics/log/ -atime -1
+
+
+
+Copying files around
+--------------------
+Copying a file from your own (unix like) computer to production. It's
+a two step process, but you can do both steps from your computer using
+a remotely executed ssh command. Eg both the following lines executed
+from my Mac while VPNed, put the file lcls_12OCT16.xdxf in my 'greg'
+space in the physics account:
+
+   $ scp lcls_12OCT16.xdxf 'greg@mcclogin:~/lcls_12OCT16.xdxf'
+   $ ssh greg@mcclogin scp lcls_12OCT16.xdxf 'physics@lcls-srv01:~/greg/' 
+
+Copying a file from production to your computer using only commands
+executed on your computer, is a reversal of the above:
+
+   $ ssh greg@mcclogin scp 'physics@lcls-srv01:~/greg/Development/profmon/lclscvs/physics/config/model/testsupport/lcls_mine.xdxf' lcls_mine.xdxf
+   $ scp 'greg@mcclogin:~/lcls_mine.xdxf' lcls_mine.xdxf
+
+A number if files at a time:
+
+  $ ssh greg@mcclogin sftp '"physics@lcls-srv01:/home/physics/greg/Development/issues/badwsfitfloor/*.png" .'
+  $ sftp 'greg@rhel6-64:/u/cd/greg/*.png' .
+
+If you use Kerberos to authenticate first, then you can do the above
+without any passwords. On unix/mac, just use "kinit" or "klog".
+
+   $ kinit greg@SLAC.STANFORD.EDU            [case is important]
+   <password>
+
+On a Mac try the Ticket Viewer, find it in
+/System/Library/CoreServices/Ticket Viewer.app.
+
+
+EMAIL SENDING FROM PRODUCTION
+=============================
+You can send email from production physics account:
+From the command line:
+  mail -a <attachment> -s <subject> greg@slac.stanford.edu
+
+Email a file from production to yourself
+----------------------------------------
+Send an email from the physics-account
+$ mail  -s <subject> greg@slac.stanford.edu
+
+In emacs:
+  If using GUI version of Emacs:
+   Tools -> Send Mail. 
+   compose message
+   To send it, Mail -> Send Message.
+  If using textual emacs:
+   C-x m  To compose message.
+   C-c C-c  To send composed message.
+
+
+PRINTING
+========
+
+The default printer on prod is the physics logbook. That is, if you
+simply select:
+
+   File->Print in an app like emacs, it'll come out in the log.
+
+To print to a real printer, use lpr or lp commands and specify the printer, eg:
+
+   lpr -P RSB-R107 README    - print README to printer in Building 52 rm 107
+
+   lpc status                - see list of printers
+
+
+
+CVS
+===
+
+* To get help on any given cvs command, type "cvs --help <command>" 
+
+  cvs --help log
+
+* Set CVSROOT if not already set. It should be set by physics user login.
+  If working on your own laptop, or otherwise outside the production
+  environment, you'll need to set CVSROOT. In bash do:
+
+  export CVSROOT=':ext:YOURAFSUSERNAME@rhel6-64.slac.stanford.edu:/afs/slac/g/lcls/cvs'
+
+* List files in CVS without checking them out:
+
+   cvs rlog -lR matlab/toolbox
+   cvs rlog -lR 'matlab/toolbox/' | grep 'wire'  # Only those with wire in name
+
+* Get files to work on. Use cvs checkout:
+
+   cvs co matlab                               # Checkout whole matlab dir tree
+   cvs co matlab/toolbox/model_nameList.m      # Checkout 1 file
+   cvs co -r 1.274 matlab/toolbox/wirescan_gui.m  # Checkout revision 1.274
+                                        # See log cmd below to find revisions.
+
+* Get a file but without checking it out. That is, just the file, can't commit it,
+  eg if you just want to compare to another revision. You're not allowed to 
+  export to a workign directory (one with a cehckout in it already, so...)
+
+   mkdir export
+   cd export
+   cvs export -D NOW physics/config/model/lcls.xdxf 
+
+* What is the status of files in a directory into which files 
+  have been checked out:
+
+   cvs status
+   cvs status | awk '/Status:/&&!/Up-to/'   # What files have you changed 
+                                            # or other people changed
+   cvs status | awk '/Status:/||/\?/'       # Compact list of status of all 
+                                            # files, incl any not in CVS
+   cvs stat | awk '(/Status:/&&!/Up-to/)||/?/'  # Every file that might 
+                                                # need some action. Ie that 
+                                                # file you've changed, 
+                                                # you've added, or someone 
+                                                # else has changed in CVS 
+   cvs stat 2>&1 | awk '(/Status:/&&!/Up-to/)||/?/'
+                                                # Every file that might
+                                                # need some action, but w/o 
+                                                # directory names, so compact 
+                                                # list.
+  
+* Update your version with latest from CVS 
+
+  cvs update -dA
+
+  Above comman will leave changes you made intact, but merge in
+  changes other people made (or that you made in cvs commits
+  elsewhere). If both you and other people changed the same files,
+  then this will try to automatically merge the two. If CVS thinks it
+  can't do that reliably, it will warn of "Conflict During merge". It
+  will leave markers in the file (>>>>>> ------ <<<<<<<) in the
+  question, directing you where to hand edit. After editing, try
+  again. cvs knows if you've done the edit.
+
+ 
+* See list of historical changes that have been made to files
+  (revision history):
+
+   cvs log           # operates on files checked out in the working directory. 
+
+   cvs log           # All history of all checked out files in working dir
+   cvs log <filename>          # All history of given file
+
+   # Print revisions of files named "control*" since date
+   cvs log -NSd ">2016-03-01" control*    
+   
+   # History between given dates (inclusive)
+   cvs -q log -NSd "2015-09-22<2015-09-23"  
+   
+   # As above, a bit more compactly
+   cvs -q log -NSd "2015-09-22<2015-09-23" | awk '/RCS/||!/:/'    
+
+* See differences between versions of a given file
+
+   # Diff of what's in your checkout (your mods) to latest in cvs
+   cvs diff orbit_response_full.m               
+                                               
+   To get historical differences, it is easiest if you have the 
+   revision numbers in question. To get those, see cvs log above.
+
+   cvs diff -r 1.98 model_nameList.m     # Changes since revison 1.98
+   cvs diff -r 1.97 -r 1.98 model_nameList.m # Changes made between 2 revisions
+ 
+   Key to diff output: 
+   > added. In the successive version but not in the preceeding version
+   < removed. In the preceding version but not in the successive version
+   --- Where a line or block has changed from 
+       (preceded by) < to (preceded by) >.
+ 
+* Tag files in CVS. 
+
+   We tag files to mark them as being part of a given (release), or
+   for a marker in time.  Eg "R2.3.0", or
+   "End-of-run-22-Sep-2015". Note, the behaviour of tag is a little
+   unexpected; the operation "cvs tag x" operates on the CVS
+   repository immediately, not waiting for a cvs commit.
+
+   Use "cvs tag" (rather than rtag) when you have the relevant files 
+   checked out of CVS. Eg
+
+   cvs co matlab/LiTrack
+   cvs status -v        # Lists files status with their existing tags
+   cvs tag bane-emma-original # Put tag on head of all files in matlab/LiTrack
+   cvs tag R1_Orig wirescan_gui.m # Put tag "R1_Orig" only on wirescan_gui.m
+
+* To release matlab files into production
+
+  cvs add [files you have created]
+  cvs commit -m "message" [files]
+  cvs2prod [list of .m file to release, eg cvs2prod `echo *.m`]
+  cvs2prod [directory UNDER toolbox]     # wrapper to update production matlab
+    e.g. cvs2prod meme/src               # ** Check thsi variation doesn't leave lock file in prod **!]
+
+* Bulk cvs checkout of files that match a pattern 
+  1. Make a file of the output of a grep of all the files you want to checkout
+  2. Awk that file for filenames of interest to checkout, selecting the part of the filename that matches
+     the cvs directory/file to co, and check them all out in one go:
+     cvs co `awk '/\/usr\/local\// {FS="/"; printf("%s ",substr($0,index($0,"/matlab")+1))}' ../aidalistMfiles.txt`
+
+ 
+LINUX / DESKTOP
+===============
+
+* Find and bring a window to the front, use wmctrl (on avail in physics account)
+
+List all the windows on the OPI
+
+   wmctrl -l
+
+Eg find an emacs window and bring to front"
+
+   wmctrl -a "emacs"
+
+* What is the process behind a window?
+
+  wmctrl -lp       - find the window and its PID (if wmctrl can find it)
+  ps -fwwp <pid>   - get complete command line the process of pid is executing.
+
+
+* Who (as an individual) is behind a process. Say PS shows that a process is hogging CPU:
+
+  $ ps
+  PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND
+  ...
+  32141 physics   20   0 30.4g  22g  79m S 100.7 42.9 151:26.76 MATLAB
+
+  The use the PID number to list /proc, for instance showing jnelson was the outside user.
+  (In this case Janice was innocent, an unnamed person had launched a utility of hers).
+
+  [physics@lcls-srv01 ~/greg]$ ls -l /proc/32141
+  total 0
+  ...
+  lrwxrwxrwx  1 physics lcls 0 Aug  7 17:15 cwd -> /home/physics/jnelson/lcls    <----
+  -r--------  1 physics lcls 0 Aug  7 17:15 environ
+  lrwxrwxrwx  1 physics lcls 0 Aug  7 17:15 exe -> /usr/local/matlab/2016b/bin/glnxa64/MATLAB
+
+  What terminal are they using:?
+  $ ls -l /proc/32141/fd
+  ...
+  lrwx------ 1 physics lcls 64 Aug  7 16:54 2 -> /dev/pts/23      <-- Using psuedo-teriminal pts/23
+
+
+* Command line calcs using "bc"
+
+physics@lcls-srv01 ~/greg]$ bc -q
+scale=4                            <- set number of decimal places 
+389.0/4079.0                       <- type expression
+.0953                              <- see answer
+quit                               <- type "quit" to exit
+
+
+EPICS 
+=====
+
+Names and values
+----------------
+1 Get the PV names associated with a device, using MEME directory service
+   Eg Names of all the PVs of a given wire scanner: 
+   $ eget -ts ds -a name WIRE:LTU1:755:%
+   WIRE:LTU1:755:ALPHA_X
+   WIRE:LTU1:755:ALPHA_Y
+   WIRE:LTU1:755:BETA_X
+   ... 
+
+   If the device has a lot of PVs, use xterm tiny font (see MB3) and column filter, eg:
+   eget -ts ds -a name KLYS:LI20:61:% | column
+
+2 Get the PV names for a property of a set of devices, given by device name pattern:
+   $ eget -ts ds -a name QUAD:LI23:%:BDES
+   QUAD:LI23:201:BDES
+   QUAD:LI23:301:BDES
+   QUAD:LI23:401:BDES
+   QUAD:LI23:501:BDES
+   ... 
+
+3 Get the values of a few PVs of a device - like field related PVs of a QUAD
+ (using bash substitution):
+
+   $ pvget -p ca QUAD:LI23:301:{BDES,BACT,BCON}
+   QUAD:LI23:301:BDES             -5.71637
+   QUAD:LI23:301:BACT             -5.71658
+   QUAD:LI23:301:BCON             -5.71637
+
+4 Get the values of all the PVs matching a pattern: 
+
+ Eg, all the MOTR PVs of a given WIRE scanner (those beginning MOTR_*)
+   $ eget -ts ds -a name WIRE:LTU1:755:MOTR_% | pvget -p ca -f -
+   WIRE:LTU1:755:MOTR_ALRM        OUT_OF_BEAM
+   WIRE:LTU1:755:MOTR_ENABLED_STS ON
+   WIRE:LTU1:755:MOTR_ERROR_STS   OK
+   WIRE:LTU1:755:MOTR_ERR_ACK_CMD NO ACK
+   WIRE:LTU1:755:MOTR_FATAL_ERR_STS OK
+   WIRE:LTU1:755:MOTR_HOME        OFF
+   ... 
+
+ Eg what are all the event definitions?
+   $ eget -ts ds -a name EDEF:SYS0:%:NAME | pvget -p ca -f -
+
+You can also redirect rather than pipe (ie use pvget <( eget xxx) rather than eget | pvget ).
+To make all the pvgets in parallel (super fast), supply the PV names on one line, 
+to do that, use eget -T). E.g. get all the KLYS AMPLs in the linac: 
+  
+  $ pvget -p ca -f <(eget -Tts ds -a name KLYS:LI%:%:AMPL)
+  KLYS:LI20:51:AMPL              0
+  KLYS:LI20:61:AMPL              20.0928
+  KLYS:LI20:71:AMPL              31.543
+  KLYS:LI20:81:AMPL              42.041
+  KLYS:LI21:11:AMPL              35.6689
+  ...
+
+* If there are many matching PVs, likr all the PVs of a device, use column to culumnize it.
+  You may want to make teh xterm big too before running sucha command to see a summay of a device.
+
+  $ eget -Tts ds -a name EDEF:SYS0:4:% | pvget -p ca -f - | column
+
+5 Get the description of a list of PVs. Eg, find out what each of the PVs in list
+  above of MOTR_ PVs does:
+
+ $ eget -ts ds -a name WIRE:LTU1:755:MOTR_% | xargs -I{} pvget -p ca {}.DESC
+ WIRE:LTU1:755:MOTR_ALRM.DESC   In Beam Alarm
+ WIRE:LTU1:755:MOTR_ENABLED_STS.DESC Enabled
+ WIRE:LTU1:755:MOTR_ERROR_STS.DESC Error
+ WIRE:LTU1:755:MOTR_ERR_ACK_CMD.DESC Error Ack CMD
+ WIRE:LTU1:755:MOTR_FATAL_ERR_STS.DESC Fatal Error
+ WIRE:LTU1:755:MOTR_HOME.DESC   Set Motor Home Position
+ WIRE:LTU1:755:MOTR_HOMED_STS.DESC Homed
+ ...
+ (and no, the descriptions aren't great. We should ask that they be made better)
+
+
+* Get all DESC and VALues of the PVs of a device. Some may be waveforms, so it's convenient to tell caget 
+  a maximum number of elements. (Technical note - pvget understands "-f -" so it can opertate very 
+  fast on output of eget, but pvget doesn;t understand -#. caget does understand -# to limit waveforms,
+  but oesn't understand -f -. So you have use xargs, caget)
+
+  Eg get all the timing pattern pv names and values and desciptions. You'll need xterm set to "tiny".
+
+  eget -ts ds -a name PATT:SYS0:1:% | xargs -I{} caget -#4 {} {}.DESC | column -x 
+  eget -ts ds -a name WIRE:LTU1:755:MOTR% | xargs -I{} caget -#2 -w0.5 {}.DESC {}.VAL | column -x
+
+
+6 Poor man's EDM. Using the unix "watch" command, updating ever 0.1 secs. 
+ These are updating displays  - so the only way to see what it does is try it.
+
+  Eg giving explicit pv names
+  watch -n .1 pvget -p ca KLYS:LI20:51:AMPL KLYS:LI20:61:AMPL KLYS:LI20:71:AMPL KLYS:LI20:81:AMPL
+
+  Using bash substitution
+  watch -n .1 pvget -p ca QUAD:LI23:301:{BDES,BACT,BLEM}
+
+  Using MEME directory service to get PV names- in this case to get SBST phases
+  watch -n 1 "eget -ts ds -a name SBST:%:%:PHAS | pvget -p ca -f -"
+
+  To spawn in its own xterm, use xterm -e. Eg
+  Xterm -e watch -n .1 "eget -ts ds -a name SBST:%:%:PHAS | pvget -p ca -f -"
+
+  It's really better not to query the ds on every iteration. And for many PVs use column.
+  Eg get all KLYS AMPL names once, then watch their values once a second.
+  (nms=`eget -Tts ds -a name KLYS:%:%:AMPL`; watch -d -n 1 "pvget -p ca $nms | column")
+
+
+7 Look for a PV whose name or DESCription field contains a string. 
+
+  eget -ts ds -a name EDEF:SYS0:4:% | xargs -I{} pvget -p ca {} {}.DESC | grep -i feedback
+
+  The following example looks in all Matlab PVs for those that
+  contain the string 'eta' or 'wiss'. Careful though, we have
+  many thousands of Matlab PVs, so this "brute-force" search can 
+  take minutes.
+
+  eget -ts ds -a name SIOC:SYS0:%ML% | xargs -I{} caget {}.DESC | awk '/eta/||/wiss/' 
+
+8 What are the device names and element names of a set of devices matching a pattern:
+
+$ (p=WIRE:LTU%:%; paste <(eget -ts ds -a name $p -a show dname -a tag CU_HXR -a sort z) <(eget -ts ds -a name $p -a show ename -a tag CU_HXR -a sort z))
+WIRE:IN20:531   WS01
+WIRE:IN20:561   WS02
+WIRE:IN20:611   WS03
+WIRE:IN20:741   WS04
+WIRE:LI21:285   WS11
+WIRE:LI21:293   WS12
+WIRE:LI21:301   WS13
+... snipped
+
+9 Get two (or more) sets of PVs in parallel for speed [see (xxx)&() ].
+pvget -p ca -f <((eget -Tts ds -a name KLYS:LI%:%:AMPL)& (eget -Tts ds -a name KLYS:LI%:%:PHAS))
+
+* Display them all in columns
+pvget -p ca -f <((eget -Tts ds -a name KLYS:LI%:%:AMPL)& (eget -Tts ds -a name KLYS:LI%:%:PHAS)) | column
+ 
+* paste together as a table:                              
+paste <(pvget -p ca `eget -Tts ds -a name KLYS:LI%:%:AMPL`) <(pvget -p ca `eget -Tts ds -a name KLYS:LI%:%:PHAS`)
+KLYS:LI20:51:AMPL              0        KLYS:LI20:51:PHAS              nan
+KLYS:LI20:61:AMPL              20.1172  KLYS:LI20:61:PHAS              nan
+KLYS:LI20:71:AMPL              31.4453  KLYS:LI20:71:PHAS              nan
+KLYS:LI20:81:AMPL              42.1875  KLYS:LI20:81:PHAS              nan
+KLYS:LI21:11:AMPL              35.4248  KLYS:LI21:11:PHAS              -115.708
+KLYS:LI21:21:AMPL              26.8066  KLYS:LI21:21:PHAS              -35.6692
+KLYS:LI21:31:AMPL              58.9111  KLYS:LI21:31:PHAS              -0.0202484
+...
+
+.. as above but avoid retyping name:
+(n=KLYS:LI%:%; paste <(pvget -p ca `eget -Tts ds -a name $n:AMPL`) <(pvget -p ca `eget -Tts ds -a name $n:PHAS`))
+
+10  compare outputs of aidalist and MEME. 
+diff -y <(aidalist %:LI%%:%1:POLY | sort) <(eget -ts ds -a regex '(KLYS|SBST):LI.*:.*1:POLY' | sort)
+
+11 Make a list of pv names to get, then get them
+nmstat=`eget -Tts ds -a regex 'CUDKLYS:LI2([0-9]{1}|30):.*:STATUS'`
+caget $nmstat 
+
+12 Using eget on ca PV so you can print its transpose
+eget -p ca -T CUDKLYS:MCC0:ONBC1SUMY
+
+8 What are all of the fields and their values of a given PV (that is,
+ ALL fields, not just the VAL field). To do
+ this, get the PV's ioc's name, log into the IOC with iocConsole, and
+ dbpr the record:
+
+ $ cainfo WIRE:LTU1:755:MOTR               # to find IOC name of PV
+ $ iocConsole ioc-ltu1-mc04                # log into IOC [hit Return to get prompt]
+ ioc-ltu1-mc04>dbpr("WIRE:LTU1:755:MOTR")  # get record field info
+ CTRL-a d to exit iocConsole
+
+
+Useful general PVs
+------------------
+PATT:SYS0:1:PULSEID  
+
+
+lcaGet and lcaGetSmart
+----------------------
+When PV is invalid (doesn't exist):
+lcaGet        Throws exception
+lcaGetSmart   Returns NAN as value
+
+
+BASH
+====
+
+* Who is behind a process? get PID from ps or top etc, eg 32141. Then 
+$ ls -l /proc/32141
+total 0
+...
+lrwxrwxrwx  1 physics lcls 0 Aug  7 14:46 cwd -> /home/physics/jnelson/lcls <------
+...
+lrwxrwxrwx  1 physics lcls 0 Aug  7 14:46 exe -> /usr/local/matlab/2016b/bin/glnxa64/MATLAB
+
+* Find the terminal attached to a process:
+$ ls -l /proc/32141/fd
+...
+lrwx------ 1 physics lcls 64 Aug  8 08:43 0 -> /dev/pts/23   <----
+
+* Send a text message to the terminal of a process:
+$ echo "hi there, your process is hogging CPU" > /dev/pts/23
+
+* What is the terminal of my process?
+$ tty
+/dev/pts/43
+
+* recursive grep:
+grep -r "searchfor" .
+grep -r --include "*.db" searchfor .
+
+
+* Delete all files in a directory EXCEPT given files:
+$ find . ! -name 'emittance_*' ! -name 'wirescan*' ! -name 'gui_editControl.m'  -type f -delete
+
+History things
+--------------
+* refer to present command line !#
+$ cp emittance_gui.m !#:1_t
+cp emittance_gui.m emittance_gui.m_t
+
+
+Unix commands useful for command line epics:
+paste
+sort
+column
+join
+fmt
+pr
+
+
+
+Finding EDM screen definitions (EDL files)
+------------------------------------------
+
+*  To find the PV name of an EDM screen "widget"
+
+   MB2 (mouse button 2). MB2 is option-click on mac.
+  
+* To find the filename of the file that defines an EDM sceen: 
+
+   With the EDM screen open, middle-mouse-button (MB2) in an innocuous 
+   part of the screen. Select "Toggle Title".
+
+* To seach all the edl files fopr references to a given string 
+   (like a PV name, title, or matlab filefile). From command line (be patient, will take some time):
+
+   printenv EDMDATAFILES | tr : '\n' | xargs -I{} find {} -name "*.edl" -maxdepth 1 | \
+    xargs egrep -i "LCLS Matlab GUIs"
+   
+*  To start a given EDM display directly form its file as foind above, use edm -x, eg:
+
+   edm -x /usr/local/lcls/tools/edm/display/misc/fastbpm.edl
+
+
+IOC Investigations
+------------------
+* Which IOC controls a PV? ANS: cainfo <pv-name>, eg:
+
+$ cainfo WIRE:LTU1:755:POSNHST1
+WIRE:LTU1:755:POSNHST1
+    State:            connected
+    Host:             ioc-ltu1-mc04.slac.stanford.edu:5068   <--- IOC is ioc-ltu1-mc04
+    Access:           read, write
+    Native data type: DBF_DOUBLE
+    Request type:     DBR_DOUBLE
+    Element count:    2800
+
+* For a softIoc, teh host will just be eg lcls-daemon1. Log into that host, and see which process 
+is talking on the port of the PV:
+i) [physics@opi16 /u1/lcls/epics/ioc/data]$ cainfo CUDKLYS:MCC0:ONBC1SUMY
+CUDKLYS:MCC0:ONBC1SUMY
+    State:            connected
+    Host:             lcls-daemon1.slac.stanford.edu:37488
+   
+ii) [laci@lcls-daemon1 ~]$ lsof -i :37488 -S
+gives (on of many for a typical soft IOC):
+ud        5595 laci  146u  IPv4 342736207      0t0  TCP lcls-daemon1.slac.stanford.edu:37488->lcls-srv02.slac.stanford.edu:49374 (ESTABLISHED)
+iii) [laci@lcls-daemon1 ~]$ ps -ww 5595
+  PID TTY      STAT   TIME COMMAND
+ 5595 pts/112  Sl+  9097:41 /usr/local/lcls/epics/iocCommon/sioc-mcc0-cud0/iocSpecificRelease/bin/linux-x86/cud /usr/local/lcls/epics/iocCommon/sioc-mcc0-cud0/st.cmd
+
+So CUDKLYS:MCC0:ONBC1SUMY is published by softioc sioc-mcc0-cud0.
+
+
+* Where are the PVs (records) managed by an IOC defined?
+
+The IOC's startup.cmd file specifies the st.cmd file which defines the
+epics database files loaded at startup.
+
+Take the "ioc" from the cainfo output host output, or for soft IOC as above, and substitue into this path:
+$ cat /usr/local/lcls/epics/iocCommon/ioc-ltu1-mc04/startup.cmd
+...
+# Load subsystem startup file
+chdir("/boot/lcls/epics/iocCommon/ioc-ltu1-mc04/iocSpecificRelease/iocBoot/ioc-ltu1-mc04")
+cexpsh("st.cmd")
+
+The chdir gives a path understood by the IOC (/boot) but uyou can see these files on prod from:
+/usr/local/lcls/epics/iocCommon/ioc-ltu1-mc04/iocSpecificRelease/
+
+The /iocSpecificRelease may be a synlink to a specific set of
+functionality (maybe under Ioctop), eg:
+
+Motion Control for wire scanners. ie
+  ls /usr/local/lcls/epics/iocCommon/ioc-ltu1-mc04/iocSpecificRelease
+  lrwxrwxrwx 1 softegr lcls 47 Nov 12 23:33 /usr/local/lcls/epics/iocCommon/ioc-ltu1-mc04/iocSpecificRelease -> 
+     ../../iocTop/MotionControl/MotionControl-R4-2-1
+
+So the st.cmd file - what the IOC boots from, is:
+ /usr/local/lcls/epics/iocCommon/ioc-ltu1-mc04/iocSpecificRelease/iocBoot/iocioc	-ltu1-mc04/st.cmd
+
+/usr/local/lcls/epics/iocCommon/ioc-ltu1-mc04/iocSpecificRelease/dbd/  - Files that say what records look like, the structures
+                                                                         that define kinds of record. 
+/usr/local/lcls/epics/iocCommon/ioc-ltu1-mc04/iocSpecificRelease/db/   - Files that define/instantiate actual records.
+
+So, see which db files are loaded by the st.cmd file, and and find them in the db/ dir.
+
+Add Devices/Pvs to a soft IOC
+-----------------------------
+Example is editing the devices in the EmittanceSupport of LCLS.
+Log into dev (lcls-dev2), then:
+
+  497  eco
+  498  cd EmittanceSupport/
+  499  cd MAIN_TRUNK/
+  500  cd iocBoot/
+  501  cd sioc-sys0-em00/
+  503  emacs st.cmd &      ** Make edits **
+  504  cd ../..
+  508  emacs RELEASE_NOTES ** Give new tag name and comment  
+  509  cvs commit -m "Fix LCLS BFW device names for UnD girders 20-33" iocBoot/sioc-sys0-em00/st.cmd RELEASE_NOTES
+  510  head RELEASE_NOTES     Just to get tag name you added
+  511  cvs tag EmittanceSupport-R3-0-7    cvs tag with the tag name 
+  512  cd to home directory
+  513  eco                    
+       Enter name of module/package to checkout: EmittanceSupport [RETURN]
+       <many other [RETURN]>
+       when finished:
+  514  cd EmittanceSupport/
+  516  cd EmittanceSupport-R3-0-7/
+  518  make
+       Check make was successful
+  519  cram push
+       Successfully pushed to LCLS, but I didn't have permssion
+       to push to other systems (facet, asta etc). That's ok, just
+       proceed to distribute to LCLS:          
+  521  cram upgrade -i ALL -f LCLS EmittanceSupport-R3-0-7
+    
+  After distribution, you can reboot the soft IOC right from EDM:
+  lclshome [Network,Global] SIOC:SYS0:EM00 -> IOC Stats -> Reboot. 
+     (then check Application Directory EDM field, to confirm the tag gets 
+      updated to reflect your new tag).
+
+  Finished.
+
+XAL
+===
+The production deck is named:
+   /usr/local/lcls/physics/config/model/main.xal
+
+Test a new XAL deck on production using the opticsSwitcher. This can be
+used to set all XAL modelManager instances on prod to using your test deck,
+for testing prior to deployment:
+
+Create a new main.xal to point to your local one. ALL files in it must be
+overridden, including teh dtd. NOTE there is a bug in XAL file parsing,
+you have to copy a dtd to teh local dir
+<!DOCTYPE sources SYSTEM "/home/physics/greg/Development/issues/xal/lclscvs/physics/config/model/xdxf.dtd">
+<sources>
+ <deviceMapping_source name="deviceMapping" url="/usr/local/lcls/physics/config/model/lcls.impl"/>
+ <optics_source name="optics" url="/home/physics/greg/Development/issues/xal/lclscvs/physics/config/model/lcls.xdxf"/>
+ <timing_source name="timing" url="/usr/local/lcls/physics/config/model/timing_pvs.tim"/>
+ <tablegroup_source name="modelparams" url="/usr/local/lcls/physics/config/model/model.params"/>
+</sources>
+
+
+$ opticsSwitcher (in ~/greg/bin/opticsSwitcher)
+enter the fully qualified name of your test xal file
+It seems you have to also hit Make Default for the change to take effect
+on modelmanagers in ACR. 
+ 
+To deploy XAL decks:
+--------------------
+XAL decks are in  /usr/local/lcls/physics/config/model/
+1. copy the existing production deck to lcls.xdxf.<date>
+2. opy in your new deck
+3. make sure opticsSwicher is pointing at the production one in 
+   /usr/local/lcls/physics/config/model/
+4. test with modelManager
+
+
+
+
+APPENDIX A: STARTUP.M AND THE MATLAB PATH FOR DEVELOPMENT. 
+---------------------------------------------------------
+
+* Setting the matlab path for matlab software development. 
+
+  SUMMARY: In short, if you set your own USERPATHROOT in your
+  startup.m file, it will be used in preference to
+  ~physics/<user>/matlab. If you don't set USERPATHROOT explicitly in
+  your startup.m, the old default case behaviour continues,
+  ~physics/<user>/matlab will be put in the path.
+
+* In excruciating detail:
+
+  Specifically, startup.m handles personal matlab paths in the
+  following way:
+
+  0. If you have logged in without a profile, only our production
+     matlab scripts (under /usr/local/lcls/tools/matlab) will be in
+     your matlab path
+
+  Otherwise (you have logged in with a profile) then:
+
+  1. If you don't have your own startup.m, and you don't have a
+     ~physics/<user>/matlab directory, only our production matlab
+     scripts will be in your matlab path
+  
+  2. If you do have your own startup.m, but you don't have a ~/matlab
+     directory, then if your startup.m sets USERPATHROOT, then the
+     directrory subtree USERPATHROOT points will be put at the head of
+     the path.
+
+     ** This should be the normal case for physicists who develop
+     matlab from now on **.
+
+  3. If you do have your own startup.m, and you do have a ~/matlab
+     directory and your startup.m explicitly sets USERPATHROOT, then
+     where it points to (not ~/matlab) will be at the head of path.
+     Otherwise (your startup.m does not set USERPATHROOT) then
+     ~/matlab will be at the head of the matlab path (the former
+     default).
+  
+* Setting USERPATHROOT to point to your matlab development directory. 
+
+Set USERPATHROOT value to the pathname of the directory that contains
+the head of the matlab cvs checkout you want to use. startup.m will
+take that pathname, and add each directory it finds under it to the
+matlab path. Eg, my matlab development for the two-bunch project is in
+files in directories under
+physics/greg/Development/twobunch/lclscvs/matlab, so for that project
+I set USERPATHROOT to:
+
+   USERPATHROOT='/home/physics/greg/Development/twobunch/lclscvs/matlab'
+ 
+* You can also use a specific startup.m file for each project. Useful
+for, eg, different settings of USERPATHROOT for different projects.
+
+  $ cd myproject
+  $ cp /usr/local/lcls/tools/matlab/toolbox/startup.m .
+  $ edit startup.m to set USERPATHROOT to directory myproject 
+  $ matlab       # the local startup.m will be used rather than default
+
+
+
+APPENDIX B
+==========
+
+Getting EPICS data on SLAC Public Machines (aka "AFS")
+=========================================
+For complicated reasons of interop between 64 bit EPICS, 64 bit machine architecure and Red Hat version, host is important. Choose either lcls-dev3 or rhel6-64. Then...
+
+bash
+source /afs/slac/g/lcls/epics/setup/go_epics_3.15.5-1.0.bash
+source ~greg/doh_epics.bash        # fixes go_epics for EPICS 7
+source ~greg/envs_epics_prod.bash  # use production IOCs, not development
+
+Then you can, for instance:
+[greg@rhel6-64k ~]$ eget -ts ds -a name BPMS:IN20:%:X
+  BPMS:IN20:221:X
+  BPMS:IN20:235:X ...
+[greg@rhel6-64k ~]$ caget BPMS:IN20:425:X
+BPMS:IN20:425:X                -0.0476485
+[greg@rhel6-64k ~]$ pvget -p ca BPMS:IN20:425:X
+BPMS:IN20:425:X                -0.0516504
+
+
+Getting EPICS PV archive data on SLAC public machines:
+-----------------------------------------------------
+The past history of the values of many of the process variables of the EPICS control system, are archived by a special "Archiver" database.
+
+Access to the archived value of PV, is also through EPICS. So the process begins with teh same setup as above:
+
+
+bash
+source /afs/slac/g/lcls/epics/setup/go_epics_3.15.5-1.0.bash
+source ~greg/doh_epics.bash        # fixes go_epics for EPICS 7
+source ~greg/envs_epics_prod.bash  # use production IOCs, not development
+
+To search for which PVs are archived, use eget -ts hist:search -a pv <pvnamepattern>
+
+Eg the following shows which PVs of the X offset of BPMS:IN20:425 are available in the archive:
+
+[greg@rhel6-64n]$ eget -ts hist:search -a pv 'BPMS:IN20:425:X*'
+BPMS:IN20:425:X.AOFF BPMS:IN20:425:X.ASLO BPMS:IN20:425:X1H BPMS:IN20:425:X1H.RMS BPMS:IN20:425:XAOFF BPMS:IN20:425:XB5L0USED BPMS:IN20:425:XENERGYJITTER BPMS:IN20:425:XOFF BPMS:IN20:425:XOFF.B BPMS:IN20:425:XOFF.C BPMS:IN20:425:XOFF.D BPMS:IN20:425:XOFF.E
+
+To get the archived values; the following will get one minute of the values 
+BPMS:IN20:425:X1H had.
+
+eget -ts hist -a pv  BPMS:IN20:425:X1H -a from '2017-11-11T00:00:00Z' -a to '2017-11-11T00:01:00Z'
+
+To see more examples and help, type:
+
+$ eget -ts hist -a help
+
+
+APPENDIX C: ORACLE DATABASE iNVESTIGATIONS.
+
+CATER web site:
+https://oraweb.slac.stanford.edu/apex/slacprod/f?p=194
+
+
+
+
+
+
+
+
+
+
+  

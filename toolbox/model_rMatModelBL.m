@@ -5,6 +5,11 @@ function [bLine,startZ,startE,idE0,idTW0]=model_rMatModelBL(name,rOpts)
 % (sub-paths).
 %
 
+% History:
+%   21-Sep-2021, M. Woodley
+%    * define LCLS2cu beamLines that start at OTR2 (CU_HXRI, CU_SXRI,
+%      CU_ALINEI (not used), CU_SPECI)
+
 debug=0;
 
 if (~iscell(name))
@@ -73,6 +78,12 @@ switch cname
         'F2_S10AIP','F2_ELEC','F2_SCAV', ...
         'F2_ELECI','F2_SCAVI'}
     if (~strcmp(cname,beamPath)),error(efmt,cname,beamPath),end
+  case {'CU_HXRI','CU_SXRI','CU_ALINEI','CU_GSPECI'} % construct these "on the fly"
+    tname=cname(1:end-1); % strip off the trailing "I" to check consistency with beamPath
+    if (~strcmp(tname,beamPath)),error(efmt,tname,beamPath),end
+    startZ=14.24102919;startE=0.135;idE0=2;idTW0=22; % start at OTR2
+    begName='OTR2';
+    beamLine=cname;
   case {'FullMachine'}
     if (~strcmp(beamPath,'CU_HXR')),error(efmt,cname,beamPath),end
     beamLine=cname;
@@ -132,11 +143,6 @@ switch cname
       case 'XBAND_TOBEND'
         startZ=0;startE=1.0;idE0=1;idTW0=13; % start at entrance of QE01X, end at DNMARK42
     end
-  case {'CU_HXRI'}
-    if (~strcmp(beamPath,'CU_HXR')),error(efmt,cname,beamPath),end
-    startZ=14.24102919;startE=0.135;idE0=2;idTW0=22; % start at OTR2
-    begName='OTR2';
-    beamLine=cname;
 end
 
 % instantiate beamLine

@@ -1,0 +1,1007 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+<meta name="keywords" content="SLAC, EPICS, Control System, Matlab, MAD" />
+
+<!-- Include the basic Accelerator Dept base.css, and the css for IDEA documents -->
+<link rel="stylesheet" type="text/css" href="https://www.slac.stanford.edu/grp/ad/css/base_cardinal.css" />
+<link rel="stylesheet" type="text/css" href="https://www.slac.stanford.edu/grp/ad/css/idea_cardinal.css" />
+
+<title>HLA Programmers Guide</title>
+
+<style type="text/css">
+</style>
+
+<!-- Script that generates the Table of Contents -->
+<script type="text/javascript" src="https://www.slac.stanford.edu/grp/ad/script/tocgen.js"></script>
+</head>
+
+<body>
+<!-- The Masthead -->
+<br />
+<div id="masthead" style="position:relative">
+    <a href="https://www.slac.stanford.edu/">
+      <img style="float:left" src="https://www.slac.stanford.edu/grp/ad/model/images/slacHeaderLogo.gif"
+        alt="SLAC National Accelerator Laboratory" width="182" height="24">
+    </a>
+</div>
+<br />
+<hr />
+
+<div class="head">
+  <!-- Title of the document goes in (the only) h1 tag. Don't forget to also
+  set the title tag above -->
+  <h1>HLA Programmers Guide</h1>
+  
+  <!-- Maturity: Working Draft or Request for Comments, or Recommendation, and date.  -->
+  <h2 class="nocount" >
+SLAC Accelerator High Level Applications Programmers Guide, 3-Dec-2017</h2>
+  
+  <dl>
+    <dt>Editors:</dt>
+    <dd>Greg White (greg@slac.stanford.edu)<br>
+        Mike Zelazny (zelazny@slac.stanford.edu)      
+      </dd>
+
+      <dt>This version:</dt>
+      <dd><a href=
+	"http://www.slac.stanford.edu/grp/ad/docs/matlab/documents/programmers_guide.html">
+	http://www.slac.stanford.edu/grp/ad/docs/matlab/documents/programmers_guide.html</a>
+      </dd>
+    </dl>
+    
+  <hr />
+</div> <!-- Header material -->
+
+
+<h2 class="nocount" id="abstract">Abstract</h2>
+
+<p>This document is intended to help SLAC physicists, operators and users, to write Matlab and Python software for data analysis, control, and optimization, of the LCLS-II accelerator complex. </p>
+
+<h2 class="nocount">Status of this Document</h2>
+
+<p>This version (3-Dec-2017) adds an error handling pattern. LCLS-2 modelling is still not present. The prior version (15-Sep-2017) was a draft of a re-write of the <a href="http://www.slac.stanford.edu/grp/ad/hla/matlab/programming_guide_matlab.pdf">original MATLAB
+Programmers Guide</a>. That guide is superseded by this document. This document updates the original with respect to programming practices for LCLS-II, especially with respect to development of multiple HLA simultaneously, lattice and optics definition of LCLS-II beampaths, access to model data, access to control PV data, use of fake data for development, and error handling. </p>
+
+<p>This HTML version, and the previous Word versions of this document are available in <a href="http://www.slac.stanford.edu/cgi-wrap/cvsweb/matlab/?cvsroot=LCLS"> SLAC's "LCLS"
+CVS repository in the Matlab module</a>.</p>
+
+<p>Please see Appendix C Items to be Added to the Document, for list of items planned but not yet included, such as Python support.</p>
+
+<h2 class="nocount">Updating this Document</h2>
+<p>
+To update this document and republish to the web; with CVSROOT set to <code>"/afs/slac/g/lcls/cvs"</code>, do <kbd>cvs co matlab/documents/programmers_guide.html</kbd>, make your edits, <kbd>cvs commit</kbd> your changes, <kbd> cd /afs/slac/www/grp/ad/docs/matlab/documents</kbd>, then <kbd>cvs update -dA programmers_guide.html</kbd>. </p>
+
+
+<!-- The Table of Contents. This will be generated automatically at display time -->
+<div id="toc">
+  <h2 class="nocount">Table of Contents</h2>
+</div>
+
+<!-- Place all the content you would like to be entered in the Table of Contents, inside the contents div below. All other content - like the Abstract and Status, outside the contents div (ie above here) -->
+<div id="contents" class="contents">	  
+<hr />
+  
+<h2 id="basics">Basics</h2>
+<p>This document assumes Matlab HLA development is carried out on the production network (as has been common practice). In a future version of this document, application development on AFS and one's own machine will be described</p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+<p>To develop applications software for LCLS-II, you will need at least the following:</p>
+<ol>
+  <li>
+    <a href="http://www2.slac.stanford.edu/comp/slacwide/account/account.html">
+    A SLAC UNIX/AFS account</a></li>
+<li>Some computer to login to, from which you can access the lcls DMZ network (host <kbd>mcclogin</kbd>), and hence the lcls production network (host <kbd>lcls-srv01</kbd> in particular) </li>
+<li>Be authenticated on the lcls production network as a permitted user. Contact EED Systems Group, <a href="https://www-public.slac.stanford.edu/phonebook/dirsearch.aspx?name=jingchen&gone=active&lf=1&url=&submit=go">Jingchen Zhou, 4661</a>, or <a href="https://www-public.slac.stanford.edu/phonebook/dirsearch.aspx?name=brobeck&gone=active&lf=1&url=&submit=go">Ken Brobeck</a> to insert the necessary RSA authentication into you SLAC unix account</li>
+<li>Be added to the list of physics users of the LCLS accelerator control system, so that your login to lcls-srv01 is tailored for developing and running EPICS and HLAs. Contact <a href="https://www-public.slac.stanford.edu/phonebook/dirsearch.aspx?lf=1&url=&gone=active&NAME=zelazny">Mike Zelazny, 3673.</a>
+</ol>
+
+<h3>Login to Production</h3>
+<p>To login to the production network, with the <a href="#prerequisites">
+prerequisites above</a> in place, login to <kbd>lcls-srv01.slac.stanford.edu</kbd> using the <kbd>physics</kbd> user name. You must go via the mcclogin host. The following one line, executed from SLAC public AFS machine rhel6-64, would make a fast login to lcls-srv01 using tricks for encryption and compression that can make lclshome and apps run acceptably fast over X11 on most modern networks:</p>
+<pre>
+  $ ssh -A -t -Y -C -c arcfour256 -l&lt;your-slac-username&gt; mcclogin.slac.stanford.edu \
+  ssh -A -t -Y -C -c arcfour256 -l physics lcls-srv01
+</pre>
+<p>At the prompt, declare who you are, as you agreed with Mike above. For me it's "greg".</p>
+  
+<h3>Starting MATLAB</h3>
+<p>If you want the full graphical development environment, simply type <kbd>matlab</kbd> at the prompt.
+  If you want to run applications only, or just do some basic scripting, add the <kbd>nodesktop</kbd> option.
+  <kbd>nosplash</kbd> makes Matlab start a bit faster. For example:</p>
+  
+<pre>
+[physics@lcls-srv01] $ matlab                       <em>Full GUI environment</em>
+[physics@lcls-srv01] $ matlab -nodesktop -nosplash  <em>Just matlab prompt</em>
+</pre>  
+
+
+<h3>Directories</h3>
+
+<p>On production LCLS hosts (lcls-srv01 etc), our matlab files are primarily to be found in  directories under <code>/usr/local/lcls/tools/matlab</code> (environment variable $MAT):</p>
+<pre>
+/usr/local/lcls/tools/matlab/toolbox   <em>Physics and apps oriented</em>
+/usr/local/lcls/tools/matlab/src       <em>Support, utilities, controls oriented</em>
+</pre>
+<p>The full list of directories Matlab looks in to find scripts and functions, can be found by typing <kbd>path</kbd> at the Matlab prompt. </p>
+<p><b>Note:</b> Our Matlab <kbd>startup.m</kbd> file is set up to automatically put all subdirectories it finds under <kbd>/usr/local/lcls/tools/matlab/toolbox</kbd> <b>also</b> on the matlab path. Therefore, it makes sense to put new projects in their own subdirectory.</p>
+<p>Both toolbox and src are kept in our CVS based source code management system, see below. </p>
+
+<h3>CVS</h3>
+
+<p>CVS (Code Versioning System) <a class="bib" href="#bib:cvs">bib:cvs</a> is a way of keeping track of changes to code. It's especially helpful in a software development collaboration. You can use CVS to keep track of changes to your scripts, enable collaborative editing, and compare to previous versions, etc. </p>
+
+<p>Our CVS at SLAC keeps track of <a href="http://www.slac.stanford.edu/cgi-wrap/cvsweb?cvsroot=LCLS" >all the software that runs the LCLS accelerator complex, is in a single so called, "repository" called "LCLS"</a>. The repository is subdivided into "modules" - essentially directories of files.</p>
+
+<p>Our Matlab files are in <a href="http://www.slac.stanford.edu/cgi-wrap/cvsweb/matlab/?cvsroot=LCLS">the matlab CVS repository</a>
+
+<p>In outline, the procedure is you work with copies of these files in your working directory. You first "checkout" <code>matlab/src</code> or <code>matlab/toolbox</code> from the repository to your working directory. You make changes to the files, or add files. When you're ready to release your version, so that the control system and your colleagues can use it, you "commit" it to the repository, and then "update" the shared directory that contains all the files of the matching module (<kbd>/usr/local/lcls/tools/matlab/toolbox</kbd> or <kbd>/usr/local/lcls/tools/matlab/src</kbd>). At that point, everyone else, and LCLS, will be using the files you contributed. See below for the step-by-step commands. </p>   
+
+<p><b>CVS references</b>: See <a href="cheatsheet.html#cvs-code-versioning-system">Cheatsheet section on CVS commands</a>.</p>
+
+<h2>Matlab Project Development</h2>
+<p>This section describes typical actions you might take to develop a Matlab HLA for the LCLS accelerators. Note, this is a little different to the old Matlab development workflow. This workflow specifically enables you to have more than one project in development at the same time, all under your home directory (like ~physics/greg/) but not interfering with each other. </p>
+
+<h3>Project creation</h3>
+<p>The following pattern is appropriate for minor modifications to a single file, or large multi-week projects.</p>
+<p>Begin by creating a directory to do your development, and another for your cvs files. Then checkout matlab files you want to work on. And finally edit a local version of startup.m to point to your development.</p>
+
+<pre>
+~/greg/Development]$ mkdir myproject              
+~/greg/Development]$ cd myproject              &#35; Keep associated files/docs here    
+~/greg/Development/myproject]$ mkdir lclscvs      
+~/greg/Development/myproject]$ cd lclscvs/     &#35; CVS files here
+~/greg/Development/myproject/lclscvs]$ cvs co matlab/toolbox/meme/src/meme_names.m
+greg@mcclogin's password: 
+U matlab/toolbox/meme/src/meme_names.m
+</pre>
+<p>Now to tell Matlab where your development matlab files can be found. You can either
+  use the "Set Path" preference inside matlab every time you open matlab, or copy startup.m to your project directory and edit it. In this latter way, you can keep a number of matlab project folders, and just start matlab from the appropriate directory - the one containing <code>startup.m</code> - for that project.
+</p>
+<pre>
+~/greg/Development/myproject/lclscvs]$ cd ..
+~/greg/Development/myproject]$ cp $MAT/toolbox/startup.m .    &#35; don't forget the "."
+~/greg/Development/myproject]$ chmod +w startup.m             &#35; change permissions so can modify it
+</pre>
+<p>Edit startup.m to assign the special variable USERPATHROOT towards the top of the file (you will find examples in startup.m) and set it to the root of your matlab files. You can edit it with emacs or Matlab itself - but if using matlab, be sure to restart matlab so it executes your local startup.m.</p>
+<pre>
+% Where I develop myproject
+  USERPATHROOT='/home/physics/greg/Development/myproject/lclscvs/matlab';
+</pre>
+<p>Now, whenever you start matlab from the project directory (which contains your edited startup.m) your project files will be at the top of matlab's path. </p>
+<pre>
+~/greg/Development/myproject]$ matlab &amp; 
+</pre>
+<h3>Project release</h3>
+<p>When you have completed a project, follow the following steps to release it. You can then delete the project directory, or keep it around (together with notes in your myproject directory). The following is an example of releasing modifications I made to <code>
+matlab/toolbox/meme/src/meme_names.m
+  </code>.
+</p>
+<pre>
+~/greg/Development/myproject]$ cd lclscvs/matlab/toolbox/meme/src
+~/greg/Development/myproject/lclscvs/matlab/toolbox/meme/src]$ ls
+total 4
+-rw-rw-r-- 1 physics lcls 1581 Jan 31 18:37 meme_names.m
+drwxrwxr-x 2 physics lcls    6 Jan 31 14:50 CVS
+~/greg/Development/myproject/lclscvs/matlab/toolbox/meme/src]$ cvs commit -m "removed explicit name arg" meme_names.m
+greg@mcclogin's password: 
+Checking in meme_names.m;
+/afs/slac/g/lcls/cvs/matlab/toolbox/meme/src/meme_names.m,v  <--  meme_names.m
+new revision: 1.3; previous revision: 1.2
+done
+~/greg/Development/myproject/lclscvs/matlab/toolbox/meme/src]$ cvs2prod
+greg@mcclogin's password: 
+U meme/src/meme_names.m
+</pre>
+<p>Completed, the new meme_names.m is now in production and all production apps will use the new version.</p>
+
+<!-- -------------------------------------------------------------- -->
+<h2>Matlab EPICS Control PV access</h2>
+
+</p>This section describes how your matlab can interface to the control system.<p>
+
+<h3>EPICS Versions and protocols for accessing Control System EPICS data</h3>
+
+<p>
+Most of the control system software used for LCLS and other SLAC accelerators, is based on EPICS (Experimental Physics and Industrial Control System) <a class="bib" href="#bib:epics">bib:epics</a>.</p>
+<p>EPICS uses two means of communication (or "network protocols") to talk to the devices of the accelerator; the legacy "Channel Access" protocol, and the new "pvAccess" protocol. </p>
+
+<p> As a user, to get device's data or to make a device go to a value, you perform get and set operations on a so-called "Process Variable", or "PV" for short. When you refer to a PV, you refer simply to its name. A PV name is simply the ASCII string that identifies the process variable quantity. Think of PVs as an <a href="https://en.wikipedia.org/wiki/Entity-attribute–value_model"> entity-attribute-value</a> system. At SLAC, when the value refers to a control system device setpoint or readback, the entity is the name of the device (eg QUAD:IN20:941, the attribute is some control or readback quantity of the device, such as magnet's BDES, and the value is the control or readback value. The SLAC PV naming convention makes this really clear; see the examples below. </p>
+
+<p>
+At SLAC, at the time of writing, all device control PV communication is done through the Channel Access protocol, so all Channel Access PV names follow the naming convention &lt;device-name&gt;:&lt;attribute-name&gt;. </p>
+
+<p>
+EPICS version 4 introduced the pvAccess protocol. pvAccess can do almost everything that Channel Access can do, and it adds 2 large feature sets: it can handle complex structured data (for instance 1 PV can carry all the data and metadata of an areaDetector NDArray), and it can handle PVs whose values are subject to arguments supplied at runtime - like a function call. </p>
+
+<p>
+Since EPICS version V4 PVs can carry complex data, often not oriented towards a single device, some EPICS V4 PV names are not &lt;device-name&gt;:&lt;attribute-name&gt;. For instance, some PVs refer to the whole of LCLS, so they're prefixed "LCLS". </p>
+
+<p>
+At the time of writing, SLAC EED Department has enabled the use of the new pvAccess protocol only for complex process variables - those whose values are tables, or matrices, or self-describing images, rather than simple scalar or array values. </p>
+
+<table class="content" style="font-size:smaller">
+    <tr>
+      <th>Example PV names</th>
+      <th>Content</th>
+      <th>Protocol used</th>
+      <th>Matlab APIs</th>
+      <th>Python APIs</th>
+    </tr>
+    <tr>
+      <td>QUAD:IN20:941:BDES</td>
+      <td>The field setpoint of magnet device QUAD:IN20:941</td>
+      <td>CA</td>
+      <td>labCA or EPICS V4</td>
+      <td>?</td>
+    </tr>
+    <tr>
+      <td>QUAD:IN20:941:RMAT</td>
+      <td>Response matrix of magnet device QUAD:IN20:941</td>
+      <td>PVA (RPC)</td>
+      <td>EPICS v4</td>
+      <td>pvaPy</td>
+    </tr>    
+</table>
+
+
+<h3>LabCA</h3>
+
+<p>The labCA toolbox wraps the essential ChannelAccess routines and makes them accessible from the MATLAB programs.</p>
+
+<p>For details of lca see the reference manual, "<a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/manual.html" >labCA -- An EPICS Channel Access Interface for scilab and matlab</a>."</p>
+
+<p>All labCA calls take a PV name argument identifying the EPICS process variable, or array of process varaibles, the user wants to access. EPICS PVs are plain ASCII strings that follow the <em>&lt; devicename &gt; : &lt; attributename &gt</em> pattern described above. Note that labCA cannot be used to access process variables that are only available over EPICS 7 pvAccess.</p>
+
+<p>LabCA is capable of handling multiple PVs in a single call; they are simply passed as a cell-array of strings, e.g.:</p>
+<pre>
+pvs = { 'QUAD:IN20:941:BDES'; 'QUAD:IN20:941:BACT'; 'QUAD:IN20:941:EACT' }
+</pre>
+
+<h4>Data Types</h4>
+<p>Unless all the PVs in an lca call are of EPICS native string type (or more formally "char") or conversion to char is enforced explicitly, labCA always converts data to double.
+Legal values for type are byte, short, long, float, double, native, or char (for strings). </p>
+
+<h4>Timestamp format</h4>
+<p>ChannelAccess timestamps provide the number of nanoseconds since 00:00:00 UTC, January 1, 1970. LabCA translates the timestamp into a complex number with the seconds in the real and nanoseconds in the imaginary parts.</p>
+To convert timestamps into MATLAB format use lca2matlabTime (see <a href="#lcaget" >example for lcaGet below</a>.
+
+<h4>Exceptions and error handling</h4>
+
+<p>There are 2 kinds of things that can go wrong in an EPICS PV interaction like lcaGet and lcaPut. The first are related to the computation itself, like a typo in the pv name, or the EPICS record in the IOC associated with that PV isn't available on the network. Such problems result in matlab exceptions. The second are oriented toward the validity of the data or control action or IOC connection to its device hardare. This second kind are handled through the EPICS alarm "status" and "severity." EPICS severity value of "INVALID" indicates EPICS detected an internal error. Schematically;
+<p>
+<kbd>yourlcamatlab &lt;--ca--&gt; IOC &lt;--fieldbus--&gt; hardware</kbd>
+</p>
+<ol>
+  <li>Exceptions: Errors in the communications <kbd>yourlcamatlab &lt;--ca--&gt; IOC</kbd> cause LCA to throw exceptions. Handle with <kbd>try/catch</kbd>. Check the pv name, IOC is on the network, etc.  
+  </li>
+  <li>EPICS status and severity convey IOC reported errors:
+  <ul>
+    <li>IOC correctly detects that a value is problematic in some way, such as being out of range are comminicated through to you through the EPICS PV's status. The status will have a severity value of 0 (NO ALARM), 1 (MINOR ALARM) or 2 (MAJOR ALARM). Handle in your code by checking the PVs status and the severity of that status with <a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node18.html" >lcaGetStatus</a></li>
+    <li>Errors in the comminication, <kbd>IOC &lt;--fieldbus--&gt; hardware</kbd>, or misconfiguration, or IOC detects an internal "record processing" systems error such as div-by-0, result in EPICS severity value of 4 (INVALID). Handle in your code by checking the PV's severity with <a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node18.html" >lcaGetStatus</a>. May have to reboot the IOC. Call IOC engineer. </li>
+  </ul>
+  </li>
+</ol>
+
+These two error types and their handling are further described below. </p>
+
+
+<h5>LCA Exceptions</h5>
+
+<p>If lca can't contact a PV, or otherwise can't complete an I/O operation, it throws an exception. If the exception is not "caught", the execution is aborted (look for details in the MATLAB manual). That is, if there is no catch statement anywhere in the stack of functions that the matlab porcess has executed so far to get to your lcaGet, then your matlab program will crash. So, you should always program with try-catch blocks around any lca code that can fail. </p>
+
+<p>The generic code pattern for the handling of lca operations like lcaGet and lcaPut is given at <a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node4.html#errorhandling" >https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node4.html#errorhandling</a>. That page includes also a table for proper interpretation of the status codes from lcaLastError.  The Matlab specific equivalent is below:
+</p>
+<pre>
+STDERR=2; % The file-id corresponding to the unix standard error
+
+try
+    lcaPut('invalidlynamedpv',1);    %! A pv invalid by virtue of something like wrong name, or offline IOC
+catch ex 
+    errcodes = lcaLastError(); %! Get the error code (or if &gt;1 PV) codes, see lca error codes table
+    fprintf(STDERR, 'errorcodes %i\n', errcodes ); % Print the error code         
+    fprintf(STDERR, '%s\n', getReport(ex,'extended'));  % Print extended error message
+end
+</pre>
+<p>An example execution of the above code is below. Note the <code>getReport()</code> prints 6 lines (including blank lines):</p>
+<pre>
+errorcode 6
+Error using lcaGet
+multi_ezca_get_nelem -  ezcaGetNelem(): could not find process variable :invalidlynamedpv              
+
+Error in putsmarttest (line3)
+   val=lcaGet('invalidlynamedpv');       
+              
+</pre>
+<p>This same basic pattern is valid for lca operations generally, like lcaGet and lcaPut, lcaGetStatus. etc. </p>
+<p>A <a href="#exceptpattern" > more complete exception handling pattern is given below.</a></p>
+
+<h5>EPICS PV Status and the Status' Severity</h5>
+
+<p>The second kind of PV errors are related to the IOC, its communicatins to harward and its record processing. These are problems like the PV is out its control limits. The basic call to get a PVs status and severity is <code><a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node18.html" >lcaGetStatus</a></code>. Basic references are the <a href="https://epics.anl.gov/EpicsDocumentation/AppDevManuals/RecordRef/Recordref-1.html" >EPICS Record Reference Manual</a>, <a href="https://epics.anl.gov/EpicsDocumentation/AppDevManuals/RecordRef/Recordref-5.html#MARKER-9-13" >Alarm Specification</a>. </p>
+
+<p>The possible values of alarm SEVR and STAT are defined in:
+<a href="https://github.com/epicsdeb/epics-base/blob/master/src/libCom/misc/alarm.h">
+https://github.com/epicsdeb/epics-base/blob/master/src/libCom/misc/alarm.h</a>
+</p>
+
+<p>NOTE: <em>Our <a href="http://www.slac.stanford.edu/cgi-wrap/cvsweb/matlab/src/lcaInit.m?rev=1.4&content-type=text/x-cvsweb-markup&cvsroot=LCLS" >lcaInit.m</a> sets the so called "severity rejection level" to None, by setting value 14</em>! That is to say, calls to lcaGet will therefore NOT return NaN in cases that the VALue of the PV is bad in any way, even disconnected hardware! For instance, by default, your code is NOT warned if the value is below the LOLO status value, which is a MAJOR alarm condition. cf <a href="http://www.slac.stanford.edu/cgi-wrap/cvsweb/matlab/src/lcaInit.m?rev=1.4&content-type=text/x-cvsweb-markup&cvsroot=LCLS" >lcaInit.m</a> </p>
+
+<p>The consequeces are described below by example of a PV whose value is, at the time of writing, out of tolerance.</p>
+
+<pre>For instance at the time of writing, the value of PV KLYS:DMP1:1:MICROPERVEANCE is
+too low. It's 0 and it should be more than 0.95 (see KLYS:DMP1:1:MICROPERVEANCE.LOLO):
+
+>> uperv = lcaGet('KLYS:DMP1:1:MICROPERVEANCE')
+                 
+uperv =  
+      0
+  
+That value of 0 in fact puts the PV in LOLO status, which in the case
+of this PV is a MAJOR severity alarm (see below):  
+
+[sv,st,~]=lcaGetStatus('KLYS:DMP1:1:MICROPERVEANCE')
+
+sv =  
+      2
+
+st =
+      5
+  
+You can get access to the SEVeRity and STATus also from the PV's SEVR and STAT fields:
+
+>> lcaGet('KLYS:DMP1:1:MICROPERVEANCE.SEVR')
+
+ans =
+
+    'MAJOR'   % epicsAlarmSeverity = MAJOR_ALARM = 2
+
+>> lcaGet('KLYS:DMP1:1:MICROPERVEANCE.STAT')
+
+ans =
+    'LOLO'   % epicsAlarmCondition = LOLO_ALARM = 5
+</pre>
+
+<p>We can set LCA's "Severity rejection level" so that the returned value will be
+NaN rather than the questionalble value of the PV's VAL field when the PV's severity
+is above a given threshold. For instance, with the KLYS:DMP1:1:MICROPERVEANCE PV
+still in MAJOR severity due to its low value of 0, as above:
+</p>
+<pre>
+>> lcaSetSeverityWarnLevel(12)                                                     
+Setting severity REJECTION level to 2                                              
+
+>> v=lcaGet('KLYS:DMP1:1:MICROPERVEANCE')                                          
+                                                                                   
+v =                                                                                
+                                                                                   
+   NaN 
+
+Then we can set it back to 14 when we have completed the lca operation that needed
+to be warned of a non-0 severity
+
+>> lcaSetSeverityWarnLevel(14)              
+Setting severity REJECTION level to 4  
+>> v=lcaGet('KLYS:DMP1:1:MICROPERVEANCE')                                          
+                     
+v =                                                                                
+     
+     0                                                                                       
+</pre>
+
+
+
+<h5>Timeouts</h5> <p>Since labCA is used for accessing data via network, your function calls can timeout (see 2.4).</p>
+
+<h4>Basic labCA Commands</h4>
+
+<h5 id="lcaget">lcaGet</h5>
+<p><code>lcaGet</code> is the basic function use to get the values of EPICS process variables over Channel Access. The value of one or a number of Process Variables can be acquired with one call. See lca reference manual,  <a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node5.html" >lcaGet</a>.</p>
+
+<h6>Synopsis</h6>
+<pre>
+<a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node5.html" >[value, timestamp] = lcaGet(pvs, nmax, type)</a>
+</pre>
+<h6>Parameters</h6>
+<dl>
+  <dt>pvs</dt>
+  <dd>A cell array of m <a href="https://www.mathworks.com/help/matlab/matlab_prog/creating-character-arrays.html" >char vectors</a> (ie strings), each element of the cell array being the name of an EPICS record, otherwise known as a process variable or "PV". A single PV can be given as simply a single character vector, e.g. 'EVNT:SYS0:1:LCLSBEAMRATE'.
+  <dt>nmax (optional)</dt>
+  <dd>Maximum number of elements (per PV) to retrieve (i.e. limit the number of columns of value to nmax).
+If set to 0 (default), all elements are fetched and the number of columns in the result matrix is set to the maximum number of elements among the PVs.
+    This parameter is useful to limit the transfer time of large waveforms. For instance BSA PV values are typically 2800 element arrays. </dt>
+    <dt>type (optional)</dt>
+    <dd>A string specifying the data type to be used for the channel access data transfer.  Legal values for type are: <code> 'byte', 'short', 'long', 'float', 'double', 'native', 'char'</code>.</dd> 
+</dl>
+<h6>Returns</h6>
+<dl>
+  <dt>value</dt>
+  <dd>The m x n result matrix. n is automatically sized to accommodate the PV with the most elements.
+    Excess elements of PVs with less than n elements are filled with NaN values. LabCA fills the rows corresponding to PVs whose value is INVALID, with NaNs. In addition, warning messages are printed to the console if a PV's alarm status exceeds a configurable threshold.</dd>
+    
+<dt>timestamp</dt>
+<dd>m x 1 column vector of matlab complex numbers holding the CA timestamps of the requested PVs.
+The timestamps count the number of seconds (real part) and fractional nanoseconds (imaginary part) elapsed since 00:00:00 UTC, Jan. 1, 1970.</dd>
+
+<h6>Examples</h6>
+<pre>
+>> % Get the desired and actual B fields of a corrector 
+>> [values, timestamps] = lcaGet({'XCOR:LI22:402:BDES';'XCOR:LI22:402:BACT'});                                          
+>> values                                                                                                               
+                                                                                                                        
+values =                                                                                                                
+                                                                                                                        
+    0.0012                                                                                                              
+    0.0012                                                                                                              
+                                                                                                                        
+>> datestr(lca2matlabTime(timestamps))                                                                                  
+                                                                                                                        
+ans =                                                                                                                   
+                                                                                                                        
+10-Jan-2018 10:17:55                                                                                                    
+10-Jan-2018 11:38:23                                                                                                    
+</pre>
+<p>See also the Lca User Guide for <a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node5.html" >examples of using lcaGet</a>.</p>
+
+<h5>lcaPut, lcaPutNoWait</h5>
+
+<p>lcaPut and lcaPutWait functions write values to PVs. The PVs may be scalars or arrays of different dimensions. It is possible to write the same value to a collection of PVs.</p>
+
+<p>lcaPut will wait until the request is processed on the server, whereas lcaPutNoWait returns immediately.</p>
+
+<h6>Synopsis</h6>
+<pre>
+<a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node6.html" >lcaPut(pvs, value, type)</a>
+<a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node7.html" >lcaPutNoWait(pvs, value, type)</a>
+</pre>
+
+<h6>Parameters</h6>
+<dl>
+  <dt>pvs</dt>
+  <dd>A cell array of m <a href="https://www.mathworks.com/help/matlab/matlab_prog/creating-character-arrays.html" >char vectors</a> (ie strings), each element of the cell array being the name of an EPICS record, otherwise known as a process variable or "PV". A single PV can be given as simply a single character vector, e.g. 'EVNT:SYS0:1:LCLSBEAMRATE'
+  </dd>
+  <dt>value</dt>
+  <dd>value is written to all m PVs. </dd>
+  <dt>type (optional)<dt>
+  <dd>
+    A string specifying the data type to be used for the channel access data transfer.
+  </dd>
+</dl>
+    
+<h6>Examples</h6>
+<pre>
+>> lcaPut('XCOR:LI22:402:BDES', 0.00125)
+>> lcaGet('XCOR:LI22:402:BDES')
+ans =
+0.00125
+</pre>
+<p>See also the Lca User Guide for <a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node6.html" >examples of using lcaPut</a>, and <a href="https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/labca/manual/node7.html" >lcaPutNoWait</a>.</p>
+
+<h5>lcaGetEnumStrings</h5>
+<p>Get the names of the</p>
+
+<h2>Lattice description of LCLS-II, optics, beampaths and devices</h2>
+<p>The MAD "decks" for LCLS, LCLS-II and FACET beampaths, are available on the web at <a href="http://www.slac.stanford.edu/grp/ad/model/">http://www.slac.stanford.edu/grp/ad/model/</a>. Specifically:</p>
+
+<table class="content">
+  <tr>
+    <th>Decks</th>
+    <th>URL</th>
+  </tr>
+  <tr>
+    <td>Operational LCLS accelerator</td>
+    <td><a href="http://www.slac.stanford.edu/grp/ad/model/lcls.html">http://www.slac.stanford.edu/grp/ad/model/lcls.html</a></td>
+  </tr>
+  <tr>
+    <td>Planned LCLS-II accelerator, including copper linac (cu) and superconducting (sc) beampaths</td>
+    <td><a href="http://www.slac.stanford.edu/grp/ad/model/lcls2.html">http://www.slac.stanford.edu/grp/ad/model/lcls2.html</a></td>
+</table>
+
+<h3>Beampaths, lines, elements and devices</h3>
+<p>Note the Beampaths section of the MAD deck web sites above. They list <a href="http://www.slac.stanford.edu/grp/ad/model/lcls.html#visualizations">the distinct electron beam traversals possible now in "LCLS-I"</a> and <a href="http://www.slac.stanford.edu/grp/ad/model/lcls2.html#visualizations">those planned in the warm-copper linac and super-conducting linac of "LCLS-II"</a>. Note beampath id CU_HXR exists in both, since this beampath is the same now as it is in the planned LCLS-II machine. </p>
+
+
+<table class="content">
+  <tr>
+    <td>Beampath</td>
+    <td>The top level of organization of LCLS-II is beampath. A "beampath" is a complete electron traversal from one of the cathodes to a dump. The MAD deck defines 8 beampaths now, eg SC_SXR, SC_HXR, CU_HXR etc. </td>
+  </tr>
+  <tr>
+    <td>Line</td>
+    <td>Within a beampath is a hierarchy of lines (lines may contain lines). For instance the CU_HXR beampath (as implemented for LCLS-I) starts with GUNL0A, then L0B, DL1 and so on. GUNL0A contains GUNBXG and BXGL0A. Beampath CU_HXR as implemented for LCLS-I is defined by <a href="http://www.slac.stanford.edu/grp/ad/model/output/lcls/latest/opt/LCLS_lines.dat">LCLS_lines.dat</a>. CU_HXR as planned for LCLS-II is defined by
+      <a href="http://www.slac.stanford.edu/grp/ad/model/output/lcls2/mad/latest/opt/LCLS2cuH_lines.dat">LCLS2cuH_lines.dat</a></td>
+  </tr>
+  <tr>
+    <td>Device names </td>
+    <td>Every MAD deck element that has an assigned device name, is listed in each lines.dat files.</td>
+  </tr>
+</table>
+
+
+<h3>Names of Elements and device names</h3>
+<p>We have two primary Matlab functions for getting device names. <kbd>model_nameList.m</kbd> <a class="bib" href="#bib:HLA_swlist">bib:HLA_swlist</a> is the main mechanism we have now used by HLAs, and is integrated into the Matlab model. <kbd>model_nameList.m</kbd> knows LCLS-I devices, and will be updated for LCLS-II. <kbd>meme_names.m</kbd> is new and is integrated into the main MAD decks. It knows LCLS-I and LCLS-II now.</p>
+
+<h4>model_nameConvert</h4>
+
+<p><kbd>model_nameConvert</kbd> is the old matlab function for getting PV names and converting element names to device names</p>
+
+<pre>
+>> model_nameConvert('YCBSY37')
+YCOR:BSY0:37
+</pre>
+
+<h4>meme_names.m</h4>
+
+<p>The <code>
+meme_names.m
+  </code> Matlab function is the new function to get names of PVs, devices, and elements. <kbd>meme_names</kbd> knows the LCLS-I and LCLS-II accelerator hierarchy now. It knows the hierarchies as defined above, so if you would like to form a query, see the URLs for lines files above.
+</p>
+
+<p> PV names that match a pattern. This example returns all the PVs of a given wire 
+using a simple wildcard '%' as aidalist did.</p>
+<pre> >> meme_names('name','WIRE:LTU1:755:%')
+</pre>
+
+<p> PV names matching <i>regex</i> patterns. This gives PHAS PVs of all KLYS with a regex.</p>
+<pre> >> meme_names('regex','KLYS:[A-Z]{2,3}[0-9]{1,2}:[0-9]{1,4}:PHAS')
+</pre>
+
+<p>BPM device names in LTU</p>
+<pre>
+>> meme_names('etype','MONI','tag','LTU','show','dname')  
+</pre>
+
+<p>All BPM PV names in LTU. The default is to show the PV name</p> 
+<pre>
+>> meme_names('etype','MONI','tag','LTU')
+</pre>
+
+<p>The BPM PV names in the LTU which match the basic pattern '%:XHST1'. That is, the X offsets read on measurement definition 1.</p>
+<pre>
+>> meme_names('etype','MONI','tag','LTU','name','%:XHST1') 
+</pre>
+
+<p>Get all the LCLS BSa rootnames, sorted by Z. Then get the PV names correspnding to one of those root names.</p>
+<pre>
+>> meme_names('sort','z','tag','LCLS.BSA.rootnames')  % Get sorted rootnames
+>> meme_names('name','VPIO:IN20:W770:FASTP%')         % Get PV names of one rootname
+</pre>
+
+
+<p><b>Examples from LCLS-2</b>: Only a few devices are presently associated with the LCLS-II superconducting linac to HXR line, LCLS2SCH.</p>
+<pre>
+>> meme_names('etype','MONI','tag','LCLS2SCH','show','dname')
+
+ans = 
+
+    'BPMS:BSYH:445'
+    'BPMS:BSYH:465'
+    'BPMS:BSYH:640'
+    'BPMS:BSYH:735'
+    'BPMS:BSYH:910'
+</pre>
+
+<p>Add at the time of writing, no PVs yet exist for those LCLS-II devices. As IOCs are added, this list will grow.</p>
+<pre>
+>> meme_names('etype','MONI','tag','LCLS2SCH','show','name') 
+
+ans = 
+
+   Empty cell array: 0-by-1
+</pre>
+
+<p>meme_names.m uses the new EPICS V4 Directory Service for its data. You can also use command line EPICS V4 tools (eget) and Python to access the same data. Greg's file <kbd>/home/physics/greg/memeExamples.txt</kbd> <a class="bib" href="#bib:memeex">bib:memeex</a> gives many more examples (see section 3).</p>
+
+
+<h2>Modelled Optics Data</h2>
+<p>There are a number of basic interfaces to 1st order optics presently in our Matlab:</p>
+
+<h3>model_rMatGet</h3>
+<p> <kbd>model_rMatGet.m</kbd> is the workhorse R-matrix acquisition engine of HLA software. It uses the Matlab implementation of the MAD device descriptions (by default), or, if specified, the XAL model. </p>
+<pre>
+    [RMAT, ZPOS, LEFF, TWISS, ENERGY] = model_rMatGet(NAMELIST, NAMETO, OPTS, PARAM)
+  gets transport matrix RMAT, z position ZPOS, effective length LEFF, Twiss
+  params TWISS [energy phi_x beta_x alpha_x eta_x eta'_x phi_y ... eta'_y]'
+    and energy ENERGY for devices in string or cellstr array NAMELIST.
+</pre>
+
+<p>The present Rmat of a given device, <em>from the MAD MATLAB model</em> (the default)</p>
+
+<pre>
+>> model_rMatGet('BPMS:LI21:233')  % or model_rMatGet('BPMS11')
+
+ans =                                                            
+                                                                 
+   -0.6720   -0.2513         0         0    5.0546    0.0513     
+    0.0226   -0.0314         0         0   -0.0321   -0.0002     
+         0         0    1.4268    3.5996         0         0     
+         0         0    0.4279    1.0985         0         0     
+   -0.0034    0.0090         0         0    0.5375    0.0068     
+   -0.0406   -0.0326         0         0  -20.5741   -0.2111     
+</pre>
+
+
+<p>(Note: When the machine is not running, you can run <kbd>epicsSimul_init</kbd> prior to running model_rMatGet to get somewhat meaningful numbers (see <a href="#fakedata">Fakedata below</a>).</p>
+
+<p> Alternatively, you can get the optics computed from the <em>XAL</em> if you specify EXTANT. The GOLD, extant model, is the default. You can also give a specific RUNID.</p>
+
+<pre>
+>> model_rMatGet('BPMS:LI21:233',[], 'TYPE=EXTANT')                   
+                                                                      
+ans =                                                                 
+                                                                      
+   -0.6733   -0.2519         0         0    5.0560    0.0513          
+    0.0228   -0.0313         0         0   -0.0321   -0.0002          
+         0         0    1.4261    3.5967         0         0          
+         0         0    0.4276    1.0977         0         0          
+   -0.0035    0.0089         0         0    0.5374    0.0068          
+   -0.0405   -0.0325         0         0  -20.5800   -0.2111
+
+>> model_rMatGet('BPMS:LI21:233',[],'RUN=45881')                 
+                                                                 
+ans =                                                            
+                                                                 
+   -0.6738   -0.2509         0         0    5.0580    0.0513     
+    0.0227   -0.0313         0         0   -0.0321   -0.0002     
+         0         0    1.4280    3.5952         0         0     
+         0         0    0.4282    1.0972         0         0     
+   -0.0035    0.0089         0         0    0.5372    0.0068     
+   -0.0405   -0.0323         0         0  -20.5881   -0.2112   
+</pre>
+
+<p>You can give a cell array of strings to get a system of matrices:</p>
+
+<pre>
+  >> model_rMatGet({'BPMS:LI21:233', 'BPMS:LI24:801', 'BPMS:LTU1:250'})
+
+ans(:,:,1) =
+
+   -0.0829    0.8827         0         0    4.9944    0.0523
+   -0.0247   -0.0267         0         0   -0.0000    0.0000
+         0         0    0.4311   -0.0466         0         0
+         0         0    0.2268    0.0312         0         0
+    0.0057    0.0062         0         0    0.5751    0.0071
+   -0.0000    0.0000         0         0  -21.6137   -0.2262
+
+
+ans(:,:,2) =
+
+   -0.0919    0.5876         0         0    3.3327    0.0560
+    0.0037   -0.0387         0         0    0.0000    0.0000
+         0         0    0.0923    0.0913         0         0
+         0         0   -0.0026    0.0126         0         0
+   -0.0013    0.0140         0         0    0.0377    0.0008
+    0.0000    0.0000         0         0   -9.2052   -0.1545
+
+
+ans(:,:,3) =
+
+   -0.0334    0.1669   -0.0000   -0.0000   -0.3627   -0.0061
+   -0.0032    0.0027   -0.0000   -0.0000   -0.0000   -0.0000
+   -0.0000   -0.0000   -0.0627   -0.0515    0.0000    0.0000
+   -0.0000   -0.0000    0.0066   -0.0016    0.0000    0.0000
+   -0.0004    0.0003   -0.0000   -0.0000   -0.0759   -0.0011
+    0.0000    0.0000         0         0   -2.9019   -0.0487
+</pre>
+
+<p>The Rmat of a given device from the XAL DESIGN model.
+  [Note there is no support for design from the Matlab MAD model,
+   so this is necessarily from XAL]</p>
+<pre>
+>> model_rMatGet('BPMS:LI21:233',[], 'TYPE=DESIGN')
+</pre>
+ 
+<p>The Rmat from A to B (by default from MATLAB extant model):<p>
+<pre>
+>> model_rMatGet('BPMS:LI21:233','BPMS:LI21:301')
+</pre>
+<p>The Rmat from A to B from DESIGN or from a given XAL run:<p>
+<pre>
+>> model_rMatGet('BPMS:LI21:233','BPMS:LI21:301','TYPE=DESIGN')
+>> model_rMatGet('BPMS:LI21:233','BPMS:LI21:301','RUNID=45881')
+</pre>
+
+<h3>model_twissGet</h3>
+<p><kbd>model_twissGet.m</kbd> is the equivalent method for getting Twiss data:</p>
+<pre>
+model_twissGet
+  [TWISS, SIGMA, ENERGY, PHASE] = model_twissGet(NAME, ROPTS, OPTS) returns
+  Twiss parameters TWISS, SIGMA matrix elements, ENERGY and PHASE for beam line
+  elements in NAME.  Options for model_rMatGet can be specified in ROPTS,
+  and further options in OPTS.
+</pre>
+<p>Some examples of Twiss model data acquisitions:</p>
+<pre>
+>> model_twissGet('BPMS:LI21:233')
+
+ans =
+
+    0.0000    0.0000
+   73.4498  857.5393
+   -1.6339 -283.7548
+
+>> model_twissGet({'BPMS:LI21:233', 'BPMS:LI24:801', 'BPMS:LTU1:250'});  % A system of twiss params
+
+>> model_twissGet('BPMS:LI21:233','TYPE=DESIGN') % Design Twiss from XAL
+
+</pre>
+
+
+<h2 id="fakedata">Fake Data in Matlab</h2>
+
+<p>You can interpose fake implementations of lcaGet and lcaPut into the
+path that do not contact the production devices at all and instead give, if they
+can, a meaningful output based on an internal (MAD) model. These fake lca functions interact with a accelerator simulation
+engine defined in scripts <kbd>epicsSimul_*.m</kbd>.</p>
+
+<p>One time setup:</p>
+<ol>
+  <li>Get a copy of lcaWrapper. I have one in prod at
+  <kbd>~physics/greg/Development/lcaWrapper</kbd>.</li>  
+
+  <li>Edit epicsSimul_init.m to set the location of your lcaWrapper. Default is Henrik's.
+  Mine on Mac wraps more lca functions, but not released. 
+  eg <kbd>pLca='/home/physics/loos/matlab/lcaWrapper';</kbd></li>
+</ol>
+    
+<p>To use fake PV values:</p>
+<ol>
+  <li><kbd>epicsSimul_init</kbd></li>
+  <li>after setup, check whether you're using real or fake lca
+  <pre>
+  >> which lcaGet   % should be the one in lcaWrapper/ dir
+  >> lcaGet('')     % should be 0, not complaint.
+  </pre>
+</ol>
+
+<h2 id="exceptpattern">Programming Pattern for Error Handling</h2>
+
+<p>The following programming pattern will make GUIs describe what happened when they encounter a problem,
+what they were in the middle of doing when the error occurred. It also makes the GUI display that
+information in a dialog box, and also print tall the relevant information to a log. In short,
+just use it everywhere. It works for GUIs as well as for functions and scripts called
+outside the context of a GUI. </p>
+
+<ol>
+  
+  <li>
+  <p> When your code detects an error, immediately (on the next line after you detected the error) issue a message using
+the Matlab "error" function.</p> 
+  <p>
+  The <kbd>error()</kbd> function's first argument should be a message code
+string, in the Matlab style, using a prefix id specific to your app. 
+  You use the id in the callback function to identify your app's exceptions. This
+  is important because your 
+  app's exceptions should not cause stacktraces in the log (the ugly and largely
+  useless "crash" stuff). Only the others, ie matlab's
+own exceptions, should cause such stacktraces. In that way, errors like "division by 0" get a
+stacktrace, useful for debugging, whereas errors like "Couldn't move
+wire scan motor" do not, since that's not a bug in matlab, it's just something
+  it wasn't able to do but handled gracefully.
+  </p>
+  </li>
+  
+  <li><p>
+In every GUI Callback function, use try/catch, with 
+<code>uiwait(errdlg(lprintf()))</code> in the catch block:
+  </p>
+  </li>
+<li><p>In every other (non-callback method), especially API methods,  
+"throw exception." That is, whenever the program can't go on because of
+a functional problem like you detect from EPICS that a wire is stuck, call <core>error()</code>. 
+  The method SHOULD also <code>lprintf</code> what happened.</p>
+  </li>
+</ol>
+
+<h4>Example of error handing pattern</h4>
+<p>
+[NOTE: constants below eg STDERR, WS_EXID_PREFIX etc, are defined in
+wirescan_const.m).
+</p>
+
+<pre>
+function scanWireName_pmu_Callback(hObject, eventdata, handles) 
+wirescan_const;
+try
+    scanWireInit(hObject,handles,get(hObject,'Value'));
+catch ex
+    if ~strncmp(ex.identifier,WS_EXID_PREFIX,3)  
+        fprintf(STDERR, '%s\n', getReport(ex,'extended'));
+    end
+    uiwait(errordlg(...
+        lprintf(STDERR, 'Problem changing wire. %s', ex.message)));
+end
+
+function handles = scanWireInit(hObject, handles, wireId)
+&hellip;
+   initFWS(handles);   % API method can call other methods
+  &hellip;
+   function initFWS( handles )
+      status = lcaPutSmart( pvName_reinit, initcode, 'short' );
+      if ( status ~= LCA_SUCCESS )
+         msgtext=lprintf(STDERR, 'Motor init failed', pvName_reinit );
+         error('WS:MOTORINITFAILED', msgtext );
+</pre>
+
+<p><em>The message text SHOULD end in a period</em>. The period is important
+because using the try catch scheme and using matlab's builtin argument
+processing, messages are chained together.</p>
+ 
+<p>Just an example of issuing an error() and printing to the log in one line:</p>
+<pre>
+    error('EM:NOGOODDATAREMAINS', lprintf(STDOUT,...
+        ['No data remaining that has both good measurement status' ...
+           ' and user approved for use. Please include more scanned ' ...
+           ' device setpoints (Quad values or wires), or check "Use"'...
+           ' to allow inclusion of more in processing.']));
+end
+</pre>
+
+<h2 id="apx:cvs">Appendix A: CVS Commands</h2>
+  
+<p>All CVS commands follow the keyword <kbd>cvs</kbd>. </p>
+
+<h5>checkout</h5>
+<p>To start working with CVS, you must check out a module (directory). This will put the files of that CVS module into your working directory. For example, make a working directory, cd to it, checkout the <kbd>matlab/toolbox</kbd> files, and cd down into the toolbox subdirectory where you'll find the matlab files:</p>
+<pre>
+$ mkdir work
+$ cd work
+$ cvs checkout matlab/toolbox
+$ cd matlab/toolbox
+</pre>
+
+<p>Now you can make edits to the files, or create new ones. </p>
+
+<p>Make sure all your scripts and functions include help at the top. Following <a href="http://www.mathworks.com/help/matlab/matlab_prog/add-help-for-your-program.html" > the Matlab conventions for help comments</a> will ensure that Matlab commands like "help" and "lookfor" will work properly. </p>
+
+
+<h5>update</h5>
+<p>You can update the files in your local directory with any changes made to them (by other people) in the repository. </p>
+
+<pre>$ cvs update -dA</pre>
+
+<p>If by chance someone else has also changed a file you have been working on, and they have committed their change before you did, then when you do the update CVS will attempt simply merge their changes into yours. The cvs update will be report that to you by printing the name of the file prefixed by "M", e.g.:</p>
+<pre>
+$ cvs update -dA
+cvs update: Updating .
+RCS file: /afs/slac/g/lcls/cvs/package/matlab/toolbox/lem.m,v
+retrieving revision 1.4
+retrieving revision 1.6
+Merging differences between 1.4 and 1.6 into lem.m
+M lem.m
+</pre>
+<p>If CVS was unable to automatically merge, you'll have a so-called "merge conflict". There are guides on the interwebs to help you fix CVS conflicts; see for instance <a class="bib" href="#bib:cvsguide"></a>. Basically, in the file that got a merge conflict, look for lines between marker lines inserted by CVS that look like ">>>>>>>" and "<<<<<<<". hand edit the file to remove the marker lines and replace the lines so marked with what you want. Then try the cvs update again. </p>
+
+
+<h5>add</h5>
+<p>If you created a new local file, you can register it with the CVS repository with "add". You have to also <kbd>cvs commit</kbd> it before it's really uploaded to the repository (see below). 
+</p>
+<pre>
+$ cvs add hist2.m</pre>
+
+
+<h5>remove</h5>
+<p>If you want to remove a file from the CVS repository, remove it from your directory first, then tell CVS to remove it from the repository. By the way, CVS doesn't actually remove it, rather CVS puts removed files in a special subdirectory of the module named "Attic." For example see <a href="http://www.slac.stanford.edu/cgi-wrap/cvsweb/matlab/toolbox/Attic/?cvsroot=LCLS" >matlab/toolbox/Attic</a> That way, it can recover and deliver previous versions of the file if they're checked out. </p>
+
+<pre>
+$ rm hist2.m
+$ cvs remove hist2.m</pre>
+
+<p>Renaming a file in CVS involves copying the old file to its new name, cvs removing the old one, cvs adding the new one, and cvs committing both: </p>
+<pre>
+$ mv <em>old new</em>
+$ cvs remove <em>old</em>
+$ cvs add <em>new</em>
+$ cvs commit -m "Renamed old to new" <em>old new</em>
+</pre>
+
+
+<h5>diff</h5>
+<p>Sometimes you want to know how your local files differ from the ones in the repository.</p>
+<pre>cvs diff hist2.m</pre>
+
+<h5>commit</h5>
+<p>After you made changes to a local file or directory of files (and tested them), you can upload the files back to the repository. This operation is called "commit". If you do the whole directory CVS will work out which ones changed and commit only those. NOTE: It's a very good idea to do a cvs update -dA immediately prior to attempting a cvs commit, to make sure that whatever you intend to commit hasn't already been changed in the repository by someone else since you did your cvs checkout.
+</p>
+<pre>
+$ cvs update -dA      <em>Check for changes since your last checkout</em>
+
+$ cvs commit -m "this is what I did to the file" moments.m    <em>or</em>
+$ cvs commit -m "the reason I changed all these files" 
+</pre>
+
+
+<h5>Guidelines</h5>
+<p>Some good guidelines for using CVS can be found at <a class="bib" href="#bib:cvsbestpractices">bib:cvsbestpractices</a>.</p>
+
+
+
+<h2 id="apx:gui">Appendix C: Matlab GUI Launch from EDM</h2>
+
+<p>This appendix describes the support for starting Matlab GUI apps from EPICS displays.</p>
+
+<ol>
+  <li>EDM (from LCLSHOME) buttons execute Matlab using xterm commands of the form:
+  <code>"xterm -iconic -T \"LiTrack GUI xterm\" -e MatlabGUI run_LiTrack_GUI"</code></li>
+
+  <li>MatlabGUI is a bash script ( /usr/local/lcls/tools/matlab/scripts/MatlabGUI) which
+   runs matlabSetup.bash, sets logging, and
+   <code>EPICS_CA_ADDR_LIST="lcls-prod01:5062 $EPICS_CA_ADDR_LIST"</code> (so
+   launched GUIs all use the lcls-prod01 gateway), and then executes:
+
+   <pre>$ matlab -glnx86 -nosplash -nodesktop -r startLCLS,$1 -logfile $log_file</pre>
+  </li>
+  
+  <li>You can simulate what MatlabGUI will do with your development
+   GUI easily). This is useful for instance to test logging since the
+   environment variable MATLAB_LOG_FILE_NAME is assigned by MatlogGUI 
+   prior to starting matlab for an app (without the .m).
+
+  <pre>$ MatlabGUI <yourgui> [epics_max_array_size_specification]</pre></li>
+</ol>
+
+
+<h2 id="addendum">Addendum: Items to be Added to the Document</h2>
+
+<p>The following are planned, but are not included in this version (31-Jan-2017); </p>
+<ol>
+  <li>Python support</li> 
+  <li>Getting LCLS-II model data</li>
+  <li>Getting BSA Data: So far unchanged from LCLS-I, see the <a href="http://www.slac.stanford.edu/grp/ad/hla/matlab/programming_guide_matlab.pdf">original MATLAB Programmers Guide</a> </li>
+  <li>Getting archive data (past PV values)</li>
+  <li>Getting SCORE data (past beamline device configuration settings)</li>
+  <li>Matlab GUI building, error handling, and standard menus</li>
+  <li>Data file access</li>
+  <li>Using fake/simulation data in apps</li>
+  <li>EPICS; Investigating EPICS IOC configuration and PV record definitions</li>
+  <li>EPICS; Creating soft-IOC PVs for storing app data in EPICS</li>
+  <li>Software development on laptop/office machines</li>
+</ol>
+
+<h2 id="refs">References</h2>
+
+<dl>
+  
+  <dt class="bib" id="bib:HLA_swlist">bib:HLA_swlist</dt>
+  <dd>LCLS HLA functions list, is a list of many of the Matlab .m files that comprise the HLAs and utilities. It is not up to date, but isn't a bad reference, <a href="http://www.slac.stanford.edu/grp/ad/hla/HLA_software.htm">http://www.slac.stanford.edu/grp/ad/hla/HLA_software.htm</a>
+  </dd>
+
+  <dt class="bib" id="bib:memeex">bib:memeex</dt>
+  <dd>Examples of use of MEME to get model, names, and miscellaneous other data  from the command line, <kbd> 
+  /home/physics/greg/memeExamples.txt
+    </kbd>
+  </dd>
+  
+  <dt class="bib" id="bib:cvs">bib:cvs</dt>
+  <dd>Version Management with CVS,
+  <a href="https://ftp.gnu.org/non-gnu/cvs/source/stable/1.11.22/cederqvist-1.11.22.pdf">https://ftp.gnu.org/non-gnu/cvs/source/stable/1.11.22/cederqvist-1.11.22.pdf
+  </a>
+  </dd>
+
+  <dt class="bib" id="bib:cvsguide">bib:cvsguide</dt>
+  <dd>Quick and Dirty Guide to CVS,
+  <a href="http://www.cs.umb.edu/~srevilak/cvs.html">http://www.cs.umb.edu/~srevilak/cvs.html
+  </a>
+  </dd>
+  
+  <dt class="bib" id="bib:cvsbestpractices">bib:cvsbestpractices</dt>
+  <dd>Guidelines for the use of CVS, <a class="bibref" href="http://dotat.at/writing/cvs-guidelines.html">http://dotat.at/writing/cvs-guidelines.html</a>
+  </dd>
+<dt class="bib" id="bib:epics">bib:cvsbestpractices</dt>
+  <dd>Experimental Physics and 
+Industrial Control System homepage, <a class="bibref" href="http://www.aps.anl.gov/epics/">http://www.aps.anl.gov/epics/</a>
+  </dd>
+  
+</dl>
+
+
+  <!-- End of the Content division - things you want in the table of contents -->
+</div>
+
+<hr />
+<address>Greg White, SLAC</address>
+<!-- hhmts start -->Last modified: Fri May 25 14:05:01 PDT 2018 <!-- hhmts end -->
+
+</body>
+</html>

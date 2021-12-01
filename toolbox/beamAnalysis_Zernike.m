@@ -142,10 +142,10 @@ check=sum(ch1(:))+sum(ch2(:));
 
 
 if check > 0
-    c_norm=zeros(1,nCoeff);
+%     c_norm=zeros(1,nCoeff); %unused variables, this line error on nCoeff
     imgC=zeros(size(img));
-    imgZ=zeros(size(img));
-    resp=zeros(1,4);
+%    imgZ=zeros(size(img));
+%    resp=zeros(1,4);
     
 else
 

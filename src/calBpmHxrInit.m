@@ -167,6 +167,33 @@ try
         girderBPMs = [];
         
         [~,bpmzs,~,~,~]  = model_rMatGet( bpms, [] , {beampathstr,'TYPE=EXTANT'});
+        rfbhx12z = bpmzs(RFBHX12);
+        
+        % Build list of quads and BPMs for quad kick compensation;
+        % then store model information
+        k = 1;
+        for j = (RFBHX13+1):(RFBHX51-1)
+                girdertemp = j + 9;
+                quads{k} = sprintf('QHXH%02d', girdertemp-1);
+                bpmstemp{k} = bpms{j};
+                q2brmat(:,:,k) = zeros(6);
+                zq(k) = 0;
+                k = k + 1;
+        end
+
+        [q2brmat,q2bz,~,~,~] = model_rMatGet( quads, bpmstemp, {beampathstr,'TYPE=EXTANT'} );
+        [~,zq,~,~,~] = model_rMatGet( quads, [] , {beampathstr,'TYPE=EXTANT'});
+        
+        k=1;
+        for j = (RFBHX13+1):(RFBHX51-1)
+            if ( (j>nbpms) || (k>length(quads)) )
+                fprintf('calBpmHxrInit 187: bad value j %i k %i\n', j, k);
+                return;
+            end
+            bpm(j).rMatq2b = q2brmat(:,:,k);
+            bpm(j).zq = zq(k);
+            k = k + 1;
+        end
         
         for j = 1:nbpms     
             
@@ -207,7 +234,6 @@ try
                         % Create r-matrix between that point and BPM,
                         % combining r-matrix beween RFBHX12 and RFBHX13
                         % and drift space between pivot point and RFBHX12
-                        [~,rfbhx12z,~,~,~]  = model_rMatGet( 'RFBHX12', [] , {beampathstr,'TYPE=EXTANT'});
                         deltaz = 4.142767 - (bpmz - rfbhx12z);
                         drift = [ 1 deltaz 0 0; 0 1 0 0; 0 0 1 deltaz; 0 0 0 1 ];
                         rMat = model_rMatGet( 'RFBHX12', bpms{j}, {beampathstr,'TYPE=EXTANT'} );
@@ -216,13 +242,15 @@ try
                         bpm(j).rMat = rMat;
                         bpm(j).L = 4.142767;
                     else
-                        bpm(j).rMat = model_rMatGet( sprintf('QHXH%02d',bpm(j).girder-1), bpms{j}, {beampathstr,'TYPE=EXTANT'} );
-                        [~,pivotz,~,~,~] = model_rMatGet( sprintf('QHXH%02d', bpm(j).girder-1), [] , {beampathstr,'TYPE=EXTANT'});
+                        pivotz = bpm(j).zq;
                         bpm(j).L = bpmz - pivotz;
                     end
+                    bpm(j).rMat = bpm(j).rMatq2b;
                     bpm(j).kcx = (bpm(j).rMat(1,2))/bpm(j).L;
                     bpm(j).kcy = (bpm(j).rMat(3,4))/bpm(j).L;
                 end
+                % pivotz/zq rMat/rMatq2b currently duplicated and can be
+                % combined
             end
             if ( (bpm(j).method == c.CAL_COR) || (bpm(j).method == c.CAL_PRED) )
                 [s, bpm(j).corpair, bpm(j).rxcor, bpm(j).rycor] = calBpmInitCor(c,cor,bpm(j).corpair,bpms{j},beampathstr,scanpvs, bpmsim);

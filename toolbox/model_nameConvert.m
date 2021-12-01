@@ -70,8 +70,10 @@ nList=nameList;
 if nargin == 3
     micro=cellstr(micro);
     if any(strcmp(micro,'*')), micro=secList;end
-    [list(:,1),str]=strtok(nameList(:,2),':');
-    list(:,2)=strtok(str,':');
+    %[list(:,1),str]=strtok(nameList(:,2),':');
+    %list(:,2)=strtok(str,':');
+    % model_nameSplit is faster:
+    [list(:,1),list(:,2)] = model_nameSplit(nameList(:,2));
     use=0;
     for j=1:length(micro)
         use=use | strcmp(list,micro{j});

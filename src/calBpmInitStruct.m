@@ -121,11 +121,16 @@ try
     f36 = 'kc';       val36 = 0; % Flag to correct for kick through undulator and quad, used for girder BPMs
     f37 = 'kcx';      val37 = 0; % Amount to scale BPM move to compensate for kick, X plane
     f38 = 'kcy';      val38 = 0; % Amount to scale BPM move to compensate for kick, Y plane
+    f39 = 'quad';     val39 = ''; % MAD name of upstream quad; only used if kc is 1; else is empty string
+    f40 = 'rMatq2b';  val40 = zeros(6); % R-matrix between quad and BPM; only used if kc is 1; else is array of zeros
+    f41 = 'zq';       val41 = 0; % quad z, only used in HXR and if kc is 1
+    f42 = 'rMatq2q';  val42 = zeros(6); % R-matrix between quad beginning and end; only used in SXR and if kc is 1; else is array of zeros
    
     bpmstruct = struct( f1, val1, f2, val2, f3, val3, f4, val4, f5, val5, f6, val6, f7, val7, f8, val8, f9, val9, f10, val10, ...
         f11, val11, f12, val12, f13, val13, f14, val14, f15, val15, f16, val16, f17, val17, f18, val18, f19, val19, f20, val20, ...
         f21, val21, f22, val22, f23, val23, f24, val24, f25, val25, f26, val26, f27, val27, f28, val28, f29, val29, f30, val30, ...
-        f31, val31, f32, val32, f33, val33, f34, val34, f35, val35, f36, val36, f37, val37, f38, val38);
+        f31, val31, f32, val32, f33, val33, f34, val34, f35, val35, f36, val36, f37, val37, f38, val38, f39, val39, f40, val40, ...
+        f41, val41, f42, val42);
     
     bpm(1:nbpms) = bpmstruct;
     

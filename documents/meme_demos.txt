@@ -1,0 +1,22 @@
+Demo scripts:
+-------------
+
+The following scripts give examples of the use of EPICS Version 4 in
+the LCLS Control System"
+
+  toolbox/emat/easypvademo.m        Demos EasyPVA API of EPICS Version 4. Allows
+                                    direct CA and PVA I/O without use of a wrapper.
+
+  toolbox/emat/ematdemo.m           Demos EMAT, a simple library for CA and PVA service data.
+
+  toolbox/meme/src/namesdemo.m      Demos names.m, to help get names of LCLS PVs, devices
+                                    and elements, from the MEME directory service.
+                                    
+  toolbox/meme/src/opticsdemo.m     Demos getting Twiss and Rmat from MEME model service.
+
+  toolbox/meme/src/oracledemo.m     Demos getting accelerator infrastructure data using
+                                    the MEME Oracle service.
+				    
+
+Greg White, SLAC, 4-Nov-2015.
+

@@ -42,8 +42,8 @@ DAC_offset = 0;
 
 V_min = -5;
 V_max = 5;
-Kp    = 0.7;
-Ki    = 0.1;
+Kp    = 0.2;
+Ki    = 0.2;
 Kd    = 0.1;
 D_term = 0;
 I_term = 0;
@@ -77,7 +77,7 @@ while i < 1
     		pause(pause_time)
     	end
         
-        % freq_err_ary
+        freq_err_ary
     	freq_err_ary_sort = sort(freq_err_ary);
     	freq_err_ary1 = freq_err_ary_sort(2:(end-1));
     	freq_err_avg = mean(freq_err_ary);
@@ -91,13 +91,14 @@ while i < 1
         dt      = pause_time*freq_avg_n;
         I_term  = I_term + (freq_err_avg*dt);
         D_term  = freq_err_diff/dt;
+        
         if lock_disable
             DAC_out = round((bits2volt/VCO_gain) * (freq_err_avg));
         else
             DAC_out = round((bits2volt/VCO_gain) * ((Kp*freq_err_avg) + (Ki*I_term) + (Kd*D_term)));
         end
 
-        lcaPut(Freq_err_disp_PV, Freq_err_disp_PV);
+        lcaPut(Freq_err_disp_PV, freq_err_avg);
         freq_err_prev = freq_err_avg;
  
         disp(['DAC output desired ' num2str(DAC_out)])

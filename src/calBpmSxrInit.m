@@ -165,6 +165,32 @@ try
         nonGirderBatchBPMs = [];
         girderBPMs = [];
 
+        % Build list of quads and BPMs for quad kick compensation;
+        % then store model information
+        k = 1;
+        for j = (RFBSX25+1):(RFBSX51-1)
+                girdertemp = j + 20;
+                quads{k} = sprintf('QSXH%02d', girdertemp);
+                bpmstemp{k} = bpms{j};
+                q2brmat(:,:,k) = zeros(6);
+                q2qrmat(:,:,k) = zeros(6);
+                k = k + 1;
+        end
+     
+        [q2brmat,~,~,~,~] = model_rMatGet( quads, bpmstemp, {'POS=END' 'TYPE=EXTANT',beampathstr} );
+        [q2qrmat,~,~,~,~] = model_rMatGet( quads, quads, {'POS=BEG' 'POSB=END' 'TYPE=EXTANT',beampathstr} );
+        
+        k=1;
+        for j = (RFBSX25+1):(RFBSX51-1)
+            if ( (j>nbpms) || (k>length(quads)) )
+                fprintf('calBpmSxrInit 187: bad value j %i k %i\n', j, k);
+                return;
+            end
+            bpm(j).rMatq2b = q2brmat(:,:,k);
+            bpm(j).rMatq2q = q2qrmat(:,:,k);
+            k = k + 1;
+        end
+        
         for j = 1:nbpms
 
             if (j < RFBSX25)
@@ -197,15 +223,14 @@ try
                     % Only get model data if BPM selected (time-consuming)
                     if ( bpmparms.sel(j) )
                         bpm(j).kc = 1;
-                        quadname = sprintf('QSXH%02d',bpm(j).girder);
-                        rq = model_rMatGet(quadname,quadname,{'POS=BEG' 'POSB=END' 'TYPE=EXTANT',beampathstr});
-                        rb = model_rMatGet(quadname,bpms{j},{'POS=END' 'TYPE=EXTANT',beampathstr});
-                        rq = rq(1:4,1:4); rb = rb(1:4,1:4); % Reduce to 4x4 elements
+                      
+                        rq = bpm(j).rMatq2q(1:4,1:4); rb = bpm(j).rMatq2b(1:4,1:4); % Reduce to 4x4 elements
                         rq(:,[2 4]) = 0; % Remove elements related to beam trajectory angle; only position is used
                         
                         rMat = rb*rq;
                         bpm(j).kcx = rMat(1,1);
                         bpm(j).kcy = rMat(3,3);
+                       
                     end
                 end
             end

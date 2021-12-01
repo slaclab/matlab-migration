@@ -20,20 +20,81 @@
 #         created from Matlab_startup by K. Brobek
 #
 #  Rev: 
-#     15-Nov-2019, P. Pascual (ppascual)
-#     Fixed issue with local variable call
+#     26-Aug-2020, P. Pascual (ppascual)
+#     Added support for MATLAB 2020a
+#     18-Jun-2020, P. Pascual (ppascual)
+#     Added matlab_version argument and complete environment 
+#     setup for MATLAB 2012a and 2019a
 #     15-Nov-2019, P. Pascual (ppascual)
 #     Added complete 32-bit environment setup
 #     18-Sept-2018, G. Gregoric (ggreg)
 #	  Added user/host checking.
 #==============================================================
 
+if [ -d /afs/slac/g/lcls ]; then
+    export LCLS_ROOT=/afs/slac/g/lcls
+    export MLM_LICENSE_FILE="27010@license1,27010@license2,27010@license3"
+else
+    export LCLS_ROOT=/usr/local/lcls
+fi
+
+invokeMatlabSetup () {
+    if [ "$1" == "2012a" ]; then
+        if [ -f ${LCLS_ROOT}/tools/oracle/oracleSetup.bash ]; then
+            source ${LCLS_ROOT}/tools/oracle/oracleSetup.bash
+        fi
+
+        if [ -f ${LCLS_ROOT}/physics/setup/javaSetup.bash ]; then
+            source ${LCLS_ROOT}/physics/setup/javaSetup.bash 2>&1 > /dev/null
+        fi
+
+        if [ -f ${LCLS_ROOT}/epics/setup/fixed-epics-setup.bash ]; then
+            source ${LCLS_ROOT}/epics/setup/fixed-epics-setup.bash
+            if [ -f ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash ]; then
+                source ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash
+            fi
+        fi
+
+        export MATLAB_VER=2012a
+        local EPICS_HOST_ARCH=linux-x86
+        if [ -f ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+            source ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+            export PATH=${MATLAB_ROOT}/bin:$PATH
+        fi
+    elif [ "$1" = "2019a" -o "$1" = "2020a" ]; then
+        if [ -f ${LCLS_ROOT}/tools/oracle/oracleSetup-R11.2.0.4.bash ]; then
+            source ${LCLS_ROOT}/tools/oracle/oracleSetup-R11.2.0.4.bash
+        fi
+
+        if [ -f ${LCLS_ROOT}/physics/setup/javaSetup-R1.8.0_181.bash ]; then
+            source ${LCLS_ROOT}/physics/setup/javaSetup-R1.8.0_181.bash 2>&1 > /dev/null
+        fi
+
+        if [ -f ${LCLS_ROOT}/epics/setup/fixed-epics-setup.bash ]; then
+            source ${LCLS_ROOT}/epics/setup/fixed-epics-setup.bash
+            if [ -f ${LCLS_ROOT}/epics/setup/epicsenv-7.0.2-1.1.bash ]; then
+                source ${LCLS_ROOT}/epics/setup/epicsenv-7.0.2-1.1.bash
+            fi
+        fi
+
+        if [ "$1" = "2019a" ]; then
+            export MATLAB_VER=2019a
+        elif [ "$1" = "2020a" ]; then
+            export MATLAB_VER=2020a
+        fi
+
+        if [ -f ${LCLS_ROOT}/tools/matlab/setup/matlabSetup64.bash ]; then
+            source ${LCLS_ROOT}/tools/matlab/setup/matlabSetup64.bash
+        fi
+    else
+        echo "Invalid MATLAB version specified. Currently supported: 2012a, 2019a, 2020a"
+    fi
+}
 
 #==============================================================
 # Check current user/host
 #==============================================================
-if  ! [ "$USER" = "physics" ] && [ `uname -n` = "lcls-srv03" ]
-  then
+if  ! [ "$USER" = "physics" ] && [ `uname -n` = "lcls-srv03" ]; then
      echo ""
      echo "This script must be run from the physics or softegr account"
      echo "on lcls-srv03 - Preferably from lclshome"
@@ -47,82 +108,101 @@ fi
 
 export DISPLAY=:1.0
 
-# 32-bit environment setup scripts 
-if [ -f $TOOLS/oracle/oracleSetup.bash ]; then
-    source $TOOLS/oracle/oracleSetup.bash
+OPTS=`getopt -o m: --long 'matlab:' -- "$@"`
+
+if [ "$?" -ne 0 ]; then
+    echo "Incorrect options provided."
 fi
 
-if [ -f $PHYSICS_TOP/setup/javaSetup.bash ]; then
-    source $PHYSICS_TOP/setup/javaSetup.bash
-fi
+eval set -- "$OPTS"
 
-if [ -f $EPICS_SETUP/fixed-epics-setup.bash ]; then
-    source $EPICS_SETUP/fixed-epics-setup.bash
-    if [ -f ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash ]; then
-        source ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash
+MATLAB_REL="${MATLAB_VER}"
+MATLAB_FUNC=""
+
+while [ "$#" -gt 0 ]; do
+    while true; do
+        case $1 in 
+            -m | --matlab)
+                MATLAB_REL=$2
+                shift 2
+                ;;
+            --)
+                shift
+                break
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+    if [ ! -z "${MATLAB_FUNC}" ]; then
+        MATLAB_FUNC="${MATLAB_FUNC} $1"
+    else
+        MATLAB_FUNC+=$1
     fi
+    shift 
+done
+
+invokeMatlabSetup "${MATLAB_REL}"
+
+MATLAB_BASE_ARGS=( -nosplash -nodesktop )
+if [ "${MATLAB_REL}" = "2012a" ]; then
+    MATLAB_BASE_ARGS+=( -glnx86 )
 fi
 
-if [ -e ${TOOLS}/matlab/setup/matlabSetup.bash ]
-then
-    export MATLAB_VER=2012a
-    export EPICS_HOST_ARCH=linux-x86
-    . ${TOOLS}/matlab/setup/matlabSetup.bash
+MATLAB_FUNC="-r \"${MATLAB_FUNC/\"/\'}\""
 
+# Create log filename
+MATLAB_FUNC_LOG=$(echo -e ${MATLAB_FUNC} | sed -e 's/^-r *//g' -e 's/^\"*\s*\([a-zA-Z0-9_]*\).*\"*$/\1/g')
 
-#TODO: Remove this line when production testing is done 
-export MATLABPATH=$MATLABPATH:$MAT/test/
+if [ -z "${MATLAB_FUNC_LOG}" ]; then
+    MATLAB_FUNC_LOG="MATLAB_${MATLAB_REL}"
+fi
 
 #==============================================================
 # Log files are stored in IOC_DATA through iocConsole
 # Log file on nfs -rename old one
 #==============================================================
-    
-    if [ -e $PHYSICS_DATA/log/matlab ]
-    then
-        log_file=$PHYSICS_DATA/log/matlab/$1$3.log
-    else 
-        log_file=$1$3.log
-    fi
 
-    MDATE=`date '+%d_%b_%Y_%H_%M'`
-    if [ -e $log_file ]; then
-        /bin/mv -f ${log_file} ${log_file}-$MDATE
-    fi
+DATE_STR=`date +"%Y-%b-%d_%T%z"`
+if [ -d ${MATLABDATAFILES}/log ]; then
+    LOG_FILE=${MATLABDATAFILES}/log/${MATLAB_FUNC_LOG}-${USER}-${DATE_STR}-$HOSTNAME-$DISPLAY.log
+else
+    LOG_FILE=${MATLAB_FUNC_LOG}-${USER}-${DATE_STR}-$HOSTNAME-$DISPLAY.log
+fi
+
+MDATE=`date '+%d_%b_%Y_%H_%M'`
+if [ -e ${LOG_FILE} ]; then
+    /bin/mv -f ${LOG_FILE} ${LOG_FILE}-$MDATE
+fi
 
 #==============================================================
 # For accounting purposes (see startup.m)
 #==============================================================
 
-    export MATLAB_STARTUP_SCRIPT=$1
-    export MATLAB_LOG_FILE_NAME=$log_file
+export MATLAB_STARTUP_SCRIPT="${MATLAB_FUNC}"
+export MATLAB_LOG_FILE_NAME="${LOG_FILE}"
 
 #==============================================================
 # Start the Matlab script
 #==============================================================
 
-    if [ "$2" = "" ]; then
-        matlab -glnx86 -nodesktop -nosplash -r $1  -logfile $log_file
-    else
-        matlab -glnx86 -nodesktop -nosplash -r lcaInit,"$1('$2')"  -logfile $log_file
-    fi
+MATLAB_ARGS_ARRAY=( "${MATLAB_BASE_ARGS[@]}" "${MATLAB_FUNC[@]}" )
+MATLAB_ARGS_ARRAY+=( -logfile "${LOG_FILE}" )
+`which matlab` "${MATLAB_ARGS_ARRAY[@]}"
 
-    sleep 1
+sleep 1
  
 #==============================================================
 # log file cleanup -keep 5 log files
 #==============================================================
-    
-    LOGCNT=`ls -t $PHYSICS_DATA/log/matlab/$1$3.log* | wc -l`
-    if [ "$LOGCNT" -gt 5 ]
-    then
-        y=`expr $LOGCNT - 5`
-        for x in `ls -t  $PHYSICS_DATA/log/matlab/$1$3.log* | tail -n$y`
+if [ -f "${PHYSICS_DATA}/log/matlab/${LOG_FILE}" ]; then
+    LOGCNT=`ls -t ${PHYSICS_DATA}/log/matlab/${LOG_FILE}.log* | wc -l`
+    if [ "${LOGCNT}" -gt 5 ]; then
+        y=`expr ${LOGCNT} - 5`
+        for x in `ls -t  ${PHYSICS_DATA}/log/matlab/${LOG_FILE}.log* | tail -n$y`
         do
             /bin/rm -f $x
         done
     fi
-
-else
-    echo "Sorry, can't find LCLS environment setup"
 fi

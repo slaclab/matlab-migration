@@ -105,6 +105,12 @@ catch
    return;
 end
 
+% check pulse Id has incremented
+last_pulseID = lcaGet(loop.check.pulseidPV);
+if last_pulseID == pulseID
+    checkOK = 0;
+end
+
 % check the measurement values: connected, flags  - 
 % make adjustments to measurements here
 avg_meas = checkMeasurements(curr_meas, loop);
@@ -214,6 +220,7 @@ for i=1:la
          %check that n_el is not stuck
          if n_el==prev_el
             stuck = stuck+1;
+            break
          else
             stuck = 0;
             prev_el = n_el;
@@ -227,7 +234,7 @@ for i=1:la
       end
       % if more than 2 measurements in a row were identical, we have a
       % stuck BPM
-      if stuck>2
+      if stuck>=1
          Nel(m) = 0;
       end
    end

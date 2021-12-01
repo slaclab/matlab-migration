@@ -109,7 +109,7 @@ data=handles.data;
 function handles = appInit(hObject, handles)
 
 % List of index names.
-handles.indexList={'LCLS' {'IN20' 'LI21' 'LI24' 'LI29' 'LTUH' 'DMPH'};...%suspending DMPH option for XTCAV control fix
+handles.indexList={'LCLS' {'IN20' 'LI21' 'LI24' 'LI29' 'LTUH' 'DMPH' 'DMPS'};...%add DMPS
 %handles.indexList={'LCLS' {'IN20' 'LI21' 'LI24' 'LI29' 'LTUH'}; ...
     'FACET' {'IN10' 'LI20'}; ...
 %    'LCLS2' {'IN10' 'LI11' 'LI14' 'BA21' 'LTU2'}; ...
@@ -131,6 +131,8 @@ handles.sector.LTUH.tcavMADList={ ...
     'TCAV3'};
 handles.sector.DMPH.tcavMADList={ ...
     'XTCAV'};
+handles.sector.DMPS.tcavMADList={ ...
+   'XTCAVB'}; %% XTCAVB
 handles.sector.LI20.tcavMADList={ ...
     'XTCAVF'};
 handles.sector.IN10.tcavMADList={ ...
@@ -153,6 +155,8 @@ handles.sector.LTUH.tcavKlysList={ ...
     'KLYS:LI24:81'};
 handles.sector.DMPH.tcavKlysList={ ...
     'KLYS:DMPH:K1'};
+handles.sector.DMPS.tcavKlysList={ ...
+    'KLYS:DMPH:K1'};  % XTCAVB, soft line, used same klystron button
 handles.sector.LI20.tcavKlysList={ ...
     'KLYS:LI20:41'};
 handles.sector.IN10.tcavKlysList={ ...
@@ -175,6 +179,8 @@ handles.sector.LTUH.profMADList={ ...
     'YAGPSI'};
 handles.sector.DMPH.profMADList={ ...
     'OTRDMP'};
+handles.sector.DMPS.profMADList={ ...
+    'OTRDMPB'};
 handles.sector.LI20.profMADList={ ...
     'USTHZ' 'USOTR' 'IPOTR1' 'DSOTR' 'WDSOTR'};
 handles.sector.IN10.profMADList={ ...
@@ -383,12 +389,28 @@ elseif strcmp(handles.measureTcavName,'TCAV:DMPH:360')
     set([handles.measurePhaseResetVal_txt handles.measurePhaseVal_txt], ...
         'String',sprintf('%5.2f mm',handles.measurePhaseOrigVal));
     set([handles.measurePhaseRangeLowUnits_txt handles.measurePhaseRangeHighUnits_txt],'String','mm');
+elseif strcmp(handles.measureTcavName,'TCAV:DMPS:360')
+    handles.measurePhaseOrigVal=lcaGetSmart('SIOC:SYS0:ML05:AO163'); % for XTCAVB feedback BPM offset
+    set([handles.measurePhaseResetVal_txt handles.measurePhaseVal_txt], ...
+        'String',sprintf('%5.2f mm',handles.measurePhaseOrigVal));
+    set([handles.measurePhaseRangeLowUnits_txt handles.measurePhaseRangeHighUnits_txt],'String','mm');   
 end
-if ~ismember(handles.measureTcavKlys,handles.acclList)
-    handles.measureAmpOrigVal=control_klysStatGet(sector.tcavMADList{1});
+
+% revised to let XTCAVB use thhe same klystron as XTCAV; DING
+% if ~ismember(handles.measureTcavKlys,handles.acclList)  
+%     handles.measureAmpOrigVal=control_klysStatGet(sector.tcavMADList{1});
+% else
+%     handles.measureAmpOrigVal=control_phaseGet(handles.measureTcavKlys,'ADES');
+% end
+if ismember(handles.measureTcavKlys,handles.acclList)
+  handles.measureAmpOrigVal=control_phaseGet(handles.measureTcavKlys,'ADES');
+elseif strcmp(handles.measureTcavName,'TCAV:DMPS:360')
+     handles.measureAmpOrigVal=control_klysStatGet('XTCAV');% XTCAVB use XTCAV klystron
 else
-    handles.measureAmpOrigVal=control_phaseGet(handles.measureTcavKlys,'ADES');
+     handles.measureAmpOrigVal=control_klysStatGet(sector.tcavMADList{1});
 end
+% revised done.
+
 measurePhaseDisp(hObject,handles,handles.measureAmpOrigVal,[]);
 set(handles.dataDeviceLabel_txt,'String',handles.measureTcavName);
 handles=tcavCalControl(hObject,handles,[]);
@@ -482,6 +504,9 @@ if strcmp(pv,'TCAV:LI24:800:TC3')
 elseif strcmp(pv,'TCAV:DMPH:360')
     lcaPutSmart('SIOC:SYS0:ML01:AO163',val);pause(5.);
     val=control_phaseGet(pv);
+elseif strcmp(pv,'TCAV:DMPS:360')
+    lcaPutSmart('SIOC:SYS0:ML05:AO163',val);pause(5.); % for XTCAVB
+    val=control_phaseGet(pv);
 else
     val=control_phaseSet(pv,val);
 end
@@ -507,6 +532,9 @@ if strcmp(pv,'TCAV:LI24:800:TC3')
     val=control_phaseGet(pv);
 elseif strcmp(pv,'TCAV:DMPH:360')
     lcaPutSmart('SIOC:SYS0:ML01:AO163',val);pause(1.);
+    val=control_phaseGet(pv);
+elseif strcmp(pv,'TCAV:DMPS:360')
+    lcaPutSmart('SIOC:SYS0:ML05:AO163',val);pause(1.); % for XTCAVB
     val=control_phaseGet(pv);
 else
     val=control_phaseSet(pv,val);
@@ -548,6 +576,10 @@ if val
         lcaPut('SIOC:SYS0:ML01:AO170',90*val);pause(4.);
         while ~lcaGet('SIOC:SYS0:ML01:AO171'), pause(.1);end
         pAct=control_phaseGet(pv);
+    elseif strcmp(pv,'TCAV:DMPS:360')
+        lcaPut('SIOC:SYS0:ML05:AO170',90*val);pause(4.); % for XTCAVB
+        while ~lcaGet('SIOC:SYS0:ML05:AO171'), pause(.1);end
+        pAct=control_phaseGet(pv);  
     else
         pAct=control_phaseSet(pv,pDes);
     end
@@ -581,6 +613,9 @@ if strcmp(sector.tcavDevList{1},'TCAV:LI24:800:TC3')
     pAct=control_phaseGet(sector.tcavDevList{1});
 elseif strcmp(sector.tcavDevList{1},'TCAV:DMPH:360')
     lcaPut('SIOC:SYS0:ML01:AO170',90);
+    pAct=control_phaseGet(sector.tcavDevList{1});
+elseif strcmp(sector.tcavDevList{1},'TCAV:DMPS:360')
+    lcaPut('SIOC:SYS0:ML05:AO170',90); %for XTCAVB
     pAct=control_phaseGet(sector.tcavDevList{1});
 else
     pAct=control_phaseSet(sector.tcavDevList{1},pDes);
@@ -710,7 +745,7 @@ switch devName(1:4)
             %emittance=str2double(get(handles.emittance_txt,'string'));
             opts.nBG =0;
             opts.emit =handles.emittance;
-            dataList=profmon_getSimulData_xtcav(devName,handles.processSampleNum,opts);
+            dataList=profmon_getSimulData_xtcav(devName,handles.processSampleNum,opts);% get simulated image data from an example data list
             %save('dataListExamp.mat','dataList')
             
             % Ding 20200629: get simulated image based on model beam size
@@ -931,13 +966,13 @@ end
 
 sector=handles.sector.(handles.sectorSel);
 opts.doPlot=0;opts.units='\mum';scl=1;opts.plane='y';
-if ismember(handles.measureTcavKlys,[handles.acclList 'KLYS:DMPH:K1']), opts.plane='x';end
+if ismember(handles.measureTcavKlys,[handles.acclList 'KLYS:DMPH:K1' 'KLYS:DMPS:K1']), opts.plane='x';end  % added XTCAVB
 if 1
 %    opts.unitsT='ps';
 %    scl=1e12/2856e6/360;
 %    scl=1e12/2856e6/360/299.792458; % Wrong, 308.23 um/degree
     scl=2856e6*360/1e12/299.792458; % Correct, 291.58 um/degree
-    if ismember(handles.measureTcavName,{'TCAV:LI20:2400' 'TCAV:DMPH:360'})
+    if ismember(handles.measureTcavName,{'TCAV:LI20:2400' 'TCAV:DMPH:360' 'TCAV:DMPS:360'})  % added XTCAVB case
         scl=4*scl; %for X-band
     end
 end
@@ -1034,15 +1069,30 @@ if ~all(data.status), return, end
 
 iMethod=handles.dataMethod.iVal;
 
-if strcmp(handles.measureTcavKlys,'KLYS:DMPH:K1')
+% if strcmp(handles.measureTcavKlys,'KLYS:DMPH:K1')
+%     model_init('source','MATLAB');
+%     dispList = model_rMatGet({'OTRDMP' 'BPMDL1' 'BPMDL3'},[],[],'twiss');
+%     dispList=dispList(11*[0 1 2]+[10 5 5])';
+% end
+if strcmp(handles.measureTcavName,'TCAV:DMPH:360')
+    
+    rOpts = {'TYPE=EXTANT' 'BEAMPATH=CU_HXR'}; 
     model_init('source','MATLAB');
-    dispList = model_rMatGet({'OTRDMP' 'BPMDL1' 'BPMDL3'},[],[],'twiss');
+    dispList = model_rMatGet({'OTRDMP' 'BPMDL1' 'BPMDL3'},[],rOpts,'twiss');
     dispList=dispList(11*[0 1 2]+[10 5 5])';
 end
 
+if strcmp(handles.measureTcavName,'TCAV:DMPS:360')  % XTCAVB
+    rOpts = {'TYPE=EXTANT' 'BEAMPATH=CU_SXR'};    
+    model_init('source','MATLAB');
+    dispList = model_rMatGet({'OTRDMPB' 'BPMDL15' 'BPMDL19'},[],rOpts,'twiss');
+    dispList=dispList(11*[0 1 2]+[10 5 5])';
+end
+
+
 if ~strcmp(data.type,'blen')
     scl=2856e6*360/1e12/299.792458; % Correct, 291.58 um/degree
-    if ismember(handles.measureTcavName,{'TCAV:LI20:2400' 'TCAV:DMPH:360'})
+    if ismember(handles.measureTcavName,{'TCAV:LI20:2400' 'TCAV:DMPH:360' 'TCAV:DMPS:360'})
         scl=4*scl; %for X-band
     end
     if strcmp(handles.accelerator,'FACET')
@@ -1057,22 +1107,29 @@ if ~strcmp(data.type,'blen')
     pvList=strcat(handles.measureDevName,':',{'';'D'},'TCAL_',xyStr(plane));
     val=[data.tcavCal(iMethod);data.tcavCalStd(iMethod)]*scl;
     lcaPutSmart(pvList,val);
-    if strcmp(handles.measureTcavKlys,'KLYS:DMPH:K1')
+ %   if strcmp(handles.measureTcavKlys,'KLYS:DMPH:K1')
+  if strcmp(handles.measureTcavName,'TCAV:DMPH:360')          
 %        lcaPutSmart('SIOC:SYS0:ML01:AO214',lcaGet('TCAV:DMPH:360:ADES'));
         % ADDED LINES - TJM 2014/31/01
         xtcDES = lcaGetSmart({'TCAV:DMPH:360:ADES' 'TCAV:DMPH:360:PDES'});
         pvList=strcat('SIOC:SYS0:ML01:AO',{'214' '215' '216' '217' '218'});
         lcaPutSmart(pvList,[xtcDES;dispList]);
         % END ADDED LINES - TJM 2014/31/01
-    end
-else
+  end
+if strcmp(handles.measureTcavName,'TCAV:DMPS:360')  % XTCAVB
+        xtcDES = lcaGetSmart({'TCAV:DMPS:360:ADES' 'TCAV:DMPS:360:PDES'});
+        pvList=strcat('SIOC:SYS0:ML05:AO',{'214' '215' '216' '217' '218'});
+        lcaPutSmart(pvList,[xtcDES;dispList]);
+   end
+   else
     for iPlane=val
         pvList=strcat(handles.measureDevName,':',{'BLEN' 'DBLEN'}');
         val=[data.blen(:,iMethod);data.blenStd(:,iMethod)]; % Already in um
         lcaPut(pvList,val);
 %        lcaPut([handles.devRef,':FIT_METHOD'],data.beam(1,iMethod).method);
     end
-    if strcmp(handles.measureTcavKlys,'KLYS:DMPH:K1') && isfield(data,'sigx')
+   % if strcmp(handles.measureTcavKlys,'KLYS:DMPH:K1') && isfield(data,'sigx')
+    if strcmp(handles.measureTcavName,'TCAV:DMPH:360') && isfield(data,'sigx')      
 %        pvList=strcat('SIOC:SYS0:ML01:AO',{'212' '213'});
 %        val=[data.sigx(:,iMethod);data.r15(:,iMethod)];
         % ADDED LINES - TJM 2014/31/01
@@ -1081,6 +1138,13 @@ else
         % END ADDED LINES - TJM 2014/31/01
         lcaPutSmart(pvList,val);
     end
+    
+    if strcmp(handles.measureTcavName,'TCAV:DMPS:360') && isfield(data,'sigx')  % XTCAVB
+        pvList=strcat('SIOC:SYS0:ML05:AO',{'212' '213' '216' '217' '218'});
+        val=[data.sigx(:,iMethod);data.r15(:,iMethod);dispList];
+        lcaPutSmart(pvList,val);
+    end    
+    
 end
 
 

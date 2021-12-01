@@ -1,0 +1,66 @@
+README of the Matlab High level applications list.
+
+Greg White, 15-Sep-17
+Update: 25-Jul-19, Added making changes to matlab/documents/
+
+This directory contains documentation on SLAC's Matlab GUIs and utilities.
+The GUIs are high level matlab software applications and libraries for beam
+optimization and control of the SLAC accelerator complex.
+
+To make changes to matlab/documents, and update web site http://www.slac.stanford.edu/grp/ad/docs/matlab/documents/:
+
+We'll make the change in an CVS checkout of /matlab/documents/ to our own SLAC public_html/ for testing the change,
+and then publish to the web site, http://www.slac.stanford.edu/grp/ad/docs/matlab/documents/:
+
+1. Make place to do you edits and CVS checkout:
+
+   cd to your ../public_html/
+   [greg@rhel6-64i public_html]$ mkdir addocs
+   [greg@rhel6-64i public_html]$ cd addocs/
+   [greg@rhel6-64i addocs]$ mkdir lclscvs
+   [greg@rhel6-64i addocs]$ cd lclscvs/
+   [greg@rhel6-64i lclscvs]$ cvs co matlab/documents
+   cvs checkout: Updating matlab/documents
+   U matlab/documents/HLA_software.xlsx
+   ...
+
+2. Make your edits
+   [greg@rhel6-64i lclscvs]$ emacsx matlab/documents/programmers_guide.html 
+
+3. CVS commit your changes 
+
+   [greg@rhel6-64i lclscvs]$ cvs commit -m "Fixed css and js references for https" matlab/documents/programmers_guide.html
+   Checking in matlab/documents/programmers_guide.html;
+   /afs/slac/g/lcls/cvs/matlab/documents/programmers_guide.html,v  <--  programmers_guide.html
+   new revision: 1.11; previous revision: 1.10
+   done
+
+4. Release to public matlab/documents web page
+
+   [greg@rhel6-64i lclscvs]$ cd /afs/slac/www/grp/ad/docs/matlab
+   [greg@rhel6-64i matlab]$ cvs update documents
+   cvs update: Updating documents
+   U documents/programmers_guide.html
+   ...
+
+
+===================
+HLA_software.xlsx is an Excel spreadsheet of the original files. GUIs mostly
+by Henrik Loos and data interfaces by Greg White. 
+
+To regenerate the web page:
+0. cvs co matlab/documents with CVSROOT set to ...
+1. Open HLA_software.xslx in Excel on your Mac or desktop.
+2. Saving
+   With AFS
+   1. Make sure you have AFS mounted
+   2. Select File -> Save as Web Page.
+      Navigate to the AFS directory of this web page (on mac, shift-command-G) and enter
+      /afs/slac/www/grp/ad/hla
+      Save with filename HLA_software.htm
+  
+   With scp
+   1. Select File -> Save as Web Page. Save to somewhere on your mac, like 
+      simply the cvs co area
+   2. scp -r HLA_software.htm HLA_software_files/ 'greg@rhel6-64.slac.stanford.edu:/afs/slac/www/grp/ad/docs/matlab/documents
+

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Accessing Production</title>
+<link rel="stylesheet" type="text/css" href="http://www.slac.stanford.edu/grp/ad/css/base_cardinal.css">
+<link rel="stylesheet" type="text/css" href="http://www.slac.stanford.edu/grp/ad/css/addocs.css">
+</head> 
+<body>
+<!--
+Modifying this file:
+See header material of ../cheatsheet.md and adapt for this file. 
+Auth: Greg White, Nov 17, 2017, SLAC.
+--> 
+<p style="font: 170% sans-serif; color: #660003; text-align: center">
+LOGGING INTO SLAC PRODUCTION ACCELERATOR NETWORK
+</p>
+<p style="text-align: center">
+Greg White, SLAC, 20-Dec-2017</p>
+
+<p>This document helps describes how users of the LCLS accelerator systems
+can gain authorization for, and and log into, computers of the "production" network, such as lcls-srv01. </p>
+<p>It is written assuming you are using a unix based computer - like Mac OS X, or Linux, though the authentication applies equally to other, non-unix, client systems. In general, all systems requiring access to the production network, must got through a DSA authenticated login, as is done by SSH.</p>
+<p>TABLE OF CONTENTS</p>
+<div class="toc">
+<ul>
+<li><a href="#authentication-and-setup">Authentication and Setup</a></li>
+<li><a href="#login-to-production">Login to production</a></li>
+</ul>
+</div>
+<h1 id="authentication-and-setup">Authentication and Setup</h1>
+<p>This section describes how you become a registered user of the control system, and how subsequently to log in efficiently.</p>
+<p>To log into Production, you need to be "authenticated" on the production network. That is, the production computers have to be taught to recognize that you are a legitimate user. Regular SLAC login is not sufficient. Authentication needs to be set up just once, after which ssh commands to production will work:</p>
+<ol>
+<li>
+<p>Run the following command on any SLAC Public (aka AFS) unix machine:</p>
+<p>$ ssh-keygen -t dsa</p>
+</li>
+<li>
+<p>Email Ken Brobeck at SLAC, saying you have done so. Then he will take the file your command created, and use it to authenticate you to the production accelerator computers. </p>
+</li>
+</ol>
+<p>After Ken has replied that you are authenticated, ssh commands like the following will work. </p>
+<h1 id="login-to-production">Login to production</h1>
+<p>Tunnel ssh from a laptop to prod. You will login as physics. This long lines works without using VPN or SLAC network (just visitor net is fine):</p>
+<pre><code>$ ssh -l &lt;username&gt;@rhel6-64.slac.stanford.edu -t -K -Y -A \
+ssh -A -t -Y mcclogin ssh -t -Y physics@lcls-srv01
+</code></pre>
+<p>On systems supporting ssh -J, this also works and may be a bit more efficient:</p>
+<pre><code>$ ssh -KAtY -J &lt;username&gt;@rhel6-64.slac.stanford.edu mcclogin ssh -lphysics lcls-srv01
+</code></pre>
+<p>Once in, if you have a personal profile, select your name from the list presented at login.
+If you don't have a personal profile, hit 0 after the list of users, and mkdir &lt;yourname&gt;.</p>
+<p>If you want to switch to your profile:</p>
+<pre><code>$ set_profile
+</code></pre>

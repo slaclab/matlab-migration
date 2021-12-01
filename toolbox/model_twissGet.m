@@ -32,6 +32,8 @@ function [twiss, sigma, energy, phase] = model_twissGet(name, rOpts, varargin)
 % Author: Henrik Loos, SLAC
 
 % History:
+%   21-Sep-2021, M. Woodley (15SEP21)
+%    * update initial design Twiss for OTR2 (in copper linac)
 %   05-Jun-2019, M. Woodley (OPTICS=AD_ACCEL-06JUN19)
 %    * use AD_ACCEL and FACET2 defined beam paths; update initial Twiss;
 %      add more points-of-interest
@@ -129,8 +131,8 @@ else
    %twiss0(:,:,9)=[1e-6 1e-6;38.47839726 135.0738675;2.750561156 2.617341185]; % at BEGBSYA for A-Line
    %twiss0(:,:,9)=[1e-6 1e-6;36.578 41.455; 0.181  1.063];      % at 50B1 for A-Line
 
-%   LCLS2sc: CATHODEB
-    twiss0(:,:,10)=[0.5e-6 0.5e-6;5.470910663e+1 5.464124178e+1;2.492727669e+1 2.489672867e+1];
+%   LCLS2sc: CATHODEB (15SEP21)
+    twiss0(:,:,10)=[0.5e-6 0.5e-6;24.132987592581 24.1032534071;12.721498354446 12.70542401701];
 
 %   FACET2e: CATHODEF
     twiss0(:,:,11)=[5e-5 5e-6;1.191686714e+1 3.135655867e0;7.509605372e0 -7.047857400e0];
@@ -173,8 +175,8 @@ else
 %   LCLS2sc: WSEMIT2
     twiss0(:,:,21)=[0.5e-6 0.5e-6;5.933102324e0 5.912476852e0;0 0];
 
-%   LCLS2cu: OTR2
-    twiss0(:,:,22)=[1e-6 1e-6;1.113081026 1.113021659;-6.894035879e-2 -7.029489754e-2];
+%   LCLS2cu: OTR2 (15SEP21)
+    twiss0(:,:,22)=[1e-6 1e-6;1.11308102615 1.113021659127;-0.068940358788 -0.070294897537];
 
     phase0=zeros(2,size(twiss0,3));  % Default to 0 phase advance
 %   LCLS2cu phases are w.r.t. CATHODE
@@ -202,7 +204,6 @@ else
     phase0(:,20)=[2.9282;4.0839]*2*pi; % LCLS2sc: WSC104
     phase0(:,21)=[4.5326;5.9125]*2*pi; % LCLS2sc: WSEMIT2
     phase0(:,22)=[0.7647;0.9398]*2*pi; % LCLS2cu: OTR2
-
 %    en0(:,1)=model_energy({'YAG01' 'BPM15' 'OTR21' 'OTR33' 'OTR21' 'OTR33' 'YAG03' 'OTR12' 'OTR33'},rOpts);
 
     if ~opts.design

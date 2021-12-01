@@ -209,7 +209,17 @@ if ( any(selGirderBPMs) )
             if ( ~bpmsim )
                 lcaPut( bpmpvs.prog{j}, c.PROG_SCANDONE ); % move this to better place
             end
+            % Temporary safety save until this version fully tested
+            try
+                path_name=(['/u1/lcls/physics/cavityBPM/calibration/data/backup/' beamline '/']);
+                date=datestr(now,31);
+                str = ['BPMCalib',beamline,'_',date(1:10),'_',date(12:13),'_',date(15:16),'_bpm',int2str(j)] ;
+                save(fullfile(path_name,str))
+                fprintf('All variables saved to %s%s.mat\n\n',path_name,str);
+            catch ME
+            end
         end
+
         disp('restoring girder moves');
         % Restore the final move (if any girders were moved)
         if ( prevPlane )
@@ -371,6 +381,15 @@ catch ME
     calBpmRestore(restore_mask, c, scanpvs, und, fb, bpmsim);
     return;    
 end
+% Temporary safety save until this version fully tested
+try
+path_name=(['/u1/lcls/physics/cavityBPM/calibration/data/backup/' beamline '/']);
+date=datestr(now,31);
+str = ['BPMCalib',beamline,'_',date(1:10),'_',date(12:13),'_',date(15:16), '_afternongirder'] ;
+save(fullfile(path_name,str))
+fprintf('All variables saved to %s%s.mat\n\n',path_name,str); 
+catch ME
+end
 
 % Batch calibration, many BPMs with one corrector pair
 try
@@ -488,7 +507,7 @@ end
 try
 path_name=(['/u1/lcls/physics/cavityBPM/calibration/data/backup/' beamline '/']);
 date=datestr(now,31);
-str = ['BPMCalib',beamline,'_',date(1:10),'_',date(12:13),'_',date(15:16)] ;
+str = ['BPMCalib',beamline,'_',date(1:10),'_',date(12:13),'_',date(15:16), '_afternongirderbatch'] ;
 save(fullfile(path_name,str))
 fprintf('All variables saved to %s%s.mat\n\n',path_name,str); 
 catch ME
@@ -1372,11 +1391,6 @@ for m = a:b
             corset = xycor.steps(k);
             if ( ~bpmsim )
                 lcaPut( xycor.setpv, corset );
-            end
-            if ( strcmp( 'YCOR:UNDH:4680', xycor.name ) )
-                disp('Increase wait time for YCOR:UNDH:4680');
-                pause(60); % temporary workaround              
-            else
                 pause(5); % Wait for corrector to settle
             end
             e = 0; % Error count for bad data
@@ -1472,11 +1486,6 @@ for m = a:b
         end
         if ( ~bpmsim )
             lcaPut( xycor.setpv, xycor.init );
-        end
-        if ( strcmp( 'YCOR:UNDH:4680', xycor.name ) )
-            disp('Increase wait time for YCOR:UNDH:4680');
-            pause(60); % temporary workaround            
-        else
             pause(5); % Wait for corrector to settle
         end
     catch ME

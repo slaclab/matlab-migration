@@ -276,7 +276,7 @@ end
 function[ref_pv, myBeamcode, err] = handleFacet()
 err = 0;
 refBPM_pv ='BPMS:IN10:221';
-refTORO_pv ='TORO:IN10:362';
+refTORO_pv ='TORO:IN10:431:0';
 response = input('\nSelect TMIT reference:\nType b for BPM10221, t for IM10431, or o to select a different BPM or toroid. ','s');
 if response=='b'||response=='B'; ref_pv=refBPM_pv;
 elseif response=='t'||response=='T'; ref_pv=refTORO_pv;

@@ -1,6 +1,15 @@
 function [ incmSet, incmReset, excmSet, excmReset, beamcode ] = getINCMEXCM( dgrp )
 % Changes to default INCM & EXCM for various FACET BPM Definitions
 
+if isequal('FACET-II',dgrp)
+    incmSet = {'MPS_POCKCELL','TS5'};
+    incmReset =  {''};
+    excmSet = {'TS1','TS2','TS3','TS4','TS6','TSLOT_U6','NO_GUN_PERM'};
+    excmReset = {''};
+    beamcode = 10;
+    return;
+end
+
 if isequal('NDRFACET',dgrp)
     incmSet = {''};
     incmReset =  {''};
@@ -47,12 +56,21 @@ if isequal('LASER1HZ',dgrp)
     return;
 end
 
+%if isequal('LASER10HZ',dgrp)
+%    incmSet = {'TEN_HERTZ','TS5'};
+%    incmReset =  {'FFTB_ext'};
+%    excmSet = {''};
+%    excmReset = {'DUMP_2_9','NO_EXT_ELEC'};
+%    beamcode = 0;
+%    return;
+%end
+
 if isequal('LASER10HZ',dgrp)
     incmSet = {'TEN_HERTZ','TS5'};
-    incmReset =  {'FFTB_ext'};
-    excmSet = {''};
-    excmReset = {'DUMP_2_9','NO_EXT_ELEC'};
-    beamcode = 0;
+    incmReset =  {''};
+    excmSet = {'TS1','TS2','TS3','TS4','TS6','TSLOT_U6'};
+    excmReset = {''};
+    beamcode = 10;
     return;
 end
 

@@ -1,7 +1,7 @@
 function beamLine=model_beamLineFACET2e()
 %
 % -----------------------------------------------------------------------------
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-2021next ***
 % -----------------------------------------------------------------------------
 %
 % Returns Matlab model beam lines that correspond to defined FACET-II
@@ -18,11 +18,9 @@ function beamLine=model_beamLineFACET2e()
 %  beamLine.F2_SCAVI  = BEGDL10 to positron production target
 %
 % -----------------------------------------------------------------------------
-
-debug=true; % don't use mat-file
-
+ 
 % check for mat-file version ... load and return beamLine if found
-if (~debug&&exist('model_beamLineFACET2e.mat')==2)
+if (exist('model_beamLineFACET2e.mat')==2)
   load model_beamLineFACET2e.mat
   return
 end
@@ -60,7 +58,7 @@ EMASS  = 0.510998902e-3; % electron rest mass [GeV]
 PMASS  = 0.938271998;    % proton rest mass [GeV]
 CLIGHT = 2.99792458e8;   % speed of light [m/s]
 
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 
 
 
@@ -82,7 +80,7 @@ CLIGHT = 2.99792458e8;   % speed of light [m/s]
 % ------------------------------------------------------------------------------
 % element and line definitions
 % ------------------------------------------------------------------------------
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 % ------------------------------------------------------------------------------
 % constants and global parameters (from FACET2e_baseline.mat)
 % ------------------------------------------------------------------------------
@@ -184,7 +182,7 @@ BMAX19 =  70;
 % ------------------------------------------------------------------------------
 % load lattice definitions
 % ------------------------------------------------------------------------------
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 % FACET2 common parameters
 % ==============================================================================
 % Modification History
@@ -207,6 +205,9 @@ LQC =  0.108  ;
 RQC =  0.043/2      ;%GLmax= 2.1 kG @ 12 A
 LQC2 =  0.1759 ;
 RQC2 =  2.1*IN2M/2   ;%GLmax=   4 kG @ 8.67 A
+LSQ =  0.3813  ;
+ASQ =  2.026*IN2M/2;
+LC260 =  0.260 ;%3D8.8 corrector effective length
 % LI19 scavenger kicker
 ZKS =  0.5;
 % common drift lengths
@@ -220,7 +221,7 @@ DAQ3={'dr' '' LDAQ3 []}';
 DAQ4={'dr' '' LDAQ4 []}';
 % ------------------------------------------------------------------------------
 
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 % ==============================================================================
 % Modification History
 % ------------------------------------------------------------------------------
@@ -384,7 +385,7 @@ LL0B =  L0BF__1{3}+L0BF__2{3}+XC10381{3}+YC10382{3}+L0BF__3{3}+L0BF__4{3}+ XC104
 
 % ------------------------------------------------------------------------------
 
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 % ==============================================================================
 % Modification History
 % ------------------------------------------------------------------------------
@@ -446,19 +447,19 @@ SINCABHS =  1-ABHS_2/6+ABHS_4/120-ABHS_6/5040 ;%~sinc(ABHs)=sin(ABHs)/ABHs
 LBHS =  (ZBH/2)/SINCABHS;
 ABHL =  ABH-ABHS;
 LBHL =  LBH-LBHS;
-BCX10451A={'be' 'BCX10451' LBHS [-ABHS GBH/2 0 0 0.400 0 0]}';
-BCX10451B={'be' 'BCX10451' LBHL [-ABHL GBH/2 0 -ABH 0 0.400 0]}';
-BCX10461A={'be' 'BCX10461' LBHL [+ABHL GBH/2 +ABH 0 0.400 0 0]}';
-BCX10461B={'be' 'BCX10461' LBHS [+ABHS GBH/2 0 0 0 0.400 0]}';
-BCX10475A={'be' 'BCX10475' LBHS [+ABHS GBH/2 0 0 0.400 0 0]}';
-BCX10475B={'be' 'BCX10475' LBHL [+ABHL GBH/2 0 +ABH 0 0.400 0]}';
-BCX10481A={'be' 'BCX10481' LBHL [-ABHL GBH/2 -ABH 0 0.400 0 0]}';
-BCX10481B={'be' 'BCX10481' LBHS [-ABHS GBH/2 0 0 0 0.400 0]}';
+BCX10451A={'dr' '' LBHS []}';
+BCX10451B={'dr' '' LBHL []}';
+BCX10461A={'dr' '' LBHL []}';
+BCX10461B={'dr' '' LBHS []}';
+BCX10475A={'dr' '' LBHS []}';
+BCX10475B={'dr' '' LBHL []}';
+BCX10481A={'dr' '' LBHL []}';
+BCX10481B={'dr' '' LBHS []}';
 % define unsplit SBENs for BMAD ... not used by MAD
-BCX10451={'be' 'BCX1045' LBH [-ABH GBH/2 0 -ABH 0.400 0.400 0]}';
-BCX10461={'be' 'BCX1046' LBH [+ABH GBH/2 +ABH 0 0.400 0.400 0]}';
-BCX10475={'be' 'BCX10475' LBH [+ABH GBH/2 0 +ABH 0.400 0.400 0]}';
-BCX10481={'be' 'BCX1048' LBH [-ABH GBH/2 -ABH 0 0.400 0.400 0]}';
+BCX10451={'dr' '' LBH []}';
+BCX10461={'dr' '' LBH []}';
+BCX10475={'dr' '' LBH []}';
+BCX10481={'dr' '' LBH []}';
 % dogleg
 GB0 =  0.03                   ;%gap height (m)
 ZB0 =  0.2032                 ;%full "Z" length (m)
@@ -485,7 +486,7 @@ BX10751={'be' 'BX1075' LB0 [AB0 GB0/2 AB0/2 AB0/2 0.45 0.45 0]}';
 LAM =  0.054;
 LAMR =  758E-9;
 GAMI =  EI/EMASS;
-K_UND =  0 ;%sqrt(2*(LAMRT*2*GAMI^2/LAM-1)) % 0 if off
+K_UND =  0 ;%sqrt(2*(lamr*2*gami^2/lam-1))
 LHUN =  0.506263/2;
 KQLH =  (K_UND*2*PI/LAM/sqrt(2)/GAMI)^2;
 % handle K_und->0 by expressing R34 as an approximate SINC function
@@ -495,9 +496,11 @@ ARGU4 =  ARGU2*ARGU2;
 ARGU6 =  ARGU4*ARGU2;
 SINCARGU =  1-ARGU2/6+ARGU4/120-ARGU6/5040 ;%~sinc(ARGu)=sin(ARGu)/ARGu
 R34U =  LHUN*SINCARGU;
-%UM10466={'un' 'UM10466' LHUN [KQLH KQLH]}';%,                            &
-UM10466={'un' 'UM10466' LHUN [KQLH LAM 1]}';
-%RM(5,6)=Lhun/(gami^2)*(1+(K_und^2)/2)
+% 
+% UM10466={'dr' '' LHUN []}';%,                            &
+% %RM(5,6)=Lhun/(gami^2)*(1+(K_und^2)/2)
+
+UM10466={'dr' '' LHUN []}';
 % ==============================================================================
 % QUAD
 % ------------------------------------------------------------------------------
@@ -607,8 +610,8 @@ BPM10781={'mo' 'BPM10781' 0 []}';
 % misc
 IM10431={'mo' 'IM10431' 0 []}';
 VV10435={'mo' 'VV10435' 0 []}';
-PR10465={'mo' 'PR10465' 0 []}';
-PR10471={'mo' 'PR10471' 0 []}';
+PR10465={'dr' '' 0 []}';
+PR10471={'dr' '' 0 []}';
 VV10545={'mo' 'VV10545' 0 []}';
 WALLBEG={'mo' 'WALLBEG' 0 []}';
 WALLEND={'mo' 'WALLEND' 0 []}';
@@ -657,7 +660,7 @@ QM10781_FULL=[QM10781,BPM10781,QM10781];
 DL10=[BEGDL10,DE00,QE10425_FULL,DE01A,IM10431,DE01B,VV10435,DE01C,QE10441_FULL,DH00,LH10,DH05A,TCY10490_FULL,DH05B,QE10511_FULL,DE03A,XC10521,YC10522,DE03B,QE10525_FULL,DE04A,VV10545,DE04B,WALLBEG,IN10WALL,WALLEND,DE05A,RST10551,DE05B,WS10561,DE05C1,MRK0F,DE05C2,PR10571,DE05D,BPM10581,DE05E,IM10591,DE05F,BZ10596,DE05G,QM10631_FULL,DE06A,XC10641,YC10642,DE06B,QM10651_FULL,DE07,BX0F,DM00A,XC10761,YC10762,DM00B,QM10771_FULL,DM01,QM10781_FULL,DM02A,IM10791,DM02B,VV10795,DM02C,ENDDL10];
 % ==============================================================================
 
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 % ==============================================================================
 % Modification History
 % ------------------------------------------------------------------------------
@@ -699,10 +702,10 @@ K11_2C={'lc' 'K11_2C' DLWL10 [SBANDF P50*GRADL1*DLWL10 PHIL1*TWOPI]}';
 % ------------------------------------------------------------------------------
 % L1 X-band
 % ------------------------------------------------------------------------------
-L1XF__1={'lc' 'L1XF' DLWLX/2 [XBANDF 0 0*TWOPI]}';
-L1XF__2={'lc' 'L1XF' DLWLX/2 [XBANDF 0 0*TWOPI]}';
+L1XF__1={'dr' '' DLWLX/2 []}';
+L1XF__2={'dr' '' DLWLX/2 []}';
 % define unsplit LCAVs for BMAD ... not used by MAD
-L1XF={'lc' 'L1XF' DLWLX [XBANDF 0 0*TWOPI]}';
+L1XF={'dr' '' DLWLX []}';
 % ==============================================================================
 % QUADs
 % ------------------------------------------------------------------------------
@@ -778,7 +781,7 @@ Q11301_FULL=[Q11301,BPM11301,Q11301];
 L1F=[BEGL1F,K11_1B_FULL,DAQA1,QA11132_FULL,DAQA2,K11_1C_FULL,K11_1D_FULL,DAQ1,Q11201_FULL,DAQ2,K11_2A_FULL,K11_2B_FULL,DAQA3,QA11265_FULL,DAQA4,K11_2C_FULL,DAQA5,Q11301_FULL,DAQA6,VV11302,DL1X,L1XF_FULL,DM10A,VV11308,ENDL1F];
 % ==============================================================================
 
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 % ==============================================================================
 % Modification History
 % ------------------------------------------------------------------------------
@@ -964,7 +967,7 @@ BC11_2=[BEGBC11_2,DM13A,DM13B,QM11358_FULL,DM14A,BL11359,IM11360,DM14B,QM11362_F
 BC11=[BC11_1,BC11_2];
 % ==============================================================================
 
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 % ==============================================================================
 % Modification History
 % ------------------------------------------------------------------------------
@@ -1562,7 +1565,7 @@ LI14=[LI14BEG,K14_1,DAQ1,Q14201_FULL,DAQ2,K14_2,DAQ1,Q14301_FULL,DAQ2,K14_3,DAQ1
 L2F=[BEGL2F,LI11,LI12,LI13,LI14,ENDL2F];
 % ==============================================================================
 
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 % ==============================================================================
 % Modification History
 % ------------------------------------------------------------------------------
@@ -1775,12 +1778,12 @@ Q14901_FULL=[Q14901,BPM14901,Q14901];
 BC14_2=[BEGBC14_2,CNT2B,DM23A,VV14885,BL14888,DM23B,DM23C,QM14891_FULL,DM24A,IM14895,DM24B,Q14901_FULL,DM25,ENDBC14_2];
 % ==============================================================================
 
-% *** OPTICS=FACET2-18MAY21 ***
+% *** OPTICS=FACET2-21AUG19 ***
 % ==============================================================================
 % Modification History
 % ------------------------------------------------------------------------------
-% 19-MAY-2021, M. Woodley
-%  * remove K15_2d_full definition
+% 04-NOV-2021, M. Woodley
+%  * remove unused K15_2d definition
 % ------------------------------------------------------------------------------
 % 16-APR-2021, G. White
 %  * 19-8a removed, XC19900 & YC19900 moved to match as-installed
@@ -2681,239 +2684,13 @@ L3F_2=[BEGL3F_2,LI19B,LI19C,ENDL3F_2];
 L3F=[L3F_1,L3F_2];
 % ==============================================================================
 
-% *** OPTICS=FACET2-18MAY21 ***
-% *** FACET-II Sector 20  ***
-%  "Phase 2" FFS installation with 0.5m IP beta functions
+% *** OPTICS=FACET2-2021next ***
 % ==============================================================================
 % FACET e- optics
 % ------------------------------------------------------------------------------
-% 17-MAY-2021, G. White
-%  * Removed QFF4, inserted Q0FF, Q1FF & Q2FF
-%    - z locations measured by metrology: see FACET elog 05/05/2021
-% 17-APR-2021, G. White
-%  * Fixed as-installed Q0D, Q1D, Q2D locations: measurements by Georg
-%  * Added all current expt table and spectrometer table devices according to
-%    walk-through by Christine: https://docs.google.com/spreadsheets/d/
-%    1Qw85KBUfSJ6Jt8tArqjcGTVlpZCtUz2hDWX8EuCRcb4/edit?usp=sharing
-% 17-JUN-2020, G. White
-%  * Added new beamline components to IP area as per engineering drawing from
-%    D. Storey
-% 30-JAN-2015, M. Woodley
-%  * move experimental area definitions to separate xsif-files
-%  * experimental area modified for hydrogen plasma chamber installation and
-%    spectrometer upgrade (QS0 installation)
-%  * device locations in experimental area and dump table area per S. Green
-%    spreadsheet
-% ------------------------------------------------------------------------------
-% 10-APR-2014, M. Woodley
-%  * add separate definitions of experimental area for long oven installation
-%    and short oven installation (comment blocks)
-%  * device locations in experimental area after long oven installation per
-%    C. Clarke, S. Li, and M. Hogan
-% 04-FEB-2013, M. Woodley
-%  * nominal optics: R56=-7mm, 10x100@MIP
-%  * M3167 (BPM) and d/s Be window locations per C. Clarke spreadsheet (version
-%    of 9/27/2013)
-% 07-NOV-2013, M. Woodley
-%  * E201 device locations per C. Clarke (1 cm, 10 cm, and 20 cm samples)
-%  * E213 IP location estimated by I. Tudosa
-%  * dump table devices and locations per E. Adli
-% 18-OCT-2013, M. Woodley
-%  * experimental area device locations per C. Clarke (9/27/2013)
-%  * E200 IP location per K. Marsh ("9_8-focus"-Layer_1.pdf)
-%  * dump table devices moved ~25 cm u/s (per E. Adli ... to be confirmed)
-%  * rematch with FF quads to nominal 0.5x5 optics at MIP
-% 15-MAY-2013, M. Woodley
-%    QFF*, and QS* Z-locations per G.Gassner list (QS12_and_QFF4_6_R1.xlsx)
-% 08-MAY-2013, M. Woodley
-%    E201 IP (sample holder) moved 10 cm d/s of Kraken chamber centerline, per
-%    C. Clarke
-% 05-APR-2013, M. Woodley
-%    Change "XTCAV" to "XTCAVF" per H. Loos; experimental device names and unit
-%    numbers per FACETExperimentalAreaDevicesLocation.xlsx (3/14/2013)
-% 18-MAR-2013, M. Woodley
-%    As-installed locations of XC1996, YC2181, YC2321, and XC2460
-%    per N. Lipkowitz
-% 15-MAR-2013, M. Woodley
-%    As-installed experimental device locations per C. Clarke ... rematch
-% 15-FEB-2013, M. Woodley
-%   * add as-installed yaw to B1L and B1R (per Y. Nosochkov)
-%   * low-beta optics is now nominal (Bx*/By* = 0.5/5.0 m @ MIP)
-% 10-FEB-2013, M. Woodley
-%   * locations of SQ1 and SQ2 per M. Sullivan tape-measurement
-%   * 2013 experimental area layout per C. Clarke email of January 24, 2013
-%     and H. Imfeld survey map of February 6, 2013
-% 02-DEC-2012, M. Woodley
-%    Add (optional/provisional) 2013 experimental area layout per C. Clarke
-% 17-AUG-2012, M. Woodley
-%    Optics version 31
-%   * consolidate common and electron files
-%   * add database MARKer points at experiment IPs
-%   * add measured multipole components
-% 30-JUN-2012, M. Woodley
-%    Add alternate E200 IPs (28 cm Rb oven and 21 cm Rb oven) per S. Li list
-%    of 6/28/2012
-% 28-JUN-2012, M. Woodley
-%    Verify Z-locations of experimental devices with S. Li list of 6/28/2012
-% 21-MAY-2012, M. Woodley
-%    Adjust locations of T203163T and IP201/P203208T per S. Li list
-% 03-MAY-2012, M. Woodley
-%    Adjust locations of devices d/s of M203340T per E. Adli, G. Gassner, S. Li,
-%    and drawing ID-257-500-27
-% 09-MAR-2012, M. Woodley
-%    Locations of notch and jaw collimators, XTCAV, sYAG, and THz cubes per
-%    G. Gassner
-% 16-FEB-2012, M. Woodley
-%   * replace DPC (DRIF) with PC200 (INST)
-%   * complement of experimental area devices and their locations per S. Li and
-%     C. Clarke
-%   * replace nonzero-length split-in-half correctors with zero-length HKICs
-%     and VKICs surrounded by half-corrector-length drifts
-% 05-AUG-2011, Y. Nosochkov
-%    Rematch FF quads for the IP position shifted by +0.2934 m (to Z=1993 m).
-%    Due to QFF2 strength limitation, change the IP x/y beta* to 0.018/0.18 m.
-%    Rematch QS1, QS2 quads in the dump line.
-% 04-AUG-2011, M. Woodley
-%    Device locations on THz and IP tables per S. Li
-% 17-JUN-2011, Y. Nosochkov
-%    Rematch sector 19 quads. In the nominal option, K-values in Li19
-%    do not fit within the booster PS range. Add option where K-values
-%    in Li18-19 are within the booster range at the expense of larger
-%    beta perturbation.
-% 01-JUN-2011, M. Woodley
-%    Add XCOR between QS1 and QS2.
-% 13-MAY-2011, M. Woodley
-%    Device locations per visual inspection.
-% 22-FEB-2011
-%    Change toroid name from T191988T to T201988T.
-% 16-FEB-2011
-%    Shift sector-20 elements downbeam by 50 mm starting from B1L.
-%    Make additional minor adjustment to positions of LAERO2PS, LPS2DUMP.
-% 23-Aug-2010
-%    Rematch quad strengths to make Q5E integral strength the same as in v.26.
-%    Set bending angle in B5D36 dipole to 6 mrad.
-% 05-Aug-2010
-%    Remove negative drifts by slight adjustment of adjacent BPM positions.
-% 03-May-2010
-%    Split dipole correctors in half and adjust their S-positions.
-% 23-APR-2010
-%    Adjust S-positions of some correctors and BPMs per engineering
-%    request.
-% 15-APR-2010
-%    Set strengths of QS1, QS2 dumpline quads for match without plasma.
-% 07-APR-2010
-%    Use 0.762 m long sextupole for S2E. Reverse wiggler polarity
-%    to make upward bending. Use 3D8.8 and 3D4.0 type magnets for
-%    orbit correctors. Use a shorter magnet for QFF6. Update magnet
-%    effective lengths and apertures (from C.Spencer's table).
-%    Remove M2E, M10E BPMs.
-%    Rematch geometry by keeping the IP position unchanged.
-%    Rematch linear optics and sextupoles.
-% 26-Jan-2010
-%    Change definition from MARKER to INSTRUMENT for some diagnostic
-%    devices.
-% 05-Nov-2009
-%    Update database names for BPMs, diagnostics and a few magnets.
-%    Move a profile monitor and beam stopper from upstream to downstream
-%    side of B1E bend.
-% 13-Oct-2009
-%    Include profile monitor and beam stopper in sector-19, two HCOLL and
-%    one VCOLL in sector-20 electron chicane, and toroid in the IP region.
-% 28-Sep-2009
-%    Update element names and remove unneeded markers in the dump line.
-% 18-Sep-2009
-%    Include 3 toroids in sector-20 e- chicane. Include 2 CTR pyro
-%    detectors in the final focus. Include OTR cube and Be window after
-%    the last FF quad. Move the last FF BPM inside the last FF quad.
-%    Include wire scanner at IP.
-% 10-Sep-2009
-%    Include notch collimator in sector-20 e- chicane. Relocate the
-%    e- wiggler to downstream end of the chicane just before Q1E.
-%    Include YAG screen 25 cm after the e- wiggler. Use L=0.25 m S3P
-%    sextupole of the same type as other sextupoles. Add HGAP and FINT
-%    parameters to chicane bend definitions and rematch quads.
-% 22-Jul-2009
-%    Use a different magnet type with L=0.285 m for S3P sextupole.
-%    Update magnet database names. Include BPMs.
-%    Use a shorter wiggler.
-% 04-Jun-2009
-%    Replace most of the L=15 cm correctors with existing L=22.4 cm magnets.
-% 23-Apr-2009
-%    Include optics for experimental dump line (M. Hogan).
-% 22-Apr-2009
-%    Rename magnets using FACET name convention.
-% 24-Mar-2009
-%    Replace the 1.739 m B2E bend magnet with 1.812 m magnet. B2E, B3E
-%    bending angles are slightly adjusted to correct the geometry.
-%    Quads are rematched.
-% 18-Mar-2009
-%    Include X,Y orbit correctors.
-% 11-Dec-2008
-%    Increase length of the "new" bends from 1 m to 1.04 m to decrease
-%    their field below 17 kG. Left edge of the 1st chicane bend is moved
-%    0.02 m upstream.
-% 04-Dec-2008
-%    Increase the path length difference between e+ and e- from 50 to 52.7 mm
-%    by raising the bend field by ~2.7%. Field in the "new" 1 m dipoles exceed
-%    17 kG at 23 GeV -- the dipole length needs to be increased.
-% 13-Nov-2008
-%    Add a 3rd sextupole family to e+ chicane for better chromaticity
-%    correction. Change all sextupole lengths in both chicanes to 0.25 m.
-%    Re-fit geometry (using ~2% higher bend field) and re-match optics.
-% 29-Oct-2008
-%    Include wigglers at the beginning of e- chicane and at the end of
-%    e+ chicane. The wiggler focusing breaks the chicane symmetry, but
-%    since the effect is rather small, the quads have not been rematched.
-%    The wiggler also slightly changes the X-Z projection which has
-%    been corrected by a slight adjustment of adjacent drift.
-% 28-Oct-2008
-%    Change Q4E doublet to a triplet to reduce its gradient below the
-%    existing magnet limit. Use doublet S1P sexupole and doublet S3E
-%    sextupole to reduce their K-values. Assume the new sextupoles are
-%    based on the existing sextupoles, but the aperture is reduced from
-%    20.6 mm to 18 mm for 31% higher K-value.
-% 27-Oct-2008
-%    Replace the magnets used for Q6E and QFF1 which are not currently
-%    available (used for LCLS) with other available existing magnets.
-% 23-Oct-2008
-%    The existing quad positions are optimized for lower strengths and
-%    stronger quad types are used where needed, but still one quad family
-%    (Q4E) is out of existing field range.
-% 03-Oct-2008
-%    Existing quad strengths are optimized, but 6 families remain
-%    out of range.
-% 24-Sep-2008
-%    Use existing SLAC magnets. The "aperture" is specified 2 mm smaller
-%    than the magnet bore aperture in order to leave space for pipe width.
-%    Bending angle is tuned to match the e- and e+ chicane Z-lengths for
-%    a given 50 mm path length difference. Quads are rematched, but some
-%    strengths are out of range. Sextupoles are not matched yet.
-% 31-Jul-2008
-%    Make all 4 e+ sextupoles independent and re-optimize their strength
-%    for minimal sigma-x at IP (using DIMAD tracking).
-% 17-Jul-2008
-%    Adjust magnet positions and lengths for lower initial T566 w/o
-%    sextupoles. Re-match the e- and e+ quad/bend optics.
-%    Optimize 6 e- sextupoles and 4 e+ sextupoles for low W-function,
-%    DDX and |T566|<0.1.
-% 11-Jul-2008
-%    Rearrange and re-optimize e- sextupoles for lower T566.
-%    Use 8 sextupoles (4 families).
-% 30-Jun-2008
-%    Re-optimize e- sextupoles for lower Txx6 2nd order chromatic terms.
-% 26-Jun-2008
-%    Match upstream linac optics and FACET.
-% 19-Jun-2008
-%    Add sextupoles to the chicanes to cancel the 2nd order dispersion.
-%    and reduce W-function at IP. The W-functions need a better correction.
-% 11-Jun-2008
-%    Chicane length is increased by 9.09 m. The bends are split in
-%    shorter magnets and placed at positions where there is no overlap
-%    with another existing beamline in the linac in the beginning of
-%    the chicanes.
-% 05-Jun-2008
-%    Quad K-values in chicanes are reduced to <0.75.
-%    Final focus is not yet re-matched.
+% 25-AUG-2021, M. Woodley
+%  * from LI20.xsif (18MAY21 release): extract W-chicane definitions
+%  * XTCAV moved into Final Focus
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 % global parameters
@@ -2922,11 +2699,6 @@ WSCL =  1 ;%wiggler field scale (=1 for wiggler ON, =0 for wiggler OFF)
 % Initial parameters at BEGBC20
 TW20=struct('BETX',12.2509,'ALFX',0.6685,'BETY',22.3869,'ALFY',1.1657);
 
-% ==============================================================================
-% transverse deflecting structure
-% ------------------------------------------------------------------------------
-LXTCAV =  40.687*IN2M;
-XTCAVF={'tc' 'XTCAVF' LXTCAV/2 [11424 0 0*TWOPI]}';
 % ==============================================================================
 % BENDs
 % ------------------------------------------------------------------------------
@@ -2992,14 +2764,6 @@ WIGE1={'be' 'WIGE' LWE [AWE GWE/2 0 AWE 0.5 0.5 pi/2]}';
 WIGE2={'be' 'WIGE' 2*LWE [-2*AWE GWE/2 -AWE -AWE 0.5 0.5 pi/2]}';
 WIGE3={'be' 'WIGE3' LWE [AWE GWE/2 AWE 0 0.5 0.5 pi/2]}';
 LDWE =  ZDWE/cos(AWE);
-% spectrometer / dump bend
-ABD =  0.006;
-LBD =  0.9779;
-GBD =  0.0635;
-B5D361={'be' 'B5D36' LBD/2 [ABD/2 GBD/2 ABD/2 0 0.5 0 pi/2]}';
-B5D362={'be' 'B5D36' LBD/2 [ABD/2 GBD/2 0 ABD/2 0 0.5 pi/2]}';
-% define unsplit SBENs for BMAD ... not used by MAD
-B5D36={'be' 'B5D36' LBD [ABD GBD/2 ABD/2 ABD/2 0.5 0.5 pi/2]}';
 % ==============================================================================
 % QUADs
 % ------------------------------------------------------------------------------
@@ -3046,50 +2810,9 @@ Q3ER_1={'qu' 'Q3ER_1' LQ3/2 [KQ3ER 0]}';
 Q3ER_2={'qu' 'Q3ER_2' LQ3/2 [KQ3ER 0]}';
 Q2ER={'qu' 'Q2ER' LQ2/2 [KQ2ER 0]}';
 Q1ER={'qu' 'Q1ER' LQ1/2 [KQ1ER 0]}';
-% Final Focus and spectrometer quadrupoles
-LQFF1 =  0.4609;
-AQFF1 =  8.325E-3;
-LQFF2 =  0.4609;
-AQFF2 =  8.325E-3;
-LQFF4 =  0.7142;
-AQFF4 =  18.6375E-3;
-LQFF5 =  2.0260;
-AQFF5 =  24.0E-3;
-LQFF6 =  0.7142;
-AQFF6 =  18.6375E-3;
-LQS0 =  0.46092;
-AQS0 =  11.5E-3;
-LQS =  1.0;
-AQS =  27.0E-3;
-KQFF1 =  0.235988;
-KQFF2 =  -0.269377;
-KQ2FF =  0.725752;
-KQ1FF =  -1.09179;
-KQ0FF =  0.4;
-KQ0D =  -0.321363;
-KQ1D =  0.533683;
-KQ2D =  -0.321363;
-QFF1={'qu' 'QFF1' LQFF1/2 [KQFF1 0]}';
-QFF2_1={'qu' 'QFF2_1' LQFF2/2 [KQFF2 0]}';
-QFF2_2={'qu' 'QFF2_2' LQFF2/2 [KQFF2 0]}';
-QFF2_3={'qu' 'QFF2_3' LQFF2/2 [KQFF2 0]}';
-Q0FF={'qu' 'Q0FF' 0.3571 [KQ0FF 0]}';
-Q1FF={'qu' 'Q1FF' 0.3571 [KQ1FF 0]}';
-Q2FF={'qu' 'Q2FF' 0.3571 [KQ2FF 0]}';
-% Q3FF: QUADRUPOLE,K1=KQ3FF,L=0.3571,APERTURE=0.0186,TYPE="1.625Q27.3"
-%  Q4FF: QUADRUPOLE,K1=KQ4FF,L=0.3571,APERTURE=0.0186,TYPE="1.625Q27.3"
-%  Q5FF: QUADRUPOLE,K1=KQ5FF,L=0.2304,APERTURE=0.0083,TYPE="0.813Q17.7"
-% spectrometer:
-Q0D={'qu' 'Q0D' 0.5 [KQ0D 0]}';
-Q1D={'qu' 'Q1D' 0.5 [KQ1D 0]}';
-Q2D={'qu' 'Q2D' 0.5 [KQ0D 0]}';
-% skew quadrupoles
-LSQ =  0.3813;
-ASQ =  (2.026*IN2M)/2;
+% skew quadrupole
 KSQ1 =  0;
-KSQ2 =  0;
 SQ1={'qu' 'SQ1' LSQ/2 [KSQ1 pi/4]}';
-SQ2={'qu' 'SQ2' LSQ/2 [KSQ2 pi/4]}';
 % ==============================================================================
 % SEXTs
 % ------------------------------------------------------------------------------
@@ -3134,7 +2857,6 @@ LDM1Q =  LDMQ+0.038489;
 LD2EA =  0.917799 ;%1.144-0.0051
 LDCNHC =  0.417207 ;%0.25
 LDHCYC1 =  1.554794 ;%0.35-0.160
-LC260 =  0.260 ;%3D8.8 corrector effective length
 LDCC =  0.15;
 LDYC1XC1 =  LDCC-0.036;
 LDCB =  0.15;
@@ -3204,35 +2926,6 @@ LDYAGQ =  0.326737389545 ;%0.25-0.0051
 LDM11Q =  LDMQ+0.055967;
 LDTM11 =  LDTM-0.061067;
 LD1ET2 =  LD1EM-LDTM;
-LDFF1 =  0.4-DLB1-0.00515-DSB1O;
-LDM1QF =  LDMQ-0.00515;
-LDFF2 =  1.87-0.01030;
-LDCQ =  0.15;
-LDFF2CM =  LDFF2-2*LC22-LDCC-LDCQ-LDM1QF-0.07865;
-LYC1XC1F =  LDCC-0.0360;
-LDXC1QF =  LDCQ+0.04265;
-LDQ2FF =  0.25-0.01030;
-LDQ2FFM1 =  LDQ2FF/2-0.026806;
-LDQ2FFM2 =  LDQ2FF/2+0.026806;
-LDYC2QF =  LDCQ+0.08885;
-LYC2XC2F =  LDCC-0.0915345;
-LDFF5 =  0.55-0.0233;
-LDFF6 =  0.45+0.11645;
-LDQ4FF =  0.25-0.0206;
-LYC3XC3F =  LDCC-0.1132905;
-LDXC3QF =  LDCQ+0.095402;
-LDQ4FFM1 =  LDQ4FF/2+0.128072;
-LDQ4FFM2 =  LDQ4FF/2+0.137876;
-LDFF5A =  0.15075;
-LDFF5B =  LDFF5-LDFF5A-LC136;
-LDFF6A =  (0.45-LC136)/2+0.10535;
-LDFF6B =  LDFF6-LDFF6A-LC136;
-LDM5QF =  0;
-LDM1QEX =  LDMQ+0.213360;
-LDM2QEX =  LDMQ+0.213430;
-LQ2BEND =  0.5+0.274320-0.03145;
-LDMB =  0.1;
-LDM3BEX =  LDMB-0.274320+0.629920-0.03145;
 D1ET1A={'dr' '' 2.821013 []}';
 D1ET1B={'dr' '' LD1ET1-D1ET1A{3} []}';
 DTPM={'dr' '' LDTPM+0.433425 []}';
@@ -3289,6 +2982,7 @@ DB2XC4={'dr' '' LB2XC4 []}';
 DXC4E={'dr' '' LC260/2 []}';
 DXC4TCA={'dr' '' LXC4TCA []}';
 DXC4TCB={'dr' '' LXC4TCB []}';
+DXTCAVF={'dr' '' 40.687*IN2M []}';
 DTCWIG={'dr' '' LTCWIG []}';
 DWE={'dr' '' LDWE []}';
 DYAGW={'dr' '' LDYAGW+0.098819 []}';
@@ -3297,107 +2991,6 @@ DM11Q={'dr' '' LDM11Q+0.022716 []}';
 DTM11={'dr' '' LDTM11-0.022716 []}';
 D1ET2A={'dr' '' 2.452948 []}';
 D1ET2B={'dr' '' LD1ET2-D1ET2A{3} []}';
-DZQFF1 =   0.4826E-3;
-DZQFF2_1 =   0.254E-3;
-DZQFF2_2 =   0;
-DZQFF2_3 =  -0.1016E-3;
-DZQFF4_1 =  -0.1016E-3;
-DZQFF4_2 =   9.652E-3;
-DZQFF5 =  -0.3302E-3;
-DZQFF6 =  -0.4826E-3;
-DZQS1 =  -0.072E-3;
-DZQS2 =   0.044E-3;
-DFF1={'dr' '' LDFF1+DZQFF1 []}';
-DM1QF={'dr' '' 0.137748 []}';
-DFF2CM={'dr' '' 0.895302 []}';
-DFF2CMA={'dr' '' 0.304902-DZQFF1 []}';
-DFF2CMB={'dr' '' 0.095348 []}';
-DFF2CMC={'dr' '' 0.113752 []}';
-DYC1FF={'dr' '' LC260/2 []}';
-DYC1XC1F={'dr' '' 0.114 []}';
-DXC1FF={'dr' '' LC260/2 []}';
-DXC1QF={'dr' '' 0.19265+DZQFF2_1 []}';
-DQ2FFM1={'dr' '' 0.115523 []}';
-DQ2FFM2={'dr' '' 0.124177-DZQFF2_1 []}';
-DQ2FF={'dr' '' 0.2397+DZQFF2_3 []}';
-DYC2QF={'dr' '' 0.23885-DZQFF2_3 []}';
-DYC2FF={'dr' '' LC260/2 []}';
-DYC2XC2F={'dr' '' 0.0584655 []}';
-DXC2FF={'dr' '' LC260 []}';
-DXC2PF={'dr' '' 0.035534 []}';
-DFF4P={'dr' '' 0.817 []}';
-DYC3PF={'dr' '' 0.063941 []}';
-DYC3FF={'dr' '' LC260 []}';
-DYC3XC3F={'dr' '' 0.0367095 []}';
-DXC3FF={'dr' '' LC260/2 []}';
-DXC3QF={'dr' '' 0.245402+DZQFF4_1 []}';
-DQ4FFM1={'dr' '' 0.329335 []}';
-DQ4FFM2={'dr' '' 0.166013-DZQFF4_1+DZQFF4_2 []}';
-DFF5A={'dr' '' 0.15075-DZQFF4_2 []}';
-DXC4FF={'dr' '' LC136/2 []}';
-DFF5B={'dr' '' 0.23995+DZQFF5 []}';
-DFF6A={'dr' '' 0.26235-DZQFF5 []}';
-DYC4FF={'dr' '' LC136/2 []}';
-DFF6B={'dr' '' 0.1681+DZQFF6 []}';
-DM1QEX={'dr' '' 0.286595 []}';
-LQSEPMA={'dr' '' 0.579-DZQS1 []}';
-DXC1EX={'dr' '' 0.35/2 []}';
-LQSEPMB={'dr' '' 2.784289+DZQS2 []}';
-LQ2BENDM={'dr' '' LQ2BEND-LDM2QEX+0.021007-DZQS2 []}';
-DM3BEX={'dr' '' 0.357498/cos(ABD) []}';
-LBPM2WIN={'dr' '' 8.375137/cos(ABD) []}';
-LAIRA={'dr' '' 0.016/cos(ABD) []}';
-LAIRB={'dr' '' 0.044/cos(ABD) []}';
-LAIRC={'dr' '' 0.1/cos(ABD) []}';
-LAIRD={'dr' '' 0.288/cos(ABD) []}';
-LAIRE={'dr' '' 0.322/cos(ABD) []}';
-LAIRF={'dr' '' 0.055/cos(ABD) []}';
-LAIRH={'dr' '' 0.482/cos(ABD) []}';
-LAIRI={'dr' '' 1.0106/cos(ABD) []}';
-LAIRJ={'dr' '' 1.67269/cos(ABD) []}';
-D3FF={'dr' '' 2.966226 []}';
-D2FF={'dr' '' 0.86484 []}';
-D1FF={'dr' '' 0.8639 []}';
-DMQ0FF={'dr' '' 0.204852 []}';
-DMQ0D={'dr' '' 0.202439 []}';
-DMQ1D={'dr' '' 0.356564 []}';
-DMQ2D={'dr' '' 0.183182 []}';
-DFFS1={'dr' '' 0.5 []}';
-DFFS2={'dr' '' 0.5 []}';
-D1D={'dr' '' 0.580966 []}';
-D2D={'dr' '' 0.754657 []}';
-D3D={'dr' '' 0.056305 []}';
-D4D={'dr' '' 3.177152733425373 []}';
-D5D={'dr' '' 1.22355893395943 []}';
-D6D={'dr' '' 1.36 []}';
-D7D={'dr' '' 1.13 []}';
-D8D={'dr' '' 0.5 []}';
-D9D={'dr' '' 4.26 []}';
-D10D={'dr' '' 0.05 []}';
-D11D={'dr' '' 0.23 []}';
-D12D={'dr' '' 0.09 []}';
-D13D={'dr' '' 0.590168 []}';
-D14D={'dr' '' 1.31 []}';
-LAIRG={'dr' '' 1.675292936069446 []}';
-% Experiment table drifts
-DEX20_1={'dr' '' 0.072982138228781 []}';
-DEX20_2={'dr' '' 0.26 []}';
-DEX20_3={'dr' '' 0.1 []}';
-DEX20_4={'dr' '' 0.06 []}';
-DEX20_5={'dr' '' 0.12 []}';
-DEX20_6={'dr' '' 0.72 []}';
-DEX20_7={'dr' '' 0.4017 []}';
-DEX20_8={'dr' '' 0.052 []}';
-DEX20_9={'dr' '' 0.4663 []}';
-DEX20_10={'dr' '' 0.09 []}';
-DEX20_10A={'dr' '' 0.04 []}';
-DEX20_11={'dr' '' 0.04 []}';
-DEX20_12={'dr' '' 1.13 []}';
-DEX20_12A={'dr' '' 0.05 []}';
-DEX20_13={'dr' '' 0.9 []}';
-DEX20_14={'dr' '' 0.11 []}';
-DEX20_15={'dr' '' 0.05 []}';
-DEX20_16={'dr' '' 0.13 []}';
 % ==============================================================================
 % XCORs
 % ------------------------------------------------------------------------------
@@ -3411,10 +3004,6 @@ XC3E={'mo' 'XC3E' 0 []}';%0.815" gap
 XCB2RE={'mo' 'XCB2RE' 0 []}';
 XC4E={'mo' 'XC4E' 0 []}';%0.815" gap
 XC2460={'mo' 'XC2460' 0 []}';%2.031" gap
-XC1FF={'mo' 'XC1FF' 0 []}';%0.815" gap
-XC3FF={'mo' 'XC3FF' 0 []}';%0.815" gap
-XC4FF={'mo' 'XC4FF' 0 []}';%0.815" gap
-XC1EX={'mo' 'XC1EX' 0 []}';%1.181" gap
 % ==============================================================================
 % YCORs
 % ------------------------------------------------------------------------------
@@ -3424,10 +3013,6 @@ YC2E={'mo' 'YC2E' 0 []}';%1.181" gap
 YC3E={'mo' 'YC3E' 0 []}';%1.181" gap
 YC2321={'mo' 'YC2321' 0 []}';%2.031" gap
 YCWIGE={'mo' 'YCWIGE' 0 []}';
-YC1FF={'mo' 'YC1FF' 0 []}';%0.815" gap
-YC2FF={'mo' 'YC2FF' 0 []}';%0.815" gap
-YC4FF={'mo' 'YC4FF' 0 []}';%1.181" gap
-YC0D={'mo' 'YC0D' 0 []}';
 % ==============================================================================
 % BPMs
 % ------------------------------------------------------------------------------
@@ -3442,55 +3027,18 @@ M8E={'mo' 'M8E' 0 []}';
 MS2ER={'mo' 'MS2ER' 0 []}';
 M9E={'mo' 'M9E' 0 []}';
 M11E={'mo' 'M11E' 0 []}';
-M1FF={'mo' 'M1FF' 0 []}';
-M2FF={'mo' 'M2FF' 0 []}';
-M3FF={'mo' 'M3FF' 0 []}';
-M4FF={'mo' 'M4FF' 0 []}';
-M5FF={'mo' 'M5FF' 0 []}';
-M0EX={'mo' 'M0EX' 0 []}';
-M1EX={'mo' 'M1EX' 0 []}';
-M2EX={'mo' 'M2EX' 0 []}';
-M3EX={'mo' 'M3EX' 0 []}';
-MQ0D={'mo' 'MQ0D' 0 []}';
-MQ1D={'mo' 'MQ1D' 0 []}';
-MQ2D={'mo' 'MQ2D' 0 []}';
 % ==============================================================================
 % diagnostics, collimators, MARKERs, etc.
 % ------------------------------------------------------------------------------
 % profile monitors
 PMON={'mo' 'PMON' 0 []}';%P202042T
 SYAG={'mo' 'SYAG' 0 []}';%P202432T
-USTHZ={'mo' 'USTHZ' 0 []}';% OTRS:LI20:3070 CAMR:LI20:106
-DSTHZ={'mo' 'DSTHZ' 0 []}';%PD203075
-PRDMP={'mo' 'PRDMP' 0 []}';%P203475T
-ELANEX={'mo' 'ELANEX' 0 []}';%P203500
-BETAL={'mo' 'BETAL' 0 []}';%P203303
-BETA1={'mo' 'BETA1' 0 []}';%P203501
-CNEAR={'mo' 'CNEAR' 0 []}';% CMOS:LI20:3490
-BETA2={'mo' 'BETA2' 0 []}';%P203488
-USOTR={'mo' 'USOTR' 0 []}';% OTRS:LI20:3158 CAMR:LI20:101
-IPOTR1P={'mo' 'IPOTR1P' 0 []}';% OTRS:LI20:3175 (in plasma oven)
-IPOTR1={'mo' 'IPOTR1' 0 []}';% OTRS:LI20:3180 (in bypass line) CAMR:LI20:102
-IPOTR2={'mo' 'IPOTR2' 0 []}';% OTRS:LI20:3202 (in bypass line)
-IPWS1={'mo' 'IPWS1' 0 []}';% WIRE:LI20:3179 (in bypass line)
-IPWS2={'mo' 'IPWS2' 0 []}';% WIRE:LI20:3206 (not installed)
-IPWS3={'mo' 'IPWS3' 0 []}';% WIRE:LI20:3229
-IPOTR3={'mo' 'IPOTR3' 0 []}';
-DSOTR={'mo' 'DSOTR' 0 []}';% OTRS:LI20:3206 CAMR:LI20:103
-WDSOTR={'mo' 'WDSOTR' 0 []}';% OTRS:LI20:3239 CAMR:LI20:104
-DTOTR={'mo' 'DTOTR' 0 []}';
-PGAM1={'mo' 'PGAM1' 0 []}';% PROF:LI20:3500 CMOS:LI20:3490 (Gamma 1 screen)
 % toroids
 IM2040={'mo' 'IM2040' 0 []}';%T202040T
 IM2452={'mo' 'IM2452' 0 []}';%T202452T
-IQMON20={'mo' 'IQMON20' 0 []}';% TORO:LI20:3163 "Resonant charge monitor" in S20 experimental region
-IM3255={'mo' 'IM3255' 0 []}';% TORO:LI20:3255
 % collimators
 CN2069={'dr' 'CN2069' 0 []}';%notch collimator
 CX2085={'dr' 'CX2085' 0 []}';%horizontal jaw collimator
-PCTCAV={'dr' 'PCTCAV' 0 []}';%TCAV protection mask
-% bunch length monitors
-BL20_4={'mo' 'BL20_4' 0 []}';%FF bunch length monitor
 % sextupole movers
 AS1EL={'mo' 'AS1EL' 0 []}';
 AS2EL={'mo' 'AS2EL' 0 []}';
@@ -3508,39 +3056,9 @@ MSEP2E={'mo' 'MSEP2E' 0 []}';
 CB2RE={'mo' 'CB2RE' 0 []}';
 CB1RE={'mo' 'CB1RE' 0 []}';
 ENDBC20={'mo' 'ENDBC20' 0 []}';
-BEGFF20={'mo' 'BEGFF20' 0 []}';
-MFFF={'mo' 'MFFF' 0 []}';%QFF1 entrance
-DBMARK67={'mo' 'DBMARK67' 0 []}';%USTHz
-ENDFF20={'mo' 'ENDFF20' 0 []}';%QFF6 exit
-BEGEXPT20={'mo' 'BEGEXPT20' 0 []}';
-MIP={'mo' 'MIP' 0 []}';% Default IP location (for optics reference)
-LCUBE={'mo' 'LCUBE' 0 []}';% Laser Injection Cube
-PIC_CENT={'mo' 'PIC_CENT' 0 []}';% Center location of "picnic basket"
-PENT={'mo' 'PENT' 0 []}';% E300 plasma entrance (Gate valve A)
-PEXT={'mo' 'PEXT' 0 []}';% Plasma oven exit (Gate valve B)
-FILG={'mo' 'FILG' 0 []}';% Filamentation experiment gas target
-FILS={'mo' 'FILS' 0 []}';% Filamentation experiment solid target
-ECUBE={'mo' 'ECUBE' 0 []}';% "CUBE"
-DWIN={'mo' 'DWIN' 0 []}';% Valve Diamond Window
-EXTHOLE1={'mo' 'EXTHOLE1' 0 []}';% Extension table (first hole)
-BEWIN1={'mo' 'BEWIN1' 0 []}';% 1st Beryllium window
-BEWIN2={'mo' 'BEWIN2' 0 []}';% 2nd Beryllium window
-ENDEXPT20={'mo' 'ENDEXPT20' 0 []}';
-BEGSPECT20={'mo' 'BEGSPECT20' 0 []}';
-BEGPDC={'mo' 'BEGPDC' 0 []}';% Upstream end of PDC chamber
-ENDPDC={'mo' 'ENDPDC' 0 []}';% Downstream end of PDC chamber
-BEGEDC={'mo' 'BEGEDC' 0 []}';% Upstream end of EDC chamber
-ENDEDC={'mo' 'ENDEDC' 0 []}';% Downstream end of EDC chamber
-BFLYMID={'mo' 'BFLYMID' 0 []}';% Middle of Butterfly chamber
-EXTWIN={'mo' 'EXTWIN' 0 []}';% Exit window (5mm thick Al)
-MAINDUMP={'mo' 'MAINDUMP' 0 []}';%dump face
-DBMARK30={'mo' 'DBMARK30' 0 []}';
-ENDSPECT20={'mo' 'ENDSPECT20' 0 []}';
-PDUMP={'mo' 'PDUMP' 0 []}';% dump screen
 % ==============================================================================
 % BEAMLINEs
 % ------------------------------------------------------------------------------
-XTCAVF_FULL=[XTCAVF,XTCAVF];
 B1LE_FULL=[B1LE1,B1LE2];
 B2LE_FULL=[B2LE1,XCB2LE,B2LE2];
 B3LE_FULL=[B3LE1,XCB3LE,B3LE2];
@@ -3575,25 +3093,236 @@ S3ER_2_FULL=[S3ER_2,S3ER_2];
 S2ER_FULL=[S2ER,AS2ER,S2ER];
 S1ER_FULL=[S1ER,AS1ER,S1ER];
 CHICANE1=[B1LE_FULL,CB1LE,D1ET1A,XC1996,D1ET1B,IM2040,DTPM,PMON,DPMM1,M1E,DM1Q,Q1EL_FULL,D2EA,CN2069,DCNHC,CX2085,DHCYC1A,SQ1_FULL,DHCYC1B,DYC1E,YC1E,DYC1E,DYC1XC1,DXC1E,XC1E,DXC1E,DXC1B,B2LE_FULL,CB2LE,MSEP1E,D3E,Q2EL_FULL,D4EA1,S1EL_FULL,D4EB1,M3E,DM3Q,Q3EL_1_FULL,DQ3E,Q3EL_2_FULL,D5EA1,MS2EL,S2EL_FULL,D5EB1,DXC2E,XC2E,DXC2E,D5EC1A,YC2181,D5EC1B,S3EL_1_FULL,DS3E,Q4EL_1_FULL,DQ4E,Q4EL_2_FULL,DQ4E,Q4EL_3_FULL,DM4Q,M4E,D6EA1,S3EL_2_FULL,D6EB1,DYC2E,YC2E,DYC2E,D6EC1,Q5EL_FULL,DM5Q,M5E,D7E1,B3LE_FULL,CB3LE,D8EM,M6E,DM6Q,Q6E];
-CHICANE2=[Q6E,D8E,B3RE_FULL,CB3RE,D7E2,M7E,DM7Q,Q5ER_FULL,D6EC2,DYC3E,YC3E,DYC3E,D6EB2,S3ER_1_FULL,D6EA2,M8E,DM8Q,Q4ER_1_FULL,DQ4E,Q4ER_2_FULL,DQ4E,Q4ER_3_FULL,DS3E,S3ER_2_FULL,D5EC2A,YC2321,D5EC2B,DXC3E,XC3E,DXC3E,D5EB2,MS2ER,S2ER_FULL,D5EA2,Q3ER_1_FULL,DQ3E,Q3ER_2_FULL,DM9Q,M9E,D4EB2,S1ER_FULL,D4EA2,DMQ,Q2ER_FULL,D3E,MSEP2E,B2RE_FULL,CB2RE,DB2XC4,DXC4E,XC4E,DXC4E,DXC4TCA,PCTCAV,DXC4TCB,XTCAVF_FULL,DTCWIG,WIGE_FULL,DYAGW,SYAG,DYAGQ,Q1ER_FULL,DM11Q,M11E,DTM11,IM2452,D1ET2A,XC2460,D1ET2B,B1RE_FULL,CB1RE];
-CHICANE=[BEGBC20,B1LE_FULL,CB1LE,D1ET1A,XC1996,D1ET1B,IM2040,DTPM,PMON,DPMM1,M1E,DM1Q,Q1EL_FULL,D2EA,CN2069,DCNHC,CX2085,DHCYC1A,SQ1_FULL,DHCYC1B,DYC1E,YC1E,DYC1E,DYC1XC1,DXC1E,XC1E,DXC1E,DXC1B,B2LE_FULL,CB2LE,MSEP1E,D3E,Q2EL_FULL,D4EA1,S1EL_FULL,D4EB1,M3E,DM3Q,Q3EL_1_FULL,DQ3E,Q3EL_2_FULL,D5EA1,MS2EL,S2EL_FULL,D5EB1,DXC2E,XC2E,DXC2E,D5EC1A,YC2181,D5EC1B,S3EL_1_FULL,DS3E,Q4EL_1_FULL,DQ4E,Q4EL_2_FULL,DQ4E,Q4EL_3_FULL,DM4Q,M4E,D6EA1,S3EL_2_FULL,D6EB1,DYC2E,YC2E,DYC2E,D6EC1,Q5EL_FULL,DM5Q,M5E,D7E1,B3LE_FULL,CB3LE,D8EM,M6E,DM6Q,Q6E_FULL,D8E,B3RE_FULL,CB3RE,D7E2,M7E,DM7Q,Q5ER_FULL,D6EC2,DYC3E,YC3E,DYC3E,D6EB2,S3ER_1_FULL,D6EA2,M8E,DM8Q,Q4ER_1_FULL,DQ4E,Q4ER_2_FULL,DQ4E,Q4ER_3_FULL,DS3E,S3ER_2_FULL,D5EC2A,YC2321,D5EC2B,DXC3E,XC3E,DXC3E,D5EB2,MS2ER,S2ER_FULL,D5EA2,Q3ER_1_FULL,DQ3E,Q3ER_2_FULL,DM9Q,M9E,D4EB2,S1ER_FULL,D4EA2,DMQ,Q2ER_FULL,D3E,MSEP2E,B2RE_FULL,CB2RE,DB2XC4,DXC4E,XC4E,DXC4E,DXC4TCA,PCTCAV,DXC4TCB,XTCAVF_FULL,DTCWIG,WIGE_FULL,DYAGW,SYAG,DYAGQ,Q1ER_FULL,DM11Q,M11E,DTM11,IM2452,D1ET2A,XC2460,D1ET2B,B1RE_FULL,CB1RE,ENDBC20];
-QFF1_FULL=[QFF1,QFF1];
-SQ2_FULL=[SQ2,SQ2];
-QFF2_1_FULL=[QFF2_1,QFF2_1];
-QFF2_2_FULL=[QFF2_2,QFF2_2];
-QFF2_3_FULL=[QFF2_3,QFF2_3];
-FF=[BEGFF20,DFF1,MFFF,QFF1_FULL,DM1QF,M1FF,DFF2CMA,BL20_4,DFF2CMB,SQ2_FULL,DFF2CMC,DYC1FF,YC1FF,DYC1FF,DYC1XC1F,DXC1FF,XC1FF,DXC1FF,DXC1QF,QFF2_1_FULL,DQ2FFM1,M2FF,DQ2FFM2,QFF2_2_FULL,DQ2FF,QFF2_3_FULL,DYC2QF,DYC2FF,YC2FF,DYC2FF,DYC2XC2F,DXC2FF,DXC2PF,USTHZ,DBMARK67,DFF4P,DSTHZ,DYC3PF,DYC3FF,DYC3XC3F,DXC3FF,XC3FF,D3FF,Q2FF,Q2FF,M3FF,D2FF,Q1FF,Q1FF,M4FF,D1FF,Q0FF,Q0FF,M5FF,DMQ0FF,ENDFF20];
-EXPT=[BEGEXPT20,DEX20_1,EXTHOLE1,DEX20_2,USOTR,DEX20_3,IQMON20,DEX20_4,BEWIN1,DEX20_5,LCUBE,DEX20_6,PIC_CENT,DEX20_7,FILG,DEX20_8,FILS,DEX20_9,IPOTR1P,DEX20_10,IPOTR1,DEX20_10A,PENT,MIP,DEX20_11,IPWS1,DEX20_12,PEXT,DEX20_12A,IPOTR2,DEX20_13,IM3255,DEX20_14,BEWIN2,DEX20_15,IPWS3,DEX20_16,DSOTR,ENDEXPT20];
+CHICANE2=[Q6E,D8E,B3RE_FULL,CB3RE,D7E2,M7E,DM7Q,Q5ER_FULL,D6EC2,DYC3E,YC3E,DYC3E,D6EB2,S3ER_1_FULL,D6EA2,M8E,DM8Q,Q4ER_1_FULL,DQ4E,Q4ER_2_FULL,DQ4E,Q4ER_3_FULL,DS3E,S3ER_2_FULL,D5EC2A,YC2321,D5EC2B,DXC3E,XC3E,DXC3E,D5EB2,MS2ER,S2ER_FULL,D5EA2,Q3ER_1_FULL,DQ3E,Q3ER_2_FULL,DM9Q,M9E,D4EB2,S1ER_FULL,D4EA2,DMQ,Q2ER_FULL,D3E,MSEP2E,B2RE_FULL,CB2RE,DB2XC4,DXC4E,XC4E,DXC4E,DXC4TCA,DXC4TCB,DXTCAVF,DTCWIG,WIGE_FULL,DYAGW,SYAG,DYAGQ,Q1ER_FULL,DM11Q,M11E,DTM11,IM2452,D1ET2A,XC2460,D1ET2B,B1RE_FULL,CB1RE];
+BC20W=[BEGBC20,B1LE_FULL,CB1LE,D1ET1A,XC1996,D1ET1B,IM2040,DTPM,PMON,DPMM1,M1E,DM1Q,Q1EL_FULL,D2EA,CN2069,DCNHC,CX2085,DHCYC1A,SQ1_FULL,DHCYC1B,DYC1E,YC1E,DYC1E,DYC1XC1,DXC1E,XC1E,DXC1E,DXC1B,B2LE_FULL,CB2LE,MSEP1E,D3E,Q2EL_FULL,D4EA1,S1EL_FULL,D4EB1,M3E,DM3Q,Q3EL_1_FULL,DQ3E,Q3EL_2_FULL,D5EA1,MS2EL,S2EL_FULL,D5EB1,DXC2E,XC2E,DXC2E,D5EC1A,YC2181,D5EC1B,S3EL_1_FULL,DS3E,Q4EL_1_FULL,DQ4E,Q4EL_2_FULL,DQ4E,Q4EL_3_FULL,DM4Q,M4E,D6EA1,S3EL_2_FULL,D6EB1,DYC2E,YC2E,DYC2E,D6EC1,Q5EL_FULL,DM5Q,M5E,D7E1,B3LE_FULL,CB3LE,D8EM,M6E,DM6Q,Q6E_FULL,D8E,B3RE_FULL,CB3RE,D7E2,M7E,DM7Q,Q5ER_FULL,D6EC2,DYC3E,YC3E,DYC3E,D6EB2,S3ER_1_FULL,D6EA2,M8E,DM8Q,Q4ER_1_FULL,DQ4E,Q4ER_2_FULL,DQ4E,Q4ER_3_FULL,DS3E,S3ER_2_FULL,D5EC2A,YC2321,D5EC2B,DXC3E,XC3E,DXC3E,D5EB2,MS2ER,S2ER_FULL,D5EA2,Q3ER_1_FULL,DQ3E,Q3ER_2_FULL,DM9Q,M9E,D4EB2,S1ER_FULL,D4EA2,DMQ,Q2ER_FULL,D3E,MSEP2E,B2RE_FULL,CB2RE,DB2XC4,DXC4E,XC4E,DXC4E,DXC4TCA,DXC4TCB,DXTCAVF,DTCWIG,WIGE_FULL,DYAGW,SYAG,DYAGQ,Q1ER_FULL,DM11Q,M11E,DTM11,IM2452,D1ET2A,XC2460,D1ET2B,B1RE_FULL,CB1RE,ENDBC20];
+% ------------------------------------------------------------------------------
+
+%CALL, FILENAME="FF20W.xsif"   FACET2 Phase 2
+% *** OPTICS=FACET2-2021next ***
+% ==============================================================================
+% FACET e- optics
+% ------------------------------------------------------------------------------
+% 26-AUG-2021, M. Woodley
+%  * Hybrid Final Focus for fall 2021 operation
+% 23-AUG-2021, G. White
+%  * Update to expected as-built condition for full Sector 20 Upgrade
+%  * Removed SQ2, XC1FF, YC1FF, MS2EL, MS2ER
+%  * Added Q5-Q3FF as independent quads
+%  * Added second IMOVN in FFS (IM20FF)
+%  * Merged with changes to master deck to describe existing experimental areas
+% 23-JUN-2021, G. White
+%  * Changed QFF1 & QFF2 -> Q5FF, Q4FF to match SCP
+% 17-MAY-2021, G. White
+%  * Removed QFF4, inserted Q0FF, Q1FF & Q2FF
+%    - z locations measured by metrology: see FACET elog 05/05/2021
+% 17-APR-2021, G. White
+%  * Fixed as-installed Q0D, Q1D, Q2D locations: measurements by Georg
+%  * Added all current expt table and spectrometer table devices according to
+%    walk-through by Christine: https://docs.google.com/spreadsheets/d/
+%    1Qw85KBUfSJ6Jt8tArqjcGTVlpZCtUz2hDWX8EuCRcb4/edit?usp=sharing
+% 17-JUN-2020, G. White
+%  * Added new beamline components to IP area as per engineering drawing from
+%    D. Storey
+% ------------------------------------------------------------------------------
+% ==============================================================================
+% transverse deflecting structure
+% ------------------------------------------------------------------------------
+LXTCAV =  40.687*IN2M;
+XTCAVF={'tc' 'XTCAVF' LXTCAV/2 [11424 0 0*TWOPI]}';
+% ==============================================================================
+% BENDs
+% ------------------------------------------------------------------------------
+% spectrometer / dump bend
+ABD =  0.006;
+LBD =  0.9779;
+GBD =  0.0635;
+B5D361={'be' 'B5D36' LBD/2 [ABD/2 GBD/2 ABD/2 0 0.5 0 pi/2]}';
+B5D362={'be' 'B5D36' LBD/2 [ABD/2 GBD/2 0 ABD/2 0 0.5 pi/2]}';
+% define unsplit SBENs for BMAD ... not used by MAD
+B5D36={'be' 'B5D36' LBD [ABD GBD/2 ABD/2 ABD/2 0.5 0.5 pi/2]}';
+% ==============================================================================
+% QUADs
+% ------------------------------------------------------------------------------
+% Final Focus
+KQ5FF =  -0.453913*(0.2304/0.23045);
+KQ4FF =  -0.337682;
+KQ3FF =   0.419544;
+KQ2FF =   0.523259;
+KQ1FF =  -0.980516;
+KQ0FF =   0.523259;
+Q5FF={'qu' 'Q5FF' 0.23045 [KQ5FF 0]}';
+Q4FF={'qu' 'Q4FF' 0.3571 [KQ4FF 0]}';
+Q3FF={'qu' 'Q3FF' 0.3571 [KQ3FF 0]}';
+Q2FF={'qu' 'Q2FF' 0.3571 [KQ2FF 0]}';
+Q1FF={'qu' 'Q1FF' 0.3571 [KQ1FF 0]}';
+Q0FF={'qu' 'Q0FF' 0.3571 [KQ0FF 0]}';
+% spectrometer
+AQS =  27.0E-3;
+KQ0D =  -0.330432;
+KQ1D =   0.54533;
+KQ2D =  -0.330432;
+Q0D={'qu' 'Q0D' 0.5 [KQ0D 0]}';
+Q1D={'qu' 'Q1D' 0.5 [KQ1D 0]}';
+Q2D={'qu' 'Q2D' 0.5 [KQ0D 0]}';
+% ==============================================================================
+% DRIFTs
+% ------------------------------------------------------------------------------
+% hybrid Final Focus (from git/master/MAD/LI20.xsif)
+D11FF={'dr' '' 0.383821 []}';
+D10FF={'dr' '' 0.137748 []}';
+D9FF={'dr' '' 0.304419 []}';
+D8FF={'dr' '' 0.894977 []}';
+D7FF={'dr' '' 0.2057 []}';
+D6FF={'dr' '' 0.1957 []}';
+DKRK1={'dr' '' 0.691936 []}';
+DKRK2={'dr' '' 0.231287 []}';
+D4FF={'dr' '' 0.484 []}';
+D3AFF={'dr' '' 0.817 []}';
+D3FF={'dr' '' 0.49065 []}';
+DXTC1={'dr' '' 0.750525 []}';
+DXTC2={'dr' '' 1.182251 []}';
+D2AFF={'dr' '' 0.034973 []}';
+D2FF={'dr' '' 0.829867 []}';
+D1AFF={'dr' '' 0.025933 []}';
+D1FF={'dr' '' 0.837967 []}';
+D0FF={'dr' '' 0.027833 []}';
+DMQ0FF={'dr' '' 0.17701988 []}';%0.177019
+% experiment table
+DEX20_1={'dr' '' 0.072982138228781 []}';
+DEX20_2={'dr' '' 0.26 []}';
+DEX20_3={'dr' '' 0.1 []}';
+DEX20_4={'dr' '' 0.06 []}';
+DEX20_5={'dr' '' 0.12 []}';
+DEX20_6={'dr' '' 0.72 []}';
+DEX20_7={'dr' '' 0.4017 []}';
+DEX20_8={'dr' '' 0.052 []}';
+DEX20_9={'dr' '' 0.4663 []}';
+DEX20_10={'dr' '' 0.09 []}';
+DEX20_10A={'dr' '' 0.04 []}';
+DEX20_11={'dr' '' 0.04 []}';
+DEX20_12={'dr' '' 1.13 []}';
+DEX20_12A={'dr' '' 0.05 []}';
+DEX20_13={'dr' '' 0.9 []}';
+DEX20_14={'dr' '' 0.11 []}';
+DEX20_15={'dr' '' 0.05 []}';
+DEX20_16={'dr' '' 0.13 []}';
+% spectrometer
+DMQ0D={'dr' '' 0.202439 []}';
+DM1QEX={'dr' '' 0.286595 []}';
+D1D={'dr' '' 0.580966 []}';
+DMQ1D={'dr' '' 0.356564 []}';
+D2D={'dr' '' 0.754657 []}';
+DMQ2D={'dr' '' 0.183182 []}';
+D3D={'dr' '' 0.056305 []}';
+D4D={'dr' '' 3.177152733425373 []}';
+DM3BEX={'dr' '' 0.357498/cos(ABD) []}';
+D5D={'dr' '' 1.22355893395943 []}';
+D6D={'dr' '' 1.36 []}';
+D7D={'dr' '' 1.13+1.0E-06 []}';
+D8D={'dr' '' 0.5 []}';
+D9D={'dr' '' 4.26-1.0E-06 []}';
+D10D={'dr' '' 0.05 []}';
+D11D={'dr' '' 0.23 []}';
+D12D={'dr' '' 0.09 []}';
+D13D={'dr' '' 0.590168 []}';
+D14D={'dr' '' 1.31 []}';
+LAIRG={'dr' '' 1.675292943463 []}';
+% ==============================================================================
+% XCORs
+% ------------------------------------------------------------------------------
+XC3FF={'mo' 'XC3FF' 0 []}';%0.815" gap
+XC1EX={'mo' 'XC1EX' 0 []}';%1.181" gap
+% ==============================================================================
+% YCORs
+% ------------------------------------------------------------------------------
+YC2FF={'mo' 'YC2FF' 0 []}';%0.815" gap
+% ==============================================================================
+% BPMs
+% ------------------------------------------------------------------------------
+M1FF={'mo' 'M1FF' 0 []}';
+MQ4FF={'mo' 'MQ4FF' 0 []}';
+M3FF={'mo' 'M3FF' 0 []}';
+M4FF={'mo' 'M4FF' 0 []}';
+M5FF={'mo' 'M5FF' 0 []}';
+M0EX={'mo' 'M0EX' 0 []}';
+M1EX={'mo' 'M1EX' 0 []}';
+M2EX={'mo' 'M2EX' 0 []}';
+M3EX={'mo' 'M3EX' 0 []}';
+% ==============================================================================
+% diagnostics, collimators, MARKERs, etc.
+% ------------------------------------------------------------------------------
+% profile monitors
+USTHZ={'mo' 'USTHZ' 0 []}';% OTRS:LI20:3070 CAMR:LI20:106
+DSTHZ={'mo' 'DSTHZ' 0 []}';%PD203075
+USOTR={'mo' 'USOTR' 0 []}';% OTRS:LI20:3158 CAMR:LI20:101
+IPOTR1P={'mo' 'IPOTR1P' 0 []}';% OTRS:LI20:3175 (in plasma oven)
+IPOTR1={'mo' 'IPOTR1' 0 []}';% OTRS:LI20:3180 (in bypass line) CAMR:LI20:102
+IPWS1={'mo' 'IPWS1' 0 []}';% WIRE:LI20:3179 (in bypass line)
+IPOTR2={'mo' 'IPOTR2' 0 []}';% OTRS:LI20:3202 (in bypass line)
+IPWS3={'mo' 'IPWS3' 0 []}';% WIRE:LI20:3229
+DSOTR={'mo' 'DSOTR' 0 []}';% OTRS:LI20:3206 CAMR:LI20:103
+WDSOTR={'mo' 'WDSOTR' 0 []}';% OTRS:LI20:3239 CAMR:LI20:104
+DTOTR={'mo' 'DTOTR' 0 []}';
+PGAM1={'mo' 'PGAM1' 0 []}';% PROF:LI20:3500 CMOS:LI20:3490 (Gamma 1 screen)
+CNEAR={'mo' 'CNEAR' 0 []}';% CMOS:LI20:3490
+PDUMP={'mo' 'PDUMP' 0 []}';%P203475T
+% toroids
+IQMON20={'mo' 'IQMON20' 0 []}';% TORO:LI20:3163 "Resonant charge monitor" in S20 experimental region
+IM3255={'mo' 'IM3255' 0 []}';% TORO:LI20:3255
+% bunch length monitors
+BL20_4={'mo' 'BL20_4' 0 []}';%FF bunch length monitor
+% other points of interest (INSTs go into Oracle database)
+BEGFF20={'mo' 'BEGFF20' 0 []}';
+MFFF={'mo' 'MFFF' 0 []}';%Q5FF entrance
+KRK={'mo' 'KRK' 0 []}';%Kraken chamber focus point
+DBMARK67={'mo' 'DBMARK67' 0 []}';%USTHz
+ENDFF20={'mo' 'ENDFF20' 0 []}';%Q0FF exit
+BEGEXPT20={'mo' 'BEGEXPT20' 0 []}';
+EXTHOLE1={'mo' 'EXTHOLE1' 0 []}';%Extension table (first hole)
+BEWIN1={'mo' 'BEWIN1' 0 []}';%1st Beryllium window
+LCUBE={'mo' 'LCUBE' 0 []}';%Laser Injection Cube
+PIC_CENT={'mo' 'PIC_CENT' 0 []}';%Center location of "picnic basket"
+FILG={'mo' 'FILG' 0 []}';%Filamentation experiment gas target
+FILS={'mo' 'FILS' 0 []}';%Filamentation experiment solid target
+PENT={'mo' 'PENT' 0 []}';%E300 plasma entrance (Gate valve A)
+MIP={'mo' 'MIP' 0 []}';%Default IP location (for optics reference)
+PEXT={'mo' 'PEXT' 0 []}';%Plasma oven exit (Gate valve B)
+BEWIN2={'mo' 'BEWIN2' 0 []}';%2nd Beryllium window
+ENDEXPT20={'mo' 'ENDEXPT20' 0 []}';
+BEGSPECT20={'mo' 'BEGSPECT20' 0 []}';
+BEGPDC={'mo' 'BEGPDC' 0 []}';%Upstream end of PDC chamber
+ENDPDC={'mo' 'ENDPDC' 0 []}';%Downstream end of PDC chamber
+BEGEDC={'mo' 'BEGEDC' 0 []}';%Upstream end of EDC chamber
+ENDEDC={'mo' 'ENDEDC' 0 []}';%Downstream end of EDC chamber
+BFLYMID={'mo' 'BFLYMID' 0 []}';%Middle of Butterfly chamber
+EXTWIN={'mo' 'EXTWIN' 0 []}';%Exit window (5mm thick Al)
+MAINDUMP={'mo' 'MAINDUMP' 0 []}';%dump face
+DBMARK30={'mo' 'DBMARK30' 0 []}';
+ENDSPECT20={'mo' 'ENDSPECT20' 0 []}';
+% ==============================================================================
+% BEAMLINEs
+% ------------------------------------------------------------------------------
+XTCAVF_FULL=[XTCAVF,XTCAVF];
+B5D36_FULL=[B5D361,B5D362];
+Q5FF_FULL=[Q5FF,Q5FF];
+Q4FF_FULL=[Q4FF,Q4FF];
+Q3FF_FULL=[Q3FF,Q3FF];
+Q2FF_FULL=[Q2FF,Q2FF];
+Q1FF_FULL=[Q1FF,Q1FF];
+Q0FF_FULL=[Q0FF,Q0FF];
 Q0D_FULL=[Q0D,Q0D];
 Q1D_FULL=[Q1D,Q1D];
 Q2D_FULL=[Q2D,Q2D];
-B5D36_FULL=[B5D361,B5D362];
+FF=[BEGFF20,D11FF,MFFF,Q5FF_FULL,D10FF,M1FF,D9FF,BL20_4,D8FF,MQ4FF,D7FF,Q4FF_FULL,D6FF,Q3FF_FULL,DKRK1,KRK,DKRK2,YC2FF,D4FF,USTHZ,DBMARK67,D3AFF,DSTHZ,D3FF,XC3FF,DXTC1,XTCAVF_FULL,DXTC2,Q2FF_FULL,D2AFF,M3FF,D2FF,Q1FF_FULL,D1AFF,M4FF,D1FF,Q0FF_FULL,D0FF,M5FF,DMQ0FF,ENDFF20];
+EXPT=[BEGEXPT20,DEX20_1,EXTHOLE1,DEX20_2,USOTR,DEX20_3,IQMON20,DEX20_4,BEWIN1,DEX20_5,LCUBE,DEX20_6,PIC_CENT,DEX20_7,FILG,DEX20_8,FILS,DEX20_9,IPOTR1P,DEX20_10,IPOTR1,DEX20_10A,PENT,MIP,DEX20_11,IPWS1,DEX20_12,PEXT,DEX20_12A,IPOTR2,DEX20_13,IM3255,DEX20_14,BEWIN2,DEX20_15,IPWS3,DEX20_16,DSOTR,ENDEXPT20];
 % z= 1998.708952
 SPECT=[BEGSPECT20,DMQ0D,Q0D_FULL,DM1QEX,M0EX,D1D,WDSOTR,DMQ1D,Q1D_FULL,DM1QEX,M1EX,D2D,DMQ2D,Q2D_FULL,DM1QEX,M2EX,D3D,XC1EX,D4D,B5D36_FULL,DM3BEX,M3EX,D5D,BEGPDC,D6D,ENDPDC,D7D,BEGEDC,D8D,ENDEDC,D9D,DTOTR,D10D,BFLYMID,D11D,EXTWIN,D12D,PGAM1,D13D,CNEAR,D14D,PDUMP,LAIRG,MAINDUMP,DBMARK30,ENDSPECT20];
-S20E=[CHICANE,FF,EXPT,SPECT];
+FF20H=[FF,EXPT,SPECT];
 % ------------------------------------------------------------------------------
 
-% *** OPTICS=FACET2-18MAY21 ***
+%CALL, FILENAME="BC20E.xsif"   FACET2 Sector 20 upgrade
+%CALL, FILENAME="FF20E.xsif"   FACET2 Sector 20 upgrade
+% *** OPTICS=FACET2-21AUG19 ***
 % ==============================================================================
 % Modification History
 % ------------------------------------------------------------------------------
@@ -3895,7 +3624,9 @@ LI19X=[BEGSCAV,KKY170,DAA7M,DAQ1,Q19501,Q19501,DAQ2,K19_5,DAQ1,Q19601,Q19601,DAQ
 % ==============================================================================
 
 BC14=[BC14_1,BC14E,BC14_2];%electron side
-FACET2E=[DL10,L1F,BC11,L2F,BC14,L3F,S20E];
+%SECTOR20 : LINE=(BC20E,FF20E)
+SECTOR20=[BC20W,FF20H];
+FACET2E=[DL10,L1F,BC11,L2F,BC14,L3F,SECTOR20];
 FACET2S=[DL10,L1F,BC11,L2F,BC14,L3F_1,SCAV];
 % beam path definitions
 %F2_ELEC   : e- gun to LI20 dump
@@ -3950,6 +3681,7 @@ TWI=struct('BETX',BXI,'ALFX',AXI,'BETY',BYI,'ALFY',AYI);
 % ------------------------------------------------------------------------------
 %CALL, FILENAME="FACET2e_match.mad8"
 %CALL, FILENAME="RDB/FACET2e_makeSymbols.mad8"
+%CALL, FILENAME="elegant/FACET2e_makeElegant.mad8"
 %STOP
 % ------------------------------------------------------------------------------
 % commands
@@ -3957,94 +3689,7 @@ TWI=struct('BETX',BXI,'ALFX',AXI,'BETY',BYI,'ALFY',AYI);
 
 
 
-% %for testing the Matlab model
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-
 % ------------------------------------------------------------------------------
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% %, COUPLE
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-
-% ------------------------------------------------------------------------------
-%COMMENT
-
-
-
-
-
-
-
-% 
-% 
-% 
-% 
-% 
-% 
-
-
-% 
-% 
-% 
-% 
-% 
-% 
 
 
 
@@ -4053,15 +3698,12 @@ TWI=struct('BETX',BXI,'ALFX',AXI,'BETY',BYI,'ALFY',AYI);
 
 
 
-%ENDCOMMENT
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
+
+
+
+
+
+
 
 % ------------------------------------------------------------------------------
 

@@ -30,6 +30,9 @@
 #
 # Mod 
 #
+# 27-Mar-2020 Patrick Pascual (ppascual)
+#  Add 32-bit MATLAB 2012a environment setup
+#
 # 26-Apr-2010 Mike Zelazny
 #  Set MATLAB_STARTUP_SCRIPT & MATLAB_LOG_FILE_NAME.
 #
@@ -60,10 +63,28 @@ OLD_DISP=`echo $DISPLAY`
 export DISPLAY=:1.0
 
 # 
-# Setup LCLS Environment
+# Setup LCLS MATLAB 2012a Environment
 #
-  if [ -e ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
-     . ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+if [ -f ${LCLS_ROOT}/tools/oracle/oracleSetup.bash ]; then
+    source ${LCLS_ROOT}/tools/oracle/oracleSetup.bash
+fi
+
+if [ -f ${LCLS_ROOT}/physics/setup/javaSetup.bash ]; then
+    source ${LCLS_ROOT}/physics/setup/javaSetup.bash 2>&1 > /dev/null
+fi
+
+if [ -f ${LCLS_ROOT}/epics/setup/fixed-epics-setup.bash ]; then
+    source ${LCLS_ROOT}/epics/setup/fixed-epics-setup.bash
+    if [ -f ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash ]; then
+        source ${LCLS_ROOT}/epics/setup/epicsenv-3.14.12.bash
+    fi
+fi
+
+export MATLAB_VER=2012a
+export EPICS_HOST_ARCH=linux-x86
+if [ -f ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
+    source ${LCLS_ROOT}/tools/matlab/setup/matlabSetup.bash
+    export PATH=${MATLAB_ROOT}/bin:$PATH
 
 #
 # Log file on nfs -rename old one
@@ -89,7 +110,7 @@ export DISPLAY=:1.0
 #
     if [ "$2" = "" ]; then
          xterm -e matlab -glnx86 -nodesktop -nosplash -r $1  -logfile $log_file &
-      else
+    else
          xterm -e matlab -glnx86 -nodesktop -nosplash -r lcaInit,"$1('$2')"  -logfile $log_file &
     fi
     
@@ -102,13 +123,13 @@ export DISPLAY=:1.0
     #
     LOGCNT=`ls -t $PHYSICS_DATA/log/matlab/$1$3.log* | wc -l`
     if [ "$LOGCNT" -gt 5 ]; then
-	y=`expr $LOGCNT - 5`
-	for x in `ls -t  $PHYSICS_DATA/log/matlab/$1$3.log* | tail -n$y`
-        do
-	  /bin/rm -f $x
-	done
+        y=`expr $LOGCNT - 5`
+        for x in `ls -t  $PHYSICS_DATA/log/matlab/$1$3.log* | tail -n$y`
+            do
+          /bin/rm -f $x
+        done
     fi
-  else
-    echo "Sorry, can't find LCLS environment setup"
-  fi
+else
+    echo "Sorry, can't find LCLS MATLAB 2012a environment setup"
+fi
 

@@ -1,0 +1,13 @@
+To Update LiTrack files on the LiTrack web-site:
+===============================================
+
+on Cygwin:
+
+$cd C:/Matlab-14/work
+$zip -r LiTrack.zip LiTrack
+
+use FTP (WinSCP) on "Start" button to send LiTrack.zip to Flora
+
+(i.e., C:/Matlab-14/work/LiTrack.zip  -->  ~emma/public_html/codes)
+
+(destination also called /afs/slac.stanford.edu/u/ad/emma/public_html/codes)

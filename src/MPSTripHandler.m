@@ -1,6 +1,43 @@
 % Waits for MPS to trip then saves BSA buffers
 % Mike Zelazny
 
+%TO DO for new MPS rates:
+% ----------------------------------------------------------------------------
+%If we're running to hard line only:
+%MPS is tripped when IOC:BSY0:MP01:PC_RATEC==0 OR when IOC:BSY0:MP01:BYKIK_RATEC==0
+%save LCLS.CUH.BSA.rootnames
+%
+%If we're running to soft line only:
+%MPS is tripped when IOC:BSY0:MP01:PC_RATEC==0 OR when IOC:BSY0:MP01:BYKIKS_RATEC==0
+%save LCLS.CUS.BSA.rotnames
+%
+%If we're running to both lines:
+%MPS is tripped when IOC:BSY0:MP01:PC_RATEC==0 OR when IOC:BSY0:MP01:BYKIK_RATEC==0 or IOC:BSY0:MP01:BYKIKS_RATEC==0
+%save LCLS.BSA.rotname
+%
+%data should contain: the PVs below:
+%
+%physics-zelazny@lcls-srv01 ~/zelazny>caget IOC:BSY0:MP01:PC_RATE \
+%> IOC:BSY0:MP01:GUNHXR_RATE \
+%> IOC:BSY0:MP01:GUNSXR_RATE \
+%> IOC:BSY0:MP01:MS_RATE \
+%> IOC:BSY0:MP01:BYKIK_RATE \
+%> IOC:BSY0:MP01:BYKIKS_RATE \
+%> IOC:BSY0:MP01:LHSHUT_RATE
+%IOC:BSY0:MP01:PC_RATE          0 Hz
+%IOC:BSY0:MP01:GUNHXR_RATE      120 Hz
+%IOC:BSY0:MP01:GUNSXR_RATE      120 Hz
+%IOC:BSY0:MP01:MS_RATE          0 Hz
+%IOC:BSY0:MP01:BYKIK_RATE       0 Hz
+%IOC:BSY0:MP01:BYKIKS_RATE      0 Hz
+%IOC:BSY0:MP01:LHSHUT_RATE      120 Hz
+%physics-zelazny@lcls-srv01 ~/zelazny>
+%zelazny@ldap-test ~>caget IOC:IN20:EV01:RG02_ACTRATE
+%IOC:IN20:EV01:RG02_ACTRATE     HXR 10 / SXR 110
+%zelazny@ldap-test ~>
+%
+% ----------------------------------------------------------------------------
+
 [ sys , accelerator ] = getSystem();
 if isequal('LCLS',accelerator) % LCLS only
     ok = 1;
@@ -130,7 +167,7 @@ if (ok)
         
         if ok
             % Set my number of pulses to average, etc...
-            eDefParams (myeDefNumber, myNAVG, myNRPOS, {''},{''},{''},{''});
+            eDefParams (myeDefNumber, myNAVG, myNRPOS, {''},{''},{''},{''}, 0);
             
             % Make sure my eDef is running
             eDefOn(myeDefNumber);
@@ -190,42 +227,25 @@ if (ok)
                                 % Pause the eDef
                                 eDefOff(myeDefNumber);
                                 
-                                s = 'MPS Tripped! Saving BSA data... About to load previously saved BSA data set';
-                                lcaPutSmart(status_pv,zeros(1000));
-                                lcaPutSmart(status_pv,double(uint8(s)));
-                                put2log(s);
-                                
-                                % Load an old dataset
-                                fileName = char(lcaGet(fileName_pv));
-                                data = load(fileName,'data');
-                                handles = data.data;
-                                
                                 s = 'MPS Tripped! Saving BSA data... Grab the data from the BSA buffers';
                                 lcaPutSmart(status_pv,zeros(1000));
                                 lcaPutSmart(status_pv,double(uint8(s)));
                                 put2log(s);
-                                
-                                % Grab the data from the BSA buffers
-                                new_name = strcat(handles.ROOT_NAME, {'HST'}, {num2str(myeDefNumber)});
-                                pause(5); % Copied this from Jim Yurner's code, not sure why its needed
-                                [the_matrix, t_stamp, isPV] = lcaGetSmart( new_name, 2800 );
-                                indx_time = strmatch(sprintf('PATT:%s:1:PULSEID',sys),handles.ROOT_NAME);
-                                matlabTS = lca2matlabTime(t_stamp(indx_time));
-                                handles.num_points = 2800;
-                                handles.the_matrix = the_matrix;
-                                handles.time_stamps = t_stamp;
-                                handles.t_stamp = datestr(matlabTS);
-                                handles.isPV = isPV;
-                                
+
+                                data.MPSTrip = 1;
+                                data.nPoints = eDefCount(myeDefNumber);
+                                data.ROOT_NAME = meme_names('tag','LCLS.BSA.rootnames');
+                                new_name = strcat(data.ROOT_NAME, {'HST'}, {num2str(myeDefNumber)});
+                                data.the_matrix = lcaGetSmart(new_name, data.nPoints);
+
                                 s = 'MPS Tripped! Saving BSA data... Save new dataset';
                                 lcaPutSmart(status_pv,zeros(1000));
                                 lcaPutSmart(status_pv,double(uint8(s)));
                                 put2log(s);
-                                
-                                % Save new dataset
-                                data = handles;
-                                data.MPSTrip = 1;
-                                fileName=util_dataSave(data,'BSA','data',handles.t_stamp,0);
+
+                                data.num_points = data.nPoints; % don't ask.
+                                [fileName, pathName]=util_dataSave(data,'BSA','data-MPS-trip',datestr(now),0);
+
                                 tic;
                                 
                                 s = 'MPS Tripped! Saving BSA data... Increment counter';

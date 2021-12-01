@@ -13,9 +13,11 @@
 #
 # Setup FACET Environment
 #
-  if [ -e ${FACET_ROOT}/tools/matlab/setup/matlabSetup.bash ]; then
-     . ${FACET_ROOT}/tools/matlab/setup/matlabSetup.bash
-
+  if [ -e ${FACET_ROOT}/tools/matlab/setup/matlabSetup_facet.bash ]; then
+     . ${FACET_ROOT}/tools/matlab/setup/matlabSetup_facet.bash
+ 
+     $PATH=$MATLABPATH:$PATH
+    
 #
 # Log file on nfs
 #

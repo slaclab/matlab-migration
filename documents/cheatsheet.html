@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Cheatsheet for LCLS Accelerator Complex Control System</title>
+<link rel="stylesheet" type="text/css" href="http://www.slac.stanford.edu/grp/ad/css/base_cardinal.css">
+<link rel="stylesheet" type="text/css" href="http://www.slac.stanford.edu/grp/ad/css/addocs.css">
+</head> 
+<body>
+<!--
+Modifying this file:
+  cheatsheet.html is generated from cheatsheet.md (marksdown). Follow these steps to edit:
+  cvs checkout matlab/documents
+  Edit cheatsheet.md
+  Convert cheatsheet.md to cheatseet.html:
+         python -m markdown -x markdown.extensions.toc -x markdown.extensions.tables cheatsheet.md > cheatsheet.html
+  cvs commit -m "comment" cheatsheet.{md,html}
+  Log into AFS,
+  cd /afs/slac/www/grp/ad/docs
+  cvs -d /afs/slac/g/lcls/cvs update matlab/documents/cheatsheet.{md,html}
+  Verify it workd by visiting http://www.slac.stanford.edu/grp/ad/docs/matlab/documents/cheatsheet.html
+Auth: Greg White, Nov 17, 2017, SLAC.
+--> 
+<!-- The Masthead -->
+<div id="masthead" style="position:relative">
+    <a href="http://www.slac.stanford.edu/">
+      <img style="position: absolute; left: 0px; top: 0px" src="http://www.slac.stanford.edu/grp/ad/model/images/slacHeaderLogo.gif"
+        alt="SLAC National Accelerator Laboratory" width="182" height="24">
+    </a>
+</div>
+<br />
+<hr />
+<br />
+<p style="font: 170% sans-serif; color: #660003; text-align: center">
+CHEATSHEET FOR THE LCLS ACCELERATOR COMPLEX PHYSICS ENVIRONMENT
+</p>
+<p style="text-align:center">
+Greg White, SLAC, November 2017.<br />
+Modified Greg White, 25/Nov/17, Corrected python setup on AFS per B. Hill.  
+</p>
+
+<p>This document helps users of the LCLS accelerator systems
+access the data of the control system, to help diagnose problems and prepare
+applications. It is very much written as a "cheatsheet", not a tutorial, and it <strong>is a working document in progress - some parts may be very incomplete</strong>. </p>
+<p>TABLE OF CONTENTS</p>
+<div class="toc">
+<ul>
+<li><a href="#getting-control-system-data-on-slac-public-machines-aka-afs">GETTING CONTROL SYSTEM DATA ON SLAC PUBLIC MACHINES (AKA "AFS")</a><ul>
+<li><a href="#setup">Setup</a></li>
+<li><a href="#getting-process-variable-pv-live-data">Getting Process Variable (PV) Live Data</a><ul>
+<li><a href="#bash-command-line">Bash Command line</a></li>
+<li><a href="#python">Python</a></li>
+</ul>
+</li>
+<li><a href="#getting-epics-pv-archive-data">Getting EPICS PV archive data</a><ul>
+<li><a href="#bash-command-line_1">Bash command Line</a></li>
+<li><a href="#python_1">Python</a></li>
+</ul>
+</li>
+<li><a href="#get-pv-names">Get PV names</a><ul>
+<li><a href="#bash-command-line_2">Bash command line</a></li>
+<li><a href="#python_2">Python</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#access-to-data-and-log-files">ACCESS TO DATA AND LOG FILES</a><ul>
+<li><a href="#data-file-locations-on-production">Data file locations on production</a></li>
+<li><a href="#web-access-to-measurement-data-and-execution-logs">Web access to measurement data and execution logs</a></li>
+</ul>
+</li>
+<li><a href="#oracle-databases">ORACLE DATABASES</a><ul>
+<li><a href="#sql-connection-configuration">SQL Connection Configuration</a></li>
+<li><a href="#oracle-table-metadata">Oracle Table Metadata</a></li>
+</ul>
+</li>
+<li><a href="#getting-started-on-production">GETTING STARTED ON PRODUCTION</a><ul>
+<li><a href="#authentication-and-logging-in-to-production">Authentication and Logging in to Production</a></li>
+<li><a href="#fast-terminal-and-editor">Fast terminal and editor</a></li>
+</ul>
+</li>
+<li><a href="#control-system-displays">CONTROL SYSTEM DISPLAYS</a><ul>
+<li><a href="#wheres-the-beam">Where's the beam?</a></li>
+<li><a href="#high-level-applications-hlas">High Level Applications (HLAs)</a></li>
+</ul>
+</li>
+<li><a href="#epics-investigations">EPICS INVESTIGATIONS</a><ul>
+<li><a href="#names-and-values">Names and values</a></li>
+<li><a href="#poor-mans-edm">Poor man's EDM</a></li>
+</ul>
+</li>
+<li><a href="#timing-and-beam-synchronous-data-acquisition">TIMING AND BEAM SYNCHRONOUS DATA ACQUISITION</a><ul>
+<li><a href="#pattern-metadata">Pattern Metadata</a></li>
+<li><a href="#event-definitions">Event Definitions</a></li>
+<li><a href="#bsa-references">BSA References</a></li>
+</ul>
+</li>
+<li><a href="#copying-files-to-and-from-production">COPYING FILES TO AND FROM PRODUCTION</a><ul>
+<li><a href="#copy-files-from-production-to-your-maclinux-desktop">Copy files from production to your Mac/linux desktop</a></li>
+<li><a href="#copy-files-from-your-maclinux-desktop-to-production">Copy files from your Mac/linux desktop to production</a></li>
+<li><a href="#kerberos">Kerberos</a></li>
+</ul>
+</li>
+<li><a href="#email-from-production">EMAIL FROM PRODUCTION</a></li>
+<li><a href="#printing">PRINTING</a></li>
+<li><a href="#cvs-code-versioning-system">CVS - CODE VERSIONING SYSTEM</a><ul>
+<li><a href="#cvs-references">CVS References</a></li>
+<li><a href="#cvs-commands-for-project-development">CVS Commands for project development</a></li>
+</ul>
+</li>
+<li><a href="#matlab">MATLAB</a><ul>
+<li><a href="#getting-pv-names-in-matlab">Getting PV names in matlab</a></li>
+<li><a href="#using-lca-to-get-pv-values-in-matlab">Using lca to get PV values in matlab</a><ul>
+<li><a href="#lcaget">lcaGet</a></li>
+<li><a href="#lca-monitors">lca monitors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<hr />
+
+<h1 id="getting-control-system-data-on-slac-public-machines-aka-afs">GETTING CONTROL SYSTEM DATA ON SLAC PUBLIC MACHINES (AKA "AFS")</h1>
+<p>This section describes how anyone logged into a SLAC unix machine, such as rhel6, can get production LCLS data. To simply get data, from a SLAC "public" machine (sometimes called an "AFS" machine) it is not necessary to be <a href="#authentication-and-logging-in-to-production">authenticated to production</a> or otherwise log into the production network.</p>
+<h2 id="setup">Setup</h2>
+<p>For complicated reasons of interop between 64 bit EPICS, 64 bit machine architecture, and Red Hat version, knowing whether your host host is 64 or 32 bit is important. Eg lcls-dev2 (32-bit), lcls-dev3 (64 bit) or rhel6-64 (is 64 bit). For simplicity, choose a 64 bit machine (such as rhel6-64.slac.stanford.edu) and then execute a setup below.</p>
+<pre><code>bash
+source /afs/slac/g/lcls/epics/setup/go_epics_3.15.5-1.0.bash
+source ~greg/doh_epics.bash        # Fixes go_epics for EPICS 7
+source ~greg/envs_epics_prod.bash  # Use production IOCs, not development
+source /afs/slac/g/lcls/epics/R3.15.5-1.0/modules/pvaPy/R0.7.0-0.0.1/bin/rhel6-x86_64/setup.sh  # Python access to EPICS PV names, model, archive data, etc.
+</code></pre>
+<h2 id="getting-process-variable-pv-live-data">Getting Process Variable (PV) Live Data</h2>
+<p>This section describes how to get the present values of control system process variables of the LCLS accelerator complex.</p>
+<p>Having done the <a href="#setup">Setup</a> above, you can get live PV data from the command line, python, or matlab.</p>
+<h3 id="bash-command-line">Bash Command line</h3>
+<p>This subsection describes getting live PV data from the bash command line.</p>
+<p>Note: Presently the EPICS toolkit is in a transitionary phase, where a 30 year old protocol, called Channel Access (or "ca") is being replaced by a new more powerful one, called pvAccess (or "pva"). The new version of EPICS, v4, can talk both protocols, ca and pva, but you have to tell it which one to use. The primary command line tool of the old version of EPICS is "caget". The command line tools of the new version are "pvget" and "eget." Presently at SLAC, 100% of our live PV data is only available using the old ca protocol (changing this is now in progress, but won't be completed for some time), so if you're going to use the latest EPICS version to get it, you have to tell the new command line tool, to use the old protocol. That's done with argument "-p ca".</p>
+<p>Get the value of the PV </p>
+<pre><code>$ caget BPMS:IN20:425:X         # Using the command line tool of EPICS v3
+BPMS:IN20:425:X                -0.0476485
+
+$ pvget -p ca BPMS:IN20:425:X   # Using EPICS v4
+BPMS:IN20:425:X                -0.0516504
+</code></pre>
+<h3 id="python">Python</h3>
+<p>This subsection describes getting live PV data from a python process.</p>
+<p>First, execute the bash environment <a href="#setup">Setup</a> lines above. They will set your PATH and LD_LIBRARY_PATH to include the default Python installation for LCLS, as well as the default version of EPICS.</p>
+<p>Next you need to tell the PyEPICS Python module (described in more detail below) where to find the EPICS library:</p>
+<pre><code>export PYEPICS_LIBCA=$EPICS_BASE_TOP/$EPICS_BASE_VER/lib/$EPICS_HOST_ARCH/libca.so
+</code></pre>
+<p>For getting EPICS v3 data, use the <a href="http://pyepics.github.io/pyepics/index.html">PyEPICS module</a>.  In a Python script (or in the Python interpreter), start by importing the module:</p>
+<pre><code>&gt;&gt;&gt; import epics
+</code></pre>
+<p>Note that while the module is officially called 'pyepics', the name you import is just 'epics'.  See the link above for full documentation, but at this point, you should be able to call <code>epics.caget()</code> to get data from PVs:</p>
+<pre><code>&gt;&gt;&gt; epics.caget("BPMS:LI24:801:X")
+0.006136119365692139
+</code></pre>
+<p>Calling <code>epics.caget()</code> is a good option for one-time data collection.  If you plan on getting data from the same PV repeatedly, you can establish a long-lived monitor by using the <code>PV</code> class:</p>
+<pre><code>&gt;&gt;&gt; my_pv = epics.PV("BPMS:LI24:801:X")
+&gt;&gt;&gt; my_pv.get()
+0.03591400384902954
+</code></pre>
+<p>Using monitors reduces network load, and will result in faster 'gets'.  Even if you are just getting data twice, its probably worth it to use a PV instead of <code>epics.caget</code>.</p>
+<h2 id="getting-epics-pv-archive-data">Getting EPICS PV archive data</h2>
+<p>The past history of the values of many of the Process Variables of the EPICS control system, are archived by a special "Archiver" database, which itself can be accessed through EPICS, described below.</p>
+<h3 id="bash-command-line_1">Bash command Line</h3>
+<p>Execute the <a href="#setup">Setup</a> as described above, then, 
+to search for which PVs are archived, use <code>eget -ts hist:search -a pv &lt;pvnamepattern&gt;</code></p>
+<p>E.g. the following shows which PVs relating to phase are available in the archive for a given klystron:</p>
+<pre><code>$ eget -ts hist:search -a pv 'KLYS:LI23:21:PHAS*'
+KLYS:LI23:21:PHAS KLYS:LI23:21:PHASTSDELTA KLYS:LI23:21:PHASTSREDUCED
+KLYS:LI23:21:PHAS_FAST1H KLYS:LI23:21:PHAS_FASTENERGYJITTER
+</code></pre>
+<p>To get the archived values, use "-s hist"; the following will get the last 2 minutes of the values 
+KLYS:LI23:21:PHAS had:</p>
+<pre>
+$ eget -ts hist -a pv KLYS:LI23:21:PHAS -a from '2 minutes ago' -a to now
+non-normative type
+NTComplexTable 
+    string[] labels [secondsPastEpoch,values,nanoseconds,severity,status]
+    structure value
+long[] secondsPastEpoch
+[1510711698,1510711708,1510711713,1510711718,1510711723,1510711728,1510711733,1510711738,1510711743,1510711748,1510711753,1510711758,1510711763,1510711773,1510711778,1510711783,1510711788,1510711793,1510711798,1510711803,1510711807,1510711812,1510711817]
+        double[] values [0.148254,0.0818329,0.148254,0.248077,0.115036,0.181503,0.248077,0.214767,0.115036,0.248077,0.281403,0.314758,0.248077,0.281403,0.348145,0.314758,0.0818329,0.381546,0.181503,0.248077,0.181503,0.281403,0.181503]
+        int[] nanoseconds [20839301,17627876,818465246,15498966,16398361,15776683,12619398,153279425,21425087,12395396,7009800,11102939,13171351,5879086,5146692,2980164,5881362,106197724,865321327,6767483,998940734,996038132,998440646]
+        int[] severity [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        int[] status [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+</pre>
+
+<p>The 'from' and 'to' arguments can take strings like "now", "yesterday", "5 seconds ago" as well as ISO 8601 UTC times like "2011-12-03T10:15:30Z". To see more examples and help, type:</p>
+<pre><code>$ eget -ts hist -a help
+</code></pre>
+<h3 id="python_1">Python</h3>
+<p>A python specific example is available directly from the online command line tool:</p>
+<pre><code>$ eget -ts hist -a help -a showpythonsample
+</code></pre>
+<p>Further python support is described at
+<a href="http://www.slac.stanford.edu/grp/ad/docs/python/meme/">MEME Tools for Python</a></p>
+<h2 id="get-pv-names">Get PV names</h2>
+<p>The basic tool to get names of devices and their process variables is the MEME EPICS 4 Directory Service ("ds"). Being an EPICS service, the DS can be accessed from the command line, python or matlab, or in fact any system with an EPICS API.</p>
+<h3 id="bash-command-line_2">Bash command line</h3>
+<pre><code>$ eget -ts ds -a name WIRE:LTU1:755:%
+WIRE:LTU1:755:ALPHA_X
+WIRE:LTU1:755:ALPHA_Y
+WIRE:LTU1:755:BETA_X
+...
+[Many PV names clipped]
+</code></pre>
+<p>The Directory Service is quite powerful. It can get names of PVs, devices, modelled element names, and can be filtered by modelled accelerator area. DS can be asked for help from the command line, see <code>eget -ts ds -a help</code>.</p>
+<h3 id="python_2">Python</h3>
+<p>Be sure to have sourced the pvaPy setup (last) line given in <a href="#setup">Setup</a> above. Then for instance to get a list of (BPM) PV names of matching pattern BPMS:LI21:%:X, use:</p>
+<pre><code>&gt;&gt;&gt; from pvaccess import *
+&gt;&gt;&gt; request = PvObject({'query' : {'ename' : STRING, 'name' : STRING}})
+&gt;&gt;&gt; request.set({'query' : {'ename' : 'BPMA11,BPMA12', 'name' : 'BPMS:LI21:%:X'}})
+&gt;&gt;&gt; rpc = RpcClient('ds')
+&gt;&gt;&gt; response = rpc.invoke(request)
+&gt;&gt;&gt; print "\n".join(response.get()['value']['name'])
+BPMS:LI21:131:X
+BPMS:LI21:161:X
+</code></pre>
+<p>Further python support is described at
+<a href="http://www.slac.stanford.edu/grp/ad/docs/python/meme/">MEME Tools for Python</a></p>
+<h1 id="access-to-data-and-log-files">ACCESS TO DATA AND LOG FILES</h1>
+<p>This section describes where we store the measurement data made by high level applications, and how you can retrieve it.</p>
+<h2 id="data-file-locations-on-production">Data file locations on production</h2>
+<p>All PHYSICS DATA that is logged by Matlab apps, is logged under 
+  <code>$MATLABDATAFILES/data/&lt;year&gt;/</code>. That is, presently, <code>/u1/lcls/matlab/data/&lt;year&gt;/</code>.  </p>
+<p>All EXECUTION logs are logged under <code>$PHYSICS_DATA</code>, that is, <code>/u1/lcls/physics/</code>.</p>
+<pre><code>/u1/lcls/physics/log/matlab   - Matlab apps
+/u1/lcls/physics/log/python/  - Python apps
+/u1/lcls/physics/log/         - Java apps and others
+</code></pre>
+<p>To find log files from a particular time period:</p>
+<pre><code>find /u1/lcls/physics/log/ -atime -1     # Modified (ie app wrote to) in the last day
+</code></pre>
+<h2 id="web-access-to-measurement-data-and-execution-logs">Web access to measurement data and execution logs</h2>
+<p>All the above data files and execution logs are available on the web at addresses below. You MUST be on the SLAC network or VPN or some other port forwarding trick if not. Tip: to order files listed by the browser by date/time, click on "Modified date" twice.</p>
+<pre><code>http://mccas0.slac.stanford.edu/u1/lcls/matlab/data/    - Measurement data files
+http://mccas0.slac.stanford.edu/u1/lcls/matlab/log/     - Matlab app log files
+http://mccas0.slac.stanford.edu/u1/lcls/physics/log/    - Java app log file
+</code></pre>
+<p>To get such a file from the SLAC web to a file to your computer, if it's under /u1/lcls, is then
+ a simple matter of using a web getter, like wget or curl. E.g.</p>
+<pre><code>wget http://mccas0.slac.stanford.edu/u1/lcls/matlab/data/2016/2016-09/2016-09-20/WireScan-WIRE_LTU0_122-2016-09-20-171523.mat
+</code></pre>
+<h1 id="oracle-databases">ORACLE DATABASES</h1>
+<p>Relational databases (ie SQL) important to the control system. All these are Oracle.</p>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th>Purpose</th>
+<th>Schema/username</th>
+<th>Instance/SID</th>
+<th>Main table</th>
+<th>User Interface</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CATER</td>
+<td>Operational issue tacking</td>
+<td>mcc_maint_read</td>
+<td>SLACPROD</td>
+<td>MCC_MAINT.ART_PROBLEMS</td>
+<td><a href="https://oraweb.slac.stanford.edu/apex/slacprod/f?p=194">https://oraweb.slac.stanford.edu/apex/slacprod/f?p=194</a></td>
+</tr>
+<tr>
+<td>Message Log</td>
+<td>Control system log</td>
+<td>message_logger_ro</td>
+<td>MCCOMSG</td>
+<td>MESSAGE_LOGGER.MESSAGE_LOG</td>
+<td>Message Log viewer GUI</td>
+</tr>
+<tr>
+<td>Infrastructure</td>
+<td>All accelerator devices</td>
+<td>lcls_infrastructure</td>
+<td>SLACPROD</td>
+<td>LCLS_ELEMENTS</td>
+<td><a href="https://oraweb.slac.stanford.edu/apex/slacprod/f?p=116">https://oraweb.slac.stanford.edu/apex/slacprod/f?p=116</a></td>
+</tr>
+<tr>
+<td>Future</td>
+<td>As infrastructure, but for LCLS-II</td>
+<td>lcls_future</td>
+<td>SLACPROD</td>
+<td></td>
+<td><a href="https://oraweb.slac.stanford.edu/apex/slacdev/f?p=408">https://oraweb.slac.stanford.edu/apex/slacdev/f?p=408</a></td>
+</tr>
+<tr>
+<td>Machine model</td>
+<td>Beam optics</td>
+<td>machine_model</td>
+<td>SLACPROD</td>
+<td>ELEMENT_MODELS</td>
+<td>Model GUI and optics service</td>
+</tr>
+<tr>
+<td>SCORE</td>
+<td>PV Setpoint configurations</td>
+<td>score</td>
+<td>MCCO</td>
+<td>SCORE_SNAPSHOT_SGNL</td>
+<td>Score GUI</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sql-connection-configuration">SQL Connection Configuration</h2>
+<p>You must be on the SLAC network to access these databases directly, so either access via sqlplus on
+a slac public machine (rhel6-64.slac.stanford.edu et al), or VPN to slac.</p>
+<p>Hostnames are as &lt;sid&gt;.slac.stanford.edu. Port 1512 (the default).</p>
+<p>Passwords available from the systems group. With access to production, Oracle wallets are at (prod) <code>/usr/local/lcls/tools/oracle/wallets</code>
+and (AFS) <code>/afs/slac/g/lcls/tools/oracle/wallets</code>.</p>
+<p>On SLAC Public (AFS), various Oracle version installs are under <code>/afs/slac/package/oracle</code>. For instance, you can find JDBC at <code>/afs/slac/package/oracle/@sys/11.1.0/jdbc/lib/ojdbc6.jar</code>.</p>
+<h2 id="oracle-table-metadata">Oracle Table Metadata</h2>
+<p>Get list of all tables in username with <code>select tablespace_name, table_name from all_tables</code>.</p>
+<p>Get description of fields of a table with DESCRIBE, eg <code>desc message_logger.message_log</code></p>
+<p>Note, in SQL Developer, for read only usernames above (CATER and Message Log), find the tables through "Other Users".</p>
+<h1 id="getting-started-on-production">GETTING STARTED ON PRODUCTION</h1>
+<p>This section lists first steps for a new user of the control system computer network. </p>
+<h2 id="authentication-and-logging-in-to-production">Authentication and Logging in to Production</h2>
+<p>To use the LCLS control system computers, your SLAC computer account must be "authenticated" on the accelerator computer network. Only then will you be able to log into the computers of the accelerator. 
+Please see <a href="./slaconly/loggingintoprod.html">LOGGING INTO PRODUCTION</a> for help on getting "authenticated" and subsequently loggin in.</p>
+<h2 id="fast-terminal-and-editor">Fast terminal and editor</h2>
+<p>Fast B&amp;W xterm, use non antialiasing X11. </p>
+<pre><code>$ xterm -fg white -bg grey20 -geom 120x70 -fa "Monospaced" -fs 9 \
+-xrm "XTerm*selectToClipboard: true" -xrm "XTerm*vt100.renderFont: false"
+</code></pre>
+<p>Fast emacs (that is, emacs in an xterm without the slow TrueFont antialiasing):</p>
+<pre><code>$ xterm -fa Monospace -fs 8 -geom 120x40 -xrm "XTerm*selectToClipboard: true" \
+-xrm "XTerm*vt100.renderFont: false" -e emacs -nw
+</code></pre>
+<p>I alias these commands in my ENVS profile (~/greg/ENVS).</p>
+<h1 id="control-system-displays">CONTROL SYSTEM DISPLAYS</h1>
+<p>This section describes the updating displays of the control system.</p>
+<ul>
+<li>
+<p>All the basic displays and apps of the control system can be viewed or started
+  from <code>lclshome</code>. Just type lclshome from the command line.</p>
+<p>$ lclshome &amp;</p>
+</li>
+<li>
+<p>Overhead displays. You can also start (aka "Launch") an overhead display on your own
+computer.  From <code>lclshome -&gt; [Applications] Global Displays... -&gt;
+ACR Cud Launcher</code>; then select the Display Name from the panel on the
+right, and hit button Display Locally.</p>
+</li>
+<li>
+<p><code>lcls2home</code> opens the prototype "home" screen for lcls-2.</p>
+</li>
+</ul>
+<p>Note, different displays are
+available for Large and Small monitor sizes (LM and SM). E.g. the
+"Python Fat BPMs" display is under Monitor Size SM.  The path to the
+executed file is on the launch display, under the main tabel of
+displays.</p>
+<h2 id="wheres-the-beam">Where's the beam?</h2>
+<p>In LCLS there is, for now, really only 1 beamcode, so there is little possibility that
+BPM readings of 0 can be interpretted in any way other than beam is not present at that BPM. So, with that in mind it's pretty simple, just look at a BPM display:</p>
+<p>Ans 1. See BPM display CUD. See above for how to launch locally.</p>
+<p>Ans 2. Open an Orbit Display, see <code>lclshome -&gt; Operator Tools ... -&gt; Orbit Display.</code> </p>
+<p>Ans 3. See EDM panel under <code>BPM/Toro/FC/BLen</code> on the left side of lclshome. On each area's display you
+see a beamline graphic. If the line linking the devices is dark blue,
+there is beam in that line segment. If it's grey, there isn't beam.</p>
+<h2 id="high-level-applications-hlas">High Level Applications (HLAs)</h2>
+<p>Most physics apps (aka "HLA's", or "GUIs") are located on the 
+"Matlab GUIs" panel, launch <code>lclshome</code> ($ lclshome) then click
+<code>Matlab GUIs...</code>.</p>
+<p>To launch LEM Server. Launch LEM control panel <code>lclshome -&gt; 
+Operator Tools... -&gt; LEM Server</code>.</p>
+<h1 id="epics-investigations">EPICS INVESTIGATIONS</h1>
+<p>This section describes how to get values of systems of PVs using the directory service and EPICS tools, as might be done for investigating control system issues.</p>
+<h2 id="names-and-values">Names and values</h2>
+<ul>
+<li>
+<p>Get the PV names associated with a device, using MEME directory service. Eg Names of all the PVs of a given wire scanner:
+<pre>
+     $ eget -ts ds -a name WIRE:LTU1:755:%
+     WIRE:LTU1:755:ALPHA_X
+     WIRE:LTU1:755:ALPHA_Y
+     WIRE:LTU1:755:BETA_X
+     ...
+</pre></p>
+</li>
+<li>
+<p>If the device has a lot of PVs, use xterm tiny font (see MB3) and <kbd>column</kbd> filter:
+<pre>
+    $ eget -ts ds -a name KLYS:LI20:61:% | column
+</pre></p>
+</li>
+<li>
+<p>Get the PV names for a property of a set of devices, given by device name pattern:
+<pre>
+    $ eget -ts ds -a name QUAD:LI23:%:BDES
+    QUAD:LI23:201:BDES
+    QUAD:LI23:301:BDES
+    QUAD:LI23:401:BDES
+    QUAD:LI23:501:BDES
+    ...
+</pre></p>
+</li>
+<li>
+<p>Get the values of a few PVs of a device - like field related PVs of a QUAD
+ (using bash substitution):
+<pre>
+   $ pvget -p ca QUAD:LI23:301:{BDES,BACT,BCON}
+   QUAD:LI23:301:BDES             -5.71637
+   QUAD:LI23:301:BACT             -5.71658
+   QUAD:LI23:301:BCON             -5.71637
+</pre></p>
+</li>
+<li>
+<p>Get the values of all the PVs matching a pattern. Eg, all the MOTR PVs of a given WIRE scanner (those beginning MOTR_*)
+<pre>
+$ eget -ts ds -a name WIRE:LTU1:735:MOTR_% | pvget -p ca -f -
+   WIRE:LTU1:735:MOTR_ALRM        OUT_OF_BEAM
+   WIRE:LTU1:735:MOTR_ENABLED_STS ON
+   WIRE:LTU1:735:MOTR_ERROR_STS   OK
+   WIRE:LTU1:735:MOTR_ERR_ACK_CMD NO ACK
+   WIRE:LTU1:735:MOTR_FATAL_ERR_STS OK
+   WIRE:LTU1:735:MOTR_HOME        OFF
+   ... 
+</pre></p>
+</li>
+<li>
+<p>Monitor values of a number of attributes by pattern. Note also use of fws tag to filter for only fast wire scanners.
+<pre>
+$ eget -ts ds -a tag fws -a regex '.<em>:LTU1:.</em>:MOTR_(INIT|ENABLED_STS|RETRACT)' | pvget -p ca -m -f -
+WIRE:LTU1:715:MOTR_ENABLED_STS OFF
+WIRE:LTU1:715:MOTR_INIT        Standby
+WIRE:LTU1:715:MOTR_RETRACT     Standby
+WIRE:LTU1:735:MOTR_ENABLED_STS OFF
+WIRE:LTU1:735:MOTR_INIT        Standby
+WIRE:LTU1:735:MOTR_RETRACT     Standby
+WIRE:LTU1:755:MOTR_ENABLED_STS OFF
+WIRE:LTU1:755:MOTR_INIT        Standby
+WIRE:LTU1:755:MOTR_RETRACT     Standby
+WIRE:LTU1:775:MOTR_ENABLED_STS OFF
+WIRE:LTU1:775:MOTR_INIT        Standby
+WIRE:LTU1:775:MOTR_RETRACT     Standby
+</pre></p>
+</li>
+<li>
+<p>Another example, what are all the event definitions?
+<pre>
+   $ eget -ts ds -a name EDEF:SYS0:%:NAME | pvget -p ca -f -
+</pre></p>
+</li>
+<li>
+<p>You can also redirect rather than pipe (ie use pvget &lt;( eget xxx) rather than eget | pvget ).
+To make all the pvgets in parallel (super fast), supply the PV names on one line, 
+to do that, use eget -T). E.g. get all the KLYS AMPLs in the linac: 
+<pre>
+  $ pvget -p ca -f &lt;(eget -Tts ds -a name KLYS:LI%:%:AMPL)
+  KLYS:LI20:51:AMPL              0
+  KLYS:LI20:61:AMPL              20.0928
+  KLYS:LI20:71:AMPL              31.543
+  KLYS:LI20:81:AMPL              42.041
+  KLYS:LI21:11:AMPL              35.6689
+...
+</pre></p>
+</li>
+<li>
+<p>If there are many matching PVs, likr all the PVs of a device, use column to culumnize it.
+  You may want to make teh xterm big too before running sucha command to see a summay of a device.
+<pre>
+  $ eget -Tts ds -a name EDEF:SYS0:4:% | pvget -p ca -f - | column
+</pre></p>
+</li>
+<li>
+<p>Get the description of a list of PVs. Eg, find out what each of the PVs in list
+  above of MOTR_ PVs does:
+<pre>
+ $ eget -ts ds -a name WIRE:LTU1:735:MOTR_% | xargs -I{} pvget -p ca {}.DESC
+ WIRE:LTU1:735:MOTR_ALRM.DESC   In Beam Alarm
+ WIRE:LTU1:735:MOTR_ENABLED_STS.DESC Enabled
+ WIRE:LTU1:735:MOTR_ERROR_STS.DESC Error
+ WIRE:LTU1:735:MOTR_ERR_ACK_CMD.DESC Error Ack CMD
+ WIRE:LTU1:735:MOTR_FATAL_ERR_STS.DESC Fatal Error
+ WIRE:LTU1:735:MOTR_HOME.DESC   Set Motor Home Position
+ WIRE:LTU1:735:MOTR_HOMED_STS.DESC Homed
+ ...
+ (and no, the descriptions aren't great. We should ask that they be made better)
+</pre></p>
+</li>
+<li>
+<p>Get all DESC and VALues of the PVs of a device. Some may be waveforms, so it's convenient to tell caget 
+  a maximum number of elements. Technical note; pvget understands "-f -" so it can opertate very 
+  fast on output of eget, but pvget doesn't understand -#. caget does understand -# to limit waveforms,
+  but doesn't understand -f -. So you have use xargs, caget). Eg get all the timing pattern pv names and values and desciptions. You'll need xterm set to "tiny".
+<pre>
+  eget -ts ds -a name PATT:SYS0:1:% | xargs -I{} caget -#4 {} {}.DESC | column -x 
+  eget -ts ds -a name WIRE:LTU1:735:MOTR% | xargs -I{} caget -#2 -w0.5 {}.DESC {}.VAL | column -x
+</pre></p>
+</li>
+<li>
+<p>Look for a PV whose name or DESCription field contains a string. 
+<pre>
+  eget -ts ds -a name EDEF:SYS0:4:% | xargs -I{} pvget -p ca {} {}.DESC | grep -i feedback
+</pre></p>
+</li>
+<li>
+<p>Look in all Matlab PVs for those that
+  contain the string 'eta' or 'wiss'. Careful though, we have
+  many thousands of Matlab PVs, so this "brute-force" search can 
+  take minutes.
+<pre>
+  eget -ts ds -a name SIOC:SYS0:%ML% | xargs -I{} caget {}.DESC | awk '/eta/||/wiss/' 
+</pre></p>
+</li>
+<li>
+<p>What are the device names and element names of a set of devices matching a pattern:
+<pre>
+    $ (p=WIRE:LTU%:%; paste &lt;(eget -ts ds -a name $p -a show dname -a tag CU_HXR -a sort z) &lt;(eget -ts ds -a name $p -a show ename -a tag CU_HXR -a sort z))
+    WIRE:IN20:531   WS01
+    WIRE:IN20:561   WS02
+    WIRE:IN20:611   WS03
+    WIRE:IN20:741   WS04
+    WIRE:LI21:285   WS11
+    WIRE:LI21:293   WS12
+    WIRE:LI21:301   WS13
+    ... snipped
+</pre></p>
+</li>
+<li>
+<p>Get two (or more) sets of PVs in parallel for speed [see (xxx)&amp;() ].
+<pre>
+pvget -p ca -f &lt;((eget -Tts ds -a name KLYS:LI%:%:AMPL)&amp; (eget -Tts ds -a name KLYS:LI%:%:PHAS))
+</pre></p>
+</li>
+<li>Display them all in columns
+<pre>
+pvget -p ca -f &lt;((eget -Tts ds -a name KLYS:LI%:%:AMPL)&amp; (eget -Tts ds -a name KLYS:LI%:%:PHAS)) | column
+</pre></li>
+<li>
+<p>paste together as a table:
+<pre>
+paste &lt;(pvget -p ca &#96;eget -Tts ds -a name KLYS:LI%:%:AMPL&#96;) &lt;(pvget -p ca &#96;eget -Tts ds -a name KLYS:LI%:%:PHAS&#96;)
+KLYS:LI20:51:AMPL              0        KLYS:LI20:51:PHAS              nan
+KLYS:LI20:61:AMPL              20.1172  KLYS:LI20:61:PHAS              nan
+KLYS:LI20:71:AMPL              31.4453  KLYS:LI20:71:PHAS              nan
+KLYS:LI20:81:AMPL              42.1875  KLYS:LI20:81:PHAS              nan
+KLYS:LI21:11:AMPL              35.4248  KLYS:LI21:11:PHAS              -115.708
+KLYS:LI21:21:AMPL              26.8066  KLYS:LI21:21:PHAS              -35.6692
+KLYS:LI21:31:AMPL              58.9111  KLYS:LI21:31:PHAS              -0.0202484
+...
+</pre></p>
+</li>
+<li>
+<p>... as above but avoid retyping name:
+<pre>
+(n=KLYS:LI%:%; paste &lt;(pvget -p ca &#96;eget -Tts ds -a name $n:AMPL&#96;) &lt;(pvget -p ca &#96;eget -Tts ds -a name $n:PHAS&#96;))
+</pre></p>
+</li>
+<li>
+<p>Compare outputs of aidalist and MEME.
+<pre>
+diff -y &lt;(aidalist %:LI%%:%1:POLY | sort) &lt;(eget -ts ds -a regex '(KLYS|SBST):LI.<em>:.</em>1:POLY' | sort)
+</pre></p>
+</li>
+<li>
+<p>Make a list of pv names to get, then get them
+<pre>
+nmstat=&#96;eget -Tts ds -a regex 'CUDKLYS:LI2([0-9]{1}|30):.*:STATUS'&#96;
+caget $nmstat</p>
+</li>
+</ul>
+<p>d=&#96;eget -ts ds -a regex 'WIRE:LTU1:7.*:(MOTR_ENABLED_STS|MOTR_RETRACT)'&#96; 
+camonitor $d
+</pre></p>
+<ul>
+<li>
+<p>Using eget on ca PV so you can print its transpose
+<pre>
+eget -p ca -T CUDKLYS:MCC0:ONBC1SUMY
+</pre></p>
+</li>
+<li>
+<p>Get are all of the fields and their values of a given PV (that is,
+ ALL fields, not just the VAL field). To do
+ this, get the PV's ioc's name, log into the IOC with iocConsole, and
+ dbpr the record:
+<pre>
+ $ cainfo WIRE:LTU1:735:MOTR               # to find IOC name of PV
+ $ iocConsole ioc-ltu1-mc04                # log into IOC [hit Return to get prompt]
+ ioc-ltu1-mc04&gt;dbpr("WIRE:LTU1:735:MOTR")  # get record field info
+ CTRL-a d to exit iocConsole
+</pre></p>
+</li>
+<li>
+<p>Get IOC and record type of PV, use <code>findpv</code>. E.g. Find all the PVs of device named <code>COLL:LI29:957</code> and their IOCs
+<pre>
+findpv COLL:LI29:957
+</pre></p>
+</li>
+</ul>
+<h2 id="poor-mans-edm">Poor man's EDM</h2>
+<p>When you don't have time to make an EDM screen, but you need to make an updating display quickly:</p>
+<p>Using the unix "watch" command, updating every 0.1 secs. These are updating displays - so the only way to see what they do is try them.</p>
+<p>Example Giving explicit pv names
+<pre>
+$ watch -n .1 pvget -p ca KLYS:LI20:51:AMPL KLYS:LI20:61:AMPL KLYS:LI20:71:AMPL KLYS:LI20:81:AMPL
+</pre>
+Example: using bash substitution
+<pre>
+$ watch -n .1 pvget -p ca QUAD:LI23:301:{BDES,BACT,BLEM}
+</pre>
+Example: using MEME directory service to get PV names- in this case to get SBST phases
+<pre>
+$ watch -n 1 "eget -ts ds -a name SBST:%:%:PHAS | pvget -p ca -f -"
+</pre>
+To spawn the display in its own xterm, use xterm -e. Eg
+<pre>
+$ xterm -e watch -n .1 "eget -ts ds -a name SBST:%:%:PHAS | pvget -p ca -f -"
+</pre>
+It's really better not to query the ds on every iteration. And for many PVs use column.
+Eg get all KLYS AMPL names once, then watch their values once a second. The following makes a
+bash variable nms, then uses it:
+<pre>
+$ (nms=&#96;eget -Tts ds -a name KLYS:%:%:AMPL&#96;; watch -d -n 1 "pvget -p ca $nms | column")
+</pre></p>
+<h1 id="timing-and-beam-synchronous-data-acquisition">TIMING AND BEAM SYNCHRONOUS DATA ACQUISITION</h1>
+<p>This section describes how to use EPICS to get beam timing synchronous measurement data. 
+The data of devices which can sample measurements synchronized to the passing of beam pulses, are
+interfaced to EPICS through the "Beam Synchronous Acquisition" system (BSA). </p>
+<p>A 360Hz fundamental fiducial is issued by the timing system. Each cycle == 1 pulse id.
+This is multiplexed by 3 AC sinusoid, equidistant (so 120 degrees separated w.r.t. each other). 
+The 6 zero-crossings of these mark the boundaries of the timing intervals of each of 6 "time slots".
+Operating on 2 such time slots then gives a repetition rate of 120 Hz (2*360/6).
+See [3], slide 22.</p>
+<p>BSA PVs are of the general form:</p>
+<pre><code>  &lt;devicename&gt;:&lt;propertyname&gt;[CNT,RMS,PID]HST&lt;edefn&gt;       [NOTE, PID only available in upgraded BSA modules]
+</code></pre>
+<p>For instance:</p>
+<pre><code>  BPMS:LI23:201:XHST7        - The array of measured values. If the number of measured points  
+                               to average was &gt; 1 as requested by edef measurement 
+                               definition then each element value will be mean of data
+                               collected.
+
+       eg $ caget -# 4 BPMS:LI23:201:XHST7
+       BPMS:LI23:201:XHST7 4 0.018005 0.0250633 0.0180283 0.0227487
+
+  BPMS:LI23:201:XCNTHST7     - CNT, is the number of measurements made to establish the value of 
+                               corresponding value element above.
+
+       eg $ caget -# 4 BPMS:LI23:201:XCNTHST7
+       BPMS:LI23:201:XCNTHST7 4 1 1 1 1            valued 1 when eDef Navg = 1.
+
+  BPMS:LI23:201:XRMSHST7     - RMS, the variance of measured data making up each element of value if
+                               number of measured points to average was &gt; 1. Called "RMS"
+                               for historical reasons.
+
+       eg  $ caget -# 4 BPMS:LI23:201:XRMSHST7
+       BPMS:LI23:201:XRMSHST7 4 0 0 0 0            valued 0 when eDef Navg = 1.
+</code></pre>
+<p>Where a BSA module has been upgraded to new BSA (inserting NaNs where no data was acquired), 
+then PIDHST PV is also available. At the time of writing no BPMs have been so 
+upgraded ( eget -s ds -a names BPMS:%:%:XPIDHST% is null set)
+So, not available on BPMS:LI23:201 but is available eg KLYS:LI20:K5:</p>
+<pre><code>       $ caget -# 4 KLYS:LI20:K5:FWD_PPIDHST9 
+       KLYS:LI20:K5:FWD_PPIDHST9 4 6348 6351 6354 6357
+</code></pre>
+<p>Presently: Max length of all arrays = 2800. Max number of measurements to average = 1000.</p>
+<h2 id="pattern-metadata">Pattern Metadata</h2>
+<pre><code>PATT:SYS0:1:PULSEID        - presently broadcast pulseid
+PATT:SYS0:1:PULSEID&lt;edef&gt;  - pulse ids being broadcast for a given edef
+PATT:SYS0:1:PULSEIDHSTBR 4 30954 30957 30960 30963   - BSA buffer of pulseid. Note Beam Rate values increment 
+                                                   in steps of 3, since pulseid issued at 360 Hz, and beam
+                                                   rate (at time of writing) is 120 Hz.
+</code></pre>
+<p>The present beam repetition rate:</p>
+<pre><code>[physics@lcls-srv01 ~/greg]$ eget -p ca EVNT:SYS0:1:LCLSBEAMRATE
+120
+</code></pre>
+<h2 id="event-definitions">Event Definitions</h2>
+<p>See LCLS Event System API doc [4].</p>
+<p>There are 20 event definition "slots", defined by EDEF:SYS0:<edefnum>:%. 
+1-14 are user reservable. 15-20 are reserved. 16=1Hz, 17=10Hz. 18=Beam Rate, or full rate. </p>
+<pre><code>  [physics@lcls-srv01 ~/greg]$ eget -Tts ds -a name EDEF:SYS0:%:NAME | pvget -p ca -f -
+  EDEF:SYS0:100:NAME             
+  EDEF:SYS0:10:NAME              tcav_feedback
+  EDEF:SYS0:11:NAME              Fast Event Logger 143
+  EDEF:SYS0:12:NAME              Wait For MPS Trip
+  EDEF:SYS0:13:NAME              Feedback TS4 &amp; ~30Hz
+  EDEF:SYS0:14:NAME              VOM_buffer_2_2989
+  EDEF:SYS0:15:NAME              Feedback TS1 &amp; ~30Hz
+  EDEF:SYS0:16:NAME              1HZ
+  EDEF:SYS0:17:NAME              10HZ
+  EDEF:SYS0:18:NAME              FULL
+  EDEF:SYS0:19:NAME              bunch-charge-feedback
+  EDEF:SYS0:1:NAME               ESA PM Orbit Check
+  EDEF:SYS0:20:NAME              FBCK2
+  EDEF:SYS0:2:NAME               
+  EDEF:SYS0:3:NAME               
+  EDEF:SYS0:4:NAME               Feedback TS4 &amp; 30Hz
+  EDEF:SYS0:5:NAME               
+  EDEF:SYS0:6:NAME               VOM_buffer_1_3194
+  EDEF:SYS0:7:NAME               Feedback TS1 &amp; 30Hz
+  EDEF:SYS0:8:NAME               OrbitDisplay 20473
+  EDEF:SYS0:9:NAME               BPM Dispersion/RMS
+</code></pre>
+<h2 id="bsa-references">BSA References</h2>
+<p>[1] Beam Synchronous Acquisition forIOC Engineers, S. Allison, 2008, (https://slacspace.slac.stanford.edu/sites/controls/wfo/lcls_timing/Documents/lclsBsa.pdf), a good summary of function and implementation</p>
+<p>[2] BSA Upgrade, (https://slacspace.slac.stanford.edu/sites/controls/Controls%20Operations%20and%20Maintenance%20Documents/Timing/BSA/BSA_Upgrade.pptx), A description of plans for upgrade to fix missing data issues.</p>
+<p>[3] How to use the Timing System as a Client, Kukhee Kim, (https://slacspace.slac.stanford.edu/sites/controls/Controls%20Operations%20and%20Maintenance%20Documents/Timing/BSA/2012_0406%20(rev.4)%20How%20to%20use%20the%20Timing%20System%20as%20a%20Client.pdf)</p>
+<p>[4] LCLS Event System API doc, (https://slacspace.slac.stanford.edu/sites/LCLS%20Document%20Storage/01%20-%20LCLS%20Systems/electronbeamsys/controls/Shared%20Documents/Timing/LCLS%20Event%20System%20API.doc)</p>
+<h1 id="copying-files-to-and-from-production">COPYING FILES TO AND FROM PRODUCTION</h1>
+<p>This section helps you get files to and from computers on the production network, like those in ACR.</p>
+<h2 id="copy-files-from-production-to-your-maclinux-desktop">Copy files from production to your Mac/linux desktop</h2>
+<p>For a single file, the simplest way to get it from production to your computer, is probably to email
+it to yourself from the physics account, see <a href="#email-from-production">email from production</a> below.</p>
+<p>Copying a file from production to your computer using only commands
+executed on your computer, is a two step process (assuming your computer is on the SLAC network), but you can do both steps from your computer using
+a remotely executed ssh command. Also of course you must be ssh authenticated on production.</p>
+<pre><code>[mac] $ ssh greg@mcclogin scp 'physics@lcls-srv01:~/greg/Development/profmon/lclscvs/physics/config/model/testsupport/lcls_mine.xdxf' lcls_mine.xdxf
+[mac ]$ scp 'greg@mcclogin:~/lcls_mine.xdxf' lcls_mine.xdxf
+</code></pre>
+<p>A number if files can be done at a time, using <code>sftp</code>:</p>
+<pre><code>[mac] $ ssh greg@mcclogin sftp '"physics@lcls-srv01:/home/physics/greg/Development/issues/badwsfitfloor/*.png" .'
+[mac] $ sftp 'greg@rhel6-64:/u/cd/greg/*.png' .
+</code></pre>
+<h2 id="copy-files-from-your-maclinux-desktop-to-production">Copy files from your Mac/linux desktop to production</h2>
+<p>Copying a file from your own (unix like) computer to production, is a reversal of above. If on the SLAC network:</p>
+<pre><code>[mac] $ scp lcls_12OCT16.xdxf 'greg@mcclogin:~/lcls_12OCT16.xdxf'
+[mac] $ ssh -x greg@mcclogin scp lcls_12OCT16.xdxf 'physics@lcls-srv01:~/greg/'
+</code></pre>
+<p>If you're not on the SLAC network, it's a 3 step process but again all 3 can be done from your computer prompt, eg copying a file to prod from a laptop:</p>
+<pre><code>[mac] % scp gatherPerformanceInfo.m 'username@rhel6-64.slac.stanford.edu:~'
+username@rhel6-64.slac.stanford.edu's password: 
+gatherPerformanceInfo.m                                           100%   16KB   1.2MB/s   00:00    
+[mac] % ssh -x username@rhel6-64.slac.stanford.edu scp gatherPerformanceInfo.m username@mcclogin
+username@rhel6-64.slac.stanford.edu's password: 
+[mac ]% ssh -x username@rhel6-64.slac.stanford.edu ssh username@mcclogin scp gatherPerformanceInfo.m 'physics@lcls-srv01:~/username/'
+</code></pre>
+<h2 id="kerberos">Kerberos</h2>
+<p>If you use Kerberos to authenticate first, then you can do the above
+without any passwords. On unix/mac, just use "kinit" or "klog".</p>
+<pre><code>$ kinit greg@SLAC.STANFORD.EDU            [case is important]
+&lt;password&gt;
+</code></pre>
+<p>On a Mac try the Ticket Viewer, find it in, <code>/System/Library/CoreServices/Ticket Viewer.app</code>.</p>
+<h1 id="email-from-production">EMAIL FROM PRODUCTION</h1>
+<p>If you're waiting to die and want to waste some time, you can use Office365 from Firefox launched from an OPI on a dev machine. </p>
+<p>Alternatively, you can send a file in email from the production physics account. From the command line:</p>
+<pre><code>mail [-a &lt;attachment&gt;] -s &lt;subject&gt; &lt;username&gt;@slac.stanford.edu
+</code></pre>
+<p>If you don't give the attachment you can type the text of your email right
+in the terminal. End it with CTRL-D.</p>
+<p>Send email from GUI version of Emacs: <code>Tools -&gt; Send Mail</code>. Compose your message. 
+To send it, <code>Mail -&gt; Send Message.</code></p>
+<p>Send email from textual emacs (emacs -nw), to compose message, 
+<code>C-x m</code>. To send the composed message, <code>C-c C-c</code>  </p>
+<h1 id="printing">PRINTING</h1>
+<p>The default printer on prod is the physics logbook. That is, if you
+simply select, <code>File-&gt;Print</code> in an app like emacs, it'll come out in the log.</p>
+<p>To print to a real printer, use <code>lpr</code> or <code>lp</code> commands and specify the printer, eg:</p>
+<pre><code>lpr -P RSB-R107 README    - print README to printer in Building 52 rm 107
+lpc status                - see list of printers
+</code></pre>
+<h1 id="cvs-code-versioning-system">CVS - CODE VERSIONING SYSTEM</h1>
+<p>CVS is the system we use to keep track of all the files of all the programs (including EPICS and Matlab scripts) that we use for running SLAC accelerators. We're presently in the process of moving to another system, git, but that won't be completed for matlab for some time.</p>
+<h2 id="cvs-references">CVS References</h2>
+<p>The operations wiki has a page for getting started with CVS - <a href="http://ad-ops.slac.stanford.edu/wiki/index.php/CVS_for_dummies">CVS for dummies</a> (<em>SLAC only</em>).</p>
+<p>Writing Matlab apps for the LCLS system, has a specific workflow involving CVS, descibed in the HLA <a href="http://www.slac.stanford.edu/grp/ad/docs/matlab/documents/programmers_guide.html#matlab_project_development">Programmers Guide</a>.</p>
+<p>All our CVSed files are available to view on the web in SLAC's cvs web, at <a href="http://www.slac.stanford.edu/cgi-wrap/cvsweb?cvsroot=LCLS">http://www.slac.stanford.edu/cgi-wrap/cvsweb?cvsroot=LCLS</a>.</p>
+<h2 id="cvs-commands-for-project-development">CVS Commands for project development</h2>
+<p>To get help on any given cvs command, type "cvs --help <command>" </p>
+<pre><code>cvs --help log
+</code></pre>
+<p>Set CVSROOT if not already set. It should be set by physics user login.
+  If working on your own laptop, or otherwise outside the production
+  environment, you'll need to set CVSROOT. In bash do:</p>
+<pre><code>export CVSROOT=':ext:YOURAFSUSERNAME@rhel6-64.slac.stanford.edu:/afs/slac/g/lcls/cvs'
+</code></pre>
+<p>List files in CVS without checking them out:</p>
+<pre><code>cvs rlog -lR matlab/toolbox
+cvs rlog -lR 'matlab/toolbox/' | grep 'wire'  # Only those with wire in name
+</code></pre>
+<p>Get files to work on. Use cvs checkout:</p>
+<pre><code>cvs co matlab                                  # Checkout whole matlab dir tree
+cvs co matlab/toolbox/model_nameList.m         # Checkout 1 file
+cvs co -r 1.274 matlab/toolbox/wirescan_gui.m  # Checkout revision 1.274
+</code></pre>
+<p>Get a file but without checking it out. That is, just get the file. You won't be able to commit it.
+For instance, you might just want to compare to another revision. You're not allowed to 
+  export to a workign directory (one with a cehckout in it already, so...)</p>
+<pre><code>mkdir export
+cd export
+cvs export -D NOW physics/config/model/lcls.xdxf
+</code></pre>
+<p>What is the status of files in a directory into which files 
+  have been checked out:</p>
+<pre><code>cvs status
+cvs status | awk '/Status:/&amp;&amp;!/Up-to/'   # What files have you changed or other people changed in repo
+
+cvs status | awk '/Status:/||/\?/'       # Compact list of status of all files, incl any not in CVS
+
+cvs stat | awk '(/Status:/&amp;&amp;!/Up-to/)||/?/'  # Every file that might need some action.
+
+cvs stat 2&gt;&amp;1 | awk '(/Status:/&amp;&amp;!/Up-to/)||/?/'   # Every file that might need some action, but w/o directory names
+</code></pre>
+<p>Update your version with latest from CVS </p>
+<pre><code>cvs update -dA
+</code></pre>
+<p>Above command will leave changes you made intact, but merge in
+  changes other people made (or that you made in cvs commits
+  elsewhere). If both you and other people changed the same files,
+  then this will try to automatically merge the two. If CVS thinks it
+  can't do that reliably, it will warn of "Conflict During merge". It
+  will leave markers in the file (&gt;&gt;&gt;&gt;&gt;&gt; ------ &lt;&lt;&lt;&lt;&lt;&lt;&lt;) in the
+  question, directing you where to hand edit. After editing, try
+  again. cvs knows if you've done the edit.</p>
+<p>See list of historical changes that have been made to files
+  (revision history):</p>
+<pre><code>cvs log           # operates on files checked out in the working directory.
+
+cvs log           # All history of all checked out files in working dir
+cvs log &lt;filename&gt;          # All history of given file
+
+# Print revisions of files named "control*" since date
+cvs log -NSd "&gt;2016-03-01" control*
+
+# History between given dates (inclusive)
+cvs -q log -NSd "2015-09-22&lt;2015-09-23"
+
+# As above, a bit more compactly
+cvs -q log -NSd "2015-09-22&lt;2015-09-23" | awk '/RCS/||!/:/'
+</code></pre>
+<p>See differences between versions of a given file:</p>
+<pre><code># Diff of what's in your checkout (your mods) to latest in cvs
+cvs diff orbit_response_full.m
+</code></pre>
+<p>To get historical differences, it is easiest if you have the 
+revision numbers in question. To get those, see cvs log above.</p>
+<pre><code>cvs diff -r 1.98 model_nameList.m          # Changes since revison 1.98
+cvs diff -r 1.97 -r 1.98 model_nameList.m  # Changes made between 2 revisions
+</code></pre>
+<p>Key to diff output:</p>
+<pre><code>&gt; added. In the successive version but not in the preceeding version
+&lt; removed. In the preceding version but not in the successive version
+--- Where a line or block has changed from 
+   (preceded by) &lt; to (preceded by) &gt;.
+</code></pre>
+<p>Tag files in CVS. </p>
+<p>We tag files to mark them as being part of a given (release), or
+   for a marker in time.  Eg "R2.3.0", or
+   "End-of-run-22-Sep-2015". Note, the behaviour of tag is a little
+   unexpected; the operation "cvs tag x" operates on the CVS
+   repository immediately, not waiting for a cvs commit.</p>
+<p>Use "cvs tag" (rather than rtag) when you have the relevant files 
+checked out of CVS. Eg</p>
+<pre><code>cvs co matlab/LiTrack
+cvs status -v        # Lists files status with their existing tags
+cvs tag bane-emma-original # Put tag on head of all files in matlab/LiTrack
+cvs tag R1_Orig wirescan_gui.m # Put tag "R1_Orig" only on wirescan_gui.m
+</code></pre>
+<p>To release matlab files into production</p>
+<pre><code>cvs add [files you have created]
+cvs commit -m "message" [files]
+cvs2prod [list of .m file to release, eg cvs2prod `echo *.m`]
+cvs2prod [directory UNDER toolbox]     # wrapper to update production matlab
+e.g. cvs2prod meme/src               # ** Check thsi variation doesn't leave lock file in prod **!]
+</code></pre>
+<p>Bulk cvs checkout of files that match a pattern</p>
+<ol>
+<li>Make a file of the output of a grep of all the files you want to checkout</li>
+<li>
+<p>Awk that file for filenames of interest to checkout, selecting the part of the filename that matches
+   the cvs directory/file to co, and check them all out in one go:</p>
+<p>cvs co &#96;awk '/\/usr\/local\// {FS="/"; printf("%s ",substr($0,index($0,"/matlab")+1))}' ../aidalistMfiles.txt&#96;</p>
+</li>
+</ol>
+<p>cvs locks</p>
+<p>When doing a cvs operations, and you get messages like, "cvs checkout: [00:06:37] waiting for fred's lock in /afs/slac/g/lcls/cvs/CVSROOT", there is some unfinished (and probably deceased) cvs process in progress. If the
+message persists, you'll have to delete the so called "lock" file left over from the dead operation before your operation can proceed. Find and delete any file in the CVSROOT dir (ie in AFS) or beneath named any of the following: <code>#cvs.history.lock</code>, or <code>#cvs.lock</code>, <code>#cvs.wfl*</code> or <code>#cvs.rfl*.</code> Eg:</p>
+<pre><code>rm -fr './#cvs.history.lock'
+</code></pre>
+<h1 id="matlab">MATLAB</h1>
+<p>Most <a href="#high-level-applications-(hlas)">high level physics applications</a> (HLAs) of the SLAC LCLS accelerator complex, are developed in Matlab.</p>
+<p>This section describes the most basic aspects of starting Matlab, getting PV names and getting values. Please refer to the <a href="http://www.slac.stanford.edu/grp/ad/docs/matlab/documents/programmers_guide.html">Matlab Programmers Guide</a> for much more detail. </p>
+<p>Starting Matlab. From the command line.</p>
+<pre><code>$ matlab [-nodesktop]      # Starts the present SLAC "supported" version, R2012b
+</code></pre>
+<p>Start Matlab in emacs:</p>
+<pre><code>M-x matlab-shell
+</code></pre>
+<h2 id="getting-pv-names-in-matlab">Getting PV names in matlab</h2>
+<p>This subsection helps you get the names of devices, process variables and element names, in matlab. </p>
+<pre><code>&gt;&gt; meme_names('name','WIRE:LTU1:735:%')   % gets PV names matching '%' wildcard
+&gt;&gt; meme_names('regex','KLYS:[A-Z]{2,3}[0-9]{1,2}:[0-9]{1,4}:PHAS')   % PV names by regular expression
+&gt;&gt; meme_names('etype','MONI','tag','LTU')   % All the beam MONItors (ie BPMS) in the LTU
+</code></pre>
+<p>Many more examples in the <a href="http://www.slac.stanford.edu/grp/ad/docs/matlab/documents/programmers_guide.html">Matlab Programmers Guide</a></p>
+<h2 id="using-lca-to-get-pv-values-in-matlab">Using lca to get PV values in matlab</h2>
+<p>Lca is a software toolkit for getting process variable data from EPICS into matlab (or scilab). It was developed here by Till Straumman. </p>
+<h3 id="lcaget">lcaGet</h3>
+<p>lcaGet is the primary tool for get PV values. It can take a single PV name (as a char string), or arrays of names (array of char strings, or cell array of strings). E.g.</p>
+<pre><code>&gt;&gt; lcaGet('XCOR:LI23:202:BACT')
+
+ans =
+
+   -0.0064
+</code></pre>
+<p>Array of char strings, as returned by <code>meme_names</code>;</p>
+<pre><code>&gt;&gt; bacts=meme_names('name','XCOR:LI23:%:BACT') 
+bacts = 
+ 'XCOR:LI23:202:BACT'
+ 'XCOR:LI23:302:BACT' 
+ 'XCOR:LI23:402:BACT'                                                                                              
+ ...
+
+&gt;&gt; lcaGet(bacts)
+   -0.0001
+   0.0062                           
+   0.0076
+   ...
+</code></pre>
+<h3 id="lca-monitors">lca monitors</h3>
+<p>"Monitors" are a way your matlab program can check whether new data in available in a PV.</p>
+<pre><code>&gt;&gt; bacts=meme_names('name','XCOR:LI23:%:BACT');   % meme_names gets a list of things to monitor
+&gt;&gt; lcaSetMonitor(bacts);                          % set the monitor on them
+&gt;&gt; lcaNewMonitorValue(xcorBacts)                  % possibly elsewhere in your code, see if they've changed.
+ans =
+     1
+     1
+     ...
+&gt;&gt; lcaGet(bacts);       % If any are valued 1 then get them
+</code></pre>
+<p>One can also get the new values of only the individual PVs whos value changed:</p>
+<pre><code>&gt;&gt; changed=lcaNewMonitorValue(xcorBacts);
+&gt;&gt; lcaGet(xcorBacts(find(changed)))         % find returns indexes of 1 values
+ans = 
+    0.0000
+    0.0053
+</code></pre>
+<p></body>
+</html></p>
