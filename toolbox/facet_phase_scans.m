@@ -626,7 +626,7 @@ for ix = 1:numel(handles.data.pdes)
                     case 'X'
                         handles.data.bpmdata(ix,:) = buffdata.get('x');
                     case 'Y'
-                        handles.data.bpmdata(ix,:) = buffdata..get('y');
+                        handles.data.bpmdata(ix,:) = buffdata.get('y');
                     otherwise
                         handles.data.bpmdata(ix,:) = zeros(1,handles.nsamp);
                 end
