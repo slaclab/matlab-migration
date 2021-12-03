@@ -7,11 +7,11 @@
 %
 %  Rem:   Aida requires a classpath, certain import statements, and
 %         an instantiated Err singleton, to operate. aidasetup does
-%         the first two of those. This M-file script additionally 
-%         intantiates an Err object with a reasonable session name 
-%         (used in cmlog 'Sys' column). The Err singleton 
+%         the first two of those. This M-file script additionally
+%         intantiates an Err object with a reasonable session name
+%         (used in cmlog 'Sys' column). The Err singleton
 %         can be acquired by the Matlab session after calling
-%         this M-file by calling Err.getInstance() giving no-arg. 
+%         this M-file by calling Err.getInstance() giving no-arg.
 %
 %         If you want more control over name used in
 %         Err.getInstance(name), use aidasetup instead, whcih does
@@ -23,8 +23,8 @@
 %         not re-execute since the Err singleton has already been
 %         set.
 %
-%  Auth:  06-Apr-2005, Greg White (greg): 
-%  Rev:   
+%  Auth:  06-Apr-2005, Greg White (greg):
+%  Rev:
 %
 %--------------------------------------------------------------
 % Mods: (Latest to oldest)
@@ -33,37 +33,28 @@
 %         aidasetup.m. That will work as long as aidasetup is a
 %         script not a function.
 %
-%============================================================== 
+%==============================================================
 
-%aidasetup
+% PVAClient imports
+import('org.epics.pvaccess.*')
+import('org.epics.pvaClient.*')
+import('org.epics.pvdata.*')
 
-import edu.stanford.slac.err.*;
-import edu.stanford.slac.aida.lib.da.*;
-import edu.stanford.slac.aida.lib.util.common.*;
+% EasyPVA imports
+import('org.epics.pvaccess.*')
+import('org.epics.pvaccess.easyPVA.*')
+import('org.epics.pvdata.*')
+
+% aida-pva-client imports
+import('static edu.stanford.slac.aida.client.AidaPvaClientUtils.*');
+import('static edu.stanford.slac.aida.client.AidaType.*');
+
+% Epics request exceptions
+import('org.epics.pvaccess.server.rpc.RPCRequestException');
 
 global aidainitdone
 if isempty(aidainitdone)
-
-  % Error handling. User M-files may get the error object so
-  % constructed by just calling, for instance err = Err.getInstance()
-  % (without an argument), that will return the singleton.
-  %
-  if strcmpi(computer,'pcwin') == 1
-    cmlogsys = 'PCMatlab';
-  else
-    user = getenv('USER');
-    cmlogsys = strcat(user,'sMatlab');
-  end
-  try
-    edu.stanford.slac.err.Err.getInstance(cmlogsys);  
-  catch
-    disp 'Err instance failed to initialize!'
-  end
-    
-  % Tidy up and remember that we've done this
-  %
   aidainitdone = 1;
   disp 'Aida client initialization completed';
-
 end
 
