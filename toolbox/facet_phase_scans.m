@@ -71,7 +71,7 @@ handles.nk = numel(handles.klystrons);
 
 % define some regions
 %handles.regions     = { 'LI00-DR11' 'DR13-LI10' 'LI11-LI20'}';
-handles.regions     = { 'L0' 'L1' 'L2' 'L3'}'; 
+handles.regions     = { 'L0' 'L1' 'L2' 'L3'}';
 % L0 is IN10:       10-2 (GUN), 10-3, 10-4, 10-5 (TCAV)
 % L1 is LI11:       11-1, 11-2
 % L2 is LI11-LI14:  11-4, 11-5 . . 14-6, 14-7 (e+), 14-8 (TCAV)
@@ -308,7 +308,7 @@ if ~handles.custom_bpm
 
     handles.measdef = handles.measdefs(handles.config.rmap(handles.r));
     set(handles.edit_measdef, 'String', handles.measdef);
-    
+
     handles.pv = strcat(handles.bpm, handles.bpmd);
 end
 
@@ -317,7 +317,7 @@ drawnow;
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = facet_phase_scans_OutputFcn(hObject, eventdata, handles) 
+function varargout = facet_phase_scans_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -342,7 +342,7 @@ handles.fakedata = get(handles.checkbox_fakedata,'Value');
 % fboff   = 1;
 % fbpv    = handles.feedbacks(handles.config.rmap(handles.r));
 % fbstate = lcaGetSmart(fbpv);
-% 
+%
 % if ~isnan(fbstate)
 %     switch char(fbpv)
 %         case 'LI01:FBCK:5:HSTA'
@@ -367,7 +367,7 @@ handles.fakedata = get(handles.checkbox_fakedata,'Value');
 %             fboff = 1;
 %     end
 % end
-% 
+%
 % if ~fboff
 %     response = questdlg(sprintf('Energy feedback %s is still on.  Proceed?', char(fbpv)));
 %     if ~strcmp(response, 'Yes')
@@ -383,7 +383,7 @@ handles.poff = 0;
 % if handles.k >= 2
 %     sbst_offs = control_phaseGet(strcat(handles.sector, '-S'));
 %     handles.poff = handles.poff + sbst_offs;
-%     
+%
 %     % check for sane values
 %     if sbst_offs == -10000 || isnan(sbst_offs)
 %         response = questdlg(sprintf('SBST %d phase readback = %f.  Phase offset will be wrong.  Proceed?', ...
@@ -468,7 +468,7 @@ if ~ok
     response = questdlg('Bad scan, do you really want to change this station?');
     if strcmp(response, 'Yes')
         ok = 1;
-    end    
+    end
 end
 
 
@@ -482,17 +482,17 @@ if ok && any(handles.data.ok()) && ~handles.fakedata
     end
 end
 
-if ok 
+if ok
 
     % set station phase to measured zero phase and trim
     [d, handles.new.ok] = control_phaseSet(handles.data.name, handles.data.fit.phase0, ~handles.fakedata);
     gui_statusDisp(handles, sprintf('Set %s to peak phase of %.1f.  Press GOLD to accept!', char(handles.data.name), handles.data.fit.phase0));
-    
+
     pvnum = (handles.s * 10) + handles.k + 100;
     pvstr = strcat('SIOC:SYS1:ML02:AO', num2str(pvnum));
     script_setupPV(pvstr, strcat(handles.klys, {' delta phase'}), 'degS', 1, handles.appName);
     lcaPutSmart(strcat('SIOC:SYS1:ML02:AO', num2str(pvnum)), handles.data.fit.phase0 - handles.data.curr.pdes);
-    
+
     % gold station
     % control_phaseGold(handles.data.name, handles.data.fphase);
 
@@ -569,14 +569,17 @@ end
 % scan around offset point
 handles.data.pdes = handles.data.pdes - handles.data.poff;
 
+bpmdParam ='';
+nrposParam = '';
+bpmsParam ='';
 
 % set up buffered acquisition if flagged
 if handles.buffacq && ~handles.fakedata
     aidainit;
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    da = DaObject();    
-    da.setParam('BPMD', char(handles.bpmd));
-% 
+
+    bpmdParam=char(handles.bpmd);
+
+%
 %     switch char(handles.bpmd)
 %         case '57'
 %             handles.dgrp = 'NDRFACET';
@@ -585,8 +588,9 @@ if handles.buffacq && ~handles.fakedata
 %         otherwise
 %             handles.dgrp = '';
 %     end
-    da.setParam('NRPOS', num2str(handles.nsamp));
-    da.setParam('BPM1', char(strcat(p, ':', m, ':', u)));
+
+    nrposParam=num2str(handles.nsamp);
+    bpmsParam=char(strcat('["', p, ':', m, ':', u, '"]'));
 end
 
 % clear out old scan data
@@ -626,25 +630,29 @@ for ix = 1:numel(handles.data.pdes)
         % set PDES and trim (trim flag 3rd argument)
         %[handles.data.pact(ix), handles.data.ok(ix)] = control_phaseSet(name, handles.data.pdes(ix), 1, 1);
         [handles.data.pact(ix), handles.data.p_ok(ix)] = control_phaseSet(name, handles.data.pdes(ix), 1, 1);
-        
-        
+
+
         if handles.buffacq
-            
+
             try
                 handles.data.b_ok(ix) = 1;
-                buffdata = da.getDaValue(strcat(handles.measdef, '//BUFFACQ'));
+                if ( ~isempty(nrposParam) )
+                    buffdata = nttable2struct(pvarpc(nturi(strcat(handles.measdef, ':BUFFACQ'), 'BPMD', bpmdParam, 'NRPOS', nrposParam, 'BPMS', bpmsParam)));
+                else
+                    buffdata = nttable2struct(pvarpc(nturi(strcat(handles.measdef, ':BUFFACQ'))));
+                end
             catch
                 handles.data.b_ok(ix) = 0;
             end
-            
+
             if handles.data.b_ok(ix)
-                handles.data.tmit(ix, :) = buffdata.get(4).getAsDoubles();
-                handles.data.goodmeas(ix,:) = buffdata.get(6).getAsDoubles();
+                handles.data.tmit(ix, :) = buffdata.value.tmit;
+                handles.data.goodmeas(ix,:) = buffdata.value.goodmeas;
                 switch char(handles.data.plane)
                     case 'X'
-                        handles.data.bpmdata(ix,:) = buffdata.get(2).getAsDoubles();
+                        handles.data.bpmdata(ix,:) = buffdata.value.x;
                     case 'Y'
-                        handles.data.bpmdata(ix,:) = buffdata.get(3).getAsDoubles();
+                        handles.data.bpmdata(ix,:) = buffdata.value.y;
                     otherwise
                         handles.data.bpmdata(ix,:) = zeros(1,handles.nsamp);
                 end
@@ -660,17 +668,17 @@ for ix = 1:numel(handles.data.pdes)
                 handles.data.bpmdata(ix, jx) = lcaGetSmart(handles.pv);
                 handles.data.tmit(ix, jx) = lcaGetSmart(strrep(handles.pv,'X','TMIT'));
                 bpm_stat = lcaGetSmart(strrep(handles.pv,'X','STA'));
-                if bpm_stat ==0 
+                if bpm_stat ==0
                     handles.data.goodmeas(ix,jx) = 1;
                 else
                     handles.data.goodmeas(ix,jx) = 0;
                 end
-                
+
             end % end sample loop
             handles.data.b_ok(ix) = 1;
         end
     end
-    
+
     if get(handles.togglebutton_abort, 'Value'), return; end
 
     handles = fit_and_plot(handles, 1, handles.axes1);
@@ -698,7 +706,7 @@ if ~handles.fakedata
       (handles.data.bpmdata < 20)   & (handles.data.bpmdata > -20)  & ...
       (handles.data.goodmeas == 1);
 else
-    use=ones(numel(handles.data.ok),numel(handles.data.bpmdata)); 
+    use=ones(numel(handles.data.ok),numel(handles.data.bpmdata));
 end
 % fit to cosine
 dataStd = zeros(size(handles.data.ok));
@@ -990,7 +998,7 @@ end
 if ok
     gui_statusDisp(handles, 'Config saved.');
 end
-    
+
 
 
 % --- Executes on button press in pushbutton_gold.
@@ -1054,7 +1062,7 @@ else
     if strcmp(response, 'Yes')
         set(hObject, 'String', sprintf('Undoing %s ...', char(handles.klys)));
         %set(hObject, 'Enable', 'off');
-        
+
 %         % get current phase setup
 %         [pAct, pDes, aAct, aDes, kPhr, gold] = control_phaseGet(handles.klys);
 
@@ -1064,13 +1072,13 @@ else
         updes = control_phaseSet(handles.klys, undo.pdes, 0, 0, 'PDES');
         % put KPHR back and trim
         ukphr = control_phaseSet(handles.klys, undo.kphr, 0, 0, 'KPHR');
-        
+
 %         % calculate undo move
 %         delta = undo.kphr - kPhr;
-% 
+%
 %         % move by delta
 %         control_phaseSet(handles.klys, pDes + delta, 1, 60);
-% 
+%
 %         % re-gold now back at its old value
 %         [new_pact, new_pdes, new_gold] = control_phaseGold(handles.klys, undo.pdes);
 
@@ -1373,7 +1381,7 @@ opts.title = 'FACET Phase Scans';
 opts.author = 'MATLAB';
 opts.text = char(handles.data.name_pact);
 util_printLog(printFig,opts);
- 
+
 guidata(hObject, handles);
 
 
@@ -1654,7 +1662,7 @@ x_barv = [x x x-tee x+tee x-tee x+tee];
 y_barv = [y+dy y-dy y-dy y-dy y+dy y+dy];
 
 if ~exist('bar_color')
-  bar_color = 'k';  
+  bar_color = 'k';
 end
 if ~exist('mrk')
   plot(axes, x_barv(:,1:4)',y_barv(:,1:4)',['-' bar_color(1)]);
@@ -1668,7 +1676,7 @@ plot(axes, x_barv(:,5:6)',y_barv(:,5:6)',['-' bar_color(1)]);
 set(axes,'NextPlot',hold_state);
 
 
-%overriding the ver_line function that is in the matlab toolbox to pass the 
+%overriding the ver_line function that is in the matlab toolbox to pass the
 %axes handle
 function ver_line(axes,x,mrk)
 %VER_LINE       ver_line([x,mrk]);
