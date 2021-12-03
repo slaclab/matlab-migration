@@ -569,30 +569,6 @@ end
 % scan around offset point
 handles.data.pdes = handles.data.pdes - handles.data.poff;
 
-bpmdParam ='';
-nrposParam = '';
-bpmsParam ='';
-
-% set up buffered acquisition if flagged
-if handles.buffacq && ~handles.fakedata
-    aidainit;
-
-    bpmdParam=char(handles.bpmd);
-
-%
-%     switch char(handles.bpmd)
-%         case '57'
-%             handles.dgrp = 'NDRFACET';
-%         case '8
-%             handles.dgrp = 'ELECEP01';
-%         otherwise
-%             handles.dgrp = '';
-%     end
-
-    nrposParam=num2str(handles.nsamp);
-    bpmsParam=char(strcat('["', p, ':', m, ':', u, '"]'));
-end
-
 % clear out old scan data
 handles.data.bpmdata =[];
 handles.data.pact = [];
@@ -636,8 +612,8 @@ for ix = 1:numel(handles.data.pdes)
 
             try
                 handles.data.b_ok(ix) = 1;
-                if ( ~isempty(nrposParam) )
-                    buffdata = nttable2struct(pvarpc(nturi(strcat(handles.measdef, ':BUFFACQ'), 'BPMD', bpmdParam, 'NRPOS', nrposParam, 'BPMS', bpmsParam)));
+                if ~handles.fakedata
+                    buffdata = nttable2struct(pvarpc(nturi(strcat(handles.measdef, ':BUFFACQ'), 'BPMD', char(handles.bpmd), 'NRPOS', num2str(handles.nsamp), 'BPMS', char(strcat('["', p, ':', m, ':', u, '"]')))));
                 else
                     buffdata = nttable2struct(pvarpc(nturi(strcat(handles.measdef, ':BUFFACQ'))));
                 end
