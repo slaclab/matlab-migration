@@ -511,13 +511,11 @@ end
 guidata(hObject, handles);
 toc;
 
-
 function handles = scan(handles)
 
 %clear the New pdes, phas, gold and kphr values so there is no risk
 %reassigning them
 clear_new_phase(handles);
-
 
 % construct name string
 handles.data.name = handles.klys;
@@ -569,6 +567,8 @@ end
 % scan around offset point
 handles.data.pdes = handles.data.pdes - handles.data.poff;
 
+aidainit;
+
 % clear out old scan data
 handles.data.bpmdata =[];
 handles.data.pact = [];
@@ -611,9 +611,9 @@ for ix = 1:numel(handles.data.pdes)
             try
                 handles.data.b_ok(ix) = 1;
                 if ~handles.fakedata
-                    buffdata = ((AidaTable)(request(strcat(handles.measdef, ':BUFFACQ')).with('BPMD', handles.bpmd).with('NRPOS', handles.nsamp).with('BPMS', char(strcat('["', p, ':', m, ':', u, '"]'))).get())).getValues();
+                    buffdata = pvaChannel(strcat(handles.measdef, ':BUFFACQ')).with('BPMD', handles.bpmd).with('NRPOS', handles.nsamp).with('BPMS', char(strcat('["', p, ':', m, ':', u, '"]'))).get().getValues();
                 else
-                    buffdata = ((AidaTable)(request(strcat(handles.measdef, ':BUFFACQ')).get())).getValues();
+                    buffdata = pvaChannel(strcat(handles.measdef, ':BUFFACQ')).get().getValues();
                 end
             catch
                 handles.data.b_ok(ix) = 0;
@@ -1021,8 +1021,6 @@ function pushbutton_undo_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_undo (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-aidainit;
-dundo = DaObject();
 
 if any(isnan(handles.undo(handles.s, handles.k, :)))
     gui_statusDisp(handles, 'Error:  no undo data saved for %s', char(handles.klys));
