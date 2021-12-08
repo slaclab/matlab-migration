@@ -611,9 +611,9 @@ for ix = 1:numel(handles.data.pdes)
             try
                 handles.data.b_ok(ix) = 1;
                 if ~handles.fakedata
-                    buffdata = pvaChannel(strcat(handles.measdef, ':BUFFACQ')).with('BPMD', handles.bpmd).with('NRPOS', handles.nsamp).with('BPMS', char(strcat('["', p, ':', m, ':', u, '"]'))).get().getValues();
+                    buffdata = pvaRequest(strcat(handles.measdef, ':BUFFACQ')).with('BPMD', handles.bpmd).with('NRPOS', handles.nsamp).with('BPMS', char(strcat('["', p, ':', m, ':', u, '"]'))).get().getValues();
                 else
-                    buffdata = pvaChannel(strcat(handles.measdef, ':BUFFACQ')).get().getValues();
+                    buffdata = pvaRequest(strcat(handles.measdef, ':BUFFACQ')).get().getValues();
                 end
             catch
                 handles.data.b_ok(ix) = 0;
