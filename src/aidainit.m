@@ -38,7 +38,6 @@
 global aidainitdone
 if isempty(aidainitdone)
     global pvaRequest
-    global pvaGet
     global pvaSet
 
 %    setupjavapath(strcat(getenv('PHYSICS_TOP'),'/release/aida-pva-client/R1.0.0/lib/aida-pva-client.jar'))
