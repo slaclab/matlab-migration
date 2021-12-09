@@ -41,7 +41,8 @@ if isempty(aidainitdone)
     global pvaGet
     global pvaSet
 
-    setupjavapath(strcat(getenv('PHYSICS_TOP'),'/release/aida-pva-client/R1.0.0/lib/aida-pva-client.jar'))
+%    setupjavapath(strcat(getenv('PHYSICS_TOP'),'/release/aida-pva-client/R1.0.0/lib/aida-pva-client.jar'))
+    setupjavapath(strcat(getenv('PWD'),'/aida-pva-client.jar'))
 
     % aida-pva-client imports
     import('edu.stanford.slac.aida.client.AidaPvaClientUtils.*');
