@@ -12,7 +12,7 @@
 % ----------------------------------------------------------
 % Mod: 24-Jul-2016, Greg White
 %      Add support for user defined development directories and
-%      recurrsive addition of subdirectories. 
+%      recurrsive addition of subdirectories.
 %      26-Aug-2015, Greg White
 %      Added EPICS Version 4.
 %      22-Apr-2014, Henrik Loos
@@ -24,30 +24,30 @@
 %      java.opts file in the bin/glndx directory of matlab.
 %===========================================================
 
-% Set development directory tree, if any. 
-% Nominally, if being run on production network, startup.m adds the 
+% Set development directory tree, if any.
+% Nominally, if being run on production network, startup.m adds the
 % production matlab directories found at PRODMATLABPATH (set to
-% $MAT). 
+% $MAT).
 %   Regarding a matlab users own personal development directories.
 % By default, PHYSICS_USER/matlab/, if it exists, is added to the path.
 % If you want to add instead your own matlab dir, uncomment
-% the line assigning USERPATHROOT below, and set your own. If you add 
+% the line assigning USERPATHROOT below, and set your own. If you add
 % your own in this way, the default PHYSICS_USER/matlab/
-% will not be probed for existence nor added to the path. 
+% will not be probed for existence nor added to the path.
 %  Some examples, all commented out for production, are included below:
 %
 % Meme work
 %  USERPATHROOT='/home/physics/greg/Development/meme/lclscvs/matlab';
 % 2-bunch LiTrack work
 %  USERPATHROOT='/home/physics/greg/Development/litrack/lclscvs/matlab';
-% Wire-scan and emittance 
+% Wire-scan and emittance
 %  USERPATHROOT='/home/physics/greg/Development/emit/lclscvs/matlab';
 
 % DIREXCLUSIONPATTERN defines the regular expression used to
 % filter out which subdirectories are added to the path by this
-% function. Subdirectries of each are also added 
+% function. Subdirectries of each are also added
 % according to these rules:
-%  1. Folders whose names begin with "." (ie "hidden" folders) are NOT added 
+%  1. Folders whose names begin with "." (ie "hidden" folders) are NOT added
 %  2. CVS folders (named "CVS) are NOT added
 %  3. Directories named "dev" are NOT added (temporarily for Marc)
 % Class and package folders (beginning @ and + respectively) are not added
@@ -61,12 +61,12 @@ lcainitstat=0;
 
 %% Set the production environment.
 %
-% This section sets the environment for applications running on the 
+% This section sets the environment for applications running on the
 % production network.
 %
 if ~ispc  % Assume ~ispc is equivalent to establishing we're on prod.
 
-    % Add LCLS Production matlab scripts & functions to head of path.  
+    % Add LCLS Production matlab scripts & functions to head of path.
     %
     PRODMATLABPATHROOT=getenv('MAT');
     addpath(regexprep(genpath(fullfile(PRODMATLABPATHROOT,'LiTrack')),...
@@ -88,7 +88,7 @@ if ~ispc  % Assume ~ispc is equivalent to establishing we're on prod.
           end
       end
     end
- 
+
     % Echo environment to matlab output
     [ sys, accelerator ] = getSystem;
     [ whoami_status, whoami_results ] = unix('whoami');
@@ -96,15 +96,15 @@ if ~ispc  % Assume ~ispc is equivalent to establishing we're on prod.
     % (-1 removes trailing CR)
     disp( [ 'System=' sys ...
         ' Accelerator=' accelerator ...
-        ' Account=' whoami_results(1:length(whoami_results)-1) ... 
-        ' Host=' hostname_results(1:length(hostname_results)-1) ... 
+        ' Account=' whoami_results(1:length(whoami_results)-1) ...
+        ' Host=' hostname_results(1:length(hostname_results)-1) ...
         ] ) ;
     disp('**************************************************************');
     unix('printenv | sort');
     disp('**************************************************************');
 
-    % Work around bug in 2007b there bug in file chooser dialog box. 
-    % We work around it using a deprecated feature. 
+    % Work around bug in 2007b there bug in file chooser dialog box.
+    % We work around it using a deprecated feature.
     try
         if strcmp(version('-release'),'2007b')
             % Setup to use non-java dialogs. - Greg White
@@ -142,7 +142,7 @@ if ~ispc  % Assume ~ispc is equivalent to establishing we're on prod.
     catch ex
         fprintf('%s Failed to initialize labCa\n',datestr(now));
     end
-            
+
     % Count Matlab startups
     %
     if lcainitstat == 1  % lca successfully initialized, so can use it
@@ -185,11 +185,11 @@ if ~ispc  % Assume ~ispc is equivalent to establishing we're on prod.
         catch ex
             fprintf('Sorry, failed to update %s run counter.\n', me);
         end
-    end % successful lca init 
+    end % successful lca init
 end % ~ispc - that is, assume we're definitely on production.
 
 
-%% Set up environment used whether on production or not. 
+%% Set up environment used whether on production or not.
 %
 
 % If USERPATHROOT (users's development dir) is not explicitly
@@ -209,7 +209,7 @@ end
 % explicitly, or by probing to see if there exists the classic default one
 % in ~physics/<physics_user>/matlab/) then add it (recurrsively including
 % all its subdirectories), to the head of the path.
-% 
+%
 if exist('USERPATHROOT','var') && isdir(USERPATHROOT)
     addpath(regexprep(genpath(fullfile(USERPATHROOT,'LiTrack')),...
                       DIREXCLUSIONPATTERN,''));
@@ -220,6 +220,8 @@ if exist('USERPATHROOT','var') && isdir(USERPATHROOT)
     addpath(regexprep(genpath(fullfile(USERPATHROOT,'src')),...
                       DIREXCLUSIONPATTERN,''));
 end
+
+aidapvainit
 
 return;
 
