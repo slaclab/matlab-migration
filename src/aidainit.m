@@ -72,7 +72,6 @@ if isempty(aidainitdone)
     AIDA_TABLE = [edu.stanford.slac.aida.client.AidaType.TABLE];
 
     pvaRequest = @(channel) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaRequest(channel);
-    pvaGet = @(channel, type) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaGet(channel, type);
     pvaSet = @(channel, value) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaSet(channel, value);
 
     aidainitdone = 1;
