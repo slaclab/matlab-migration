@@ -45,16 +45,12 @@ import('org.epics.pvaccess.*')
 import('org.epics.pvaccess.easyPVA.*')
 import('org.epics.pvdata.*')
 
-% aida-pva-client imports
-import('static edu.stanford.slac.aida.client.AidaPvaClientUtils.*');
-import('static edu.stanford.slac.aida.client.AidaType.*');
-
 % Epics request exceptions
 import('org.epics.pvaccess.server.rpc.RPCRequestException');
 
 global aidainitdone
 if isempty(aidainitdone)
   aidainitdone = 1;
-  disp 'Aida client initialization completed';
+  disp 'Aida PVA initialization completed';
 end
 
