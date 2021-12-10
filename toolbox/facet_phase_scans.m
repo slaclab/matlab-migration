@@ -569,8 +569,6 @@ end
 % scan around offset point
 handles.data.pdes = handles.data.pdes - handles.data.poff;
 
-aidainit;
-
 % clear out old scan data
 handles.data.bpmdata =[];
 handles.data.pact = [];
