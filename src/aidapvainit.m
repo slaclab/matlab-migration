@@ -74,6 +74,6 @@ if isempty(aidainitdone)
     pvaSet = @(channel, value) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaSet(channel, value);
 
     aidainitdone = 1;
-    disp 'Aida client initialization completed';
+    disp 'Aida PVA client initialization completed';
 end
 
