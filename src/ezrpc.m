@@ -1,5 +1,7 @@
 function [ PVDATA ] = ezrpc( NTURI )
-    aidainit;
+    import('org.epics.pvaccess.*')
+    import('org.epics.pvaccess.easyPVA.*')
+    import('org.epics.pvdata.*')
 
     servererr='MEME:ematrpc:servererror';       % server side issued an error
     connecterr='MEME:ematrpc:connectionerror';  % pvAccess connection error

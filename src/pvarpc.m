@@ -1,5 +1,7 @@
 function [ PVDATA ] = pvarpc( NTURI )
-    aidainit;
+    import('org.epics.pvaccess.*')
+    import('org.epics.pvaClient.*')
+    import('org.epics.pvdata.*')
 
     PVDATA = NaN;
     nturi_pvs = NTURI;
