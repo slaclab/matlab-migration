@@ -50,6 +50,16 @@ if isempty(aidapvainitdone)
     % Epics request exceptions
     import('org.epics.pvaccess.server.rpc.RPCRequestException');
 
+    % PVAClient imports
+    import('org.epics.pvaccess.*')
+    import('org.epics.pvaClient.*')
+    import('org.epics.pvdata.*')
+
+    % EasyPVA imports
+    import('org.epics.pvaccess.*')
+    import('org.epics.pvaccess.easyPVA.*')
+    import('org.epics.pvdata.*')
+
     AIDA_BOOLEAN = [edu.stanford.slac.aida.client.AidaType.BOOLEAN];
     AIDA_BYTE = [edu.stanford.slac.aida.client.AidaType.BYTE];
     AIDA_CHAR = [edu.stanford.slac.aida.client.AidaType.CHAR];

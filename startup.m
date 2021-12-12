@@ -1,57 +1,3 @@
-% This script executes Matlab environment setup for SLAC 'LCLS'
-% control system accelerator systems, including accelerators
-% LCLS, FACET, NLCTA, XTA, and ASTA.
-%
-% This is a common startup file used by every Matlab Application.
-% Please be extra special careful what you add here as
-% you might break every Matlab Application currently in use.
-% This file is closely watched to make sure it's safe and sane.
-% Do NOT add user specific directories or user specific scripts
-% to this file. Use USERPATHROOT to add development directories.
-%
-% ----------------------------------------------------------
-% Mod: 24-Jul-2016, Greg White
-%      Add support for user defined development directories and
-%      recurrsive addition of subdirectories.
-%      26-Aug-2015, Greg White
-%      Added EPICS Version 4.
-%      22-Apr-2014, Henrik Loos
-%      Use old file dialogs only for version 2007b
-%      19-Jul-2011, Greg White
-%      Added specialization for FACET. Sets the AIDA network that
-%      will be joined by any subsequent DaObject creation,
-%      to AIDAPROD. The defaul is AIDALCLS, as specified in the
-%      java.opts file in the bin/glndx directory of matlab.
-%===========================================================
-
-% Set development directory tree, if any.
-% Nominally, if being run on production network, startup.m adds the
-% production matlab directories found at PRODMATLABPATH (set to
-% $MAT).
-%   Regarding a matlab users own personal development directories.
-% By default, PHYSICS_USER/matlab/, if it exists, is added to the path.
-% If you want to add instead your own matlab dir, uncomment
-% the line assigning USERPATHROOT below, and set your own. If you add
-% your own in this way, the default PHYSICS_USER/matlab/
-% will not be probed for existence nor added to the path.
-%  Some examples, all commented out for production, are included below:
-%
-% Meme work
-%  USERPATHROOT='/home/physics/greg/Development/meme/lclscvs/matlab';
-% 2-bunch LiTrack work
-%  USERPATHROOT='/home/physics/greg/Development/litrack/lclscvs/matlab';
-% Wire-scan and emittance
-%  USERPATHROOT='/home/physics/greg/Development/emit/lclscvs/matlab';
-
-% DIREXCLUSIONPATTERN defines the regular expression used to
-% filter out which subdirectories are added to the path by this
-% function. Subdirectries of each are also added
-% according to these rules:
-%  1. Folders whose names begin with "." (ie "hidden" folders) are NOT added
-%  2. CVS folders (named "CVS) are NOT added
-%  3. Directories named "dev" are NOT added (temporarily for Marc)
-% Class and package folders (beginning @ and + respectively) are not added
-% either since it appears addpath stops them.
 DIREXCLUSIONPATTERN=':?(\w|\/|\.)*((\.((\w)*))|(CVS)|(dev))';
 
 
@@ -99,8 +45,6 @@ if ~ispc  % Assume ~ispc is equivalent to establishing we're on prod.
         ' Account=' whoami_results(1:length(whoami_results)-1) ...
         ' Host=' hostname_results(1:length(hostname_results)-1) ...
         ] ) ;
-    disp('**************************************************************');
-    unix('printenv | sort');
     disp('**************************************************************');
 
     % Work around bug in 2007b there bug in file chooser dialog box.
@@ -192,13 +136,23 @@ end % ~ispc - that is, assume we're definitely on production.
 %% Set up environment used whether on production or not.
 %
 
+% first see if we are starting from a matlab directory.  If so use that as the USERPATHROOT
+% if it has not already been overridden
+if ~exist('USERPATHROOT','var')
+    toolboxpath=[getenv('PWD') '/toolbox'];
+    if isdir(toolboxpath)
+        USERPATHROOT=getenv('PWD');
+    end
+end
+
+
 % If USERPATHROOT (users's development dir) is not explicitly
 % defined above, see if PHYSICS_USER/matlab/ exists, and if it
 % does, set the USERPATHROOT to that dir.
 if ~exist('USERPATHROOT','var')
     physicsuser=getenv('PHYSICS_USER');
     if ~isempty(physicsuser)
-        defaultuserpathroot=['/home/physics/' physicsuser '/matlab'];
+        defaultuserpathroot=[getenv('HOME') physicsuser '/matlab'];
         if isdir(defaultuserpathroot)
             USERPATHROOT=defaultuserpathroot;
         end
@@ -222,6 +176,7 @@ if exist('USERPATHROOT','var') && isdir(USERPATHROOT)
 end
 
 aidapvainit
+aidainit
 
 return;
 
