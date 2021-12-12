@@ -35,8 +35,8 @@
 %
 %==============================================================
 
-global aidainitdone
-if isempty(aidainitdone)
+global aidapvainitdone
+if isempty(aidapvainitdone)
     global pvaRequest
     global pvaSet
 
@@ -72,8 +72,9 @@ if isempty(aidainitdone)
 
     pvaRequest = @(channel) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaRequest(channel);
     pvaSet = @(channel, value) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaSet(channel, value);
+    pvaUnpack = @(response) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaUnpack(response);
 
-    aidainitdone = 1;
+    aidapvainitdone = 1;
     disp 'Aida PVA client initialization completed';
 end
 
