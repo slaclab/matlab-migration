@@ -2,7 +2,7 @@ function stat=LEM_DbEnergy(opCode,Esecn)
 %
 % stat=LEM_DbEnergy(opCode,Esecn);
 %
-% Read/write LEM MAGNET energy values from/to EPICS PVs 
+% Read/write LEM MAGNET energy values from/to EPICS PVs
 %
 % INPUTs:
 %
@@ -32,17 +32,18 @@ for m=1:length(id)
   if (~MAGNET(n).epics)
     dbname=strcat(dbname(6:10),dbname(1:5),dbname(11:end)); % unmunge
   end
-  Query=strcat(dbname,':E',Esecn,'//VAL');
+  Query=strcat(dbname,':E',Esecn,':VAL');
   if (opCode==1)
     energy=MAGNET(n).energy;
     try
-      da.setDaValue(Query,DaValue(energy));
-    catch
+      pvaSet(Query,energy);
+    catch e
+      handleExceptions(e);
       error('*** Write %s',Query)
     end
   else
     try
-      energy=da.get(Query,4);
+      energy=pvaGet(Query, AIDA_DOUBLE);
       MAGNET(n).energy0=energy;
     catch
       error('*** Read %s',Query)

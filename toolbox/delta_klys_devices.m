@@ -63,7 +63,7 @@ end;
 %  string = strcat(upper(prim(j,:)),':',upper(micro(j,:)),':',...
 %                        int2str(unit(j)),':',upper(secn(j,:)));
 %  try
-%    oldval=da.get(string,5);
+%    oldval=pvaGet(string, AIDA_FLOAT);
 %  catch
 %    errordlg('Error caught on "da.get" in "delta_klys_devices.m"','da.get error!');
 %    iok = 0;

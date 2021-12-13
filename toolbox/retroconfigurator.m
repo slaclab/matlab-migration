@@ -94,7 +94,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = retroconfigurator_OutputFcn(hObject, eventdata, handles) 
+function varargout = retroconfigurator_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -193,7 +193,7 @@ after = java.sql.Timestamp(jnow.getTime() - (1000 * 60 * 60));  % this is one ho
 snapshots = [];
 
 while isempty(snapshots) && ((after.getYear() + 1900) > 2000)
-    % get a list of snapshots from the archiver for the last hour, 
+    % get a list of snapshots from the archiver for the last hour,
     % if none found, double the length of time and search again
     % bail out if you get all the way back to year 2000, something is wrong
     snapshots = handles.ScoreAPI.readSnapshots(after, before);
@@ -219,7 +219,7 @@ handles.numrows = size(ScoreData);
 handles.data = cell(0);
 
 for i=1:handles.numrows
-    
+
     try
         ScoreRow = get(ScoreData,i-1);
         handles.data{i}.region       = char(getRegion(ScoreRow));
@@ -237,11 +237,11 @@ end
 
 
 % % % strip from desnames the 'null' entries (i.e. no "DES" defined in score)
-% 
+%
 % nulls = strcmp(desnames, 'null');
-% 
+%
 % newdesnames = cell(sum(~nulls), 1);
-% 
+%
 % j = 1;
 % for i = 1:length(desnames)
 %     if ~nulls(i)
@@ -249,13 +249,13 @@ end
 %         j = j + 1;
 %     end
 % end
-% 
+%
 % % strip from actnames the 'null' entries (i.e. no "ACT" defined in score)
-% 
+%
 % nulls = strcmp(actnames, 'null');
-% 
+%
 % newactnames = cell(sum(~nulls), 1);
-% 
+%
 % j = 1;
 % for i = 1:length(actnames)
 %     if ~nulls(i)
@@ -263,12 +263,12 @@ end
 %         j = j + 1;
 %     end
 % end
-% 
+%
 % handles.actnames = newactnames;
 % handles.desnames = newdesnames;
-% 
+%
 % % allocate some space for the history data
-% 
+%
 % desdata = cell(1, length(handles.desnames));
 % actdata = cell(1, length(handles.actnames));
 
@@ -281,24 +281,24 @@ endtime = handles.timestamp + datenum(0, 0, 0, 0, 2, 30);
 a = datestr(handles.timestamp, 'mm/dd/yyyy HH:MM:SS');
 b = datestr(endtime, 'mm/dd/yyyy HH:MM:SS');
 timeRange = {a;b};
-[time, elecenergy] = aidaGetHistory('SIOC:SYS0:ML00:AO500//HIST.lcls', timeRange);
+[time, elecenergy] = aidaGetHistory('SIOC:SYS0:ML00:AO500:HIST.lcls', timeRange);
 a = elecenergy(1);
 handles.elecE = num2str(a, '%6.3f');
-[time, ipk2cur] = aidaGetHistory('SIOC:SYS0:ML00:AO195//HIST.lcls', timeRange);
+[time, ipk2cur] = aidaGetHistory('SIOC:SYS0:ML00:AO195:HIST.lcls', timeRange);
 b = ipk2cur(1);
 handles.ipk2 = num2str(b, 4);
-[time, pulseenergy] = aidaGetHistory('PHYS:SYS0:1:ELOSSENERGY//HIST.lcls', timeRange);
+[time, pulseenergy] = aidaGetHistory('PHYS:SYS0:1:ELOSSENERGY:HIST.lcls', timeRange);
 c = pulseenergy(1);
 handles.pulseE = num2str(c, '%6.2f');
-[time, photonenergy] = aidaGetHistory('SIOC:SYS0:ML00:AO627//HIST.lcls', timeRange);
+[time, photonenergy] = aidaGetHistory('SIOC:SYS0:ML00:AO627:HIST.lcls', timeRange);
 d = photonenergy(1);
 handles.photonE = num2str(d, '%6.0f');
-[time, chargei] = aidaGetHistory('SIOC:SYS0:ML00:AO470//HIST.lcls', timeRange);
+[time, chargei] = aidaGetHistory('SIOC:SYS0:ML00:AO470:HIST.lcls', timeRange);
 e = chargei(1);
 handles.charge = num2str(e, '%6.3f');
 
 % set up what's needed for ArchiveData() call
-url = 'http://lcls-archsrv/cgi-bin/ArchiveDataServer.cgi';
+url = 'http::lcls-archsrv/cgi-bin/ArchiveDataServer.cgi';
 addpath /home/physics/nate/dev/matarch/O.linux-x86/;
 
 i = 1;
@@ -314,10 +314,10 @@ disp('                PV name                     Value           Timestamp     
 disp('----------------------------------------  ----------  -------------------- ---------------');
 disp(handles.region)
 for i = 1:handles.numrows
-    
+
     % get the DES value
     name = handles.data{i}.setpointName;
-    
+
     % clear the "no data in archiver" flag
     nodata = 0;
 
@@ -325,14 +325,14 @@ for i = 1:handles.numrows
     newpixels(3) = ceil(barpixels(3) * (i/last));
     setpixelposition(handles.progressbar, newpixels);
     drawnow;
-    
+
     if ~strcmp(name, 'null')    %if this row has a DES value
 
         set(hObject, 'String', [num2str(i), '/', num2str(last), ': ', char(name)]);
         drawnow;
-        
+
         % actually get the data
-        
+
         tic();
         try
             data = ArchiveData(url, 'values', 1, name, starttime, endtime, 100, 0);
@@ -340,7 +340,7 @@ for i = 1:handles.numrows
             nodata = 1;
         end
         elapsed = toc();
-        
+
         if nodata
             % if the archivedata() call failed, it's not in the archiver
             % probably should check via meme_names for archived
@@ -388,23 +388,23 @@ for i = 1:handles.numrows
     else
         % do something about 'null' PVs here
     end
-    
+
     % now get the corresponding ACT value
-        
+
     name = handles.data{i}.readbackName;
-    
+
     % clear the "no data in archiver" flag
     nodata = 0;
 
     set(hObject, 'String', [num2str(i), '/', num2str(last), ': ', char(name)]);
-    
+
     if ~strcmp(name, 'null')    %if this row has an ACT value
 
         set(hObject, 'String', [num2str(i), '/', num2str(last), ': ', char(name)]);
         drawnow;
-        
+
         % actually get the data
-        
+
         tic();
         try
             data = ArchiveData(url, 'values', 1, name, starttime, endtime, 100, 0);
@@ -412,10 +412,10 @@ for i = 1:handles.numrows
             nodata = 1;
         end
         elapsed = toc();
-        
+
         if nodata
             % if the archivedata() call failed, it's not in the archiver
-            % probably should check via aidalist here for a //HIST.lcls thing
+            % probably should check via aidalist here for a :HIST.lcls thing
             % and then be smart about adding it to the "to be archived" list
             % for now, just use the live value instead
 
@@ -449,7 +449,7 @@ for i = 1:handles.numrows
     else
         % do something about 'null' PVs here
     end
-    
+
     i = i + 1;
 end
 
@@ -477,8 +477,8 @@ set(hObject, 'Enable', 'on');
 
 guidata(hObject, handles);
 
-                                      
-    
+
+
 
 
 % --- Executes on button press in pushbutton_save.
@@ -495,7 +495,7 @@ sqldate = java.sql.Timestamp(jdate.getTime());
 blah = struct('region', [], 'ts', [], 'comment', [], 'data', []);
 blah.region = handles.region;
 blah.ts = sqldate;
-blah.comment = [handles.elecE, ' GeV, ', handles.ipk2, ' A, ', handles.pulseE, ' mJ, ', handles.photonE, ' eV, ', handles.charge, ' nC']; 
+blah.comment = [handles.elecE, ' GeV, ', handles.ipk2, ' A, ', handles.pulseE, ' mJ, ', handles.photonE, ' eV, ', handles.charge, ' nC'];
 blah.data = handles.data;
 blah.configTitle = 'stuff';
 
@@ -555,7 +555,7 @@ after = java.sql.Timestamp(jnow.getTime() - (1000 * 60 * 60));  % this is one ho
 snapshots = [];
 
 while isempty(snapshots) && ((after.getYear() + 1900) > 2000)
-    % get a list of snapshots from the archiver for the last hour, 
+    % get a list of snapshots from the archiver for the last hour,
     % if none found, double the length of time and search again
     % bail out if you get all the way back to year 2000, something is wrong
     snapshots = handles.ScoreAPI.readSnapshots(after, before);
@@ -581,7 +581,7 @@ handles.numrows = size(ScoreData);
 handles.data = cell(0);
 
 for i=1:handles.numrows
-    
+
     try
         ScoreRow = get(ScoreData,i-1);
         handles.data{i}.region       = char(getRegion(ScoreRow));
@@ -599,11 +599,11 @@ end
 
 
 % % % strip from desnames the 'null' entries (i.e. no "DES" defined in score)
-% 
+%
 % nulls = strcmp(desnames, 'null');
-% 
+%
 % newdesnames = cell(sum(~nulls), 1);
-% 
+%
 % j = 1;
 % for i = 1:length(desnames)
 %     if ~nulls(i)
@@ -611,13 +611,13 @@ end
 %         j = j + 1;
 %     end
 % end
-% 
+%
 % % strip from actnames the 'null' entries (i.e. no "ACT" defined in score)
-% 
+%
 % nulls = strcmp(actnames, 'null');
-% 
+%
 % newactnames = cell(sum(~nulls), 1);
-% 
+%
 % j = 1;
 % for i = 1:length(actnames)
 %     if ~nulls(i)
@@ -625,12 +625,12 @@ end
 %         j = j + 1;
 %     end
 % end
-% 
+%
 % handles.actnames = newactnames;
 % handles.desnames = newdesnames;
-% 
+%
 % % allocate some space for the history data
-% 
+%
 % desdata = cell(1, length(handles.desnames));
 % actdata = cell(1, length(handles.actnames));
 
@@ -643,24 +643,24 @@ endtime = handles.timestamp + datenum(0, 0, 0, 0, 2, 30);
 a = datestr(handles.timestamp, 'mm/dd/yyyy HH:MM:SS');
 b = datestr(endtime, 'mm/dd/yyyy HH:MM:SS');
 timeRange = {a;b};
-[time, elecenergy] = aidaGetHistory('SIOC:SYS0:ML00:AO500//HIST.lcls', timeRange);
+[time, elecenergy] = aidaGetHistory('SIOC:SYS0:ML00:AO500:HIST.lcls', timeRange);
 a = elecenergy(1);
 handles.elecE = num2str(a, '%6.3f');
-[time, ipk2cur] = aidaGetHistory('SIOC:SYS0:ML00:AO195//HIST.lcls', timeRange);
+[time, ipk2cur] = aidaGetHistory('SIOC:SYS0:ML00:AO195:HIST.lcls', timeRange);
 b = ipk2cur(1);
 handles.ipk2 = num2str(b, 4);
-[time, pulseenergy] = aidaGetHistory('PHYS:SYS0:1:ELOSSENERGY//HIST.lcls', timeRange);
+[time, pulseenergy] = aidaGetHistory('PHYS:SYS0:1:ELOSSENERGY:HIST.lcls', timeRange);
 c = pulseenergy(1);
 handles.pulseE = num2str(c, '%6.2f');
-[time, photonenergy] = aidaGetHistory('SIOC:SYS0:ML00:AO627//HIST.lcls', timeRange);
+[time, photonenergy] = aidaGetHistory('SIOC:SYS0:ML00:AO627:HIST.lcls', timeRange);
 d = photonenergy(1);
 handles.photonE = num2str(d, '%6.0f');
-[time, chargei] = aidaGetHistory('SIOC:SYS0:ML00:AO470//HIST.lcls', timeRange);
+[time, chargei] = aidaGetHistory('SIOC:SYS0:ML00:AO470:HIST.lcls', timeRange);
 e = chargei(1);
 handles.charge = num2str(e, '%6.3f');
 
 % set up what's needed for ArchiveData() call
-url = 'http://lcls-archsrv/cgi-bin/ArchiveDataServer.cgi';
+url = 'http::lcls-archsrv/cgi-bin/ArchiveDataServer.cgi';
 addpath /home/physics/nate/dev/matarch/O.linux-x86/;
 
 i = 1;
@@ -676,10 +676,10 @@ disp('                PV name                     Value           Timestamp     
 disp('----------------------------------------  ----------  -------------------- ---------------');
 disp(handles.region)
 for i = 1:handles.numrows
-    
+
     % get the DES value
     name = handles.data{i}.setpointName;
-    
+
     % clear the "no data in archiver" flag
     nodata = 0;
 
@@ -687,14 +687,14 @@ for i = 1:handles.numrows
     newpixels(3) = ceil(barpixels(3) * (i/last));
     setpixelposition(handles.progressbar, newpixels);
     drawnow;
-    
+
     if ~strcmp(name, 'null')    %if this row has a DES value
 
         set(hObject, 'String', [num2str(i), '/', num2str(last), ': ', char(name)]);
         drawnow;
-        
+
         % actually get the data
-        
+
         tic();
         try
             data = ArchiveData(url, 'values', 1, name, starttime, endtime, 100, 0);
@@ -702,10 +702,10 @@ for i = 1:handles.numrows
             nodata = 1;
         end
         elapsed = toc();
-        
+
         if nodata
             % if the archivedata() call failed, it's not in the archiver
-            % probably should check via aidalist here for a //HIST.lcls thing
+            % probably should check via aidalist here for a :HIST.lcls thing
             % and then be smart about adding it to the "to be archived" list
             % for now, just use the live value instead
             not_archived = [not_archived; cellstr(name)];
@@ -749,23 +749,23 @@ for i = 1:handles.numrows
     else
         % do something about 'null' PVs here
     end
-    
+
     % now get the corresponding ACT value
-        
+
     name = handles.data{i}.readbackName;
-    
+
     % clear the "no data in archiver" flag
     nodata = 0;
 
     set(hObject, 'String', [num2str(i), '/', num2str(last), ': ', char(name)]);
-    
+
     if ~strcmp(name, 'null')    %if this row has an ACT value
 
         set(hObject, 'String', [num2str(i), '/', num2str(last), ': ', char(name)]);
         drawnow;
-        
+
         % actually get the data
-        
+
         tic();
         try
             data = ArchiveData(url, 'values', 1, name, starttime, endtime, 100, 0);
@@ -773,10 +773,10 @@ for i = 1:handles.numrows
             nodata = 1;
         end
         elapsed = toc();
-        
+
         if nodata
             % if the archivedata() call failed, it's not in the archiver
-            % probably should check via aidalist here for a //HIST.lcls thing
+            % probably should check via aidalist here for a :HIST.lcls thing
             % and then be smart about adding it to the "to be archived" list
             % for now, just use the live value instead
 
@@ -810,7 +810,7 @@ for i = 1:handles.numrows
     else
         % do something about 'null' PVs here
     end
-    
+
     i = i + 1;
 end
 
@@ -837,7 +837,7 @@ sqldate = java.sql.Timestamp(jdate.getTime());
 blah = struct('region', [], 'ts', [], 'comment', [], 'data', []);
 blah.region = handles.region;
 blah.ts = sqldate;
-blah.comment = [handles.elecE, ' GeV, ', handles.ipk2, ' A, ', handles.pulseE, ' mJ, ', handles.photonE, ' eV, ', handles.charge, ' nC']; 
+blah.comment = [handles.elecE, ' GeV, ', handles.ipk2, ' A, ', handles.pulseE, ' mJ, ', handles.photonE, ' eV, ', handles.charge, ' nC'];
 blah.data = handles.data;
 blah.configTitle = 'stuff';
 

@@ -1,8 +1,5 @@
 function stat=LEM_SetLTUBend()
 
-global da
-da.reset
-
 global controlFlags
 useBDES=controlFlags(1); % use BDES values ... otherwise use BACT
 if (useBDES)
@@ -31,9 +28,9 @@ PS(id).bad=((energy<PS(id).bmin)|(energy>PS(id).bmax));
 
 % get present main power supply setpoint
 
-Query=strcat(PS(id).dbname,':',secn,'//VAL');
+Query=strcat(PS(id).dbname,':',secn,':VAL');
 try
-  Bps=da.get(Query,4);
+  Bps=pvaGet(Query, AIDA_DOUBLE);
 catch
   error('*** %s',Query)
 end
@@ -52,9 +49,9 @@ for m=1:4
 
 % get present trim setpoint
 
-  Query=strcat(PS(idt).dbname,':',secn,'//VAL');
+  Query=strcat(PS(idt).dbname,':',secn,':VAL');
   try
-    Bt=da.get(Query,4);
+    Bt=pvaGet(Query, AIDA_DOUBLE);
   catch
     error('*** %s',Query)
   end

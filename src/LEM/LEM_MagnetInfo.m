@@ -239,31 +239,31 @@ global da
 da.reset
 
 if (epics)
-  Query=strcat(dbname,':BMIN//VAL');
+  Query=strcat(dbname,':BMIN:VAL');
   try
-    bmin=da.get(Query,4);
+    bmin=pvaGet(Query, AIDA_DOUBLE);
   catch
     error('*** %s',Query)
   end
-  Query=strcat(dbname,':BMAX//VAL');
+  Query=strcat(dbname,':BMAX:VAL');
   try
-    bmax=da.get(Query,4);
+    bmax=pvaGet(Query,AIDA_DOUBLE);
   catch
     error('*** %s',Query)
   end
 else
   munge=strcat(dbname(6:10),dbname(1:5),dbname(11:end));
-  Query=strcat(munge,'//IMMO');
+  Query=strcat(munge,':IMMO');
   try
-    d=da.getDaValue(Query);
+    d=pvaGet(Query);
   catch
     error('*** %s',Query)
   end
-  immo=d.getFloats;
+  immo=toArray(d);
   bipolar=(prod(immo)<0);
-  Query=strcat(munge,'//BMAX');
+  Query=strcat(munge,':BMAX');
   try
-    d=da.get(Query,4);
+    d=pvaGet(Query,AIDA_DOUBLE);
   catch
     error('*** %s',Query)
   end
@@ -280,9 +280,9 @@ else
 % the sign of BMAX and flip the limits
 
   if (strcmp(munge,'QUAD:LI21:201'))
-    Query=strcat(munge,'//HSTA');
+    Query=strcat(munge,':HSTA');
     try
-      hsta=da.get(Query,6);
+      hsta=pvaGet(Query,AIDA_LONG);
     catch
       error('*** %s',Query)
     end

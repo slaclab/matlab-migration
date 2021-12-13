@@ -39,26 +39,26 @@ for n=1:length(id)
 
 % get QTRM IVBU polynomial
 
-  Query=strcat(strrep(dbname(n,:),'QUAD','QTRM'),'//IVBU');
-  d=da.getDaValue(Query);
-  ivb=flipud(d.getFloats);
+  Query=strcat(strrep(dbname(n,:),'QUAD','QTRM'),':IVBU');
+  d=pvaGet(Query);
+  ivb=flipud(toArray(d));
 
 % compute QTRM current
 
-  Query=strcat(strrep(dbname(n,:),'QUAD','QTRM'),'//',secn);
-  bqtrm=da.get(Query,4);
+  Query=strcat(strrep(dbname(n,:),'QUAD','QTRM'),':',secn);
+  bqtrm=pvaGet(Query, AIDA_DOUBLE);
   iqtrm=polyval(ivb,bqtrm);
 
 % get QUAD IVBU polynomial
 
-  Query=strcat(dbname(n,:),'//IVBU');
-  d=da.getDaValue(Query);
-  ivb=flipud(d.getFloats);
+  Query=strcat(dbname(n,:),':IVBU');
+  d=pvaGet(Query);
+  ivb=flipud(toArray(d));
 
 % compute QUAD current
 
-  Query=strcat(dbname(n,:),'//',secn);
-  bquad=da.get(Query,4);
+  Query=strcat(dbname(n,:),':',secn);
+  bquad=pvaGet(Query,AIDA_DOUBLE);
   iquad=polyval(ivb,bquad);
 
 % invert IVBU polynomial to get total integrated gradient

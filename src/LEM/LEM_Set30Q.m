@@ -11,9 +11,6 @@ function stat=LEM_Set30Q()
 
 debug=0;
 
-global da
-da.reset
-
 global controlFlags
 useBDES=controlFlags(1); % use BDES values ... otherwise use BACT
 if (useBDES)
@@ -39,13 +36,13 @@ for n=1:length(idm)
 
 % get QUAD IVBU polynomial
 
-  Query=strcat(PS(idq).dbname,'//IVBU');
+  Query=strcat(PS(idq).dbname,':IVBU');
   try
-    d=da.getDaValue(Query);
+    d=pvaGet(Query);
   catch
     error('*** %s',Query)
   end
-  ivb=flipud(d.getFloats);
+  ivb=flipud(toArray(d));
 
 % use QUAD IVB to compute total desired current
 
@@ -76,9 +73,9 @@ for n=1:length(idm)
 
 % get present QUAD setpoint (for PS BDES Values)
 
-  Query=strcat(PS(idq).dbname,'//',secn);
+  Query=strcat(PS(idq).dbname,':',secn);
   try
-    Bqnow=da.get(Query,4);
+    Bqnow=pvaGet(Query, AIDA_DOUBLE);
   catch
     error('*** %s',Query)
   end
@@ -86,13 +83,13 @@ for n=1:length(idm)
 
 % get QTRM IVBU polynomial
 
-  Query=strcat(PS(idt).dbname,'//IVBU');
+  Query=strcat(PS(idt).dbname,':IVBU');
   try
-    d=da.getDaValue(Query);
+    d=pvaGet(Query);
   catch
     error('*** %s',Query)
   end
-  ivb=flipud(d.getFloats);
+  ivb=flipud(toArray(d));
 
 % invert QTRM IVBU polynomial to get QTRM BDES
 
@@ -120,9 +117,9 @@ for n=1:length(idm)
 
 % get present QTRM setpoint (for PS BDES Values)
 
-  Query=strcat(PS(idt).dbname,'//',secn);
+  Query=strcat(PS(idt).dbname,':',secn);
   try
-    Btnow=da.get(Query,4);
+    Btnow=pvaGet(Query, AIDA_DOUBLE);
   catch
     error('*** %s',Query)
   end

@@ -13,7 +13,7 @@ wireStr = { 'EMITN_X'     'BETA_X'     'ALPHA_X'       'BMAG_X'   'EMITN_Y'     
 
 N = length(wireStr);
 
-%wireList = {'WIRE:LI01:719//EPAR'; 'WIRE:LI02:119//EPAR' ; 'WIRE:LI11:344//EPAR'};
+%wireList = {'WIRE:LI01:719:EPAR'; 'WIRE:LI02:119:EPAR' ; 'WIRE:LI11:344:EPAR'};
 wireList = {'WIRE:LI01:719'; 'WIRE:LI02:119' ; 'WIRE:LI04:911'; 'WIRE:LI11:344'; 'WIRE:LI18:944'};
 wireDateTimeEpicsList = {'LI01:WIRE:719:EPTS'; 'LI02:WIRE:119:EPTS' ; 'LI04:WIRE:911:EPTS'; 'LI11:WIRE:344:EPTS'; 'LI18:WIRE:944:EPTS'};
 wireDateTimePVnums = {'201', '204',  '205', '208', '209', '212', '213', '216', '217', '220', '221', '224', '225', '228', '229', '232',  '233', '236', '237', '240'};
@@ -222,7 +222,7 @@ end
         singleWireVal = [];
         try
             for ii = 1:length(singleWireAidaList)
-                v = d.getDaValue(singleWireAidaList{ii});
+                v = pvaGet(singleWireAidaList{ii});
                 singleWireVal = [singleWireVal, v.get(7)];
             end
 
@@ -428,7 +428,7 @@ function [outEmitList, outLI02List, singleWireAidaList, singleWireEpicsList] = i
 
 M = 201; MM = M; %1st Matlab PV
 
-% Lable outEmitList for Matlab PV list for WIRE:LIxx:NNN//EPAR
+% Lable outEmitList for Matlab PV list for WIRE:LIxx:NNN:EPAR
 init = 0;
 if init <= 0,
         kk=0;
@@ -494,8 +494,8 @@ for kk = 1:2:2*length( singleLI02wires )
 end
 
 for kk = 1:2:2*length( singleLI02wires )
-    singleWireAidaList(kk) = {sprintf('WIRE:LI02:%s//WSEX', singleLI02wires{(kk+1)/2})};
-    singleWireAidaList(kk+1) = {sprintf('WIRE:LI02:%s//WSEY', singleLI02wires{(kk+1)/2})};
+    singleWireAidaList(kk) = {sprintf('WIRE:LI02:%s:WSEX', singleLI02wires{(kk+1)/2})};
+    singleWireAidaList(kk+1) = {sprintf('WIRE:LI02:%s:WSEY', singleLI02wires{(kk+1)/2})};
     singleWireEpicsList(kk) = {sprintf('LI02:WIRE:%s:XTIM', singleLI02wires{(kk+1)/2})};
     singleWireEpicsList(kk+1) = {sprintf('LI02:WIRE:%s:YTIM', singleLI02wires{(kk+1)/2})};
 end
@@ -749,7 +749,7 @@ end
 % FACET CUD
 %
 % Emittance values with Alarm limits and "ageing feature":
-% From - {'WIRE:LI01:719//EPAR'; 'WIRE:LI02:119//EPAR' ; 'WIRE:LI11:344//EPAR'};
+% From - {'WIRE:LI01:719:EPAR'; 'WIRE:LI02:119:EPAR' ; 'WIRE:LI11:344:EPAR'};
 %
 % - LI01 EMITN X/Y    BMAG X/Y
 % - LI02 EMITN X/Y    BMAG X/Y

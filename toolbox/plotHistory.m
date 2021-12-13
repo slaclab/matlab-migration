@@ -1,20 +1,20 @@
 function plotHistory( pv, timeRange, flags)
 %function plotHistory( pv, timeRange, flags);
 % Inputs:
-%  
+%
 %     pv - The name of an AIDA acquireable history variable. These
 %                typically end in //HIST, or sometimes //HIST.lcls if from
 %                EPICS. See aidalist unix script.  User is prompted for PV
 %                if not specified.
-%  
-%     timeRange -  Cell array containing startTime and endTime. 
+%
+%     timeRange -  Cell array containing startTime and endTime.
 %                  Time in format 'mm/dd/yyyy hh:mm:ss'.  Defaults to last
 %                  2 hours if not specified.
-%  
-%     flags - Vector of option flags.  Optional (defaults to no aditional option). 
+%
+%     flags - Vector of option flags.  Optional (defaults to no aditional option).
 %     flags(1) = Interpolation Step:
-%                value in seconds used to generate evenly spaced time vector and 
-%                interpolated data instead of raw archiver data. 
+%                value in seconds used to generate evenly spaced time vector and
+%                interpolated data instead of raw archiver data.
 %     flags(2) = Median Filter on/off.
 %     flags(3) = Multi-plot.
 %
@@ -27,14 +27,14 @@ function plotHistory( pv, timeRange, flags)
 % W. Colocho, June 2008.
 
 %prompt for pv if not given
-if nargin < 1,  
+if nargin < 1,
   pv = inputdlg({'Enter PV:'},'PV?', 1);
-  if(isempty(pv)),fprintf('Error: no pv given\n'); return, end 
+  if(isempty(pv)),fprintf('Error: no pv given\n'); return, end
   pv = upper(char(pv));
 end
 %prompt for timeRange if not given
 if nargin < 2, timeRangeString = '2 Hours'; timeRange = {''};
-  else timeRangeString = 'UseTimeRange'; 
+  else timeRangeString = 'UseTimeRange';
 end
 if nargin <3, flags = [0 0 0]; end
 %find out machine name
@@ -47,11 +47,11 @@ dcm_obj = datacursormode(uData.figH);
 set(dcm_obj, 'UpdateFcn',@dataCursorShowTime)
 if ( strcmp('usr', strtok(which('plotHistory'),'/') ) )
    %set(uData.figH, 'DeleteFcn', 'stopTimerOnClose');%exit matlab when figure is closed if on production.
-   %set(uData.figH,'CloseRequestFcn','exit'); 
+   %set(uData.figH,'CloseRequestFcn','exit');
 else
     set(uData.figH, 'DeleteFcn', 'stopTimerOnClose'); %For development stop timer if window is closed.
 end
-uData.source = 'appliance'; 
+uData.source = 'appliance';
 uData.timeRange = timeRange;
 uData.pv = pv;
 uData.interpStep = flags(1);
@@ -67,7 +67,7 @@ makeToolbar(uData);
 %Setup Menus
 timeStr = {'2 Hours', '4 Hours', '8 Hours', '12 Hours', '24 Hours', '48 hours',  ...
            'Three Days', 'Four Days', 'Week', 'Two Weeks' , 'Three Weeks', ...
-           'Four Weeks', 'Eight Weeks'};            
+           'Four Weeks', 'Eight Weeks'};
 menuH1 = uimenu('Label', 'Time Range', 'Tag', 'plotLastMenu');
 for i = 1:length(timeStr)
   uimenu(menuH1,'Label',timeStr{i} ,'Callback',{@plotIt,timeStr{i}});
@@ -168,17 +168,17 @@ function plotIt(src,evt,optStr) %
 plotAgain = 1;
 uData = get(gcf,'UserData');
 if ~isfield(uData,'newLinePlot'), uData.newLinePlot = 1; else uData.newLinePlot = 0; end
-if strcmp (optStr, 'printLcls'), 
+if strcmp (optStr, 'printLcls'),
     switch uData.accelerator
         case 'LCLS', util_printLog(uData.figH);
         case 'FACET', print(gcf,'-dpsc2','-Pfacetlog');
     end
-    return, 
+    return,
 end
 
-if strcmp(optStr, 'printOpsLog'), 
-    print(gcf, '-dpsc2', '-Pelog_mcc'),  
-    return, 
+if strcmp(optStr, 'printOpsLog'),
+    print(gcf, '-dpsc2', '-Pelog_mcc'),
+    return,
 end
 medFiltStr = '';
 
@@ -195,7 +195,7 @@ if strcmp (optStr, 'multiPlot'),
     name1 = pvStr(1:4);
     len = length(pvStr);
     name2 = pvStr(len-3:len);
-    
+
     prompt={'aidalist search input'};
     name='Get PV List';
     numlines=1;
@@ -205,7 +205,7 @@ if strcmp (optStr, 'multiPlot'),
     options.Interpreter='none';
     answer=inputdlg(prompt,name,numlines,defaultList,options);
     pvList = aidalist(char(answer));
-    
+
     str = pvList;
     [s,v] = listdlg('PromptString','Select a file:',...
                 'SelectionMode','multiple',...
@@ -227,7 +227,7 @@ if strcmp (optStr, 'corrcoef'),
     options.Interpreter='none';
     answer=inputdlg(prompt,name,numlines,defaultAxis,options);
     if isempty(answer), return, end
-    
+
     flag = [1 0];
     plotForms(answer, range, uData, flag);
     return,
@@ -244,7 +244,7 @@ if strcmp (optStr, 'polyfit'),
     options.Interpreter='none';
     answer=inputdlg(prompt,name,numlines,defaultAxis,options);
     if isempty(answer), return, end
-    
+
     flag = [0 1];
     plotForms(answer, range, uData, flag);
     return,
@@ -256,7 +256,7 @@ if strcmp (optStr, 'math'),
         'Formula: (ie. A+B)', 'A = Device 1:', 'B = Device 2:', 'C = Device 3:', 'D = Device 4:'};
     name='Formula';
     numlines=1;
-    
+
     form = '';
     defaultanswer = { timeRange{1}, timeRange{2}, form, uData.pv, uData.pv, '', '' };
     options.Resize='on';
@@ -264,7 +264,7 @@ if strcmp (optStr, 'math'),
     options.Interpreter='none';
     answer=inputdlg(prompt,name,numlines,defaultanswer,options);
     if isempty(answer), return, end
-    
+
     math(answer, uData);
     return,
 end
@@ -319,7 +319,7 @@ lineH = findobj(uData.figH,'Type','line', 'Tag', 'LinePlot');
 if stripToolStart
     lineUsDat = get(lineH(1),'UserData');
     tim = lineUsDat{2};
-    if isempty(tim), 
+    if isempty(tim),
         tim = timer('TimerFcn',{@timerStripTool, lineH}, 'Period', 2.0, 'ExecutionMode',   'fixedRate');
         lineUsDat = {lineUsDat{1}, tim};
         set(lineH(1), 'UserData',lineUsDat);
@@ -327,12 +327,12 @@ if stripToolStart
     start(tim)
     return
 end
-if stripToolStop, 
+if stripToolStop,
     lineUsDat = get(lineH(1),'UserData');
     tim = lineUsDat{2};
     if ~isempty(tim), stop(tim) ; end
 end
-    
+
 %timerStripTool(uData, lineH);
 
 
@@ -350,17 +350,17 @@ end
 if(getNewData)
   title('Getting data...'), drawnow
 %   switch uData.accelerator
-%       case 'LCLS', aidaStr = 'HIST.lcls';  
-%       case 'FACET', aidaStr = 'HIST.facet'; 
+%       case 'LCLS', aidaStr = 'HIST.lcls';
+%       case 'FACET', aidaStr = 'HIST.facet';
 %       otherwise, aidaStr = 'none';
 %   end  W. Colocho no longer needed since we use archList instead of
 %   aidalist
-  
-  
+
+
   archivedPv = [uData.pv ];
-  try 
+  try
       if ~isempty(range)
-          try 
+          try
               switch uData.source
                   case 'appliance', [uData.time, uData.value] = history(uData.pv, range{2});
                   case 'engine', [uData.time, uData.value] = aidaGetHistory(archivedPv, range{2},{'current'}, uData.interpStep);
@@ -386,25 +386,25 @@ if(getNewData)
                   case 'engine',[uData.time, uData.value] = aidaGetHistory(archivedPv, timeRange,{'current'}, uData.interpStep);
               end
           catch
-              title(sprintf('Failed to get data: %s',uData.pv)) , drawnow, 
+              title(sprintf('Failed to get data: %s',uData.pv)) , drawnow,
               addPVtoRequestToArchive(uData);
               return
           end
       end
   catch  %Add to "To Be Archived" list
         % isArchived = length(archList(uData.pv));
-      try              
+      try
           addPVtoRequestToArchive(uData);
           return
       catch
           fprintf('%s Failed to write to /u1/%s/tools/ArchiveBrowser/toBeArchivedList/', datestr(now),lower(uData.accelerator));
       end
   end %if Archived
-  
+
 end %if getNewData
 %%
 
-if(uData.medFilt), 
+if(uData.medFilt),
     uData.medFilt = uData.medFilt+10;
     uData.value = medfilt1(uData.value, uData.medFilt);
     uData.medFiltStr = ' (Median Filtered)';
@@ -426,13 +426,13 @@ set(uData.figH,'UserData',uData);
 %Plot
 if (length(uData.value) < 10), markStr = 'o-'; else markStr = '-'; end
 if plotAgain
-    if uData.newLinePlot, 
+    if uData.newLinePlot,
         lineH = plot(uData.time, uData.value,markStr);
-        lineUsDat =  {uData.pv, []}; set(lineH,'UserData', lineUsDat, 'Tag', 'LinePlot'); 
+        lineUsDat =  {uData.pv, []}; set(lineH,'UserData', lineUsDat, 'Tag', 'LinePlot');
     else
         set(lineH,'XData',uData.time,'YData',uData.value)
     end
-    
+
 end
 
 set(uData.figH,'Color',[.6 .7 .7])
@@ -440,13 +440,13 @@ zoomHandle = zoom;  set(zoomHandle,'ActionPostCallback','plotHistoryMakeLabels')
 plotHistoryMakeLabels;
 
 if(strmatch('limitsScale',optStr))
-    
+
     pvLim = [regexprep(uData.pv,{'CON','DES'},'ACT'), '.'];
     limitsPVs = {[pvLim,'HIHI']; %Alarm Upper Limit
                  [pvLim,'LOLO']; %Alarm Lower Limit
                  [pvLim,'HIGH']; %Warn Upper Limit
                  [pvLim,'LOW']};%Warn Lower Limit
-    limits = lcaGet(limitsPVs)'; 
+    limits = lcaGet(limitsPVs)';
     lh = line([ uData.time(1); uData.time(end) ] * [1 1 1 1], [limits; limits] );
     set(lh(1:2),'Color','r');
     set(lh(3:4),'Color','y');
@@ -504,25 +504,25 @@ xaxisPv = char(answer(1));
 yaxisPv = char(answer(2));
 
 switch uData.accelerator
-    case 'LCLS', aidaStr = 'HIST.lcls';  
-    case 'FACET', aidaStr = 'HIST.facet'; 
+    case 'LCLS', aidaStr = 'HIST.lcls';
+    case 'FACET', aidaStr = 'HIST.facet';
     otherwise, aidaStr = 'none';
 end
 
-archivedXPv = [xaxisPv,'//',aidaStr ];
-archivedYPv = [yaxisPv,'//',aidaStr ];
+archivedXPv = [xaxisPv,':',aidaStr ];
+archivedYPv = [yaxisPv,':',aidaStr ];
 isXArchived = length(aidalist(xaxisPv,aidaStr));
 isYArchived = length(aidalist(yaxisPv,aidaStr));
 if isXArchived && isYArchived
     if ~isempty(range)
-        try 
+        try
             switch uData.source
                   case 'appliance', [xTime, xValue] = history(uData.pv, range{2}, 'Operator', 'firstSample', 'Bin', 1);
                   case 'engine',[xTime, xValue] = aidaGetHistory(archivedXPv, range{2},{'current'}, interpStep);
             end
         catch title(sprintf('Failed to get data: %s', xaxisPv)) , drawnow, return
         end
-        try 
+        try
            switch uData.source
                   case 'appliance',  [yTime, yValue] = history(uData.pv, range{2},'Operator', 'firstSample', 'Bin', interpStep);
                   case 'engine', [yTime, yValue] = aidaGetHistory(archivedYPv, range{2},{'current'}, interpStep);
@@ -530,7 +530,7 @@ if isXArchived && isYArchived
         catch title(sprintf('Failed to get data: %s', yaxisPv)) , drawnow, return
         end
         for ll = 3:length(range)
-            try 
+            try
                 switch uData.source
                   case 'appliance', [timeTmpX, valueTmpX] = history(uData.pv, range{ll},'Operator', 'firstSample', 'Bin', interpStep);
                   case 'engine',[timeTmpX, valueTmpX] = aidaGetHistory(archivedXPv, range{ll},{'current'}, interpStep);
@@ -539,7 +539,7 @@ if isXArchived && isYArchived
             end
             xTime = vertcat(timeTmpX, xTime);
             xValue = vertcat(valueTmpX, xValue);
-            try 
+            try
                switch uData.source
                   case 'appliance', [timeTmpY, valueTmpY] = history(uData.pv, range{ll},'Operator', 'firstSample', 'Bin', interpStep);
                   case 'engine', [timeTmpY, valueTmpY] = aidaGetHistory(archivedYPv, range{ll},{'current'}, interpStep);
@@ -550,14 +550,14 @@ if isXArchived && isYArchived
             yValue = vertcat(valueTmpY, yValue);
         end
     else
-        try 
+        try
            switch uData.source
                   case 'appliance',  [xTime, xValue] = history(uData.pv, timeRange,'Operator', 'firstSample', 'Bin', interpStep);
                   case 'engine', [xTime, xValue] = aidaGetHistory(archivedXPv, timeRange,{'current'}, interpStep);
            end
         catch title(sprintf('Failed to get data: %s', xaxisPv)) , drawnow, return
         end
-        try 
+        try
            switch uData.source
                   case 'appliance', [yTime, yValue]= history(uData.pv, timeRange,'Operator', 'firstSample', 'Bin', interpStep);
                   case 'engine', [yTime, yValue] = aidaGetHistory(archivedYPv, timeRange,{'current'}, interpStep);
@@ -574,7 +574,7 @@ else
     end
 end
 
-% remove NaN values 
+% remove NaN values
 yValue(isnan(xValue)) = [];  %remove x NaNs from y and then x
 xValue(isnan(xValue)) = [];
 
@@ -629,7 +629,7 @@ elseif flag(2)
     xStr = { xaxisPv, xaxisUnits, '', sprintf('Degree: %0.5g', degree), ...
                 sprintf('Coefficients: '), sprintf('%0.4d  ', form), ...
                 sprintf('Coefficients for: '), formStr };
-            
+
     Y = polyval(form, x);
     plot(x,y,markStr,x,Y,':');
     title({titleStr{1}, titleStr{2}}, 'interpreter', 'none');
@@ -663,15 +663,15 @@ for ii = 1:numPvs
 end
 
 switch uData.accelerator
-    case 'LCLS', aidaStr = 'HIST.lcls';  
-    case 'FACET', aidaStr = 'HIST.facet'; 
+    case 'LCLS', aidaStr = 'HIST.lcls';
+    case 'FACET', aidaStr = 'HIST.facet';
     otherwise, aidaStr = 'none';
 end
 
 archivedPvs = cell(1,numPvs);
 isArchived = cell(1,numPvs);
 for ii = 1:numel(pvNames)
-    archivedPvs{ii} = [pvNames{ii}, '//', aidaStr ];
+    archivedPvs{ii} = [pvNames{ii}, ':', aidaStr ];
     isArchived{ii} = length( aidalist(pvNames{ii},aidaStr) );
 end
 time = cell(1,numPvs);
@@ -679,7 +679,7 @@ value = cell(1,numPvs);
 for ii = 1:numel(isArchived)
     if isArchived{ii}
         if ~isempty(range)
-            try 
+            try
                 switch uData.source
                   case 'appliance', [time{ii}, value{ii}] = history(uData.pv, range{2},'Operator', 'firstSample', 'Bin', interpStep);
                   case 'engine',[time{ii}, value{ii}] = aidaGetHistory(archivedPvs{ii}, range{2},{'current'}, interpStep);
@@ -687,7 +687,7 @@ for ii = 1:numel(isArchived)
             catch title(sprintf('Failed to get data: %s', pvNames{ii})) , drawnow, return
             end
             for ll = 3:length(range)
-                try 
+                try
                   switch uData.source
                   case 'appliance',  [timeTmp, valueTmp] = history(uData.pv, range{ll},'Operator', 'firstSample', 'Bin', interpStep);
                   case 'engine',  [timeTmp, valueTmp] = aidaGetHistory(archivedPvs{ii}, range{ll},{'current'}, interpStep);
@@ -729,20 +729,20 @@ if isArchived{4}, d = value{4}; d(badI) = []; end
 newValues = eval(lower(formula));
 
 % Plot
-if (length(uData.value) < 10), markStr = 'o-'; else markStr = '-'; end 
-plot(time, newValues, markStr); 
+if (length(uData.value) < 10), markStr = 'o-'; else markStr = '-'; end
+plot(time, newValues, markStr);
 set(figH,'Color',[.6 .7 .7])
 datetick('keeplimits');
- 
+
 titleStr = { formula };
 title( titleStr, 'interpreter', 'none');
- 
+
 for ii = 1:numel(pvNames)
     if isArchived{ii}
         yaxisUnits = char(lcaGetUnits(pvNames{ii}));
         break
     end
-end 
+end
 yStr = { yaxisUnits };
 ylabel(yStr);
 
@@ -767,18 +767,18 @@ switch timeString
     theEnd = now  ;
     theStartV = theEnd - [ 2/24, 4/24, 8/24, 12/24, 1, 2, 3, 4, 7, 14, 21, 28, 56];
     timeRangeIndx = strmatch(timeString, uData.timeStr, 'exact');
-    if (~isempty(timeRangeIndx)), 
-        theStart = theStartV(timeRangeIndx); 
+    if (~isempty(timeRangeIndx)),
+        theStart = theStartV(timeRangeIndx);
         timeRange = {[datestr(theStart,23),' ',datestr(theStart,13)], ...
                       [datestr(theEnd,23), ' ',datestr(theEnd,13)]};
         range = getRange(timeRange,uData.source);
     end
-    
+
   case {'UseTimeRange', 'medianFilter', 'limitsScale', 'ignoreFlyer', 'multiPlot', 'stripTool', ...
           'corrcoef', 'polyfit', 'math', 'rmsFilter'}
     timeRange = uData.timeRange;
     range = getRange(timeRange, uData.source);
-    
+
   case {'stepLeft','stepRight','stepLDay','stepRDay'}
     timeRangeDN = datenum(uData.timeRange);
     switch timeString
@@ -791,12 +791,12 @@ switch timeString
     timeRange = {[datestr(theStart,23),' ',datestr(theStart,13)], ...
                   [datestr(theEnd,23), ' ',datestr(theEnd,13)]};
     range = getRange(timeRange, uData.source);
-    
+
   case 'userRange'
     timeRange =  inputdlg({'Start Time','End Time'},'Enter Time Range', ...
                  1, uData.timeRange);
     if(isempty(timeRange)), fprintf('Time Range not specified; ending...\n'); end
-    range = getRange(timeRange, uData.source);  
+    range = getRange(timeRange, uData.source);
 end
 
 end
@@ -814,7 +814,7 @@ function range = getRange(timeRange, source)
         lastStart = theStart; %hold the original start position
         theStart = theEnd - chunk; % minus 1 day from theEnd
         ii = 2;
-        
+
         while theStart > lastStart
             % get the time range of 1 day span / store in array
             range{ii} = {[datestr(theStart,23),' ',datestr(theStart,13)], ...
@@ -825,7 +825,7 @@ function range = getRange(timeRange, source)
             ii = ii+1;
         end
         range{ii} = {[datestr(lastStart,23),' ',datestr(lastStart,13)], ...
-                      [datestr(theEnd,23), ' ',datestr(theEnd,13)]};     
+                      [datestr(theEnd,23), ' ',datestr(theEnd,13)]};
     else
         range = [];
     end
@@ -856,15 +856,15 @@ for ii = 1:len
 
     if uData.getNewData
     switch uData.accelerator
-        case 'LCLS', aidaStr = 'HIST.lcls';  
-        case 'FACET', aidaStr = 'HIST.facet'; 
+        case 'LCLS', aidaStr = 'HIST.lcls';
+        case 'FACET', aidaStr = 'HIST.facet';
         otherwise, aidaStr = 'none';
     end
-    archivedPv = [pvName,'//',aidaStr ];
+    archivedPv = [pvName,':',aidaStr ];
     isArchived = length(aidalist(pvName,aidaStr));
-    if isArchived     
+    if isArchived
         if ~isempty(range)
-            try 
+            try
                switch uData.source
                   case 'appliance',  [uData.time, uData.value]  = history(uData.pv, range{2},'Operator', 'firstSample', 'Bin', uData.interpStep);
                   case 'engine', [uData.time, uData.value] = aidaGetHistory(archivedPv, range{2},{'current'}, uData.interpStep);
@@ -872,7 +872,7 @@ for ii = 1:len
             catch title(sprintf('Failed to get data: %s',uData.pv)) , drawnow, return
             end
             for ll = 3:length(range)
-                try 
+                try
                    switch uData.source
                   case 'appliance', [timeTmp, valueTmp] = history(uData.pv, range{ll},'Operator', 'firstSample', 'Bin', uData.interpStep);
                   case 'engine', [timeTmp, valueTmp] = aidaGetHistory(archivedPv, range{ll},{'current'}, uData.interpStep);
@@ -883,14 +883,14 @@ for ii = 1:len
                 uData.value = vertcat(valueTmp, uData.value);
             end
         else
-            try 
+            try
                switch uData.source
                   case 'appliance', [uData.time, uData.value]   = history(uData.pv, timeRange,'Operator', 'firstSample', 'Bin', uData.interpStep);
                   case 'engine', [uData.time, uData.value] = aidaGetHistory(archivedPv, timeRange,{'current'}, uData.interpStep);
                end
             catch title(sprintf('Failed to get data: %s',uData.pv)) , drawnow, delete(bar); return
             end
-        end     
+        end
     else  %Add to "To Be Archived" list
         try
             unix(['echo ' [datestr(now), '  ', archivedPv] ' >> /u1/' lower(uData.accelerator) '/tools/ArchiveBrowser/toBeArchivedList']);
@@ -905,7 +905,7 @@ for ii = 1:len
         end
     end %if Archived
     end
-  
+
     try % if uData.value is cell
         if uData.ignoreFlyer
             removeIndx = [find(( uData.value{ii} > mean(uData.value{ii}) + 3 * std(uData.value{ii}))), ...
@@ -920,7 +920,7 @@ for ii = 1:len
         % median filter
         if(uData.medFilt), uData.value{ii} = medfilt1(uData.value{ii},5);uData.medFiltStr = ' (Median Filtered)';
         else uData.medFiltStr = ''; end
-        
+
         time{ii} = uData.time{ii};
         value{ii} = uData.value{ii};
     catch %if uData.value is double
@@ -962,18 +962,18 @@ for jj = 1:len
         catch epicsDesc = {' '}; end
         try epicsUnits = char(lcaGetUnits(pvList(jj)));
         catch epicsUnits = ' '; end
-        ylabel([epicsDesc,  epicsUnits])      
+        ylabel([epicsDesc,  epicsUnits])
         set(figH,'Color',[.6 .7 .7])
-        
+
         clear pvTitle;
         hold off;
-        
+
         plotHistory(pvList(jj:end),timeRange, [0 0 1]);
         uData.pv = pvList(1:jj-1);
         skip = 1;
         break;
     end
-    
+
     if (length(value{jj}) < 10), markStr = 'o-'; else markStr = '-'; end
     num = mod(jj,max);
     if num==0, num=max; end
@@ -981,11 +981,11 @@ for jj = 1:len
     lineH = findobj(uData.figH,'Type','line', 'Tag','LinePlot');
     if (isempty(lineH) || (length(uData.pv) > length(lineH) ))
         lineH = plot(time{jj}, value{jj}, lineType);
-        lineUsDat =  {uData.pv(jj), []};  
+        lineUsDat =  {uData.pv(jj), []};
         set(lineH,'UserData', lineUsDat, 'Tag', 'LinePlot');
     else
         for lineHndls = 1:length(lineH)
-            thisUsDat = get(lineH(lineHndls), 'UserData'); 
+            thisUsDat = get(lineH(lineHndls), 'UserData');
             if strcmp(thisUsDat{1}{1}, uData.pv{jj}), theLineH = lineH(lineHndls); break; end
         end
         %fprintf('\n%s \n%s \n', uData.pv{jj}, thisUsDat{1}{1})
@@ -995,8 +995,8 @@ for jj = 1:len
         datetick
         %
     end
-    
-    
+
+
     pvTitle{tt} = char(pvList(jj));
     tt = tt+1;
     if tt>max, tt=1; end
@@ -1027,7 +1027,7 @@ if ~skip
     try epicsUnits = char(lcaGetUnits(pvList(jj)));
     catch epicsUnits = ' '; end
     ylabel([epicsDesc,  epicsUnits])
-    % 
+    %
     hold off
     set(figH,'Color',[.6 .7 .7])
 end
@@ -1036,18 +1036,18 @@ end
 if uData.limScale == 1
     if ~ischar(uData.pv(1))
        for kk = 1:length(uData.pv)
-          pvStr{kk} = char(uData.pv(kk)); 
+          pvStr{kk} = char(uData.pv(kk));
        end
     else
         pvStr{1} = uData.pv;
     end
-    for kk = 1:length(pvStr)   
+    for kk = 1:length(pvStr)
         pvLim = [regexprep(char(pvStr(kk)),{'CON','DES'},'ACT'), '.'];
         limitsPVs = {[pvLim,'HIHI']; %Alarm Upper Limit
                      [pvLim,'LOLO']; %Alarm Lower Limit
                      [pvLim,'HIGH']; %Warn Upper Limit
                      [pvLim,'LOW']};%Warn Lower Limit
-        limits = lcaGet(limitsPVs)'; 
+        limits = lcaGet(limitsPVs)';
         try
             lh = line([ uData.time(1); uData.time(end) ] * [1 1 1 1], [limits; limits] );
         catch

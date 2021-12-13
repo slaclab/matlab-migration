@@ -35,7 +35,7 @@ klys2_pv = 'ACCL:LI24:200:KLY_PDES';
 % da.setParam('DGRP', 'LIN_KLYS');
 %
 %
-% pmdl_phase_raw = da.get('SBST:LI24:1//PMDL',4);
+% pmdl_phase_raw = pvaGet('SBST:LI24:1:PMDL', AIDA_DOUBLE);
 phasecorrection = 0;
 pmdl_phase_raw = lcaGet('LI24:SBST:1:PMDL');
 lcaPut(pmdl_pv, pmdl_phase_raw);
@@ -103,7 +103,7 @@ while 1
     if m > 30
         m = 1;
         try
-            % pmdl_phase_raw = da.get('SBST:LI24:1//PMDL',4);
+            % pmdl_phase_raw = pvaGet('SBST:LI24:1:PMDL', AIDA_DOUBLE);
             pmdl_phase_raw = lcaGet('LI24:SBST:1:PMDL');
             disp(' ');
     disp('bc2_energy_feedback.m');
@@ -134,7 +134,7 @@ while 1
     pmdl_offset = tmp(4);
     pmdl_gain = tmp(5);
     bad = 0;
-    
+
     if bpmnew == bpmlast
         disp('Old bpm data');
         bad = 1;

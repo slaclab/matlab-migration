@@ -2,9 +2,9 @@ function boolOut = isStatusBits(varargin)
 % Return True(1) if mask bit(s) are set in Status Bits otherwise False (0).
 %    User must create the hex word to represent the mask.
 % FUNCTION boolOut = isStatusBits('prim','micro',unit,'sec','mask')
-%    or    boolOut = isStatusBits('prim:micro:unit//sec','mask')
+%    or    boolOut = isStatusBits('prim:micro:unit:sec','mask')
 % EXAMPLE  boolOut = isStatusBits('lgps','dr12',11,'hsta','0100')
-%    or    boolOut = isStatusBits('lgps:dr12:11//hsta','0100')
+%    or    boolOut = isStatusBits('lgps:dr12:11:hsta','0100')
 % Author: Cyterski
 err = Err.getInstance('isStatusBits');    % Error Handling
 
@@ -13,7 +13,7 @@ if nargin == 2                            % Handle different input arguments
     mask = varargin{2};
 elseif nargin == 5
     inString = strcat(upper(varargin{1}),':',upper(varargin{2}),...
-        ':',int2str(varargin{3}),'//',upper(varargin{4}));
+        ':',int2str(varargin{3}),':',upper(varargin{4}));
     mask = varargin{5};
 else
     disp('Incorrect argument list - see "help isStatusBits"');

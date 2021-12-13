@@ -49,7 +49,7 @@ for j=1:length(invalue),
 end
 
 disp('Attempting to set VDES');
-requestBuilder = pvaRequest('MAGNETSET//VDES');
+requestBuilder = pvaRequest('MAGNETSET:VDES');
 indata = AidaPvaStruct();
 indata.put('names', deviceArray);
 indata.put('values', valueArray);

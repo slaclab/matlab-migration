@@ -7,9 +7,6 @@ function stat=LEM_PowerSupplyInfo()
 %    50Q1-3 now under EPICS control (50Q2 is master, others are slaves)
 % ------------------------------------------------------------------------------
 
-global da
-da.reset
-
 global MAGNET PS
 
 N=0;
@@ -47,9 +44,9 @@ for n=1:length(id)
   dbname=strrep(dbname,'QUAD','QTRM');
   PS(N).dbname=dbname;
   PS(N).epics=0;
-  Query=strcat(dbname,'//BMAX');
+  Query=strcat(dbname,':BMAX');
   try
-    d=da.get(Query,4);
+    d=pvaGet(Query,AIDA_DOUBLE);
   catch
     error('*** %s',Query)
   end
@@ -85,15 +82,15 @@ for n=1:length(id)
     dbname=strrep(dbname,'BEND','BTRM');
     PS(N).dbname=dbname;
     PS(N).epics=1;
-    Query=strcat(dbname,':BMIN//VAL');
+    Query=strcat(dbname,':BMIN:VAL');
     try
-      PS(N).bmin=da.get(Query,4);
+      PS(N).bmin=pvaGet(Query,AIDA_DOUBLE);
     catch
       error('*** %s',Query)
     end
-    Query=strcat(dbname,':BMAX//VAL');
+    Query=strcat(dbname,':BMAX:VAL');
     try
-      PS(N).bmax=da.get(Query,4);
+      PS(N).bmax=pvaGet(Query,AIDA_DOUBLE);
     catch
       error('*** %s',Query)
     end

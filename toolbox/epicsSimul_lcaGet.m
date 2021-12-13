@@ -10,9 +10,9 @@ if epicsUseAida
     val=cell(size(pvList));ts=zeros(size(pvList));
     for j=1:length(pvList)
         if ~any(strcmp(pvList{j},'.'))
-            str=[pvList{j} '//VAL'];
+            str=[pvList{j} ':VAL'];
         else
-            str=strrep(pvList{j},'.','//');
+            str=strrep(pvList{j},'.',':');
         end
         try
             val(j,:)=toArray(pvaGet(str,AIDA_DOUBLE_ARRAY));

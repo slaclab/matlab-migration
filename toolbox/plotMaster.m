@@ -675,7 +675,7 @@ for I = 1:length(handles.varNames)%handles.varCount
                     return
                 end
             case 'Archive'
-                [t v] = aidaGetHistory( [handles.varNames(I).name{:} '//HIST.' handles.accelerator], ...
+                [t v] = aidaGetHistory( [handles.varNames(I).name{:} ':HIST.' handles.accelerator], ...
                     {datestr(handles.timeRange(1),  'mm/dd/yyyy HH:MM:SS'), datestr(handles.timeRange(2), 'mm/dd/yyyy HH:MM:SS')});
                 handles.varNames(I).requestStr = handles.varNames(I).name;
             case 'isFormula',  %Fill all other values, so do nothing here.

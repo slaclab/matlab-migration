@@ -5,28 +5,28 @@ function [name, val] = plotz(prim, secn, region, varargin)
 % primaries PRIM in regions REGION, e.g. {'L2' 'L3'} and obtains value of
 % secondary SECN ans then creates stem plot. Both PRIM and SECN can be
 % multiple items, different SECNs are plotted with different colors.
-% 
+%
 % Features:
-% 
+%
 % Input arguments:
 %    PRIM:   Char or cellstr (array) of primary names, e.g. 'QUAD'
 %    SECN:   Char or cellstr (array) of secondary tags, e.g. 'BDES'
-%    REGION: Optional parameter for accelerator areas, default 'FULL', 
+%    REGION: Optional parameter for accelerator areas, default 'FULL',
 %    e.g. 'L2','L3','FULL'
 %    OPTS:   Options
 %            DELAY: Default 0, plot once, if > 0, plot in loop with this delay
 %            HISTORY: Default 10, saves data from the past number of
 %            iterations, e.g. 'delay',1,'history',10
 %            saves data from the last 10 seconds
-% 
+%
 % Output arguments:
 %    NAME: List of names found
 %    VAL:  List of values plotted
-% 
+%
 % Example function calls:
 % plotz('BPMS','X1H', 'L3')
-% plotz('VPIO','P','FULL','delay',1,'history',100) 
-% 
+% plotz('VPIO','P','FULL','delay',1,'history',100)
+%
 % Compatibility: Version 7 and higher
 % Called functions: util_parseOptions, model_nameRegion, model_rMatGet, lca*
 
@@ -107,7 +107,7 @@ for i = 1:length(uData.optList)
 %         uimenu(menu,'Label', optListLabel{i}, 'Callback', { @plotIt , uData.optList{i} }, 'Enable', 'off');
     else
         uimenu(menu,'Label', optListLabel{i}, 'Callback', { @plotIt , uData.optList{i} });
-    end    
+    end
 end
 
 size = length(val);
@@ -130,12 +130,12 @@ uData.valArray = val;
 uData.pv = pv;
 uData.stop = 0;
 uData.figH = gcf;
-% 
+%
 uData.pv = pv;
 uData.tStr = tStr;
 uData.max = max;
 uData.size = size;
-% 
+%
 set(uData.figH,'UserData',uData);
 
 end
@@ -181,7 +181,7 @@ timeArray = uData.timeArray;
 
 while uData.delay
     % Correctly closes plot window while updating
-    try 
+    try
         fig = get(uData.figH);
         sfigure(uData.figH);
         uData = get(gcf,'UserData');
@@ -207,7 +207,7 @@ while uData.delay
         end
         ylabel(strcat(uData.secn,'  (',uData.egu,')'));
         title([uData.tStr datestr(lca2matlabTime(ts(1)))]);
-      
+
         % Recent history update
         new = uData.new+1;
         if new > uData.max, new=1; end
@@ -218,12 +218,12 @@ while uData.delay
         uData.new = new;
         uData.figH = gcf;
         set(uData.figH,'UserData',uData);
-        
+
         pause(uData.delay);
         drawnow;
     else
         break;
-    end  
+    end
 end
 
 return
@@ -234,15 +234,15 @@ function plotIt(src,evt,optStr) %
 uData = get(gcf,'UserData');
 
 % Print Log
-if strcmp(optStr, 'printLcls'), 
+if strcmp(optStr, 'printLcls'),
     util_printLog(uData.figH);
-    return, 
+    return,
 end
 
 % Print Ops Log
-if strcmp(optStr, 'printOpsLog'), 
-    print(gcf, '-dpsc2', '-Pelog_mcc'),  
-    return, 
+if strcmp(optStr, 'printOpsLog'),
+    print(gcf, '-dpsc2', '-Pelog_mcc'),
+    return,
 end
 
 % Set Y-axis linear scale
@@ -332,7 +332,7 @@ end
 
 % Difference to Point in Time
 if strcmp(optStr, 'difference'),
-    fprintf('Difference\n'); 
+    fprintf('Difference\n');
     difference();
     return,
 end
@@ -340,14 +340,14 @@ end
 % Single PV History
 if strcmp(optStr, 'single'),
     fprintf('Single PV History\n');
-    singleHistory(); 
+    singleHistory();
     return,
 end
 
 % Math Plot Function
 if strcmp(optStr, 'math'),
     fprintf('Math Function\n');
-    math(); 
+    math();
     return,
 end
 
@@ -376,7 +376,7 @@ function plotScale(type)
 return
 end
 
-% 
+%
 function recentHist()
     uData = get(gcf,'UserData');
     z = uData.z;
@@ -420,7 +420,7 @@ end
 
 % Difference to a Point in Time Function
 function difference() %
-    uData = get(gcf,'UserData');    
+    uData = get(gcf,'UserData');
     prompt={'Time: (mm/dd/yyyy hh:mm:ss)',...
         'Reference Time: (mm/dd/yyyy hh:mm:ss)'};
     name='Start Time Values - Reference Time Values';
@@ -477,11 +477,11 @@ function difference() %
             [time1, value1] = history(aidaName, timeRange1);
             [time2, value2] = history(aidaName, timeRange2);
         catch
-            errordlg('Failed to retrieve history','Error'); 
+            errordlg('Failed to retrieve history','Error');
             delete(b);
             return
         end
-        
+
         if(isempty(time1) || isempty(time2)) %value output in plot is 0
             continue
         end
@@ -491,7 +491,7 @@ function difference() %
         else
             len = length(time1);
             startTime = time1(len);
-            startVal = value1(len); 
+            startVal = value1(len);
         end
         histArray(ii,1) = startTime;
         histArray(ii,2) = startVal;
@@ -501,11 +501,11 @@ function difference() %
         else
             len = length(time2);
             endTime = time2(len);
-            endVal = value2(len); 
+            endVal = value2(len);
         end
         histArray(ii,3) = endTime;
         histArray(ii,4) = endVal;
-        
+
         diff(ii,1) = (startVal - endVal);
         waitbar(ii/numel(uData.pv));
     end
@@ -527,7 +527,7 @@ end
 
 % Get Single PV History Function
 function singleHistory() %
-    uData = get(gcf,'UserData');    
+    uData = get(gcf,'UserData');
     prompt={'Name of an AIDA acquireable history variable:',...
         'Start Time: (mm/dd/yyyy hh:mm:ss)',...
         'End Time: (mm/dd/yyyy hh:mm:ss)'};
@@ -548,7 +548,7 @@ function singleHistory() %
     %aidaName = strcat(answer(1),'//HIST.lcls');
     aidaName = strcat(answer(1)); % 3/2014 (colocho) change from aida to appliance call.
     timeRange = {answer(2);answer(3)};
-    
+
     b = msgbox('Retrieving History...'); % display message box until history is retrieved
     try
         [time, value] = history(aidaName, timeRange);
@@ -558,7 +558,7 @@ function singleHistory() %
         return
     end
     delete(b);
-    
+
     range = [char(timeRange{1}) ' to ' char(timeRange{2})];
     h = figure('Name',[char(aidaName) ' : ' range],'NumberTitle','off');
     set(0,'CurrentFigure',h);
@@ -569,13 +569,13 @@ function singleHistory() %
     % title
     tStr=['Z-Plot: ' char(answer(1))];
     title(tStr);
-    changeCursor('time',time);   
+    changeCursor('time',time);
     return,
 end
 
 % Customize data cursor
 % cursorType e.g: 'main','pv','time'
-function changeCursor(cursorType,cursorInfo)  
+function changeCursor(cursorType,cursorInfo)
     uData.stop = 1;
     uData.cursorType = cursorType;
     uData.cursorInfo = cursorInfo;
@@ -601,7 +601,7 @@ end
 
 % Math plot functions
 function math() %
-    uData = get(gcf,'UserData');    
+    uData = get(gcf,'UserData');
     prompt={'Time: ''mm/dd/yyyy hh:mm:ss'' or ''now''',...
         'PRIM:', 'A = SECN 1:', 'B = SECN 2:', 'Formula: (ie. A+B)'};
     name='Formula';
@@ -621,15 +621,15 @@ function math() %
     options.WindowStyle='normal';
     options.Interpreter='none';
     answer=inputdlg(prompt,name,numlines,defaultanswer,options);
-    
+
     % PV Names
     [pv1,name1,egu1] = getNames(answer(2),answer(3));
     pv2 = getNames(answer(2),answer(4));
     if length(pv1) ~= length(pv2)
-       errordlg('Matrix dimensions are not the same'); 
+       errordlg('Matrix dimensions are not the same');
        return
     end
-    
+
     % Time
     now = 0;
     if strcmpi('now',answer(1))
@@ -650,7 +650,7 @@ function math() %
             swap1 = 0;
         end
     end
-    
+
     % Create wait bar
     bar = waitbar(0,'Retrieving History...',...
         'CreateCancelBtn',...
@@ -663,10 +663,10 @@ function math() %
         if getappdata(bar,'canceling')
             break
         end
-        
+
         if now==0,
-            aidaName1 = strcat(pv1(ii),'//HIST.lcls');
-            aidaName2 = strcat(pv2(ii),'//HIST.lcls');
+            aidaName1 = strcat(pv1(ii),':HIST.lcls');
+            aidaName2 = strcat(pv2(ii),':HIST.lcls');
             try
                 [time1, value1] = history(aidaName1, timeRange1);
                 [time2, value2] = history(aidaName2, timeRange1);
@@ -686,7 +686,7 @@ function math() %
                 startVal1 = value1(len);
                 len = length(time2);
                 startVal2 = value2(len);
-            end  
+            end
             a = startVal1;
             b = startVal2;
             newVal(ii,1) = eval(lower(answer{5}));

@@ -14,7 +14,7 @@ nXs = length(bpm_XPVs);
 
 R1s = zeros(nXs,2);
 
-requestBuilder = pvaRequest([ dev0 '//R']);
+requestBuilder = pvaRequest([ dev0 ':R']);
 requestBuilder.returning(AIDA_DOUBLE_ARRAY);
 for j = 2:nXs	% get all Rmats from dev0 to 2nd & 3rd x-BPMs
   requestBuilder.with('B',bpm_XPVs{j,1});

@@ -109,15 +109,16 @@ handles.pv_list = {
                     'LASR:IN20:1:LSR_P_FB_PND'   0
                     'LASR:IN20:1:LSR_P_FB_PND'   0
                     'LASR:IN20:1:LSR_SEND'       0
+                    'LASR:IN20:1:LSR_SEND'       0
                     'LASR:IN20:1:LSR_S_PS'       0
                                             };
 handles.klys_pv_list = {
-                    'KLYS:LI20:51//TACT' 'TC0'
-                    'KLYS:LI20:61//TACT' 'GN1'
-                    'KLYS:LI20:71//TACT' 'L0A'
-                    'KLYS:LI20:81//TACT' 'L0B'
-                    'KLYS:LI21:11//TACT' 'L1S'
-                    'KLYS:LI21:21//TACT' 'L1X'
+                    'KLYS:LI20:51:TACT' 'TC0'
+                    'KLYS:LI20:61:TACT' 'GN1'
+                    'KLYS:LI20:71:TACT' 'L0A'
+                    'KLYS:LI20:81:TACT' 'L0B'
+                    'KLYS:LI21:11:TACT' 'L1S'
+                    'KLYS:LI21:21:TACT' 'L1X'
                                             };      % TCAV must be first in list
 handles.Nsystems = round(length(handles.pv_list(:,1))/8);
 handles.SysNames = '   ';
@@ -463,5 +464,5 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-system('firefox https://confluence.slac.stanford.edu/display/LCLSHELP/RF+Status+GUI')
+system('firefox https::confluence.slac.stanford.edu/display/LCLSHELP/RF+Status+GUI')
 

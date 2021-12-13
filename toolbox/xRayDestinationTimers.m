@@ -1,7 +1,7 @@
 function xRayDestinationTimers
 %function xRayDestinationTimers
 % Plots history of X Ray destination counters.
-% 
+%
 
 shiftOption = listdlg('PromptString', 'Shift?','SelectionMode','single', ...
     'ListString',{'NOW', 'DAY', 'SWING', 'OWL'});
@@ -22,13 +22,13 @@ presentShift =  now - fix(now);
 if presentShift < 8/24, thisShift = 'OWL'; end
 if presentShift > 8/24 && presentShift < 16/24, thisShift = 'DAY';   end
 if presentShift > 16/24, thisShift = 'SWING'; end
-    
+
 dayOffset = -1;
-    
+
 switch shiftOption
     case 'DAY', shiftOffset = 16/24; if strcmp(thisShift,'SWING'), dayOffset = 0; end
-    case 'SWING', shiftOffset = 24/24; 
-    case 'OWL', shiftOffset = 8/24; if sum(strcmp(thisShift, {'DAY','SWING'})), dayOffset = 0; end 
+    case 'SWING', shiftOffset = 24/24;
+    case 'OWL', shiftOffset = 8/24; if sum(strcmp(thisShift, {'DAY','SWING'})), dayOffset = 0; end
 end
 
 if strcmp(shiftOption, 'NOW')
@@ -39,9 +39,9 @@ end
 
 theStart = theEnd - 8/24;
 timeRange = {[datestr(theStart,23),' ',datestr(theStart,13)], [datestr(theEnd,23), ' ',datestr(theEnd,13)]};
-legStr = {destinationTimerPV.description};                  
-  for ii = 1:length(destinationTimerPV)        
-      [time destinationTimerPV(ii).value] = aidaGetHistory([destinationTimerPV(ii).name, '//HIST.lcls'], timeRange, {'current'}, 1);
+legStr = {destinationTimerPV.description};
+  for ii = 1:length(destinationTimerPV)
+      [time destinationTimerPV(ii).value] = aidaGetHistory([destinationTimerPV(ii).name, ':HIST.lcls'], timeRange, {'current'}, 1);
       maxVal = max( destinationTimerPV(ii).value );
       legStr(ii) = {sprintf('%s %.1f', legStr{ii}, maxVal)};
   end
@@ -54,5 +54,5 @@ legStr = {destinationTimerPV.description};
   legend(legStr, 'Location', 'Best')
   title('X-Ray Destination Timers')
   set(gcf,'CloseRequestFcn','exit');
-  
+
 end

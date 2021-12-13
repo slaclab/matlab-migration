@@ -79,34 +79,25 @@ if 0
         aida_command = 'LCLS_FEL//BPMS'; % Gun to Undulator
         put2log(sprintf('About to attempt Aida data collection of %s %s', ...
             bpmd, aida_command));
-        import edu.stanford.slac.aida.lib.da.DaObject;
-        d = DaObject;
-        d.setParam(bpmd);
-        vBPMS = d.getDaValue(aida_command);
-        names = Vector(vBPMS.get(0));
-        xvals = Vector(vBPMS.get(1));
-        yvals = Vector(vBPMS.get(2));
-        zvals = Vector(vBPMS.get(3));
-        tmits = Vector(vBPMS.get(4));
-        hstas = Vector(vBPMS.get(5));
-        stats = Vector(vBPMS.get(6));
-        nBPMS = names.size();
-        for i = 1:nBPMS
-            name(i) = {names.elementAt(i-1)};
-            hsta(i) = hstas.elementAt(i-1);
-            stat(i) = stats.elementAt(i-1);
-            x(i) = xvals.elementAt(i-1);
-            y(i) = yvals.elementAt(i-1);
-            z(i) = zvals.elementAt(i-1);
-            tmit(i) = tmits.elementAt(i-1);
-            testname = sprintf('%s:',char(name(i)));
-        end
+        d = pvaRequest(aida_command);
+        d.with(BPMD, 56);
+        vBPMS = d.get();
+
+        nBPMS = vBPMS.size;
+        name = toArray(vBPMS.get('name'));
+        hsta = toArray(vBPMS.get('hsta'));
+        stat = toArray(vBPMS.get('stat'));
+        x = toArray(vBPMS.get('x'));
+        y = toArray(vBPMS.get('y'));
+        z = toArray(vBPMS.get('z'));
+        tmit = toArray(vBPMS.get('tmits'));
         put2log('Aida ok');
         % plot
         subplot(3,1,1), plot(z,x), title ([aida_command ' ' bpmd]), ylabel('x (mm)');
         subplot(3,1,2), plot(z,y), ylabel('y (mm)');
         subplot(3,1,3), plot(z,tmit), ylabel('tmit'), xlabel('z (m)');
-    catch
+    catch e
+        handleExceptions(e);
         put2log(sprintf('Aida was unable to read %s %s', bpmd, aida_command));
     end
 end
