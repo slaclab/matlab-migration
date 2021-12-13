@@ -316,8 +316,12 @@ try
     end
 
     try
-        klys_active = aidaget(gBunchLength.tcav.aida,'string',{'BEAM=1'});
-    catch
+        requestBuilder = pvaRequest(gBunchLength.tcav.aida);
+        requestBuilder.with('BEAM',1);
+        requestBuilder.returning(AIDA_STRING);
+        klys_active = requestBuilder.get();
+    catch e
+        handleExceptions(e)
         klys_active = 'Aida failure';
     end
 
@@ -606,7 +610,7 @@ try
                         set (gBunchLengthGUI.handles.mImageAnalysis, 'Enable', 'off')
                     else
                         set (gBunchLengthGUI.handles.mImageAnalysis, 'Enable', 'on');
-                    end   
+                    end
                 else
                     set (gBunchLengthGUI.handles.mImageAnalysis, 'Enable', 'on');
                 end

@@ -1,7 +1,7 @@
 function dspr = fbGet_MeasDspr(meas)
 %	dspr = fbGet_MeasDspr(config.meas);
 %
-%	get the MAD energy parameter of the device 
+%	get the MAD energy parameter of the device
 %
 %	INPUTS:	meas:		the structure that contains all actuator info
 %
@@ -24,11 +24,11 @@ for i=1:numPVs
       if (~isempty(strfind(devices{i,1},'801'))) % get value from PV
          dspr(i) = lcaGet('BMLN:LI24:805:LVPOS')*(-1);
       else
-          
-         %tws = aidaget([devices{i,1}, '//twiss'], 'doublea'); % get value from aida Model
+
+         %tws = aidaget([devices{i,1}, ':twiss'], 'doublea'); % get value from aida Model
          twiss = model_rMatGet(devices{i,1},[], {'TYPE=DESIGN',['BEAMPATH=' beamPath]}, 'twiss');
          tws = twiss(5);
-         if isnan(tws), tws = 0; end 
+         if isnan(tws), tws = 0; end
          dspr(i) = tws*1000;
 
       end

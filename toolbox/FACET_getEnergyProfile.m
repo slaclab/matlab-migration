@@ -72,7 +72,7 @@ for m=1:Nmicr
       end
       if (getNow)
         query=strcat(SLCname(kname{m,n}),':ENLD');
-        bval=aidaget(query);
+        bval=pvaGet(query);
       end
       kenld(m,n)=bval(end);
     end
@@ -101,7 +101,7 @@ for n=2:19
     else
       query=sprintf('SBST:%s:1:PDES',micr);
     end
-    bval=aidaget(query);
+    bval=pvaGet(query);
   end
   psbst(n-1)=bval(end);
 end
@@ -114,7 +114,7 @@ if (kstat(8,1)) % start with LI02
   if (getHist)
     [tval,bval]=getHistory('LI09:PHAS:12:VDES',timerange); % feedback
   else
-    bval=aidaget('PHAS:LI09:12:VACT'); % LEM uses VACT
+    bval=pvaGet('PHAS:LI09:12:VACT'); % LEM uses VACT
   end
   pklys(8,1)=bval(end);
 end
@@ -122,7 +122,7 @@ if (kstat(8,2)) % start with LI02
   if (getHist)
     [tval,bval]=getHistory('LI09:PHAS:22:VDES',timerange); % feedback
   else
-    bval=aidaget('PHAS:LI09:22:VACT'); % LEM uses VACT
+    bval=pvaGet('PHAS:LI09:22:VACT'); % LEM uses VACT
   end
   pklys(8,2)=bval(end);
 end

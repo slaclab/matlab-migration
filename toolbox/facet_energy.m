@@ -286,8 +286,8 @@ function [phase, gain, total] = get_scavengy()
     k17 = strcat({'17-'}, {'1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'});
     k18 = strcat({'18-'}, {'1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'});
 
-    p17 = aidaget('AMPL:EP01:171//VDES');
-    p18 = aidaget('AMPL:EP01:181//VDES');
+    p17 = pvaGet('AMPL:EP01:171:VDES');
+    p18 = pvaGet('AMPL:EP01:181:VDES');
 
     phas = control_phaseGet([k17; k18]);
     fphas = [(phas(1:8) + p17); (phas(9:16) + p18)];

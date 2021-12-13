@@ -46,11 +46,15 @@ for sector = 20:30
         if (sector == 20) && (station == 1)
             continue;
         end
-        klysname = ['KLYS:LI', num2str(sector),':', num2str(station),'1//TACT'];
+        klysname = ['KLYS:LI', num2str(sector),':', num2str(station),'1:TACT'];
         try
-            out.klystrons.act(sector,station) = aidaget(klysname, 'short', {'BEAM=1' 'DGRP=LIN_KLYS'});
-        catch
-            disp('aidaget error');
+            requestBuilder = pvaRequest(klysname);
+            requestBuilder.returning(AIDA_SHORT);
+            requestBuilder.with('BEAM',1);
+            requestBuilder.with('DGRP','LIN_KLYS');
+            out.klystrons.act(sector,station) = requestBuilder.get();
+        catch e
+            handleExceptions(e)
         end
         hsta = dat(P.map.hsta(sector, station));
         stat = dat(P.map.stat(sector, station));

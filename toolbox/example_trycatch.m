@@ -15,19 +15,21 @@ Logger = getLogger('example try catch block');
 SCP_variable='DOES:NOT:EXIST';
 put2log(sprintf('Attempting aidaget for %s',SCP_variable));
 try
-    value = aidaget(SCP_variable,'double');
+    value = pvaGet(SCP_variable,AIDA_DOUBLE);
     put2log(sprintf('%s found, value=%d',SCP_variable,value));
-catch
+catch e
+    handleExceptions(e)
     put2log(sprintf('Sorry %s not found!',SCP_variable));
 end
 %
 % Example aidaget success:
 %
-SCP_variable='BPMS:IA20:221//Z';
+SCP_variable='BPMS:IA20:221:Z';
 put2log(sprintf('Attempting aidaget for %s',SCP_variable));
 try
-    value = aidaget(SCP_variable,'double');
+    value = pvaGet(SCP_variable,AIDA_DOUBLE);
     put2log(sprintf('%s found, value=%d',SCP_variable,value));
-catch
+catch e
+    handleExceptions(e)
     put2log(sprintf('Sorry %s not found!',SCP_variable));
 end

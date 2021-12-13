@@ -63,7 +63,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = schottky_scan_NLCTA_OutputFcn(hObject, eventdata, handles) 
+function varargout = schottky_scan_NLCTA_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -74,7 +74,7 @@ varargout{1} = handles.output;
 
 function handles = appInit(hObject, handles)
     guidata(hObject,handles);
-    
+
 % --- Executes on button press in acquireStart.
     function acquireStart_Callback(hObject, eventdata, handles)
 
@@ -163,7 +163,7 @@ function handles = appInit(hObject, handles)
                 pause(delay1);
             end
 
-            phaseR(j)  = aidaget([phase_pv '//VDES']);        % read phase [degS]
+            phaseR(j)  = pvaGet([phase_pv ':VDES']);        % read phase [degS]
             %     lasengy(j) = lcaGet(laser_energy_pv);
             [c(j), dc(j)]=measureNLCTAcharge(navg,vb);
             %     [X,Y,T,dX,dY,dT,iok] = read_BPMs({bpm_pv},navg,rate);
@@ -216,7 +216,7 @@ function handles = appInit(hObject, handles)
             %                ':TMIT', num2str(eDefNumber), '.H']});
             %  ch2(j)  = tmp(1)*1.602E-10;       % mean charge [nC]
             %  dch2(j) = tmp(2)*1.602e-10;       % std charge [nC]
-            ph2R(j)  = aidaget([phase_pv '//VDES']);        % read phase [degS]
+            ph2R(j)  = aidaget([phase_pv ':VDES']);        % read phase [degS]
             %     ph2R(j) = lcaGet(phase_pv);       % read phase [degS]
             [ch2(j), dch2(j)]=measureNLCTAcharge(navg,vb);
             %     [X,Y,T,dX,dY,dT,iok] = read_BPMs({bpm_pv},navg,rate);
@@ -231,7 +231,7 @@ function handles = appInit(hObject, handles)
                 result_phase = initial_phase;
                 %             control_phaseSet('LASER',result_phase);
                 %      lcaPut(phase_pv, result_phase);
-                aidaset([phase_pv '//VDES'], result_phase); % restore phase
+                aidaset([phase_pv ':VDES'], result_phase); % restore phase
                 %             lcaPut(charge_feedback_pv, last_q);
                 %  eDefRelease(eDefNumber);
                 return

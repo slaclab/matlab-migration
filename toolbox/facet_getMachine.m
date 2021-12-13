@@ -136,10 +136,10 @@ disp('Getting live SBST status...');
 
 % get fast phase shifters
 disp('Getting pulsed phases...');
-state.phase.k_9_1 = aidaget('PHAS:LI09:12//VACT');    % 9-1 pulsed phase shifter SPPS
-state.phase.k_9_2 = aidaget('PHAS:LI09:22//VACT');    % 9-2 pulsed phase shifter SPPS
-state.phase.s_17 = aidaget('AMPL:EP01:171//VACT');   % S17 pulsed phase shifter SPPS
-state.phase.s_18 = aidaget('AMPL:EP01:181//VACT');   % S18 pulsed phase shifter SPPS
+state.phase.k_9_1 = pvaGet('PHAS:LI09:12:VACT');    % 9-1 pulsed phase shifter SPPS
+state.phase.k_9_2 = pvaGet('PHAS:LI09:22:VACT');    % 9-2 pulsed phase shifter SPPS
+state.phase.s_17 = pvaGet('AMPL:EP01:171:VACT');   % S17 pulsed phase shifter SPPS
+state.phase.s_18 = pvaGet('AMPL:EP01:181:VACT');   % S18 pulsed phase shifter SPPS
 
 % caclulate total phase (klys PHAS + sbst PHAS)
 state.klys.PACT = zeros(size(state.klys.PHAS));

@@ -144,7 +144,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = RF_status_OutputFcn(hObject, eventdata, handles) 
+function varargout = RF_status_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -397,7 +397,10 @@ while get(hObject,'Value')
   for j = 1:handles.Nklys
     try
       set(handles.MSG,'String',' ')
-      actstr = aidaget(handles.klys_pv_list(j,1),'string',{'BEAM=1'}); % returns 'activated' when on beam code #1 (LCLS)
+      requestBuilder = pvaRequest(handles.klys_pv_list(j,1));
+      requestBuilder.returning(AIDA_STRING);
+      requestBuilder.with('BEAM',1);
+      actstr = requestBuilder.get();  % returns 'activated' when on beam code #1 (LCLS)
     catch
       set(handles.MSG,'String','aidaGet error on klys PV list')
       drawnow

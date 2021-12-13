@@ -1,8 +1,8 @@
 function [coeff1, coeff2] = fbGetL3BPMCoeffs(bpm_XPVs)
 %
 % the coefficients for three-BPM estimate of bunch centroid energy
-% sigma = x3 - 
-%        (R31-12/R21-11)x2 - 
+% sigma = x3 -
+%        (R31-12/R21-11)x2 -
 %        (R31-11*R21-12 - R31-12*R21-11)/R21-12)x3
 % so the coefficients 1 and 2 are:
 % c1 = (R31-12/R21-11), and
@@ -14,8 +14,11 @@ nXs = length(bpm_XPVs);
 
 R1s = zeros(nXs,2);
 
+requestBuilder = pvaRequest([ dev0 '//R']);
+requestBuilder.returning(AIDA_DOUBLE_ARRAY);
 for j = 2:nXs	% get all Rmats from dev0 to 2nd & 3rd x-BPMs
-  R = reshape(cell2mat(aidaget([ dev0 '//R'], 'doublea',{['B=' bpm_XPVs{j,1}]})),6,6)';
+  requestBuilder.with('B',bpm_XPVs{j,1});
+  R = reshape(toArray(requestBuilder.get()),6,6)';
   R1s(j,:) = [R(1,1) R(1,2)];
 end
 

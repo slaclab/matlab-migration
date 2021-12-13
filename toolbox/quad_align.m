@@ -453,19 +453,22 @@ bpm_ind=1;
 global RespMatH RespMatV
 %get the orbit response and z positions from aida
 for j = 1:length(all_bpm)
-    bpm_pos(j)    = aidaget([all_bpm_SLC{j} '//Z'])-2015;
+    bpm_pos(j)    = pvaGet([all_bpm_SLC{j} ':Z'])-2015;
 end
 
 for j = 1:length(all_quad)
-    quad_pos(j)    = aidaget([all_quad_SLC{j} '//Z'])-2015;
+    quad_pos(j)    = pvaGet([all_quad_SLC{j} ':Z'])-2015;
     for i=1:length(all_bpm_SLC)
         if bpm_pos(i)<quad_pos(j)
             RespMatH(i,j)=0;
         else
             try
-                R = aidaget({[all_quad_SLC{j} '//R']},'doublea',{['B=' all_bpm_SLC{i}]});
+                requestBuilder = pvaRequest({[all_quad_SLC{j} ':R']});
+                requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+                requestBuilder.with('B',all_bpm_SLC{i});
+                R = toArray(requestBuilder.get());
             catch
-                disp(sprintf('aidaget failure for %s//R', all_quad_SLC{j}));
+                disp(sprintf('aidaget failure for %s:R', all_quad_SLC{j}));
             end
             Rm       = reshape(R,6,6);
             Rm = cell2mat(Rm)';
@@ -478,9 +481,9 @@ end
 
 for i=1:length(all_quad_SLC)
     try
-        twiss = cell2mat(aidaget([all_quad_SLC{i} '//twiss'],'doublea'));
+        twiss = cell2mat(aidaget([all_quad_SLC{i} ':twiss'],'doublea'));
     catch
-        disp(sprintf('aidaget failure for %s//twiss', all_quad_SLC{i}));
+        disp(sprintf('aidaget failure for %s:twiss', all_quad_SLC{i}));
     end
     en_quad(i)=twiss(1)*1000;
 end

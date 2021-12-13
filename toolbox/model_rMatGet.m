@@ -163,8 +163,12 @@ if modelOnline && ~ismember(modelSource,{'MATLAB'})
 %        if isempty(param) && ~rzDone
         if ismember('R',param) && ~rzDone
             try
-                rMat(:,:,j)=reshape(cell2mat(aidaget([name ':R'],'doublea',[nT opt])),6,6);
-            catch
+                requestBuilder = pvaRequest([name ':R']);
+                requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+%                requestBuilder.with([nT opt]);  % TODO - make options - this is complicated so I'll leave it to the experts :)
+                rMat(:,:,j)=reshape(cell2mat(requestBuilder.get()),6,6);
+            catch e
+                requestBuilder.get(e)
                 disp(['AIDA Error: No R matrix available for ' name]);
             end
         end
@@ -189,7 +193,10 @@ if modelOnline && ~ismember(modelSource,{'MATLAB'})
         if any(ismember({'twiss' 'EN'},param)) && ~strncmp(name,'SOLN',4)
             % Twiss parameters are [En (mu b a D Dp)_x (mu b a D Dp)_y]
             try
-                t=cell2mat(aidaget([name ':twiss'],'doublea',opt));
+                requestBuilder = pvaRequest([name ':twiss']);
+                requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+%                requestBuilder.with(opt);  % TODO put in options
+                t=cell2mat(toArray(requestBuilder.get()));
                 twiss(:,j)=t(1:11);energy(j)=t(1);
             catch
                 disp(['AIDA Error: No twiss parameters available for ' name]);

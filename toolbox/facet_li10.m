@@ -159,8 +159,8 @@ klys = {'KLYS:LI09:11'; 'KLYS:LI09:21'};
 [m,p,u] = model_nameSplit(paus);
 paus = strcat(p, ':', m, ':', u);
 
-p1 = aidaget(strcat(paus{1}, '//VDES'));
-p2 = aidaget(strcat(paus{2}, '//VDES'));
+p1 = pvaGet(strcat(paus{1}, ':VDES'));
+p2 = pvaGet(strcat(paus{2}, ':VDES'));
 
 fphas = [p1; p2];
 

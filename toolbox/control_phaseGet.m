@@ -1,7 +1,7 @@
 function [pAct, pDes, aAct, aDes, kPhr, gold] = control_phaseGet(name, type, ds)
 %PHASEGET
 %  PHASEGET(NAME, TYPE, DS) get RF phase NAME_S_PV for EPICS devices and
-%  NAME:PHAS for SLC devices (NAME//PHAS). For 24-1,2,3, it takes
+%  NAME:PHAS for SLC devices (NAME:PHAS). For 24-1,2,3, it takes
 %  NAME_PDES. If TYPE is specified, the output arguments will be determined
 %  by the secondaries listed in TYPE.
 %
@@ -17,9 +17,9 @@ function [pAct, pDes, aAct, aDes, kPhr, gold] = control_phaseGet(name, type, ds)
 %               Data slot 2 - Next 60 Hz for CU_SXR
 %               Data slot 3 - Next 60 Hz for CU_HXR
 %
-%               Data Slots is an abstraction layer concept. We have 12 
-%               channels that we can be configured based on timing 
-%               "Conditional Expressions". 
+%               Data Slots is an abstraction layer concept. We have 12
+%               channels that we can be configured based on timing
+%               "Conditional Expressions".
 %
 % Output arguments:
 %    PACT: List of RF devices actual phase, NaN if read failure
@@ -70,28 +70,29 @@ nameSLC=model_nameConvert(name,'SLC');
 for j=find(is.SLC)'
     try
         if ismember('PHAS',type)
-%            pAct(j)=aidaget([nameSLC{j} '//PHAS'],'double');
-            pAct(j)=aidaget([nameSLC{j} '//' namePACT{j}(end-3:end)],'double');
+%            pAct(j)=pvaGet([nameSLC{j} ':PHAS'],AIDA_DOUBLE);
+            pAct(j)=pvaGet([nameSLC{j} ':' namePACT{j}(end-3:end)],AIDA_DOUBLE);
         end
         if ismember('PDES',type)
-%            pDes(j)=aidaget([nameSLC{j} '//PDES'],'double');
-            pDes(j)=aidaget([nameSLC{j} '//' namePDES{j}(end-3:end)],'double');
+%            pDes(j)=pvaGet([nameSLC{j} ':PDES'],AIDA_DOUBLE);
+            pDes(j)=pvaGet([nameSLC{j} ':' namePDES{j}(end-3:end)],AIDA_DOUBLE);
         end
         if ismember('AMPL',type)
-%            aAct(j)=aidaget([nameSLC{j} '//AMPL'],'double');
-            aAct(j)=aidaget([nameSLC{j} '//' nameAACT{j}(end-3:end)],'double');
+%            aAct(j)=pvaGet([nameSLC{j} ':AMPL'],AIDA_DOUBLE);
+            aAct(j)=pvaGet([nameSLC{j} ':' nameAACT{j}(end-3:end)],AIDA_DOUBLE);
         end
         if ismember('ADES',type)
-%            aDes(j)=aidaget([nameSLC{j} '//ADES'],'double');
-            aDes(j)=aidaget([nameSLC{j} '//' nameADES{j}(end-3:end)],'double');
+%            aDes(j)=pvaGet([nameSLC{j} ':ADES'],AIDA_DOUBLE);
+            aDes(j)=pvaGet([nameSLC{j} ':' nameADES{j}(end-3:end)],AIDA_DOUBLE);
         end
         if ismember('KPHR',type)
-            kPhr(j)=aidaget([nameSLC{j} '//KPHR'],'double');
+            kPhr(j)=pvaGet([nameSLC{j} ':KPHR'],AIDA_DOUBLE);
         end
         if ismember('GOLD',type)
-            gold(j)=aidaget([nameSLC{j} '//GOLD'],'double');
+            gold(j)=pvaGet([nameSLC{j} ':GOLD'],AIDA_DOUBLE);
         end
-    catch
+    catch e
+        handleExceptions(e)
         disp(['AIDA Error: No phases available for ' nameSLC{j}]);
     end
 end

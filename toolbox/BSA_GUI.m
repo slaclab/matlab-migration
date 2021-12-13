@@ -1,6 +1,6 @@
 function varargout = BSA_GUI(varargin)
 % BSA_GUI M-file for BSA_GUI.fig
-%  
+%
 %
 %       J. Turner 20 May 2009 - Who is responsible now that Jim has retiured?
 %
@@ -21,7 +21,7 @@ function varargout = BSA_GUI(varargin)
 %       this)
 %
 %       Plots A vs Time is what it says. Check out the pull down menu on
-%       the figures. It calls "plot_menus_BSA". 
+%       the figures. It calls "plot_menus_BSA".
 %
 %       Plot A vs B is for correlation.
 %
@@ -106,7 +106,7 @@ if strcmp('physics',getenv('USER'))  || strncmp('lcls',getenv('HOSTNAME'),4)
     root_name = meme_names('tag',['LCLS.CU' HS '.BSA.rootnames'], 'sort','z');
     if ~ismember('GDET:FEE1:241:ENRC',root_name)
         root_name = [root_name ;{'GDET:FEE1:241:ENRC'; 'GDET:FEE1:242:ENRC'; 'GDET:FEE1:361:ENRC'; 'GDET:FEE1:362:ENRC'}];
-    end   
+    end
 else
     root_name = load('root_name');
 end
@@ -117,7 +117,7 @@ z = model_rMatGet(n,[],{'TYPE=DESIGN',['BEAMPATH=CU_' HS 'XR']},'Z');
 [z I] = sort(z);
 root_name = root_name(I);
 z_positions =z;
- 
+
 handles.ROOT_NAME = root_name;
 handles.z_positions = z_positions;
 handles.zLCLS=2014.7019;
@@ -133,7 +133,7 @@ handles.foundVar2Indx = 1:1:length(handles.ROOT_NAME);
 guidata(handles.BSAFigure, handles);
 
 % --- Outputs from this function are returned to the command line.
-function varargout = BSA_GUI_OutputFcn(hObject, eventdata, handles) 
+function varargout = BSA_GUI_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
@@ -333,7 +333,7 @@ drawnow
 eDefList =  get(handles.edef_menu,'String');
 eDefStr = eDefList{get(handles.edef_menu,'Value')};
 set(handles.select_EDEF_text, 'String', ['Fault file data: ' eDefStr])
-nPts = str2double(get(handles.num_points,'String')); 
+nPts = str2double(get(handles.num_points,'String'));
 [the_matrix, t_stamp, isPV] = lcaGetSyncHST(handles.ROOT_NAME, nPts,eDefStr);
 
 matlabTS = lca2matlabTime(t_stamp(end));
@@ -380,7 +380,7 @@ disp('Acquire Data button pressed.');
 %     % Not much I can do if this fails
 % end
 % uniqueNumber = lcaGetSmart(uniqueNumberPV);
-% 
+%
 % %figure out beamcode
 % str = get(handles.edef_menu,'String');
 % val = get(handles.edef_menu,'Value');
@@ -401,7 +401,7 @@ set( handles.select_EDEF_text, 'String', 'Getting Data...' );
 eDefAcq(handles.eDefNumber, handles.nPoints);
 new_name = strcat(handles.ROOT_NAME, {'HST'}, {num2str(handles.eDefNumber)});
 set(handles.select_EDEF_text, 'String', ['New Data: HST' num2str(handles.eDefNumber)])
-handles.eDefStr = ['HST' num2str(handles.eDefNumber)];                                
+handles.eDefStr = ['HST' num2str(handles.eDefNumber)];
 
 %
 tic
@@ -472,7 +472,7 @@ function data = getData(handles)
 handlesFields = fieldnames(handles);
 for ii = 1:length(handlesFields)
     h = handlesFields{ii};
-    if ~ishandle(handles.(h)) 
+    if ~ishandle(handles.(h))
         if strcmp(h,'figure_handles'), continue, end
         data.(h) = handles.(h);
     end
@@ -735,7 +735,7 @@ text('Units','normalized',...
 disp(sprintf('Done plotting %s vs %s', char(ytext), char(xtext)));
 
 %
-% plots 
+% plots
 %
 % get EGU (engineering units)
 %
@@ -746,14 +746,14 @@ disp(sprintf('Done plotting %s vs %s', char(ytext), char(xtext)));
 % PSD(A)
 % Sqrt(Int(PSD(A)))
 %
-% to do:  
+% to do:
 %         make correlated sigma by taking out beta
 % %        power in a user specified band vs Z????????????
 %         energy correlation vs Z (with final energy fluctuations) (FJD Z)
 %         remove betatron osc from energy - maybe mia svd?
 %         in time button, histogram and fit with asym gauss
 %         rms vs Z
-%         
+%
 
 
 % --- Executes on button press in A_PSD.
@@ -804,11 +804,11 @@ diff_xdata_sum = sum(abs(diff_xdata));
 if diff_xdata_sum~=0
     disp('rate varied during data!   Taking largest block of highest rate')
     disp(' this is still... under construction!')
-    
+
     dx = diff(xdata);
     ddx = (diff(dx));
     id_pblm = find(ddx~=0);
-    
+
     figure
     plot_menus_BSA
     datalen = (1:length(ddx));
@@ -817,7 +817,7 @@ if diff_xdata_sum~=0
                 'Units','normalized',...
                 'FontUnits','normalized',...
                 'FontSize',[0.040]);
-    
+
     %at_max_rate = find(beamrate_vector == max_rate);
     [block_boundaries] = [1 id_pblm length(xdata)];
     blocks = diff(block_boundaries);
@@ -860,7 +860,7 @@ if diff_xdata_sum~=0
 
         end
     end
-    
+
 end
 
 figure;
@@ -979,7 +979,7 @@ for j=1:length(handles.bpms.etay_id)
     [etay_corf(j)] = corcoef(xdata2,handles.the_matrix(handles.bpms.etay_id(j),:));
 end
 
-% bpm 250 in LTUH data or LTUS 235 
+% bpm 250 in LTUH data or LTUS 235
 
 bpm250x = handles.the_matrix(handles.bpms.etax_id(4),:);
 bpm450x = handles.the_matrix(handles.bpms.etax_id(5),:);
@@ -992,7 +992,7 @@ handles.bpms.x_id;
 for j=1:length(handles.bpms.x_id)
      useY = ~isnan(handles.the_matrix(handles.bpms.x_id(j),:));
      use = useX & useY;
-     try   
+     try
         [x_bpm_corf(j)] = corcoef(xdata2,handles.the_matrix(handles.bpms.x_id(j),:));
         [x_bpm_rms(j)] = util_stdNan(handles.the_matrix(handles.bpms.x_id(j),:));
         [etaxcorf(j)] = corcoef(bpm250x,handles.the_matrix(handles.bpms.x_id(j),:));
@@ -1051,9 +1051,9 @@ z_y_bpm = handles.z_positions(handles.bpms.y_id) - handles.zLCLS;
 z_x_bpm = handles.z_positions(handles.bpms.x_id) - handles.zLCLS;
 
 if (~isfield(handles.bpms,'betax'))||(handles.new_model==1)
-    % example:   aidaget('BPMS:DMP1:693//twiss','floata')
+    % example:   aidaget('BPMS:DMP1:693:twiss','floata')
     % 15 floats: Kinetic Energy (GeV),   psix,   betax (m),   alphax,   etax (m),
-    %                           etax',   psiy,   betay (m),   alphay,   etay (m), 
+    %                           etax',   psiy,   betay (m),   alphay,   etay (m),
     % etay',  Z (m), Effective Length (m), Slice Effective Length (m), Ordinal position in beamline (as a float)
 
     %
@@ -1061,9 +1061,9 @@ if (~isfield(handles.bpms,'betax'))||(handles.new_model==1)
     %
     % WAIT FUNCTION?
     %
-    
+
     % pause(1);
-    
+
     set( hObject, 'Value', 0 );
     %
     %
@@ -1077,7 +1077,7 @@ if (~isfield(handles.bpms,'betax'))||(handles.new_model==1)
     etay_bpm  = twiss(10,:);
     %energy    = twiss(1,:);
     %zPos      = twiss(12,:);
-    
+
     %%%%
 
 
@@ -1094,15 +1094,15 @@ pause(1);
 set( hObject, 'String', 'All Z vs A' );
 
 
-% dispersion as determined by 
+% dispersion as determined by
 % slope with BPM 250 in LTU in mm * dispersion_at_250 + same at 450 and
 % divide by two
-if handles.isSxr    
+if handles.isSxr
     etaxIndx1 = strcmp(handles.bpms.name,'BPMS:LTUS:235');
-    etaxIndx2 = strcmp(handles.bpms.name,'BPMS:LTUS:370');  
+    etaxIndx2 = strcmp(handles.bpms.name,'BPMS:LTUS:370');
 else
     etaxIndx1 = strcmp(handles.bpms.name,'BPMS:LTUH:250');
-    etaxIndx2 = strcmp(handles.bpms.name,'BPMS:LTUH:450'); 
+    etaxIndx2 = strcmp(handles.bpms.name,'BPMS:LTUH:450');
 end
 handles.bpms.x_dispersion = (1e3 * parx250 * handles.bpms.etax(etaxIndx1) + 1e3 * parx450 * handles.bpms.etax(etaxIndx2))/2 ;
 handles.bpms.y_dispersion = (1e3 * pary250 * handles.bpms.etax(etaxIndx1) + 1e3 * pary450 * handles.bpms.etax(etaxIndx2))/2 ;
@@ -1159,7 +1159,7 @@ if isempty(myStr)
     xStr = sprintf('All BSA units');
     tStr = sprintf('correlation with all BSA units');
 else
-    xStr = sprintf('Z position of all units containing "%s"',myStr); 
+    xStr = sprintf('Z position of all units containing "%s"',myStr);
     tStr = sprintf('correlation with all units containing "%s"',myStr);
 end
 
@@ -1341,7 +1341,7 @@ text('Units','normalized',...
 
 %%%%
 %
-% dispersion at each bpm 
+% dispersion at each bpm
 figure;
 plot_menus_BSA;
 font_size=0.08;
@@ -1374,7 +1374,7 @@ axis([0 A(2) -50 50]);
 
 
 %
-% dispersion at each bpm 
+% dispersion at each bpm
 figure;
 plot_menus_BSA;
 font_size=0.035;
@@ -1542,7 +1542,7 @@ else
     handles.bpms.etax{j,:} = sprintf('BPMS:LTUS:235:X'); j = j + 1;
     handles.bpms.etax{j,:} = sprintf('BPMS:LTUS:370:X'); j = j + 1;
     handles.bpms.etax{j,:} = sprintf('BPMS:CLTS:420:X'); j = j + 1;
-    handles.bpms.etax{j,:} = sprintf('BPMS:CLTS:620:X'); j = j + 1;   
+    handles.bpms.etax{j,:} = sprintf('BPMS:CLTS:620:X'); j = j + 1;
 end
 
 j=0;
@@ -1562,15 +1562,15 @@ if isHXR
     handles.bpms.etay{j,:} = sprintf('BPMS:LTUH:170:Y'); j = j + 1;
     handles.bpms.etay{j,:} = sprintf('BPMS:DMPH:502:Y'); j = j + 1;
     handles.bpms.etay{j,:} = sprintf('BPMS:DMPH:693:Y'); j = j + 1;
-    
+
 else
     handles.bpms.etay{j,:} = sprintf('BPMS:CLTS:450:Y'); j = j + 1;
     handles.bpms.etay{j,:} = sprintf('BPMS:CLTS:590:Y'); j = j + 1;
     handles.bpms.etay{j,:} = sprintf('BPMS:DMPS:502:Y'); j = j + 1;
     handles.bpms.etay{j,:} = sprintf('BPMS:DMPS:693:Y'); j = j + 1;
-    
+
 end
-    
+
 j=0;
 for j = 1:length(handles.bpms.etay)
     try
@@ -1588,12 +1588,12 @@ end
 % use = strcmp(prim,'BPMS');
 % inroot = strcat(prim(use),':',micro(use),':',unit(use));
 % bpms = unique(inroot);
-% 
+%
 % handles.bpms.x = strcat(bpms,':X');
 % handles.bpms.y = strcat(bpms,':Y');
 % handles.bpms.y_id = zeros(1,length(handles.bpms.y));
 % handles.bpms.x_id = zeros(1,length(handles.bpms.x));
-% 
+%
 % for j = 1:length(handles.bpms.y)
 %     [handles.bpms.y_id(j)] = strmatch(handles.bpms.y(j,:),handles.ROOT_NAME);
 % end
@@ -1623,7 +1623,7 @@ handles.y_noeta_bpm(handles.bpms.etay_sub_id) = [];
 
 for j = 1:length(handles.bpms.etax)
     [handles.bpms.etax_id(j)] = strmatch(handles.bpms.etax(j,:),handles.ROOT_NAME);
-    [handles.bpms.etax_sub_id(j)] = strmatch(handles.bpms.etax(j,:),handles.bpms.x); 
+    [handles.bpms.etax_sub_id(j)] = strmatch(handles.bpms.etax(j,:),handles.bpms.x);
 end
 handles.x_noeta_bpm_id = handles.bpms.x_id;
 handles.x_noeta_bpm_id(handles.bpms.etax_sub_id) = [];
@@ -1698,11 +1698,11 @@ diff_xdata_sum = sum(abs(diff_xdata));
 if diff_xdata_sum~=0
     disp('rate varied during data!   Taking largest block of highest rate')
     disp(' this is still... under construction!')
-    
+
     dx = diff(xdata2);
     ddx = (diff(dx));
     id_pblm = find(ddx~=0);
-    
+
     figure
     plot_menus_BSA
     datalen = (1:length(ddx));
@@ -1711,7 +1711,7 @@ if diff_xdata_sum~=0
                 'Units','normalized',...
                 'FontUnits','normalized',...
                 'FontSize',[0.040]);
-    
+
     %at_max_rate = find(beamrate_vector == max_rate);
     [block_boundaries] = [1 id_pblm length(xdata2)];
     blocks = diff(block_boundaries);
@@ -1754,7 +1754,7 @@ if diff_xdata_sum~=0
 
         end
     end
-    
+
 end
 
 
@@ -1932,12 +1932,12 @@ if N<10 N=10; end
 if N>100 N=100; end
 [counts,barnum]=hist(ydata, N);
 [yfit,p,dp,chisq]=gauss_fit(barnum, counts);
-yyf = p(1)*ones(size(barnum)) + p(2)*sqrt(2*pi)*p(4)*gauss(barnum,p(3),p(4)); 
-hist(ydata, N); 
+yyf = p(1)*ones(size(barnum)) + p(2)*sqrt(2*pi)*p(4)*gauss(barnum,p(3),p(4));
+hist(ydata, N);
 set(gca,'FontUnits','normalized',...
     'FontSize',[0.035]);
-hold on; 
-A=axis; 
+hold on;
+A=axis;
 plot(barnum,yfit,'b');
 h = findobj(gca,'Type','patch');
 set(h,'FaceColor','r','EdgeColor','w')
@@ -2079,7 +2079,7 @@ if isempty(private)
 else
     set(handles.eDef_pushbutton,'Visible', 'on')
 end
-updateRootName(hObject, handles) 
+updateRootName(hObject, handles)
 
 
 
@@ -2110,7 +2110,7 @@ if ~handles.haveEDef
     uniqueNumberPV = 'SIOC:SYS0:ML00:AO900';
     lcaPutSmart(uniqueNumberPV, 1+lcaGetSmart(uniqueNumberPV));
     uniqueNumber = lcaGetSmart(uniqueNumberPV);
-    
+
     %figure out beamcode
 
     isCUS = strncmp('CUS',str{val},3);
