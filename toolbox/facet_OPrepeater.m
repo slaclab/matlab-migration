@@ -44,7 +44,7 @@ posipvs = {
     script_setupPV(483, 'e+ WIRE:LI11:344 EMITN_Y', 'cm*mrad', 2, 'facet_OPrepeater.m', 'SYS1', 'ML00');
     script_setupPV(484, 'e+ WIRE:LI11:344 BETA_Y',  'm',       3, 'facet_OPrepeater.m', 'SYS1', 'ML00');
     script_setupPV(485, 'e+ WIRE:LI11:344 ALPHA_Y', ' ',       3, 'facet_OPrepeater.m', 'SYS1', 'ML00');
-    script_setupPV(486, 'e+ WIRE:LI11:344 BMAG_Y',  ' ',       2, 'facet_OPrepeater.m', 'SYS1', 'ML00');    
+    script_setupPV(486, 'e+ WIRE:LI11:344 BMAG_Y',  ' ',       2, 'facet_OPrepeater.m', 'SYS1', 'ML00');
     };
 
 
@@ -102,10 +102,6 @@ dr03PVs = {dr03x; dr03y};
 egainPV = script_setupPV(011, 'Sec 2-10 egain', 'MeV', 2, 'facet_OPrepeater.m', 'SYS1', 'ML00');
 chirpPV = script_setupPV(012, 'Sec 2-10 chirp', 'MeV', 2, 'facet_OPrepeater.m', 'SYS1', 'ML00');
 phasePV = script_setupPV(013, 'Sec 2-10 effective phase', 'degS', 2, 'facet_OPrepeater.m', 'SYS1', 'ML00');
-
-aidainit
-import edu.stanford.slac.aida.lib.da.DaObject;
-d=DaObject;
 
 % waveform PVs for 24 hr cud
 wfsize = 10000;
@@ -174,7 +170,7 @@ lcaPutSmart(wfPVs{2}, zeros(1,wfsize));
 index = 0;
 imAlive = 0;
 while (1)
-   
+
     % Get EPAR for emit measurements in LI01, LI02 and LI04, LI11 and LI18
 try
 emitVals = control_emitGetElectron(wireList);
@@ -191,14 +187,14 @@ for kk = 1:length(wireList)
     singleEmitVals = singleEmitVals(:);
     oldVals = lcaGetSmart(outEmitList(:,kk));
     updateFlag = find(oldVals ~= singleEmitVals);
-    
+
     nanIndx = find(isnan(singleEmitVals));
-    
+
     singleEmitVals(nanIndx) = -1;
-    
-    
+
+
     %only update if values have changed.
-    
+
     if ~isempty(updateFlag)
         lcaPutSmart(outEmitList(updateFlag,kk), singleEmitVals(updateFlag));
     end
@@ -207,7 +203,7 @@ end
 %     wireVal = [];
 %     for ii = 1:length(wireList)
 %         v = d.getDaValue(wireList{ii});
-% 
+%
 %         for jj = 1:N, newVals(jj) = v.get(jj-1); end
 %         wireVal = [wireVal, newVals];
 %     end
@@ -216,7 +212,7 @@ end
     % Get ASYM PARAM for WSEX and WSEY for LI02
     % Get latest of SCAV or ELEC
     timeStamp = datenum(lcaGetSmart({'LI02:WIRE:119:SPTS'    'LI02:WIRE:119:EPTS'}) );
-    
+
     % nate 02-22-13 was crashing nightly due to NaN timestamps from VMS at midnight (???)
     if ~any(isnan(timeStamp))
 
@@ -229,10 +225,10 @@ end
                 v = d.getDaValue(singleWireAidaList{ii});
                 singleWireVal = [singleWireVal, v.get(7)];
             end
-            
+
             lcaPutSmart(outLI02List', singleWireVal');
         catch
-            
+
         end
 
         %Single wire color ageing.
@@ -247,22 +243,22 @@ end
     catch
         posiok = 0;
     end
-    
+
     if posiok
         oldposiemits = reshape(oldposiVals, [4 2 2]);
-        
+
         for kk = 1:size(posiemitVals, 3)
             posivals = posiemitVals(:,:,kk);
             posivals([1 5]) = posivals([1 5]) .* posivals([4 8]) * 1e5;
             posiemitVals(:,:,kk) = posivals;
         end
-        
+
         posiupdateFlag = posiemitVals ~= oldposiemits;
         lcaPutSmart(posipvs(posiupdateFlag), posiemitVals(posiupdateFlag));
         wireScanAgeing('', posipvs');
-        
+
     end
-    
+
     % get X and Y sizes for DR13 wire 164
     timestampPVs = { ...
         'DR13:WIRE:164:XTIM' % timestamp of latest X e- scan
@@ -271,7 +267,7 @@ end
         'DR13:WIRE:164:ETIM' % timestamp of latest Y scav scan
         };
     oldValues = lcaGetSmart(dr13PVs);
-    timeStamps = datenum(lcaGetSmart(timestampPVs));    
+    timeStamps = datenum(lcaGetSmart(timestampPVs));
     planes = {'X'; 'Y'};
     if ~any(isnan(timeStamps))
         for ix = 1:2
@@ -284,15 +280,15 @@ end
                 dr13wiresNewest = strcat(dr13wire, ':WSS', planes(ix));
             end
             dr13values(:,ix) = lcaGetSmart(dr13wiresNewest);
-            
+
             if dr13values(1,ix) ~= oldValues(ix)
                 lcaPutSmart(dr13PVs(ix), dr13values(1,ix));
             end
-        
+
         end
-        
+
     wireScanAgeing('', dr13PVs');
-    end    
+    end
 
     % get X and Y sizes for DR03 wire 173
 %    dr03timestampPVs = strcat(dr03wire, {':ATIM'; ':BTIM'});
@@ -304,54 +300,54 @@ end
     if any(isnewdr03)
         lcaPutSmart(dr03PVs(isnewdr03), newdr03Values(isnewdr03));
     end
-    
-    wireScanAgeing('', dr03PVs');    
-    
+
+    wireScanAgeing('', dr03PVs');
+
     %
     %  figure out and output the most recent LI20 emittance measurement
     %
-    
+
     % get li20 emittance devices
     [xv, xt] = lcaGetSmart(li20pvx);
     [yv, yt] = lcaGetSmart(li20pvy);
-    valx = reshape(xv, size(li20pvx));    
-    valy = reshape(yv, size(li20pvy));    
+    valx = reshape(xv, size(li20pvx));
+    valy = reshape(yv, size(li20pvy));
     tsx  = reshape(lca2matlabTime(xt), size(li20pvx));
     tsy  = reshape(lca2matlabTime(yt), size(li20pvy));
-        
+
     % find most recent Li20 emittance
     [m, idx] = max(tsx(1,:));
     [m, idy] = max(tsy(1,:));
     li20val = [valx(:,idx); valy(:,idx)];
     li20ts = [tsx(:,idx); tsy(:,idx)];
-    
+
     % convert mm-mrad to cm-mrad
     li20val([1 5]) = 0.1 * li20val([1 5]);
- 
+
     % get current val & ts of outputs
     [li20outval, li20outts] = lcaGetSmart(li20outpv);
     li20outts = lca2matlabTime(li20outts);
     li20new = (li20ts([1 5]) > li20outts([1 5]));
-    
+
     li20str = int8(zeros(1000,1));
-    
+
     % output values and names of most recent emittances (X and Y separately)
     if li20new(1)
         li20str = zeros(1000,1);
         li20str(1:numel(char(li20devs(idx)))) = double(char(li20devs(idx)));
-        lcaPutSmart(li20outpv(1:4), li20val(1:4)); 
+        lcaPutSmart(li20outpv(1:4), li20val(1:4));
         lcaPutSmart(li20locpv(1), li20str');
     end
     if li20new(2)
         li20str = zeros(1000,1);
         li20str(1:numel(char(li20devs(idx)))) = double(char(li20devs(idx)));
-        lcaPutSmart(li20outpv(5:8), li20val(5:8)); 
+        lcaPutSmart(li20outpv(5:8), li20val(5:8));
         lcaPutSmart(li20locpv(2), li20str');
     end
-    
+
     % do emittance aging
     wireScanAgeing('', li20outpv');
-    
+
     % get WSIP1 sizes and calculated size subtracted numbers
     ws1d = lcaGetStruct(ws1.in);
     subx = sqrt((ws1d.x)^2 - (ws1d.d/4)^2);
@@ -369,12 +365,12 @@ end
         disp('Failure in facet_chirp');
     end
 
-    
+
     %
     % save CUD data in waveform
     %
 
-    % get the existing waveforms 
+    % get the existing waveforms
     wfdata = lcaGetSmart(wfPVs(3:end));
     data = lcaGetSmart(dataPVs);
 
@@ -387,7 +383,7 @@ end
         t0 = [tnow(1:3) 0 0 0];
         tfrac = etime(tnow, t0) / (60 * 60);
         index = ceil((wfsize-1) * (tfrac / 24))+ 1;
-        
+
         % force 1st iteration to only update 1 point
         if oldindex == 0
             oldindex = index;
@@ -401,7 +397,7 @@ end
         else
             wrap = 0;
         end
-        
+
         % shove the new data into the array
         wfdata(:,oldindex:index) = repmat([data ./ wfScale], 1, numel(oldindex:index));
         % write out the waveforms
@@ -418,15 +414,15 @@ end
         lcaPutSmart(wfPVs{2}, marker');
 
     end
-    
-    pause(0.5)    
-        
+
+    pause(0.5)
+
     imAlive = imAlive + 1;
     lcaPutSmart('SIOC:SYS1:ML00:AO002', imAlive);
 end
 end
 
-     
+
 function [outEmitList, outLI02List, singleWireAidaList, singleWireEpicsList] = initPVs(N, wireStr, singleLI02wires, wireList)
 
 
@@ -436,7 +432,7 @@ M = 201; MM = M; %1st Matlab PV
 init = 0;
 if init <= 0,
         kk=0;
-        
+
         for jj = M:M+N-1, kk = kk+1;
             lcaPut(['SIOC:SYS1:ML00:SO0', num2str(jj)], 'facet_OPrepeater');
             lcaPut(['SIOC:SYS1:ML00:AO', num2str(jj), '.DESC'], [wireList{1}(6:end) ' ' wireStr{kk}])
@@ -453,22 +449,22 @@ if init <= 0,
         for jj = M:M+N-1, kk = kk+1;
             lcaPut(['SIOC:SYS1:ML00:SO0', num2str(jj)], 'facet_OPrepeater');
             lcaPut(['SIOC:SYS1:ML00:AO', num2str(jj), '.DESC'], [wireList{3}(6:end) ' ' wireStr{kk}])
-        end    
-        
+        end
+
         M=jj +1;
         kk=0;
         for jj = M:M+N-1, kk = kk+1;
             lcaPut(['SIOC:SYS1:ML00:SO0', num2str(jj)], 'facet_OPrepeater');
             lcaPut(['SIOC:SYS1:ML00:AO', num2str(jj), '.DESC'], [wireList{4}(6:end) ' ' wireStr{kk}])
-        end      
-        
+        end
+
         M=jj +1;
         kk=0;
         for jj = M:M+N-1, kk = kk+1;
             lcaPut(['SIOC:SYS1:ML00:SO0', num2str(jj)], 'facet_OPrepeater');
             lcaPut(['SIOC:SYS1:ML00:AO', num2str(jj), '.DESC'], [wireList{5}(6:end) ' ' wireStr{kk}])
-        end      
-        
+        end
+
 end
 
 
@@ -478,7 +474,7 @@ for ii = 1:length(wireStr) * length(wireList)
 end
 %lastUsedPvN = M+ii;
 lastUsedPvN = 241; %force to be 241 so that single li02 wire PVs names never change.
-jj = lastUsedPvN; 
+jj = lastUsedPvN;
 
 init = 0; %set to 0 if we ever lose labels.
 if init <= 0,
@@ -503,7 +499,7 @@ for kk = 1:2:2*length( singleLI02wires )
     singleWireEpicsList(kk) = {sprintf('LI02:WIRE:%s:XTIM', singleLI02wires{(kk+1)/2})};
     singleWireEpicsList(kk+1) = {sprintf('LI02:WIRE:%s:YTIM', singleLI02wires{(kk+1)/2})};
 end
-    
+
 
 end
 
@@ -514,20 +510,20 @@ function wireScanAgeing(timeStampPv, cudOutPvList, timeStamp)
 % others; color rule 91 "emittance" 21-25 for ALARM, 31-35 for NO ALARM, 41-46 "Stale").
 % To set alarms: lcaPutSmart(strcat(cudOutPvList,'.HIGH')',0.05)
 %                lcaPutSmart(strcat(cudOutPvList,'.HSV')','MAJOR')
-% lcaPutSmart(strcat(cudOutPvList(1:2:end),'.HIGH'), 0.1) 
+% lcaPutSmart(strcat(cudOutPvList(1:2:end),'.HIGH'), 0.1)
 % lcaPutSmart(strcat(cudOutPvList(1:2:end),'.LOW'), -0.1)
-% lcaPutSmart(strcat(cudOutPvList(2:2:end),'.HIGH'), 0.2) 
+% lcaPutSmart(strcat(cudOutPvList(2:2:end),'.HIGH'), 0.2)
 % lcaPutSmart(strcat(cudOutPvList(2:2:end),'.LOW'), -0.2)
 %
-% For emittance alarms: 
+% For emittance alarms:
 
     present = now;
     staleHours = lcaGetSmart('SIOC:SYS0:ML00:AO512');
-    
+
      %kludge since XTIM is not the right time PV
      if nargin == 2,
          actualTimeStamp = lcaGetSmart(strcat(cudOutPvList,'TS'));
-        
+
          %actualTimeStamp = lcaGetSmart([timeStampPv strrep(timeStampPv, 'EPTS', 'SPTS')]);
 %          actTst = datenum(actualTimeStamp);
 %          actTst = reshape(actTst, length(actTst)/2 ,2);
@@ -535,13 +531,13 @@ function wireScanAgeing(timeStampPv, cudOutPvList, timeStamp)
 %          %Add four PVs for each one gives (Same timestamp for 4 values)
 %          for jj = 1:length(actTst), newActTSt(:,jj) = actTst(jj) * ones(1,4); end
 %          actualTimeStamp = newActTSt(:);
-         
+
      else
          actualTimeStamp = ones(size(timeStampPv)) * timeStamp;
      end
      actualTimeStamp = datestr(actualTimeStamp);
 
-     
+
      severity = lcaGet(strcat(cudOutPvList','.SEVR'));
      staleSev = zeros(length(severity),1);
      staleSev = staleSev + ( strcmp('MAJOR',severity) * 20 ) +  ( strcmp('NO_ALARM',severity) * 30 );
@@ -631,7 +627,7 @@ for j=1:length(name)
             if nargout > 1
                 twissStd(:,iPlane,j) = zeros([4 1]);  % errors are not stored
             end
-        end        
+        end
     else
         for iPlane=1:length(tag)
             names=strcat({'EMITN' 'BETA' 'ALPHA' 'BMAG'}','_',upper(tag(iPlane)));
@@ -730,7 +726,7 @@ for j=1:length(name)
             if nargout > 1
                 twissStd(:,iPlane,j) = zeros([4 1]);  % errors are not stored
             end
-        end        
+        end
     else
         for iPlane=1:length(tag)
             names=strcat({'EMITN' 'BETA' 'ALPHA' 'BMAG'}','_',upper(tag(iPlane)));
@@ -751,18 +747,18 @@ twissStd(1,:)=twissStd(1,:)*1e-6; % Normalized emittance in m
 end
 
 % FACET CUD
-% 
+%
 % Emittance values with Alarm limits and "ageing feature":
 % From - {'WIRE:LI01:719//EPAR'; 'WIRE:LI02:119//EPAR' ; 'WIRE:LI11:344//EPAR'};
-% 
+%
 % - LI01 EMITN X/Y    BMAG X/Y
 % - LI02 EMITN X/Y    BMAG X/Y
 % - LI11 EMITN X/Y    BMAG X/Y
-% 
+%
 % - LI02 tail parameters
 % - DR13 Skew
 % - DR12 Septum bump calculated X/Y position and angle.
-% 
+%
 % - TMIT for DR11, DR13, LI20 (Show Absolute values and/or Yield?)
 % - Jitter? (Orbit RMS?, energy vs X/Y correlation)
 % - LI10 Chicane R56
@@ -771,12 +767,12 @@ end
 % - Beam energy from magnet settings.
 % - Energy Loss scan results
 % - Any experiment specific information? Plasma Oven info?
-% 
+%
 % Beam rate
 % CID local mode or normal mode
 % TIU: ok/fault
 % BCS: ok/fault
 % HLAM in/out
 % PPS Stoppers (cid500, LTR/RTL, Li04 backward beam, EP01)
-% 
-%     
+%
+%

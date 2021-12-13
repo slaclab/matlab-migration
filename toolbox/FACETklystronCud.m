@@ -12,14 +12,14 @@ if isempty(sys)
     [sys, accelerator] = getSystem();
 end
 if ~strcmpi(accelerator, 'FACET')
-   exit 
+   exit
 end
-aidainit;
+
 nLogLines = 24;
 toggleLogFile = 1;
 logStringHead = 'begin\nnumCols 3\nheaderAlign "ccclc"\nalign "ccclc"\nseparators "|"\ncomment "#"\nend\n';
 logStringList(1:nLogLines) = {''};
-err = getLogger(['klystronCud_', accelerator]);  
+err = getLogger(['klystronCud_', accelerator]);
 fprintf('\nStarting Klystron Cud %s\n\n',datestr(now)')
 format long
 statusStr = {'OK '; 'ACC'; 'OFF'; 'MNT'; 'TBR'; 'ARU';  'CKP'};
@@ -144,7 +144,7 @@ while(1)
     [isACC,stat,swrd, hdsc,dsta1,dsta2]=deal(zeros(size(handles.klysS)));
     [colEdge,colBack,colText,strN,sizText]=deal(cell(size(handles.klysS)));
     useIndx = 1:numel(handles.klysS); % Station indices
-    nulIndx = strmatch(' ' , handles.klysS);    
+    nulIndx = strmatch(' ' , handles.klysS);
     offOrMNTOrTBR(nulIndx) = '';
     useIndx(nulIndx) = ''; % Remove unused station indices
     if mod(counter, 10)
@@ -177,7 +177,7 @@ while(1)
             sum(sum(stat)), sum(sum(hdsc)) ));
         dbstack
         continue
-    end  
+    end
     % Handle heater delays
     strS_size = size(strS);
     for jj = 1:strS_size(2)
@@ -297,7 +297,7 @@ while(1)
     useIndx = 1:sbstSize(1);
     nulIndx = strmatch(' ' , handles.sbstS);
     useIndx(nulIndx) = ''; % Removes unused station indices
-    try 
+    try
          [isACC,stat,swrd,hdsc,dsta1,dsta2]=deal(zeros(sbstSize));
          % 10/11/11 W. Colocho - Need to fix SBST string and isACC. control_klysStatGet.m does not
          % support SBST and status bits don't really translate.
@@ -329,7 +329,7 @@ while(1)
 end % End of main loop
 end
 
-function [strS strM strL strXL] = klysCudString(stat,swrd,hdsc,dsta, handles, type) 
+function [strS strM strL strXL] = klysCudString(stat,swrd,hdsc,dsta, handles, type)
 % info from REF_:[KLYSUTIL]KLYS_STRING.FOR
 % Input: act, stat, swrd, hdsc, dsta, handles
 % Output: strS - 3 leter character for CUD.
@@ -363,8 +363,8 @@ persistent sys
 if isempty(sys)
     sys = getSystem();
 end
-persistent HSinfo STinfo SWinfo DSinfo BAinfo HDinfo; 
-HSinfo = { ...   
+persistent HSinfo STinfo SWinfo DSinfo BAinfo HDinfo;
+HSinfo = { ...
 'HS', 2000, 'Gh', 'ON ', 'ONLIN', 'Hsta online ', 'Hsta online';...
 'HS',   10, 'Sh', 'MNT', 'MAINS', 'Maintenance ', 'Hsta maintenance mode';...
 'HS',    1, 'Sh', 'OFF', 'OFFL ', 'OFFLINE     ', 'Hsta offline';...
@@ -399,8 +399,8 @@ STinfo = { ...
 'ST', 9999, 'SN', 'ski', 'skip ', 'skip        ', ' None';...
 'ST',   30, 'Ss', 'UPD', 'UPDAT', 'UPDATE Req  ', 'Stat_Update Req ';...
 'ST', 9999, 'SN', 'ski', 'skip ', 'skip        ', ''};
-    
-SWinfo = {... 
+
+SWinfo = {...
 'SW',   55, 'SH', 'CBL', 'Cable', 'Bad Cable   ', 'BAD CABLE Status';...
 'SW',   80, 'SH', 'MKS', 'MKSU ', 'MKSU Protect', 'MKSU Protect';...
 'SW',   68, 'SH', 'TRG', 'TRIG ', 'NO Triggers ', 'NO Triggers';...
@@ -560,32 +560,32 @@ debugFlag = lcaGet(['SIOC:' sys ':ML00:AO324']);
 
 msg1 = [datestr(now) ' Warning: Found word with negative bits. '];
 warn=0;
-if min(min(stat)) < 0 
+if min(min(stat)) < 0
     if debugFlag, disp(msg1), disp(handles.klysS(stat<0)), end
-    stat(stat<0) = 0; warn = 1; 
+    stat(stat<0) = 0; warn = 1;
 end
-if min(min(swrd)) < 0, 
+if min(min(swrd)) < 0,
     if(debugFlag), disp(msg1), disp(handles.klysS(swrd<0)), end
     swrd(swrd<0) = 0; warn = 2;
 end
-if min(min(hdsc)) < 0, 
+if min(min(hdsc)) < 0,
     if(debugFlag), disp(msg1), disp(handles.klysS(hdsc<0)), end
     hdsc(hdsc<0) = 0; warn = 3;
 end
-if min(min(dsta(:,:,1))) < 0, 
+if min(min(dsta(:,:,1))) < 0,
     if(debugFlag), disp(msg1), disp(handles.klysS(dsta(:,:,1)<0)), end
     d1 = dsta(:,:,1); d1(d1<0) = 0;
-    dsta(:,:,1) = d1; warn = 4;  %dsta(dsta(:,:,1)<0) = 0;    
+    dsta(:,:,1) = d1; warn = 4;  %dsta(dsta(:,:,1)<0) = 0;
 end
-if min(min(dsta(:,:,2))) < 0, 
+if min(min(dsta(:,:,2))) < 0,
     if(debugFlag), disp(msg1),  disp(handles.klysS(dsta(:,:,2)<0)), end
     d2 = dsta(:,:,2); d2(d2<0) = 0;
-    dsta(:,:,2) = d2; warn = 5; %dsta(dsta(:,:,2)<0) = 0;  
+    dsta(:,:,2) = d2; warn = 5; %dsta(dsta(:,:,2)<0) = 0;
 end
 strS = cell(size(stat)); %initialize string matrix
 strM = strS;
 strL = strS;
-strXL = strS; 
+strXL = strS;
 if(debugFlag)
     warnStr = {'stat', 'swrd', 'hdsc', 'dsta1','dsta2'};
     if(warn)

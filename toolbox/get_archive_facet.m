@@ -58,28 +58,25 @@ if ~exist('show_plot','var')
   show_plot = 1;
 end
 
-namel = [name '//HIST.facet'];
+namel = [name ':HIST.facet'];
+disp 'Acquisition begins.'
 
-aidainit;
-
-if(isempty(da))
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    da = DaObject();  
-else
-    da.reset;
+try
+    da = pvaRequest(namel);
+    da.with('STARTTIME', starttime);
+    da.with('ENDTIME', endtime);
+    if density
+        da.with('DENSITY','NORMAL');
+    end
+    hist = da.get();
+    disp ('Acquisition ends successfully');
+catch e
+    handleExceptions(e);
 end
-disp 'Acquisition begins ...'
-da.setParam('STARTTIME',starttime);  
-da.setParam('ENDTIME',endtime);   
-if density, da.setParam('DENSITY','NORMAL');end
-hist = da.getDaValue(namel);                          
-disp 'Acquisition ends successfully'
 
-pts = hist.get(0).size();                        
-dblArray = javaArray('java.lang.Double',pts);   
-values1 = double(hist.get(0).toArray(dblArray));                      
-StringArray = javaArray('java.lang.String',pts);
-times1 = char(hist.get(1).toArray(StringArray));                      
+pts = hist.size;
+values1 = toArray(hist.get('values'));
+times1 = toArray(hist.get('times'));
 
 if show_plot==1
   egu = lcaGet([name '.EGU']);

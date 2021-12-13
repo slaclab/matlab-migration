@@ -1,31 +1,32 @@
-aidainit
-da = edu.stanford.slac.aida.lib.da.DaObject()
-da.reset()
-da.setParam('NRPOS=10')
-
 try
-  da.setParam('BPMD=1')
-  da.setParam('BPM1=BPMS:LI00:415')
-  da.getDaValue('INJ_ELEC//BUFFACQ')
-  'INJ_ELEC OK'
+    requestBuilder = pvaRequest('INJ_ELEC:BUFFACQ');
+    requestBuilder.with('NRPOS', 10);
+    requestBuilder.with('BPMD', 1);
+    requestBuilder.with('BPMS', { 'BPMS:LI00:415' } );
+    requestBuilder.get();
+    'INJ_ELEC OK'
 catch
-  'INJ_ELEC Failed'
+    'INJ_ELEC Failed'
 end
 
 try
-  da.setParam('BPMD=8')
-  da.setParam('BPM1=BPMS:EP01:185')
-  da.getDaValue('ELECEP01//BUFFACQ')
-  'ELECEP01 OK'
+    requestBuilder = pvaRequest('ELECEP01:BUFFACQ');
+    requestBuilder.with('NRPOS', 10);
+    requestBuilder.with('BPMD', 8);
+    requestBuilder.with('BPMS', { 'BPMS:EP01:185' } );
+    requestBuilder.get();
+    'ELECEP01 OK'
 catch
-  'ELECEP01 Failed'
+    'ELECEP01 Failed'
 end
 
 try
-  da.setParam('BPMD=57')
-  da.setParam('BPM1=BPMS:LI02:201')
-  da.getDaValue('NDRFACET//BUFFACQ')
-  'NDRFACET OK'
+    requestBuilder = pvaRequest('NDRFACET:BUFFACQ');
+    requestBuilder.with('NRPOS', 10);
+    requestBuilder.with('BPMD', 57);
+    requestBuilder.with('BPMS', { 'BPMS:LI02:201' } );
+    requestBuilder.get();
+    'NDRFACET OK'
 catch
-  'NDRFACET Failed'
+    'NDRFACET Failed'
 end

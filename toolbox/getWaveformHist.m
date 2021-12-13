@@ -35,21 +35,15 @@ startTime = timeRange{1};
 endTime = timeRange{2};
 timeString = '';
 
-aidainit;
-persistent da;
-if(isempty(da)),  
-   import edu.stanford.slac.aida.lib.da.DaObject;
-   da = DaObject(),  
-end
+da = pvaRequest([ waveformPV ':HIST.lcls']);
+da.with('STARTTIME', startTime);
+da.with('ENDTIME',  endTime);
+da.with('DATEFORMAT', 'MMDDYYYY_FRAC');
 
-r = DaReference([ waveformPV '//HIST.lcls'],da);
-r.setParam('STARTTIME',startTime);
-r.setParam('ENDTIME', endTime);
-r.setParam('DATEFORMAT','MMDDYYYY_FRAC');
 %Get the value
+valueHist = da.get();
 
-valueHist = r.getDaValue();
-pts = valueHist.get(0).size();
+pts = valueHist.size;
 if(pts==0),
   error(['Number of points returned by get command for time range '...
           timeRange{1} ' to ' timeRange{2},' is zero']);
@@ -58,31 +52,27 @@ end
 
 % Make it usable
 
-dblArray = javaArray('java.lang.Double',pts);
-value = double(valueHist.get(0).toArray(dblArray));
-
+value = toArray(valueHist.get('values'));
 
 % Get wavefrom info
 
-waveformCount = valueHist.get(5);
-nWaveforms = waveformCount.size();
-nWavePts = waveformCount.get(0);
+waveformCount = toArray(valueHist.get('waveformCount'));
+nWaveforms = waveformCount.length;
+nWavePts = waveformCount(1);
 value = reshape(value, nWavePts, nWaveforms);
 
 % Process time
-time = cell2mat(cell(valueHist.get(3).toArray()));
+time = toArray(valueHist.get('times'));
 %Account for Daylight savigns times
 try
-    isdst = [cell2mat(cell(valueHist.get(6).toArray()))];  %#ok<AGROW>    
+    isdst = toArray(valueHist.get('isdst'));
 catch
-    fprintf('Warning: no DST/PST flag from Archiver data time may be off by 1 hour\n');  
-    isdst = ones(size(time));    
+    fprintf('Warning: no DST/PST flag from Archiver data time may be off by 1 hour\n');
+    isdst = ones(size(time));
 end
 
-StringArray = javaArray('java.lang.String',nWaveforms);
-
 %Add tenth of seconds value from timeString.
-timeString = [timeString; char(valueHist.get(1).toArray(StringArray))];  %#ok<AGROW>
+timeString = toArray(valueHist.get('timeString'));
 tenthSec = str2num(timeString(:,end-1:end)) / 100/24/60/60; %#ok<ST2NM>
 time = time + tenthSec;
 

@@ -7,10 +7,6 @@ function stat=LEM_Undo()
 %    Restore EPICS magnet EDES PVs values, too
 % ------------------------------------------------------------------------------
 
-aidainit
-da=DaObject;da.reset
-dav=DaValue;dav.reset
-
 global debugFlags
 debug=debugFlags(4);
 
@@ -49,23 +45,24 @@ if (~isempty(idSLC))
 
   magnet=cellstr(char(PS(idSLC).dbname));
   bdes=unLEM.PS.bdesSLC;
-  dav.type=0; % DaValue.Type.STRUCT;
-  dav.addElement(DaValue(magnet));
-  dav.addElement(DaValue(bdes));
+  value = AidaPvaStruct()
+  value.put('names', magnet)
+  value.put('values', bdes)
 
 % put the BDES values and trim all
 
   if (debug)
     disp('*** debugLEM: no SLC BDES values reset')
   else
-    da.setParam('MAGFUNC=TRIM');
     try
-      result=da.setDaValue('MAGNETSET//BDES',dav); % (0)=status, (1)=BACT
-      errorLog.log('LEM: SLC magnet TRIM successful');
-      disp('*** SLC TRIM successful')
-    catch
-      errorLog.log('LEM: SLC magnet TRIM returned with errors, please see Message Log');
-      disp('*** one or more SLC magnets failed TRIM')
+        requestBuilder = pvaRequest('MAGNETSET:BDES');
+        requestBuilder.with('MAGFUNC', 'TRIM');
+        result = requestBuilder.set(value);
+        errorLog.log('LEM: SLC magnet TRIM successful');
+        disp('*** SLC TRIM successful')
+    catch e
+        handleExceptions(e, '*** one or more SLC magnets failed TRIM');
+        errorLog.log('LEM: SLC magnet TRIM returned with errors, please see Message Log');
     end
   end
 end
@@ -83,11 +80,11 @@ if (~isempty(idEPICS))
     for m=1:nEPICS
       n=idEPICS(m);
       dbname=PS(n).dbname;
-      bdesQuery=strcat(dbname,':BDES//VAL');
+      bdesQuery=strcat(dbname,':BDES:VAL');
       bdes=unLEM.PS.bdesEPICS(m);
-      da.setDaValue(bdesQuery,DaValue(bdes));
-      ctrlQuery=strcat(dbname,':CTRL//VAL');
-      da.setDaValue(ctrlQuery,DaValue('TRIM'));
+      pvaSet(bdesQuery, bdes);
+      ctrlQuery=strcat(dbname,':CTRL:VAL');
+      pvaSet(ctrlQuery, 'TRIM');
     end
 
   % second loop ... check that TRIM completed
@@ -101,12 +98,12 @@ if (~isempty(idEPICS))
       for m=1:length(id)
         n=idEPICS(id(m));
         dbname=PS(n).dbname;
-        ctrlStateQuery=strcat(dbname,':CTRLSTATE//VAL');
+        ctrlStateQuery=strcat(dbname,':CTRLSTATE:VAL');
         try
-          state=da.get(ctrlStateQuery,10);
-          notDone(m)=~strcmp(state,'Done');
-        catch
-          error('*** %s',ctrlStateQuery)
+          state=pvaGet(ctrlStateQuery, AIDA_STRING);
+          notDone(m)=~strcmp(state, 'Done');
+        catch e
+          handleExceptions(e, '*** %s', ctrlStateQuery);
         end
       end
       nTry=nTry+1;
@@ -135,11 +132,11 @@ for m=1:length(unLEM.MAGNET.id)
       ic=strfind(dbname,':');ic1=ic(1);ic2=ic(2);
       dbname=strcat(dbname(ic1+1:ic2),dbname(1:ic1),dbname(ic2+1:end)); % unmunge
     end
-    Query=strcat(dbname,':EDES//VAL');
+    Query=strcat(dbname,':EDES:VAL');
     try
-      da.setDaValue(Query,DaValue(MAGNET(n).energy0));
-    catch
-      error('*** %s',Query)
+      pvaSet(Query, MAGNET(n).energy0);
+    catch e
+        handleExceptions(e, '*** %s', Query);
     end
   end
 end
@@ -155,11 +152,11 @@ if (isfield(unLEM,'Fudge'))
   else
     try
       for n=1:4
-        Query=strcat(lemPVs(n),'//VAL');
-        da.setDaValue(Query,DaValue(unLEM.Fudge(n)));
+        Query=strcat(lemPVs(n),':VAL');
+        pvaSet(Query, unLEM.Fudge(n));
       end
-    catch
-      error('Failed to reset fudge factor softIOC values')
+    catch e
+      handleExceptions(e, 'Failed to reset fudge factor softIOC values');
     end
   end
 end

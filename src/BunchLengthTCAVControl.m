@@ -6,8 +6,6 @@ function BunchLengthTCAVControl (action)
 
 global gBunchLength;
 
-aidainit;
-
 if strcmp('ACTIVATE',action)
 
     if isfield(gBunchLength,'fb')
@@ -40,18 +38,21 @@ if strcmp('ACTIVATE',action)
     try
 
         % reactivate triggers
-        status = aidaget(gBunchLength.tcav.aida,'string',{'BEAM=1'});
+        requestBuilder = pvaRequest(gBunchLength.tcav.aida);
+        requestBuilder.with('BEAM', 1);
+        requestBuilder.returning(AIDA_STRING);
+        status = requestBuilder.get();
 
         if ~strcmp('activated',status)
             try
-                SetKlysTact (gBunchLength.tcav.aida, '1', 'LIN_KLYS', 1);
+                SetKlysTact (gBunchLength.tcav.aida, 1, 'LIN_KLYS', 1);
             catch
-                BunchLengthLogMsg (sprintf ('Aida TCAV control failed for %s', gBunchLength.tcav.aida));
+                BunchLengthLogMsg (sprintf ('aida-pva TCAV control failed for %s', gBunchLength.tcav.aida));
             end
         end
 
     catch
-        BunchLengthLogMsg (sprintf ('aidaget failed for %s',gBunchLength.tcav.aida));
+        BunchLengthLogMsg (sprintf ('aida-pva get failed for %s',gBunchLength.tcav.aida));
     end
 
     try % set TCAV BGRP variable
@@ -81,11 +82,14 @@ if strcmp ('STANDBY', action)
 
     try
         % Deactivate triggers
-        status = aidaget(gBunchLength.tcav.aida,'string',{'BEAM=1'});
+        requestBuilder = pvaRequest(gBunchLength.tcav.aida);
+        requestBuilder.with('BEAM', 1);
+        requestBuilder.returning(AIDA_STRING);
+        status = requestBuilder.get();
 
         if ~strcmp('deactivated',status)
             try
-                SetKlysTact (gBunchLength.tcav.aida, '1', 'LIN_KLYS', 0);
+                SetKlysTact (gBunchLength.tcav.aida, 1, 'LIN_KLYS', 0);
             catch
                 BunchLengthLogMsg (sprintf ('Aida TCAV control failed for %s', gBunchLength.tcav.aida));
             end

@@ -1,7 +1,6 @@
 
 function gettwiss(DEV)
 
-aidainit
 %fprintf(strcat('\nDEV = ',DEV,'\n\n'))
 
 characternum = numel(DEV);
@@ -43,7 +42,7 @@ for n = [1:numel(namelist)];
         continue
         n = n+1;
     end
-    
+
 end
 
 energy = [twiss(1,n)];

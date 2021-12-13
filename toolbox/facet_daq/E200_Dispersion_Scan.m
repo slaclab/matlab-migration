@@ -20,7 +20,7 @@ par.bpmd = 'NDRFACET';
 par.n_shot = n_shot;
 par.knob = 'SCAVENGY.MKB';
 par.comt_str = ['E200 dispersion scan, using function "SCAVENGY.MKB",\nfrom ' num2str(E_range_low) ' to ' num2str(E_range_high) '.\n' num2str(n_step) ' steps.'];
-            
+
 % first figure out a scan range
 disp('Calculating scan range...');
 fast.name = {'EP01:AMPL:171:VDES' 'EP01:AMPL:181:VDES';
@@ -59,10 +59,8 @@ end
 phase_deltas = diff([0 range 0]);
 
 % set up AIDA for knob control
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
-da.setParam('MKB', strcat('mkb:', par.knob));
+requestBuilder = pvaRequest('MKB:VAL');
+requestBuilder.with('MKB', strcat('mkb:', par.knob));
 
 % turn off energy feedbacks
 fbpv = {'SIOC:SYS1:ML00:AO060'; 'SIOC:SYS1:ML00:AO084'};
@@ -77,7 +75,7 @@ try
 
         % set energy here
         disp(['Step ' num2str(ix) '. Setting knob to ' num2str(range(ix))]);
-        da.setDaValue('MKB//VAL', DaValue(java.lang.Float(phase_deltas(ix))));
+        requestBuilder.set(phase_deltas(ix));
         pause(1.0);
         % calculate energy from phase readback here
         phase(ix, :) = reshape(lcaGetSmart(fast.name), 1, []);  %phase(:, [1:3]) is VDES
@@ -94,7 +92,7 @@ try
     end
     % restore energy multiknob
     disp('Scan finished. Restoring knob.');
-    da.setDaValue('MKB//VAL', DaValue(java.lang.Float(phase_deltas(end))));
+    requestBuilder.set(phase_deltas(end));
 
 catch err
     % turn feedbacks back on

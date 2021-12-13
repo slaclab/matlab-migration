@@ -225,29 +225,18 @@ end
 % --------------------------------------------------------------------
 function val = magnetSet(name, val, secn, func)
 
-% Initialize aida
-%global da in
-
-aidainit;
-   import edu.stanford.slac.aida.lib.da.DaObject;
-   import edu.stanford.slac.err.*;
-   import edu.stanford.slac.aida.lib.da.*;
-   import edu.stanford.slac.aida.lib.util.common.*;
-   da=DaObject;
-   in=DaValue;
-
 if isempty(name), val=[];return, end
-in.type=0;
-in.addElement(DaValue(name));
-%in.addElement(DaValue(java.lang.Float(val))); % Kludge to make Aida format conversion work.
-in.addElement(DaValue(single(val))); % Kludge to make Aida format conversion work.
-da.reset;
-da.setParam('MAGFUNC',func);
-da.setParam('LIMITCHECK','SOME');
+in = AidaPvaStruct();
+in.put('names', { name } ) ;
+in.put('values', { val } ) ;
+requestBuilder = pvaRequest(['MAGNETSET:' secn]);
+requestBuilder.with('MAGFUNC', func);
+requestBuilder.with('LIMITCHECK', 'SOME');
+
 try
-    out=da.setDaValue(['MAGNETSET//' secn],in);
-    val=getAsDoubles(out.get(1));
-catch
-    disp(sprintf('Aida error trimming %s ... %s',name{unique([1 end])}));
+    out=requestBuilder.set(in);
+    val=toArray(out.get('value'));
+catch e
+    handleExceptions(e, 'Aida error trimming %s ... %s', name{unique([1 end])});
     val=nan(size(name));
 end

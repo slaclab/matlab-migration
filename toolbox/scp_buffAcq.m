@@ -4,8 +4,8 @@ function [x, y, tmit, bpms, pulseid, good] = scp_buffAcq(bpms, dgrp, num)
 % Returns NaN values if buffered acquisition failes.
 %
 % Input Arguments:
-%   BPMS: String or cell array of strings of BPM names (e.g. 'BPMS:LI02:201'). 
-%   DGRP: Name of DGRP to acquire buffered data from, e.g. 'NDRFACET' or 'ELECEP01'. 
+%   BPMS: String or cell array of strings of BPM names (e.g. 'BPMS:LI02:201').
+%   DGRP: Name of DGRP to acquire buffered data from, e.g. 'NDRFACET' or 'ELECEP01'.
 %   NUM:  Number of samples to acquire.
 %
 % Output arguments:
@@ -14,7 +14,7 @@ function [x, y, tmit, bpms, pulseid, good] = scp_buffAcq(bpms, dgrp, num)
 %       STAT:       M x NUM array of pulse IDs.
 %       GOOD:       M x NUM array of "good measurement" flags.
 %
-%  
+%
 % Compatibility: Version 7 and higher
 %
 % Author: Nate Lipkowitz, SLAC
@@ -32,28 +32,29 @@ end
 bpms = reshape(cellstr(bpms), 1, []);
 
 % set up aida query
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
-da.setParam('BPMD', num2str(bpmd));
-da.setParam('NRPOS', num2str(num));
-for ix = 1:numel(bpms)
-    da.setParam(strcat('BPM', num2str(ix)), char(model_nameConvert(bpms(ix), 'SLC')));
-end
 
+da = pvaRequest(strcat(char(dgrp), ':BUFFACQ'));
+da.with('BPMD', bpmd);
+da.with('NRPOS', num);
+convertedBpms
+for ix = 1:numel(bpms)
+    convertedBpms(ix) = model_nameConvert(bpms(ix), 'SLC');
+end
+da.with('BPMD', convertedBpms);
 
 % call AIDA
 try
-    buffdata = da.getDaValue(strcat(char(dgrp), '//BUFFACQ'));
-catch
+    buffdata = da.get();
+catch e
+    handleExceptions(e);
     [x, y, tmit, pulseid] = deal(nan(num, numel(bpms)));
     good = zeros(num, numel(bpms));
     return;
 end
 
 % extract java stuff to matlab and reformat arrays
-pulseid = flipdim(reshape(buffdata.get(1).getAsDoubles(), num, numel(bpms)), 2);
-x = flipdim(reshape(buffdata.get(2).getAsDoubles(), num, numel(bpms)), 2);
-y = flipdim(reshape(buffdata.get(3).getAsDoubles(), num, numel(bpms)), 2);
-tmit = flipdim(reshape(buffdata.get(4).getAsDoubles(), num, numel(bpms)), 2);
-good = flipdim(reshape(buffdata.get(6).getAsDoubles(), num, numel(bpms)), 2);
+pulseid = flipdim(reshape(toArray(buffdata.get('id')), num, numel(bpms)), 2);
+x = flipdim(reshape(toArray(buffdata.get('x')), num, numel(bpms)), 2);
+y = flipdim(reshape(toArray(buffdata.get(3)), num, numel(bpms)), 2);
+tmit = flipdim(reshape(toArray(buffdata.get(4)), num, numel(bpms)), 2);
+good = flipdim(reshape(toArray(buffdata.get(6)), num, numel(bpms)), 2);

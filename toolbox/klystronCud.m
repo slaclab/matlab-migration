@@ -11,13 +11,12 @@ persistent accelerator
 if isempty(sys)
     [sys, accelerator] = getSystem();
 end
-aidainit;
 nLogLines = 24;
 toggleLogFile = 1;
 logStringHead = 'begin\nnumCols 3\nheaderAlign "ccclc"\nalign "ccclc"\nseparators "|"\ncomment "#"\nend\n';
 logStringList(1:nLogLines) = {''};
 
-err=getLogger(['klystronCud_', accelerator]);  
+err=getLogger(['klystronCud_', accelerator]);
 fprintf('\nStarting Klystron Cud %s\n\n',datestr(now)')
 format long
 statusStr = {'OK '; 'ACC'; 'OFF'; 'MNT'; 'TBR'; 'ARU';  'CKP'};
@@ -53,19 +52,19 @@ end
 [c, ia, ib] = intersect(handles.klysS,removeList);
 ia_stn = mod(ia,8); ia_stn(ia_stn==0) = 8;
 for ii = 1:length(ia), handles.klysS(ia_stn(ii),fix((ia(ii)-1)/8)+1) = {' '};  end
-        
-klysNumel = numel(handles.klysS); %- length(removeList); 
+
+klysNumel = numel(handles.klysS); %- length(removeList);
 sbstNumel = numel(handles.sbstN);
 blankMat = cell(8,sbstNumel);
 [blankMat{:}] = deal(' ');
 isAccPvs = blankMat;
 statPvs = blankMat;
-strPvs =  blankMat; 
+strPvs =  blankMat;
 pActPvs = cell(sbstNumel,1);
 pLimHihiPvs = pActPvs;
 pLimLoloPvs = pActPvs;
 pstrPvs = pActPvs;
-pisAccPvs = pActPvs; 
+pisAccPvs = pActPvs;
 jj = 0;
 for ii = 1:sbstNumel
     % First define PVs for sub-boosters
@@ -74,20 +73,20 @@ for ii = 1:sbstNumel
             pActPvs{ii} = sprintf('CUDSBST:%s:1:STATUS', sbst{ii} );
             pLimHihiPvs{ii} = sprintf('CUDSBST:%s:1:STATUS.HIHI', sbst{ii} );
             pLimLoloPvs{ii} =  sprintf('CUDSBST:%s:1:STATUS.LOLO', sbst{ii} );
-            pstrPvs{ii} = sprintf('CUDSBST:%s:1:STATUS.DESC', sbst{ii} ); 
-            pisAccPvs{ii} = sprintf('CUDSBST:%s:1:ONBEAM1', sbst{ii} ); 
+            pstrPvs{ii} = sprintf('CUDSBST:%s:1:STATUS.DESC', sbst{ii} );
+            pisAccPvs{ii} = sprintf('CUDSBST:%s:1:ONBEAM1', sbst{ii} );
         case 'FACET'
             pActPvs{ii} = sprintf('FCUDSBST:%s:1:STATUS', sbst{ii} );
             pLimHihiPvs{ii} = sprintf('FCUDSBST:%s:1:STATUS.HIHI', sbst{ii} );
             pLimLoloPvs{ii} =  sprintf('FCUDSBST:%s:1:STATUS.LOLO', sbst{ii} );
-            pstrPvs{ii} = sprintf('FCUDSBST:%s:1:STATUS.DESC', sbst{ii} ); 
-            if(ii==1 | ii==2) 
-                pisAccPvs{ii} = sprintf('FCUDSBST:%s:1:ONBEAM11', sbst{ii} ); 
-            else 
-                pisAccPvs{ii} = sprintf('FCUDSBST:%s:1:ONBEAM10', sbst{ii} ); 
-            end 
+            pstrPvs{ii} = sprintf('FCUDSBST:%s:1:STATUS.DESC', sbst{ii} );
+            if(ii==1 | ii==2)
+                pisAccPvs{ii} = sprintf('FCUDSBST:%s:1:ONBEAM11', sbst{ii} );
+            else
+                pisAccPvs{ii} = sprintf('FCUDSBST:%s:1:ONBEAM10', sbst{ii} );
+            end
     end
-    
+
     % Next, define PVs for klystrons
     for stn = 1:8
         thisStation = sprintf('%s-%i',sbst{ii}(3:4),stn);
@@ -103,7 +102,7 @@ for ii = 1:sbstNumel
                     statPvs{stn,ii} = sprintf('FCUDKLYS:%s:%i:STATUS', sbst{ii}, stn );
                     strPvs{stn,ii} = sprintf('FCUDKLYS:%s:%i:STATUS.DESC', sbst{ii}, stn );
                 elseif(ii==21) % Special stations: 'KLYS:DR01:1'; 'KLYS:DR03:1'; 'KLYS:DR13:1'; 'KLYS:LI20:93';  'KLYS:LI20:94'; 'KLYS:LI20:41'
-                    switch stn, 
+                    switch stn,
                         case 2,
                             isAccPvs{stn,ii} =  sprintf('FCUDKLYS:DR01:1:ONBEAM11');
                             statPvs{stn,ii} = sprintf('FCUDKLYS:DR01:1:STATUS');
@@ -136,7 +135,7 @@ for ii = 1:sbstNumel
                 end
 
         end
-            
+
     end
 end
 
@@ -146,7 +145,7 @@ end
      case 'FACET'
          strPvsS = strrep(strPvs,'FCUDKLYS','KLYS');
  end
- strPvsS = strrep(strPvsS,':STATUS.DESC', '1:SSTATSTR'); 
+ strPvsS = strrep(strPvsS,':STATUS.DESC', '1:SSTATSTR');
  if(strcmp(accelerator,'FACET'))
      strPvsS{5,21} = sprintf('KLYS:LI20:93:SSTATSTR');
      strPvsS{6,21} = sprintf('KLYS:LI20:94:SSTATSTR');
@@ -157,15 +156,15 @@ end
  strPvsXL = strrep(strPvsS,'SSTATSTR', 'XLSTATSTR');
 % Remove SBST 20 if LCLS
 pActPvs = pActPvs(oneOrTwo:end); pLimHihiPvs = pLimHihiPvs(oneOrTwo:end); pLimLoloPvs = pLimLoloPvs(oneOrTwo:end);
-if(strcmp(accelerator, 'LCLS')) 
-    pstrPvs = pstrPvs(oneOrTwo:end); 
-    pisAccPvs = pisAccPvs(oneOrTwo:end); 
-else 
-    pstrPvs = pstrPvs(oneOrTwo:end-1); 
-    pisAccPvs = pisAccPvs(oneOrTwo:end-1); 
-end 
+if(strcmp(accelerator, 'LCLS'))
+    pstrPvs = pstrPvs(oneOrTwo:end);
+    pisAccPvs = pisAccPvs(oneOrTwo:end);
+else
+    pstrPvs = pstrPvs(oneOrTwo:end-1);
+    pisAccPvs = pisAccPvs(oneOrTwo:end-1);
+end
 % Define PVs for L2 & L3 phases
-if(strcmp(accelerator, 'LCLS')) 
+if(strcmp(accelerator, 'LCLS'))
     pActMeanPvs = { 'CUDSBST:L2:PHASE:MEAN' ; 'CUDSBST:L3:PHASE:MEAN' } ;
     pLimMeanPvs = { 'CUDSBST:L2:PHASE:MEAN.LOLO' ; 'CUDSBST:L3:PHASE:MEAN.LOLO'; ...
                     'CUDSBST:L2:PHASE:MEAN.HIHI' ; 'CUDSBST:L3:PHASE:MEAN.HIHI'};
@@ -188,7 +187,7 @@ pause(1)
     %nulIndx = strmatch(' ' , statPvs);
     nulIndx = strmatch(' ' , handles.klysS);
     useIndx(nulIndx) = ''; % Removes unused station indices (is a vector of removed station indices)
-    
+
     try % Try getting all of the relevant info using a modified version of klysStatGet
         [isACC(useIndx),stat(useIndx),swrd(useIndx), hdsc(useIndx), dsta1(useIndx),dsta2(useIndx)]=klysCud_klysStatGet(handles.klysS(useIndx),accelerator);
     catch
@@ -199,33 +198,33 @@ pause(1)
     dsta = zeros([size(handles.klysS), 2]);
     dsta(:,:,1) = dsta1;
     dsta(:,:,2) = dsta2;
-    
+
     %act=bitand(act,7); % Use only bits 1, 2, 3
-    
+
     %Ignore bits for special stations. isS21==21 true for sector 21
     % ['isS', ss{:}, '=handles.sbstN', '==', ss{:},';']  translates to  isS24=handles.sbstN==24;
     if strcmp(accelerator,'LCLS')
      for ss = {'20', '21', '24'},
        eval(['isS', ss{:}, '=handles.sbstN', '==', ss{:},';']);
      end
-     
-     for bits = [6 8:11] %Allow for bit 7 (Amplitude Mean bit to be set) 
+
+     for bits = [6 8:11] %Allow for bit 7 (Amplitude Mean bit to be set)
        swrd(1:8,isS20) = bitset(swrd([1:8],isS20),bits,0);
        swrd(1:2,isS21) = bitset(swrd(1:2,isS21),bits,0); % 21-1 LRF,
        swrd([1:3 8],isS24) = bitset(swrd([1:3 8],isS24),bits,0);
      end
-     
+
      stat(1:8,isS20) = bitset(stat(1:8,isS20),1,1);
      stat(1:2,isS21) = bitset(stat(1:2,isS21),1,1); %
      stat([1:3 8],isS24) = bitset(stat([1:3 8],isS24),1,1); %
-     
+
      for bits = [4, 10],
-       stat(1:8,isS20) = bitset(stat(1:8,isS20),bits,0); %  
+       stat(1:8,isS20) = bitset(stat(1:8,isS20),bits,0); %
        stat(1:2,isS21) = bitset(stat(1:2,isS21),bits,0); %
        stat([1:3 8],isS24) = bitset(stat([1:3 8],isS24),bits,0); %
      end
     end
-    
+
 %     % Set logical status arrays
 %     isACC=bitget(act,1) == 1; % Klys on ACCEL
      isStat=bitget(stat,1) == 1; % Status OK
@@ -235,8 +234,8 @@ pause(1)
          %keyboard
      end
      strN(:)=cellstr(num2str(repmat(handles.klysN,length(handles.sbstN),1))); % Show Klys number
-     
-%    Get string from status bits and output the ones that have changed. 
+
+%    Get string from status bits and output the ones that have changed.
      try
      [strS strM strL  strXL] = klysCudString(stat,swrd,hdsc,dsta, handles); %string Short, Medium, Large, XLarge
      catch
@@ -244,7 +243,7 @@ pause(1)
          dbstack
          continue
      end
-              
+
      oldStr1 = strS;
 
      % Heater DelayklysCudStri
@@ -256,7 +255,7 @@ pause(1)
                     tStart = uint64(hdelay(kk,jj)); %find time elapsed
                     tElapsed = toc(tStart);
                     tForm = (tElapsed/60);
-                    tCheck = mod(tForm*10,10); 
+                    tCheck = mod(tForm*10,10);
                     if tCheck > 2   %first 12secs will display 'KHD'
                         tForm = tForm - 0.5;
                         tForm = sprintf('%.0f', tForm);
@@ -272,26 +271,26 @@ pause(1)
                 hdelay(kk,jj) = 0;
             end
         end
-     end     
+     end
 
-%    Color of String is based on Status value  (see $EDMFILES colors.list) 
+%    Color of String is based on Status value  (see $EDMFILES colors.list)
      statWarn = ones(size(isStat)) * 80;
      statAlarm = double(isPO15 & isACC) * 110;
-     
+
      for ii = 1:length(statusStr),
        statWarn(strmatch(statusStr{ii},strS) ) = statusColor(ii);
      end
      indx0 = strmatch('OK ', strS) ;
      strS(indx0) = strN( indx0 ); %'OK' gets station number.
-     
+
      statVal = max(statWarn, statAlarm);
-     
+
      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
      % Added on 11/16/12 by bripman to fix AMM status color for stations
      % with very low amplitude.
      switch accelerator
          case 'LCLS'
-             
+
              amplPvs = strrep(statPvs,'CUDKLYS','KLYS');
              amplPvs = strrep(amplPvs,':STATUS','1:AMPL');
              adesPvs = strrep(statPvs,'CUDKLYS','KLYS');
@@ -299,7 +298,7 @@ pause(1)
              amplVals = ones(8,11);
              adesVals = ones(8,11);
              ratios = ones(8,11);
-             
+
              for col=1:11
                  for row=1:8
                     if ~strcmpi(amplPvs(row,col), ' ')
@@ -313,12 +312,12 @@ pause(1)
                     end
                  end
              end
-             
+
          case 'FACET'
              % Finish this when FACET starts up again
      end
-     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
-     
+     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
      try
      lcaPut(statPvs(useIndx)', statVal(useIndx)')
      lcaPut(isAccPvs(useIndx)', double(isACC(useIndx))')
@@ -326,17 +325,17 @@ pause(1)
      lcaPut(strPvsS(useIndx)', strS(useIndx)'); %Do only LCLS for EPICS long string status
      lcaPut(strPvsM(useIndx)', strM(useIndx)');
      lcaPut(strPvsL(useIndx)', strL(useIndx)');
-     lcaPut(strPvsXL(useIndx)', strXL(useIndx)');  
-     
+     lcaPut(strPvsXL(useIndx)', strXL(useIndx)');
+
      % Why are the next three lines even here? They're redundant with the
      % switch statement that follows. Should take these out when I have a
      % stable version running.
      if strcmp(accelerator,'LCLS')
-         lcaPut('CUDKLYS:MCC0:ONBC1SUMY',double(isACC(:))' ) 
+         lcaPut('CUDKLYS:MCC0:ONBC1SUMY',double(isACC(:))' )
      end
-     
+
      switch accelerator
-         case 'LCLS', lcaPut('CUDKLYS:MCC0:ONBC1SUMY',double(isACC(:))' ); 
+         case 'LCLS', lcaPut('CUDKLYS:MCC0:ONBC1SUMY',double(isACC(:))' );
          case 'FACET',
              linacKlysComp =  isACC(:,3:20); %LI02 to LI19
              lcaPut('FCUDKLYS:MCC1:ONBC10SUMY',double(linacKlysComp(:))' );
@@ -349,24 +348,24 @@ pause(1)
    % Now do sub-boosters...
     pTolSbsts=1;
     pTolMean=[1;0.5];
-    oldDes = pDes; 
+    oldDes = pDes;
     try [pAct,pDes]=control_phaseGet(handles.sbstS(oneOrTwo:end)); % Returns actual and desired phase in deg
     catch fprintf(['Failed on [pAct,pDes]=control_phaseGet(handles.sbstS) ' ...
                    '%s\n'],datestr(now));
     end
-    if (sum(isnan(pDes))), 
-        fprintf('Warning control_phaseGet return NAN for pDes %s\n',datestr(now)); 
+    if (sum(isnan(pDes))),
+        fprintf('Warning control_phaseGet return NAN for pDes %s\n',datestr(now));
         pDes = oldDes;
     end
     try lcaPut(pActPvs,pAct);
     catch fprintf('Failed on lcaPut(pActPvs,pAct) %s\n',datestr(now)), end
 
-    
+
     if( sum(oldDes-pDes) || counter ==2 )
         try
           lcaPut(pLimHihiPvs, pDes + pTolSbsts);
           lcaPut(pLimLoloPvs, pDes - pTolSbsts);
-        catch  fprintf('Failed on lcaPut pLimHihiPvs or Lolo %s\n',datestr(now)), 
+        catch  fprintf('Failed on lcaPut pLimHihiPvs or Lolo %s\n',datestr(now)),
         end
         pDesMean=[mean(pDes(1:4));mean(pDes(5:10))];
         if(strcmp(accelerator, 'LCLS'))
@@ -380,11 +379,11 @@ pause(1)
         try lcaPut(pActMeanPvs, pActMean);
         catch  fprintf('Failed on lcaPut pACtMeanPvs %s\n',datestr(now)), end
     end
-    
+
     counter = counter + 1;
     if (counter > 50000), counter = 2; end
 
-    
+
     %sbst green bars
     sbstSize = size(isACC);
     sbstSize = sbstSize(2);
@@ -402,7 +401,7 @@ pause(1)
             pisACC(kk,1) = max(isACC(:,kk));
         end
     end
-    
+
    % sub-booster string pv's
     sbstSize = size(handles.sbstS);
     sbstSize(1) = sbstSize(1) - 1;
@@ -411,8 +410,8 @@ pause(1)
     useIndx = 1:sbstSize(1);
     nulIndx = strmatch(' ' , handles.sbstS);
     useIndx(nulIndx) = ''; %Removes unused station indices (is a vector of removed station indices)
-    
-    try 
+
+    try
          [isACC,stat,swrd,hdsc,dsta1,dsta2]=deal(zeros(sbstSize));
          % 10/11/11 W. Colocho :Need to fix SBST string and isACC. control_klysStatGet.m does not
          % support SBST and status bits don't really translate.
@@ -424,8 +423,8 @@ pause(1)
     dsta = zeros([sbstSize, 2]);
     dsta(:,:,1) = dsta1;
     dsta(:,:,2) = dsta2;
-     
-%    Get string from status bits and output the ones that have changed. 
+
+%    Get string from status bits and output the ones that have changed.
      try
      [strS strM strL  strXL] = klysCudString(stat,swrd,hdsc,dsta, handles, 'SBST'); %string Short, Medium, Large, XLarge
      catch
@@ -434,12 +433,12 @@ pause(1)
          continue
      end
 
-    try 
+    try
         lcaPut(pisAccPvs(useIndx), double(pisACC(useIndx)));
         lcaPut(pstrPvs(useIndx), strS(useIndx));
-    catch 
-        fprintf('Failed on lcaPut(sbstPvs,pAct) %s\n',datestr(now)) 
-    end 
+    catch
+        fprintf('Failed on lcaPut(sbstPvs,pAct) %s\n',datestr(now))
+    end
     %fprintf('test')
 end % End of main loop
 
@@ -447,7 +446,7 @@ end % End of main loop
 end
 
 % function [strS strM strL strXL] = klysCudString(stat,swrd,hdsc,dsta, handles)
-function [strS strM strL strXL] = klysCudString(stat,swrd,hdsc,dsta, handles, type) 
+function [strS strM strL strXL] = klysCudString(stat,swrd,hdsc,dsta, handles, type)
 % info from REF_:[KLYSUTIL]KLYS_STRING.FOR
 % Input: act, stat, swrd, hdsc, dsta, handles
 % Output: strS - 3 leter character for CUD.
@@ -483,8 +482,8 @@ if isempty(sys)
 end
 
  persistent HSinfo STinfo SWinfo DSinfo BAinfo HDinfo;
- 
- HSinfo = { ...   
+
+ HSinfo = { ...
 'HS', 2000, 'Gh', 'ON ', 'ONLIN', 'Hsta online ', 'Hsta online';...
 'HS',   10, 'Sh', 'MNT', 'MAINS', 'Maintenance ', 'Hsta maintenance mode';...
 'HS',    1, 'Sh', 'OFF', 'OFFL ', 'OFFLINE     ', 'Hsta offline';...
@@ -519,8 +518,8 @@ STinfo = { ...
 'ST', 9999, 'SN', 'ski', 'skip ', 'skip        ', ' None';...
 'ST',   30, 'Ss', 'UPD', 'UPDAT', 'UPDATE Req  ', 'Stat_Update Req ';...
 'ST', 9999, 'SN', 'ski', 'skip ', 'skip        ', ''};
-    
-SWinfo = {... 
+
+SWinfo = {...
 'SW',   55, 'SH', 'CBL', 'Cable', 'Bad Cable   ', 'BAD CABLE Status';...
 'SW',   80, 'SH', 'MKS', 'MKSU ', 'MKSU Protect', 'MKSU Protect';...
 'SW',   68, 'SH', 'TRG', 'TRIG ', 'NO Triggers ', 'NO Triggers';...
@@ -682,33 +681,33 @@ debugFlag = lcaGet(['SIOC:' sys ':ML00:AO324']);
 
 msg1 = [datestr(now) ' Warning: Found word with negative bits. '];
 warn=0;
-if min(min(stat)) < 0 
+if min(min(stat)) < 0
     if debugFlag, disp(msg1), disp(handles.klysS(stat<0)), end
-    stat(stat<0) = 0; warn = 1; 
+    stat(stat<0) = 0; warn = 1;
 end
-if min(min(swrd)) < 0, 
+if min(min(swrd)) < 0,
     if(debugFlag), disp(msg1), disp(handles.klysS(swrd<0)), end
     swrd(swrd<0) = 0; warn = 2;
 end
-if min(min(hdsc)) < 0, 
+if min(min(hdsc)) < 0,
     if(debugFlag), disp(msg1), disp(handles.klysS(hdsc<0)), end
     hdsc(hdsc<0) = 0; warn = 3;
 end
-if min(min(dsta(:,:,1))) < 0, 
+if min(min(dsta(:,:,1))) < 0,
     if(debugFlag), disp(msg1), disp(handles.klysS(dsta(:,:,1)<0)), end
     d1 = dsta(:,:,1); d1(d1<0) = 0;
-    dsta(:,:,1) = d1; warn = 4;  %dsta(dsta(:,:,1)<0) = 0;    
+    dsta(:,:,1) = d1; warn = 4;  %dsta(dsta(:,:,1)<0) = 0;
 end
-if min(min(dsta(:,:,2))) < 0, 
+if min(min(dsta(:,:,2))) < 0,
     if(debugFlag), disp(msg1),  disp(handles.klysS(dsta(:,:,2)<0)), end
     d2 = dsta(:,:,2); d2(d2<0) = 0;
-    dsta(:,:,2) = d2; warn = 5; %dsta(dsta(:,:,2)<0) = 0;  
+    dsta(:,:,2) = d2; warn = 5; %dsta(dsta(:,:,2)<0) = 0;
 end
 
 strS = cell(size(stat)); %initialize string matrix
 strM = strS;
 strL = strS;
-strXL = strS; 
+strXL = strS;
 
 if(debugFlag)
     warnStr = {'stat', 'swrd', 'hdsc', 'dsta1','dsta2'};
@@ -717,10 +716,10 @@ if(debugFlag)
       %keyboard
     end
 end
-         
+
 try
-for i=1:16,  
-  ST(:,:,i) = bitget(stat,i) * STinfo{i,2};  
+for i=1:16,
+  ST(:,:,i) = bitget(stat,i) * STinfo{i,2};
   SW(:,:,i) = bitget(swrd,i) * SWinfo{i,2};
 end
 
@@ -745,7 +744,7 @@ tt = [STinfo{:,2},  SWinfo{:,2}, DSinfo{:,2}, BAinfo{:,2}, HDinfo{:,2}];
 tTag = {STinfo{:,1},  SWinfo{:,1}, DSinfo{:,1}, ...
         BAinfo{:,1}, HDinfo{:,1} };
 
-    
+
 if nargin < 6
     type = '';
 end
@@ -825,21 +824,21 @@ end
 
 % Work in progress - fixing this to get info on all beamcodes for all FACET
 % stations.
-% 
+%
 % function [isACC, stat, swrd, hdsc, dsta1, dsta2] = klysCud_klysStatGet(name,accelerator)
-% 
+%
 % % LCLS
 % if(strcmp(accelerator, 'LCLS'))
 %     [act,stat,swrd,hdsc,dsta]=control_klysStatGet(name);
 % end
-% 
+%
 % % FACET
 % if(strcmp(accelerator, 'FACET'))
 %   [act6,stat6,swrd6,hdsc6,dsta6]=control_klysStatGet(name,6);
 %   [act10,stat10,swrd10,hdsc10,dsta10]=control_klysStatGet(name,10);
 %   [act11,stat11,swrd11,hdsc11,dsta11]=control_klysStatGet(name,11);
 % end
-% 
+%
 % dsta1 = dsta(:,1);
 % dsta2 = dsta(:,2);
 % isACC=false(size(stat)); % Create an array of logical zeros

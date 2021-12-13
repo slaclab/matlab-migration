@@ -63,7 +63,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = SYAG_dispersion_gui_OutputFcn(hObject, eventdata, handles) 
+function varargout = SYAG_dispersion_gui_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -116,7 +116,7 @@ set(handles.current_dispersion_value,'String',num2str(current_dispersion));
 handles = update_gui(handles);
 update_image(handles);
 
-% Set handles.do_scan ~=1 when troubleshooting. Set =1 to actually perform dispersion scan. 
+% Set handles.do_scan ~=1 when troubleshooting. Set =1 to actually perform dispersion scan.
 handles.do_scan = 1;
 guidata(hObject, handles);
 
@@ -209,9 +209,8 @@ phase_deltas = diff([0 handles.data.range 0]);
 
 % set up AIDA for knob control
 if handles.do_scan == 1
-aidainit;
-da = DaObject();
-   da.setParam('MKB', strcat('mkb:', handles.data.knob(handles.data.knobv)));
+   requestBuilder = pvaRequest('MKB:VAL');
+   requestBuilder.with('MKB', strcat('mkb:', handles.data.knob(handles.data.knobv)));
 end
 
 set(hObject, 'String', 'Acquiring...');
@@ -237,9 +236,9 @@ for ix = 1:handles.data.nstep
         gui_statusDisp(handles, sprintf('Setting %s to %.1f', handles.data.knob{handles.data.knobv}, handles.data.range(ix)));
     end
     if handles.do_scan == 1
-       da.setDaValue('MKB//VAL', DaValue(java.lang.Float(phase_deltas(ix))));
+       requestBuilder.set(phase_deltas(ix));
     end
-    
+
     % calculate energy from phase readback here
     phase(ix, :) = reshape(lcaGetSmart(fast.name), 1, []);  %phase(:, [1:3]) is VDES
     pact = klys.phas + repmat(sbst.phas, 8, 1) + repmat(phase(ix, [1 3]), 8, 1);
@@ -275,7 +274,7 @@ handles.data.phase = phase;
 
 % restore energy multiknob
 if handles.do_scan == 1
-   da.setDaValue('MKB//VAL', DaValue(java.lang.Float(phase_deltas(end))));
+   requestBuilder.set(phase_deltas(end));
 end
 
 %turn feedbacks back on

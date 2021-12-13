@@ -26,8 +26,6 @@ function [pAct, iok] = control_phaseSet(name, pDes, trim, nTry, type, ds)
 % --------------------------------------------------------------------
 % Check input arguments
 
-global da
-
 % Defaults
 if nargin < 6, ds=[];end
 if nargin < 5, type=[];end
@@ -89,14 +87,6 @@ end
 % Use AIDA for SLC RF devices.
 pTol=2; % Phase tolerance
 if any(is.SLC)
-    aidainit;
-    if isempty(da), 
-       import edu.stanford.slac.aida.lib.da.DaObject;    
-       da=DaObject;
-    end
-    da.reset;
-    
-    if ~trim, da.setParam('TRIM','NO');end
     pAct(is.SLC)=Inf;
     isBad=abs(pAct-pDes) > pTol & is.SLC;
     jTry=5;
@@ -104,11 +94,14 @@ if any(is.SLC)
         disp_log(char(strcat({'Set '},name(isBad),':',type(isBad),{' to '},cellstr(num2str(pDes(isBad))))));
         if jTry < 5, pause(5.);end
         for j=find(isBad)'
-            in=DaValue(java.lang.Float(pDes(j)));
             try
-                da.setDaValue([model_nameConvert(name{j},'SLC') '//' type{j}],in);
-            catch
-                disp_log(['Error in setting phase for ' name{j}]);
+                requestBuilder = pvaRequest([model_nameConvert(name{j},'SLC') '//' type{j}]);
+                if ~trim
+                    requestBuilder.with('TRIM','NO');
+                end
+                requestBuilder.set(pDes(j));
+            catch e
+                handleExceptions(e, ['Error in setting phase for ' name{j}]);
                 iok=0;
             end
         end

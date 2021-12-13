@@ -74,7 +74,7 @@ handles.CustomAnalysisList{1}='This is not the full version, no custom analysis!
 %             COPIA=0;
 %         end
 %     end
-%     if(COPIA)        
+%     if(COPIA)
 %         handles.CustomAnalysisList{end+1}=CustomAnalysis(II).name;
 %         copyfile([pwd,'/CustomAnalysis/',CustomAnalysis(II).name], pwd,'f')
 %         handles.FunctionAnalysisListHandles{end+1}=eval(['@',CustomAnalysis(II).name(1:(end-2))]);
@@ -134,7 +134,7 @@ ProfList{9}='Direct Imager WFOV';
 set(handles.ProfileMonitorMenu,'String',ProfList)
 
 for II=1:handles.OutVariablesNumber
-   eval(['set(handles.w',char(48+II),',''string'',[handles.PV(II).what,handles.PV(II).name])']) 
+   eval(['set(handles.w',char(48+II),',''string'',[handles.PV(II).what,handles.PV(II).name])'])
 end
 
 handles.Signal(1).Code{1}='CodeOutput=sum(FirstProfile(%1:%2,:));';
@@ -160,7 +160,7 @@ handles.FullPVList=JimTurnerOpeningFunctionBSA_gui(handles);
 [handles.FullPVList.fp,handles.FullPVList.sp,handles.FullPVList.tp,handles.FullPVList.qp]=read_pv_names(handles.FullPVList.root_name)
 
 handles=NaClO_Callback(hObject, eventdata, handles);
-% 
+%
 % set(handles.dialogotrasordi,'string','el. stored');
 % set(handles.dia_text_rec,'string','0');
 set(handles.CominciaModalitaSchiavo,'UserData',0);
@@ -188,7 +188,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = CVS_CVCRCI_OutputFcn(hObject, eventdata, handles) 
+function varargout = CVS_CVCRCI_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -204,11 +204,11 @@ tp={};
 qp={};
 NPV=numel(ROOTNAME);
 for II=1:NPV
-   breaks=find(ROOTNAME{II}==':'); 
-   p1=ROOTNAME{II}(1:(breaks(1)-1)); 
-   p2=ROOTNAME{II}((breaks(1)+1):(breaks(2)-1)); 
-   p3=ROOTNAME{II}((breaks(2)+1):(breaks(3)-1)); 
-   p4=ROOTNAME{II}((breaks(3)+1):end); 
+   breaks=find(ROOTNAME{II}==':');
+   p1=ROOTNAME{II}(1:(breaks(1)-1));
+   p2=ROOTNAME{II}((breaks(1)+1):(breaks(2)-1));
+   p3=ROOTNAME{II}((breaks(2)+1):(breaks(3)-1));
+   p4=ROOTNAME{II}((breaks(3)+1):end);
 %    if(~any(strcmpi(p1,fp)))
         fp{end+1}=p1;
 %    end
@@ -221,7 +221,7 @@ for II=1:NPV
 %    if(~any(strcmpi(p4,qp)))
         qp{end+1}=p4;
 %    end
-   
+
 end
 
 function FullPVList=JimTurnerOpeningFunctionBSA_gui(handles)
@@ -461,7 +461,7 @@ handles.TOOT_NAME={'PATT:SYS0:1:NSEC',...
 'BPMS:CLTH:170:X',...
 'BPMS:CLTH:170:Y',...
 'BPMS:CLTH:170:TMIT',...
-'BPMS:BSYH:445:X',...             
+'BPMS:BSYH:445:X',...
 'BPMS:BSYH:445:Y',...
 'BPMS:BSYH:445:TMIT',...
 'BPMS:BSYH:465:X',...
@@ -901,25 +901,15 @@ handles.TOOT_NAME={'PATT:SYS0:1:NSEC',...
 'TORO:DMP1:999:TMIT'};
 
 try
-% Connect to Aida
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject; 
-da = DaObject();
-
 % Get the BSA Names.
-v = da.getDaValue('LCLS//BSA.elements.byZ'); 
+v = pvaGet('LCLS:BSA.elements.byZ');
 
-% Extract the number of BSA element names returned (the number of rows)
-Mrows = v.get(0).size(); 
+% Extract the number of BSA elements
+Mrows = v.size;
 
 % Extract just the element names and Z positions.
-root_name = (char(v.get(4).getStrings()));
-
-z_pos = (v.get(3).getStrings()); 
-
-for i=1:Mrows
-    z_positions(i) = str2double(z_pos(i,:));
-end
+root_name = toArray(v.get('name'));
+z_positions = toArray(v.get('z'));
 
 %Eliminate SLC database stuff and other unnecessary variables
 
@@ -955,18 +945,18 @@ id_bsa_1 = find( (((root_name(:,1)=='L')&(root_name(:,2)=='I'))...
     &(root_name(:,13)=='5'))...
     |((root_name(:,6)=='I')&(root_name(:,7)=='N')...
     &(root_name(:,11)=='9')&(root_name(:,12)=='8')...
-    &(root_name(:,13)=='1'))...      
+    &(root_name(:,13)=='1'))...
     |((root_name(:,1)=='I')&(root_name(:,2)=='O')...
-    &(root_name(:,3)=='C'))...      
+    &(root_name(:,3)=='C'))...
     |((root_name(:,14)=='S')&(root_name(:,15)=='E')...
-    &(root_name(:,16)=='C'))...      
+    &(root_name(:,16)=='C'))...
     |((root_name(:,13)=='S')&(root_name(:,14)=='E')...
-    &(root_name(:,15)=='C'))...      
+    &(root_name(:,15)=='C'))...
     )~=1);
 
-%    &(root_name(:,15)=='C'))...      
+%    &(root_name(:,15)=='C'))...
 %    |((root_name(:,1)=='F')&(root_name(:,2)=='A')...
-%    &(root_name(:,3)=='R')&(root_name(:,4)=='C'))...      
+%    &(root_name(:,3)=='R')&(root_name(:,4)=='C'))...
 %    |((root_name(:,6)=='L')&(root_name(:,7)=='I')...
 %    &(root_name(:,8)=='2')&(root_name(:,9)=='4')&(root_name(:,11)~='8'))...
 
@@ -1063,7 +1053,7 @@ if(isempty(FiguresList))
 else
     for II=1:numel(FiguresList)
        Lista{II}=num2str(FiguresList(II));
-    end 
+    end
 end
 set(handles.Vis_List,'String',Lista)
 
@@ -1081,7 +1071,7 @@ if(any(isnan(Init_Vars.DoubleBufferCycle)) || any(isinf(Init_Vars.DoubleBufferCy
         PrevColor=get(handles.dbcycle,'backgroundcolor');
         Init_Vars.INIT_FAILED=1;
         set(handles.handles.dbcycle,'backgroundcolor',[1,0,0]); pause(0.5);
-        set(handles.handles.dbcycle,'backgroundcolor',PrevColor); 
+        set(handles.handles.dbcycle,'backgroundcolor',PrevColor);
     end
 end
 Init_Vars.PulseIDProfileDelay=str2double(get(handles.PulseID_delay,'string'));
@@ -1089,7 +1079,7 @@ if(any(isnan(Init_Vars.PulseIDProfileDelay)) || any(isinf(Init_Vars.PulseIDProfi
     PrevColor=get(handles.PulseID_delay,'backgroundcolor');
     Init_Vars.INIT_FAILED=1;
     set(handles.PulseID_delay,'backgroundcolor',[1,0,0]); pause(0.5);
-    set(handles.PulseID_delay,'backgroundcolor',PrevColor); 
+    set(handles.PulseID_delay,'backgroundcolor',PrevColor);
 end
 Init_Vars.PulseIDProfileDelay=round(Init_Vars.PulseIDProfileDelay);
 Init_Vars.BothProfiles=0;
@@ -1173,7 +1163,7 @@ if(Init_Vars.ReadProfile)
             TEMPVAR=TEMPVAR+1;
             Init_Vars.ShotToShotScalarsResorting(end+1)=1;Init_Vars.number_of_basic_processings=Init_Vars.number_of_basic_processings+2;
             Init_Vars.ResortingX(end+1,1)=2;Init_Vars.ResortingX(end,2)=length(Init_Vars.ShotToShotScalarsResorting);
-        end 
+        end
         if(Init_Vars.BasicProcessing(2))
             Init_Vars.ProfQuantResorting(end+1)=2; Init_Vars.ProfQuantResorting(end+1)=3;
             Init_Vars.BaseLineX{TEMPVAR+1}='First Profile Peak';
@@ -1296,7 +1286,7 @@ Init_Vars.ScalarsResorting=1:(numel(Init_Vars.PvNotSync)+handles.NumberOfOnTheFl
 if(Mode_of_Init==1)
     for II=1:handles.NumberOfAvailableFilters
             Init_Vars.CodiceFiltro(II).Code=TranslateCode(handles.Filter(II).Code,Init_Vars.ShotToShotScalarsResorting,2*(handles.ProfileProcessNumber+1)+Init_Vars.PvNumber+handles.TSandPulseIds+handles.NumberOfAvailableSignals,length(Init_Vars.ScalarsResorting),1);
-    end 
+    end
     for II=1:handles.OutVariablesNumber
             Init_Vars.CodiceOut(II).Code=TranslateCode(handles.Out(II).Code,Init_Vars.ShotToShotScalarsResorting,2*(handles.ProfileProcessNumber+1)+Init_Vars.PvNumber+handles.TSandPulseIds+handles.NumberOfAvailableSignals,length(Init_Vars.ScalarsResorting),2);
     end
@@ -1306,14 +1296,14 @@ if(Mode_of_Init==1)
 elseif(Mode_of_Init==2)
     for II=1:handles.NumberOfAvailableFilters
             Init_Vars.CodiceFiltro(II).Code=TranslateCode_NotOnlineVER(handles.Filter(II).Code,handles,Init_Vars.SignalsResorting,Init_Vars.SynchPvResorting,Init_Vars.ProfQuantResorting,Init_Vars.PvNumber,Init_Vars.PvNotSyncNumber,1);
-    end 
+    end
     for II=1:handles.NumberOfAvailableSignals
             Init_Vars.CodiceSig(II).Code=TranslateCode_NotOnlineVER(handles.Signal(II).Code,handles,Init_Vars.SignalsResorting,Init_Vars.SynchPvResorting,Init_Vars.ProfQuantResorting,Init_Vars.PvNumber,Init_Vars.PvNotSyncNumber,0);
     end
 elseif(Mode_of_Init==3)
     for II=1:handles.NumberOfAvailableFilters
             Init_Vars.CodiceFiltro(II).Code=TranslateCode_NotOnlineVER(handles.Filter(II).Code,handles,Init_Vars.SignalsResorting,Init_Vars.SynchPvResorting,Init_Vars.ProfQuantResorting,Init_Vars.PvNumber,Init_Vars.PvNotSyncNumber,1);
-    end 
+    end
     for II=1:handles.NumberOfAvailableSignals
             Init_Vars.CodiceSig(II).Code=TranslateCode_NotOnlineVER(handles.Signal(II).Code,handles,Init_Vars.SignalsResorting,Init_Vars.SynchPvResorting,Init_Vars.ProfQuantResorting,Init_Vars.PvNumber,Init_Vars.PvNotSyncNumber,4);
     end
@@ -1402,7 +1392,7 @@ if(~isempty(FiguresList))
                 findobj(FiguresList(ScreenID));
                 FigureStillOpen=1;
             catch ME
-                FigureStillOpen=0;    
+                FigureStillOpen=0;
             end
             if(FigureStillOpen) %check for consitency, if ok... just keep it AS it is. Otherwise... reset what necessary, but keep it open
                 X_SEL=get(ChildrenSorting(ScreenID,2),'string');
@@ -1430,7 +1420,7 @@ if(~isempty(FiguresList))
                     end
                 else
                     set(ChildrenSorting(ScreenID,3),'value',1); set(ChildrenSorting(ScreenID,3),'string',UD{2});
-                    set(ChildrenSorting(ScreenID,4),'value',1); 
+                    set(ChildrenSorting(ScreenID,4),'value',1);
                     set(ChildrenSorting(ScreenID,4),'string',UD{2});
                     set(ChildrenSorting(ScreenID,5),'value',1); set(ChildrenSorting(ScreenID,5),'string',UD{2});
                     petizione=get(ChildrenSorting(ScreenID,23),'Userdata');
@@ -1507,7 +1497,7 @@ if(Init_Vars.usebsa)
     if(~Init_Vars.PvNumber)
         Init_Vars.usebsa=0;
         set(handles.c_BSA,'value',0);
-    else 
+    else
         [myeDefNumber,new_name1,new_name2]=Initialize_Double_Buffer(handles,Init_Vars);
         PlusOne=get(handles.CV_PlusOne,'value');
         if(PlusOne)
@@ -1535,7 +1525,7 @@ if(Init_Vars.ReadProfile) % Get the size of the profile and decides if transpose
                backg1=mean(double(backg1),1);
                backg2=mean(double(backg2),2);
             else
-               backg1=0*proj1.'; backg2=0*proj2; 
+               backg1=0*proj1.'; backg2=0*proj2;
             end
         else
             prof=reshape(prof,Init_Vars.CameraSize.Rows,Init_Vars.CameraSize.Columns);
@@ -1579,7 +1569,7 @@ if(~Init_Vars.usebsa) %it is not a bsa acquisition, set up buffers
             ReadCueProf2=zeros(Init_Vars.blocksize,length(proj2));
             KEEP_Pr=zeros(length(proj1),Init_Vars.keepsize);
             KEEP_Pr2=zeros(length(proj2),Init_Vars.keepsize);
-        else 
+        else
             ReadCueProf=zeros(Init_Vars.blocksize,length(proj));
             KEEP_Pr=zeros(length(proj),Init_Vars.keepsize);
         end
@@ -1608,7 +1598,7 @@ else %it is a bsa acquisition, set up buffers
             KEEP_Pr2=zeros(length(proj2),Init_Vars.keepsize);
         end
     else
-       LastValidTime=1; 
+       LastValidTime=1;
     end
     ReadCueValid=1;
     Just_Started=1;
@@ -1650,7 +1640,7 @@ end
 
 % return
 while(1) %Readout cycle
-    handles = guidata(handles.output); 
+    handles = guidata(handles.output);
     colore=get(handles.Stop3,'Backgroundcolor'); %Checks if read-out has been stopped
     if(sum(colore==handles.ColorWait)==3) %check for stop reading
         if(usebsa)
@@ -1672,7 +1662,7 @@ while(1) %Readout cycle
     end
     if(usebsa) %bsa cycle for getting data synchronously
         ValidDataArray_PV=[];ValidPulseIDs=[];ValidTimeStamps=[];
-                
+
         switch(Phase_Cycle)
             case 0
                 if(Just_Started)
@@ -1680,13 +1670,13 @@ while(1) %Readout cycle
                 end
             case 1
             case 2
-            case 3    
+            case 3
         end
         tic
         % get Pvs if has to get Pvs
         while(toc < eDef_BASEDELAYTIMING) %just get profile monitor while you can
             if(ReadProfile)
-                [Image,ReadCueProfTS(1,ReadCueValid)]=lcaGetSmart(profile); 
+                [Image,ReadCueProfTS(1,ReadCueValid)]=lcaGetSmart(profile);
                 if(PlusOne)
                     [ValuePlusOne(ReadCueValid),ReadCueProfTS_PlusOne(ReadCueValid)]=lcaGetSmart(PlusOneName);
                 end
@@ -1698,7 +1688,7 @@ while(1) %Readout cycle
                             proj2=transpose(mean(double(prof),2))-backg2;
                         else
                             proj=mean(double(prof),ProjectionDirection)-backg;
-                        end    
+                        end
                     else
                         proj=double(Image(ROIx(1):ROIx(2)))-backg;
                     end
@@ -1710,9 +1700,9 @@ while(1) %Readout cycle
                             ReadCueProf(ReadCueValid,:)=transpose(proj);
                         else
                             ReadCueProf(ReadCueValid,:)=proj;
-                        end  
+                        end
                     end
-             ReadCueValid=ReadCueValid+1; %Processing should take the time 
+             ReadCueValid=ReadCueValid+1; %Processing should take the time
              %pause(eDef_BASEDELAYTIMING/2800*2); %Not sure if it is needed, puts a safeguard agains buffer filling
             else %only BSA acquisition, wait the posted time and do nothing
                 pause(0.05);
@@ -1724,7 +1714,7 @@ while(1) %Readout cycle
                 if(Just_Started)
                 eDefOn(myeDefNumber(2))
                 end
-                GrabTurn=0; 
+                GrabTurn=0;
             case 1
                 eDefOff(myeDefNumber(1))
                 %retrieve buffer 1
@@ -1740,13 +1730,13 @@ while(1) %Readout cycle
                   pulseID_Buffer2_ns=pulseID_Buffer1_ns;
                   Just_Started=0;
                 end
-                %eDefOn(myeDefNumber(1));              
+                %eDefOn(myeDefNumber(1));
                 GrabTurn=1;
             case 2
                 if(Just_Started)
                 eDefOn(myeDefNumber(1));
                 end
-                GrabTurn=0; 
+                GrabTurn=0;
             case 3
                 eDefOff(myeDefNumber(2))
                 [the_matrix2,TSY2] = lcaGetSmart(new_name2, 2800 );
@@ -1759,32 +1749,32 @@ while(1) %Readout cycle
                 %save TEMP2
                 GrabTurn=1;
                 %eDefOn(myeDefNumber(2));
-              
+
         end
-        
-        Phase_Cycle=mod((Phase_Cycle+1),4);   
-        
+
+        Phase_Cycle=mod((Phase_Cycle+1),4);
+
         %Does the timestamps matching for BSA case
         if(ReadProfile) %Must Have also Pvs, altrimenti va in non bsa mode automaticamente, e' il piu' comprensibile su cosa deve fare
             %trova semplicemente i pvs che hanno lo stesso timestamps
-                   
+
             if(GrabTurn)
-            disp(['Grab Turn, read values ',num2str(ReadCueValid-1)])    
+            disp(['Grab Turn, read values ',num2str(ReadCueValid-1)])
 %             M1A{end+1}=the_matrix1;
 %             M2A{end+1}=the_matrix2;
 %             M1TS{end+1}=pulseID_Buffer1_TS;
 %             M2TS{end+1}=pulseID_Buffer2_TS;
 %             SPTS{end+1}=bitand(uint32(imag(ReadCueProfTS(1:(ReadCueValid-1)))),hex2dec('1FFFF'));
 %             GDA{end+1}=ValuePlusOne(1:(ReadCueValid-1));
-%             GDTS{end+1}=bitand(uint32(imag(ReadCueProfTS_PlusOne(1:(ReadCueValid-1)))),hex2dec('1FFFF'));          
+%             GDTS{end+1}=bitand(uint32(imag(ReadCueProfTS_PlusOne(1:(ReadCueValid-1)))),hex2dec('1FFFF'));
 %             save TEMP
-            
+
             PulseIDPlusOne=bitand(uint32(imag(ReadCueProfTS_PlusOne(1:(ReadCueValid-1)))),hex2dec('1FFFF'));
             [~,Loc1,Loc2]=intersect(the_matrix1(1,:),ValuePlusOne(1:(ReadCueValid-1)),'stable');
             PIDM1=pulseID_Buffer1_TS(Loc1);
             PIDG1=PulseIDPlusOne(Loc2);
             DeltaPulseID1=double(PIDG1-uint32(PIDM1));
-                                
+
             if(~isempty(Loc1))
                 Delta1=mode(DeltaPulseID1);
                 if(max(DeltaPulseID1)~=min(DeltaPulseID1))
@@ -1794,12 +1784,12 @@ while(1) %Readout cycle
                 disp('Caution, No Matches on buffer 1');
                 Delta1=1;
             end
-        
+
             [~,Loc3,Loc4]=intersect(the_matrix2(1,:),ValuePlusOne(1:(ReadCueValid-1)),'stable');
             PIDM2=pulseID_Buffer2_TS(Loc3);
             PIDG2=PulseIDPlusOne(Loc4);
             DeltaPulseID2=double(PIDG2-uint32(PIDM2));
-            
+
             if(~isempty(Loc3))
                 Delta2=mode(DeltaPulseID2);
                 if(max(DeltaPulseID2)~=min(DeltaPulseID2))
@@ -1809,17 +1799,17 @@ while(1) %Readout cycle
                 disp('Caution, No Matches on buffer 2');
                 Delta2=1;
             end
-            
+
             PID1Rescaled=mod(pulseID_Buffer1_TS+Delta1,MAXPulseID);
             PID2Rescaled=mod(pulseID_Buffer2_TS+Delta2,MAXPulseID);
-            
+
             pulseID_Profile=bitand(uint32(imag(ReadCueProfTS)),hex2dec('1FFFF'));
             FullMatrixTemporary=[the_matrix1,the_matrix2];
             Full_Temporary_PulseIds=[PID1Rescaled,PID2Rescaled];
             [uniquePulseID_Profile,uniquePulseID_Profile_Location]=unique(pulseID_Profile);
             disp(['Unique Profile read ',num2str(length(uniquePulseID_Profile_Location))])
             [SortedPulseIDUseless,DoveNellaMatrice,DoveNeiProfili]=intersect(Full_Temporary_PulseIds,uniquePulseID_Profile);
-            
+
   %           pulseID_Buffer1_TS=bitand(uint32(imag(Buffer1_TS)),hex2dec('1FFFF'));
   %           pulseID_Buffer2_TS=bitand(uint32(imag(Buffer2_TS)),hex2dec('1FFFF'));
 %               if(PlusOne)
@@ -1829,19 +1819,19 @@ while(1) %Readout cycle
 %                     Empty1=the_matrix1;
 %                     Empty2=the_matrix2;
 %                     the_matrix1=the_matrix1(:,DoveUtileSecondo);
-%                                         
+%
 %                     [length(unique(pulseID_PlusOne)), length(DoveUtileSecondo) ,length(pulseID_Buffer1_TS)]
-%                     
+%
 %                     [IntersezioneInutile,DoveUtilePrimo,DoveUtileSecondo]=intersect(ValuePlusOne(1:(ReadCueValid-1)),the_matrix2(1,:));
 %                     pulseID_Buffer2_TS=pulseID_PlusOne(DoveUtilePrimo);
 %                     the_matrix2=the_matrix2(:,DoveUtileSecondo);
-%                     
+%
 %                     [length(pulseID_PlusOne), length(DoveUtileSecondo), length(pulseID_Buffer2_TS) ]
-% 
-%               end  
-%               
-%               
-%               
+%
+%               end
+%
+%
+%
 %               FullMatrixTemporary=[the_matrix1,the_matrix2];
 %               Full_Temporary_PulseIds=[pulseID_Buffer1_TS,pulseID_Buffer2_TS];
 %               pulseID_Profile=bitand(uint32(imag(ReadCueProfTS(1:(ReadCueValid-1)))),hex2dec('1FFFF'));
@@ -1856,16 +1846,16 @@ while(1) %Readout cycle
 %               [length(pulseID_Profile) length(uniquePulseID_Profile), length(IInutileA)]
 %               [IInutileB,IInutile2,IInutile3]=intersect(pulseID_Buffer2_TS,uniquePulseID_Profile);
 %               [length(pulseID_Profile) length(uniquePulseID_Profile), length(IInutileB)]
-%               
+%
 %               [length(intersect(pulseID_PlusOne,uniquePulseID_Profile)),length(intersect(IInutileA,IInutileB))]
-%               
+%
 %               the_matrix1=Empty1;
 %               the_matrix2=Empty2;
-%               
+%
 %               [FullBufferTimeStamps,LocationFullBuffer1,LocationFullBuffer2]=union(pulseID_Buffer1_TS,pulseID_Buffer2_TS);
 %               [ValidPulseIDs,LocationFullBuffer,LocationInUniquePulseId_Profile]=intersect(FullBufferTimeStamps,uniquePulseID_Profile);
-% 
-%             
+%
+%
 %             [uniquevalues_pr,uniquelocations_pr]=unique(pulseID_Profile);
 %             ValidDataArray_PV=[];
 %             if(~BothProfiles)
@@ -1894,22 +1884,22 @@ while(1) %Readout cycle
 %                   [dontcare1,WhereTheywillGo,WhereIwillFoundthem]=intersect(FullBufferTimeStamps(LocationFullBuffer),pulseID_Buffer2_TS(LocationFullBuffer2));
 %                   ValidDataArray_PV(:,WhereTheywillGo)=the_matrix2(:,WhereIwillFoundthem);
 %               end
-              
+
               ReadCueValid=1; %After Grabbing, resets readcue ...
-              
+
               size(ValidDataArray_PV)
               size(ValidPulseIDs)
               size(ValidTimeStamps)
-              
-              
+
+
               else
               ValidDataArray_PV=[];
               ValidPulseIDs=[];
-              ValidTimeStamps=[]; 
-               
+              ValidTimeStamps=[];
+
             end
         else %Only Pvs, come fa a sapere da dove? (absolute time will do the trick, FILLING and Pointer =1 means just started)
-          if(GrabTurn) 
+          if(GrabTurn)
             %save TEMP
 %            pulseID_Buffer1_TS=bitand(uint32(imag(Buffer1_TS)),hex2dec('1FFFF'));
 %            pulseID_Buffer2_TS=bitand(uint32(imag(Buffer2_TS)),hex2dec('1FFFF'));
@@ -1922,7 +1912,7 @@ while(1) %Readout cycle
            if(isempty(firstgoodthisset) && sum(any(~isnan(FullMatrixTemporary))))
                ValidDataArray_PV=[];
                ValidPulseIDs=[];
-               ValidTimeStamps=[]; 
+               ValidTimeStamps=[];
            else
                LastValidTime=max(SortedTimeStampsTemporary);
                ValidDataArray_PV=FullMatrixTemporary(:,SortedTimeStampsTemporaryOrder(firstgoodthisset:end));
@@ -1932,9 +1922,9 @@ while(1) %Readout cycle
           else
             ValidDataArray_PV=[];
             ValidPulseIDs=[];
-            ValidTimeStamps=[]; 
+            ValidTimeStamps=[];
           end
-        end    
+        end
     else % not bsa data, just read and order in best effort mode
         if(ReadProfile)
             if(ONLINE)
@@ -1951,7 +1941,7 @@ while(1) %Readout cycle
                             proj2=transpose(mean(double(prof),2)-backg2);
                         else
                             proj=mean(double(prof),ProjectionDirection)-backg;
-                        end    
+                        end
                     else
                         proj=double(Image(ROIx(1):ROIx(2)))-backg;
                     end
@@ -1963,7 +1953,7 @@ while(1) %Readout cycle
                             ReadCueProf(ReadID,:)=transpose(proj);
                         else
                             ReadCueProf(ReadID,:)=proj;
-                        end  
+                        end
                     end
                 end
             else % This else if for test (works only in offline mode to try viewer features or re-play data)
@@ -1980,7 +1970,7 @@ while(1) %Readout cycle
                             proj2=transpose(mean(double(prof),2)-backg2);
                         else
                             proj=mean(double(prof),ProjectionDirection)-backg;
-                        end    
+                        end
                     else
                         proj=double(Image(ROIx(1):ROIx(2)))-backg;
                     end
@@ -1992,9 +1982,9 @@ while(1) %Readout cycle
                             ReadCueProf(ReadID,:)=transpose(proj);
                         else
                             ReadCueProf(ReadID,:)=proj;
-                        end  
+                        end
                     end
-                end  
+                end
             end % End of test else
         else
             if(ONLINE)
@@ -2011,9 +2001,9 @@ while(1) %Readout cycle
                 end
             end
         end
-        
+
         % MatchTimeStamps
-        
+
         if(ReadProfile && PvNumber) %Match all of them THIS PART OF CODE WORKS ONLY FOR NON-BSA MODE
             pulseID_Profile=bitand(uint32(imag(ReadCueProfTS)),hex2dec('1FFFF'))+PulseIDProfileDelay;
             ValidDataArray_PV=[];
@@ -2036,7 +2026,7 @@ while(1) %Readout cycle
             for PvID=1:PvNumber
                 [dontcare, IR, dontcare2]=intersect(UniquePvPulseID{PvID},uniqueintersect);
                 ValidDataArray_PV(PvID,:)=ReadCuePVs(PvID,UniquePvPulseID_Locations{PvID}(IR));
-            end 
+            end
         elseif(ReadProfile) %Only profile all good, just remove duplicates
             pulseID_Profile=bitand(uint32(imag(ReadCueProfTS)),hex2dec('1FFFF'));
             [uniquevalues_pr,uniquelocations_pr]=unique(pulseID_Profile);
@@ -2064,23 +2054,23 @@ while(1) %Readout cycle
             end
             ValidPulseIDs=uniqueintersect;
             ValidTimeStamps=ReadCuePvsTS(PvID,uniquelocations{PvID}(IR));
-        end     
+        end
     end
-    %save TEMP1 
+    %save TEMP1
     % ... Time Stamps ARE MATCHED here...  my variables are
     % ValidDataArray_PV, ValidPulseIDs, ValidTimeStamps, ValidDataArray_Pr,
     % ValidDataArray_Pr1, ValidDataArray_Pr2 Not all of them are always
     % defined.
-    
+
     % If nothing was acquired this round, just leave a message that
     % something is going wrong (avoid updating cue with nothing, and updating display that doesn't change)
     if(isempty(ValidPulseIDs))
     disp(handles.extGui)
     disp('nothing acquired that has timestamp matched')
     pause(0.1);
-    
+
     else
-    % Evaluate Shot by Shot quantities (TOTAL INT, FWHM, PEAK VAL, PEAK POS, MEAN) and appends to the pvs list 
+    % Evaluate Shot by Shot quantities (TOTAL INT, FWHM, PEAK VAL, PEAK POS, MEAN) and appends to the pvs list
     EvaluatedProfileQuantities=[];
     if(ReadProfile)
         %save TEMP
@@ -2155,7 +2145,7 @@ while(1) %Readout cycle
                                 else
                                     FWHM2(II)=MV2-mv2+1;
                                 end
-                            end   
+                            end
                             EvaluatedProfileQuantities(end+1,:)=FWHM1;
                         else
                             if(~BasicProcessing(2))
@@ -2209,12 +2199,12 @@ while(1) %Readout cycle
        if(SignalON(II))
            for III=1:numel(CodiceSig(II).Code)
                 eval(CodiceSig(II).Code{III})
-           end 
+           end
            ValidDataArray_PV(end-PvNumber-sum(SignalON)+SignalEvaluated,:)=CodeOutput;
            SignalEvaluated=SignalEvaluated+1;
        end
     end
-    
+
     [SA,SB]=size(ValidDataArray_PV);
     % Update The Stack DA RICONTROLLARE ACCURATAMENTE
     if((ValidDataPointer+SB)>keepsize)
@@ -2248,9 +2238,9 @@ while(1) %Readout cycle
         end
         ValidDataPointer=ValidDataPointer+SB;
     end
-    
+
     set(handles.dia_text_rec,'string',num2str(ValidDataPointer));
-    
+
     if(FILLING)
         LastValidData=ValidDataPointer-1;
     else
@@ -2273,7 +2263,7 @@ while(1) %Readout cycle
         if(eval(['get(handles.q',char(48+II),',''value'')']))
             eval(['FilterType=-1+get(handles.f',char(48+II),',''value'');']);
             if(~FilterType)
-               SHOTS_RIMASTI=1:LastValidData; 
+               SHOTS_RIMASTI=1:LastValidData;
             else
                SHOTS_RIMASTI=Rimasti{FilterResorting(FilterType)};
             end
@@ -2286,18 +2276,18 @@ while(1) %Readout cycle
             end
         end
     end
-    
-    %save TEMP 
+
+    %save TEMP
     %Update Screens
     drawnow
     pause(0.0001)
     %pause(0.000001) %DB Changed 10/09/14 bc stop3_callback wasn't working
-    
+
     UD=get(handles.CVCRCIISSA,'UserData');
     FiguresList=UD{4};
     ChildrenSorting=UD{5};
     %if(0)
-    
+
     if(~isempty(FiguresList))
         if(get(handles.c_update,'value'))
             ScreenToBeUpdated=ScreenToBeUpdated+1;
@@ -2314,9 +2304,9 @@ while(1) %Readout cycle
                 Petizione=get(ChildrenSorting(ScreenID,23),'userdata');
                 FigureStillOpen=1;
             catch ME
-                FigureStillOpen=0;    
+                FigureStillOpen=0;
             end
-            
+
 %           save TEMP
             %FiguresList
             %Petizione
@@ -2350,7 +2340,7 @@ while(1) %Readout cycle
                                 if(Petizione.Filt3)
                                    DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),Rimasti{FilterResorting(Petizione.Filt3)});
                                 else
-                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData); 
+                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData);
                                 end
                                 plot(ChildrenSorting(ScreenID,1),DataY3,'.b')
                             end
@@ -2415,7 +2405,7 @@ while(1) %Readout cycle
                                           plot(ChildrenSorting(ScreenID,1),Xaxis,DATAY1(:,mod(round(rand(1)*10^7),s_temp2)+1),'k','LineWidth',2)
                                       end
                                   end
-                                  
+
                                   if(Petizione.Filt2)
                                       if(ResortingX(Petizione.X_SEL,2)==1)
                                           DATAY1=KEEP_Pr(:,Rimasti{FilterResorting(Petizione.Filt2)});
@@ -2432,7 +2422,7 @@ while(1) %Readout cycle
                                           end
                                       end
                                   end
-                                  
+
                                   if(Petizione.Filt3)
                                       if(ResortingX(Petizione.X_SEL,2)==1)
                                           DATAY1=KEEP_Pr(:,Rimasti{FilterResorting(Petizione.Filt3)});
@@ -2449,8 +2439,8 @@ while(1) %Readout cycle
                                           end
                                       end
                                   end
-                                  
-                                  
+
+
                                     if(~Petizione.b_autoX)
                                         CurrLim=xlim(ChildrenSorting(ScreenID,1));
                                         if(~isnan(Petizione.lim_x1)), CurrLim(1)=Petizione.lim_x1;, end
@@ -2480,7 +2470,7 @@ while(1) %Readout cycle
                                 end
                                 DataY1=KEEP_PV(ResortingY(Petizione.Y_SEL1,2),1:LastValidData);
                             end
-                            
+
                             if(Petizione.b_autoY)
                                 MapYMin=min(DataY1);
                                 MapYMax=max(DataY1);
@@ -2566,7 +2556,7 @@ while(1) %Readout cycle
                                     MatrixToPlot(:,BinsID)=mean(DATAX1(:,find(BinTheyFitInto==BinsID)),2);
                                 end
                             end
-                             
+
                             PointersOfThisPlot=plot(ChildrenSorting(ScreenID,1),XAxis,MatrixToPlot);
                             if(length(PointersOfThisPlot)<=10)
                                 if(exist('Legend','var')), clear Legend, end
@@ -2591,16 +2581,16 @@ while(1) %Readout cycle
                                     end
                         end
                     case 2 %SEL_X is a shot to shot value
-                         
+
                         DATAX1TEMP=KEEP_PV(ResortingX(Petizione.X_SEL,2),1:LastValidData);
                         if(~ResortingY(Petizione.Y_SEL1,1) && ~ResortingY(Petizione.Y_SEL2,1) && ~ResortingY(Petizione.Y_SEL3,1)) %Resort the buffer and plot
                                 if(~FILLING)
-                                   DataX1=DATAX1TEMP([ValidDataPointer:keepsize,1:(ValidDataPointer-1)]); 
+                                   DataX1=DATAX1TEMP([ValidDataPointer:keepsize,1:(ValidDataPointer-1)]);
                                 else
                                    DataX1=DATAX1TEMP;
                                 end
                                 plot(ChildrenSorting(ScreenID,1),DataX1,'.k');
-                        else    
+                        else
                             if(ResortingY(Petizione.Y_SEL1,1)) %something is selected on first
                                 if(Petizione.Filt1)
                                    DataY1=KEEP_PV(ResortingY(Petizione.Y_SEL1,2),Rimasti{FilterResorting(Petizione.Filt1)});
@@ -2626,7 +2616,7 @@ while(1) %Readout cycle
                                    DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),Rimasti{FilterResorting(Petizione.Filt3)});
                                    DataX1=DATAX1TEMP(:,Rimasti{FilterResorting(Petizione.Filt3)});
                                 else
-                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData); 
+                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData);
                                    DataX1=DATAX1TEMP;
                                 end
                                 plot(ChildrenSorting(ScreenID,1),DataX1,DataY3,'.b');
@@ -2649,13 +2639,13 @@ while(1) %Readout cycle
                         DATAX1TEMP=DATAX1TEMP-min(DATAX1TEMP);
                         if(~ResortingY(Petizione.Y_SEL1,1) && ~ResortingY(Petizione.Y_SEL2,1) && ~ResortingY(Petizione.Y_SEL3,1)) %Resort the buffer and plot
                                 if(~FILLING)
-                                   DataX1=DATAX1TEMP([ValidDataPointer:keepsize,1:(ValidDataPointer-1)]); 
+                                   DataX1=DATAX1TEMP([ValidDataPointer:keepsize,1:(ValidDataPointer-1)]);
                                 else
                                    DataX1=DATAX1TEMP;
                                 end
                                 plot(ChildrenSorting(ScreenID,1),DataX1,'.k');
-                        else    
-                            if(Petizione.TrasformaFourier)                                    
+                        else
+                            if(Petizione.TrasformaFourier)
                                     FrequencyVectorDefined=0;
                             end
                             if(ResortingY(Petizione.Y_SEL1,1)) %something is selected on first
@@ -2666,7 +2656,7 @@ while(1) %Readout cycle
                                    DataY1=KEEP_PV(ResortingY(Petizione.Y_SEL1,2),1:LastValidData);
                                    DataX1=DATAX1TEMP;
                                 end
-                                if(Petizione.TrasformaFourier)                                    
+                                if(Petizione.TrasformaFourier)
                                     FrequencyEstimate=round(1/median(diff(DataX1))); % da lavorare
                                     if(FrequencyEstimate>120), FrequencyEstimate=120;, end
                                     FrequencyVector=linspace(0,round(FrequencyEstimate/2),round(length(DataX1)/2));
@@ -2704,7 +2694,7 @@ while(1) %Readout cycle
                                    DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),Rimasti{FilterResorting(Petizione.Filt3)});
                                    DataX1=DATAX1TEMP(:,Rimasti{FilterResorting(Petizione.Filt3)});
                                 else
-                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData); 
+                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData);
                                    DataX1=DATAX1TEMP;
                                 end
                                 if(Petizione.TrasformaFourier)
@@ -2718,7 +2708,7 @@ while(1) %Readout cycle
                                 else
                                     plot(ChildrenSorting(ScreenID,1),DataX1,DataY3,'.b');
                                 end
-                            end  
+                            end
                         end
                         if(~Petizione.b_autoX)
                             CurrLim=xlim(ChildrenSorting(ScreenID,1));
@@ -2732,19 +2722,19 @@ while(1) %Readout cycle
                             if(~isnan(Petizione.lim_y2)), CurrLim(2)=Petizione.lim_y2;, end
                             ylim(ChildrenSorting(ScreenID,1),CurrLim);
                         end
-                    
+
                 end
             end %*%
             %insert function to copy figures
             if handles.extGui
                 handles =  sendImage(hObject, handles);
             end
-            
+
             if(Petizione.LogBookAndSave || Petizione.LogBookOnlyFigure)
                 CurrentTime=clock;
 %                 CurrentYearString=num2str(CurrentTime(1));
 %                 CurrentMonthString=num2str(CurrentTime(2));
-%                 
+%
                 %timestamp=clock;
                 CurrentYearString=num2str(CurrentTime(1),'%.4d');
                 CurrentMonthString=num2str(CurrentTime(2),'%.2d');
@@ -2753,7 +2743,7 @@ while(1) %Readout cycle
                 CurrentTempo2String=num2str(CurrentTime(5),'%.2d');
                 CurrentTempo3String=num2str(floor(CurrentTime(6)),'%.2d');
                 CurrentTempo4String=num2str(round((CurrentTime(6)-floor(CurrentTime(6)))*1000),'%.3d');
-                CurrentTimeString=[CurrentYearString,'-',CurrentMonthString,'-',CurrentDieiString,'--',CurrentTempo1String,'-',CurrentTempo2String,'-',CurrentTempo3String,'-',CurrentTempo4String];          
+                CurrentTimeString=[CurrentYearString,'-',CurrentMonthString,'-',CurrentDieiString,'--',CurrentTempo1String,'-',CurrentTempo2String,'-',CurrentTempo3String,'-',CurrentTempo4String];
                 for II=1:Petizione.LogBookAndSave
                     NewFigure=figure; 			% Create a new figure
                     %NewAxes=axes;		% Create an axes object in the figure
@@ -2766,22 +2756,22 @@ while(1) %Readout cycle
                     util_printLog(NewFigure);
                     AllowedXAxisNames=UD{1};
                     if(exist('KEEP_PV','var'))
-                       saving_string=[saving_string,'KEEP_PV',' ']; 
+                       saving_string=[saving_string,'KEEP_PV',' '];
                     end
                     if(exist('KEEP_Pr','var'))
-                       saving_string=[saving_string,'KEEP_Pr',' ']; 
+                       saving_string=[saving_string,'KEEP_Pr',' '];
                        if(ReadProfile)
-                            saving_string=[saving_string,'profile',' ']; %it has at least a profile 
+                            saving_string=[saving_string,'profile',' ']; %it has at least a profile
                        end
                     end
                     if(exist('KEEP_Pr2','var'))
-                       saving_string=[saving_string,'KEEP_Pr2',' ']; 
+                       saving_string=[saving_string,'KEEP_Pr2',' '];
                     end
                     if(exist('SingleValuePvs','var'))
-                       saving_string=[saving_string,'SingleValuePvs',' ']; 
+                       saving_string=[saving_string,'SingleValuePvs',' '];
                     end
-                    saving_string=[saving_string,'AllowedXAxisNames',' ']; 
-                    eval(['save /u1/lcls/matlab/data/',CurrentYearString,'/',CurrentYearString,'-',CurrentMonthString,'/',CurrentYearString,'-',CurrentMonthString,'-',CurrentDieiString,'/MonitorGui-',CurrentTimeString,' ',saving_string]);     
+                    saving_string=[saving_string,'AllowedXAxisNames',' '];
+                    eval(['save /u1/lcls/matlab/data/',CurrentYearString,'/',CurrentYearString,'-',CurrentMonthString,'/',CurrentYearString,'-',CurrentMonthString,'-',CurrentDieiString,'/MonitorGui-',CurrentTimeString,' ',saving_string]);
                 end
                 for II=1:Petizione.LogBookOnlyFigure
                     NewFigure=figure; 			% Create a new figure
@@ -2793,7 +2783,7 @@ while(1) %Readout cycle
                     util_printLog(NewFigure);
                     %util_eLogEntry(fig, datenum(CurrentTime), logBook, varargin)
                 end
-            end      
+            end
             else %Delete it from list
                 if ((ScreenID==1) && (numel(FiguresList)==1) )
                     FiguresList=[];
@@ -2870,7 +2860,7 @@ for II=1:numel(Code)
            Code{II}=regexprep(Code{II},['#',num2str(JJ)],[str1,'(',num2str(Resort),',1:LastValidData)']);
        elseif(FLAG==2)
            Code{II}=regexprep(Code{II},['#',num2str(JJ)],[str1,'(',num2str(Resort),',SHOTS_RIMASTI)']);
-       else   
+       else
            Code{II}=regexprep(Code{II},['#',num2str(JJ)],[str1,'(',num2str(Resort),',:)']);
        end
    end
@@ -2883,7 +2873,7 @@ end
 % end
 OutCode=Code;
 % for II=1:numel(CurrentCode)
-%    eval(CurrentCode{II}); 
+%    eval(CurrentCode{II});
 % end
 
 
@@ -3042,7 +3032,7 @@ switch(get(handles.ProfileMonitorMenu,'value'))
             disp('unable to read image size')
             CameraSize.Rows=1024;
         end
-        
+
         CameraSize.Columns=1;
         set(handles.e_roix1,'String',1);set(handles.e_roix2,'String',1024);
         set(handles.e_roiy1,'String',1);set(handles.e_roiy2,'String',1);
@@ -3110,7 +3100,7 @@ switch(get(handles.ProfileMonitorMenu,'value'))
         set(handles.e_roiy1,'String',1);set(handles.e_roiy2,'String',256);
         set(handles.e_roix1,'enable','on');set(handles.e_roix2,'enable','on');
         set(handles.e_roiy1,'enable','on');set(handles.e_roiy2,'enable','on');
-        set(handles.ProfileMonitorName,'UserData',CameraSize);    
+        set(handles.ProfileMonitorName,'UserData',CameraSize);
         set(handles.ProjectionXY,'value',2)
         if(get(handles.c_BSA,'value'))
             set(handles.PulseID_delay,'string','0');
@@ -3125,7 +3115,7 @@ switch(get(handles.ProfileMonitorMenu,'value'))
         set(handles.e_roiy1,'String',1);set(handles.e_roiy2,'String',1);
         set(handles.e_roix1,'enable','on');set(handles.e_roix2,'enable','on');
         set(handles.e_roiy1,'enable','on');set(handles.e_roiy2,'enable','on');
-        set(handles.ProfileMonitorName,'UserData',CameraSize);    
+        set(handles.ProfileMonitorName,'UserData',CameraSize);
         set(handles.ProjectionXY,'value',2)
         if(get(handles.c_BSA,'value'))
             set(handles.PulseID_delay,'string','0');
@@ -3140,7 +3130,7 @@ switch(get(handles.ProfileMonitorMenu,'value'))
         set(handles.e_roiy1,'String',1);set(handles.e_roiy2,'String',1);
         set(handles.e_roix1,'enable','on');set(handles.e_roix2,'enable','on');
         set(handles.e_roiy1,'enable','on');set(handles.e_roiy2,'enable','on');
-        set(handles.ProfileMonitorName,'UserData',CameraSize);    
+        set(handles.ProfileMonitorName,'UserData',CameraSize);
         set(handles.ProjectionXY,'value',2)
         if(get(handles.c_BSA,'value'))
             set(handles.PulseID_delay,'string','0');
@@ -3155,13 +3145,13 @@ switch(get(handles.ProfileMonitorMenu,'value'))
         set(handles.e_roiy1,'String',1);set(handles.e_roiy2,'String',1024);
         set(handles.e_roix1,'enable','on');set(handles.e_roix2,'enable','on');
         set(handles.e_roiy1,'enable','on');set(handles.e_roiy2,'enable','on');
-        set(handles.ProfileMonitorName,'UserData',CameraSize);    
+        set(handles.ProfileMonitorName,'UserData',CameraSize);
         set(handles.ProjectionXY,'value',3)
         if(get(handles.c_BSA,'value'))
             set(handles.PulseID_delay,'string','0');
         else
             set(handles.PulseID_delay,'string','0');
-        end  
+        end
     otherwise
         set(handles.ProfileMonitorName,'String','');
         CameraSize.Rows=NaN;
@@ -3302,12 +3292,12 @@ CodiceFiltro=Init_Vars.CodiceFiltro; CodiceSig=Init_Vars.CodiceSig; handles.Sing
 EvaluatedProfileQuantities2=[];
 EvaluatedProfileQuantities=[];
 if(ReadProfile)
-    if(BothProfiles)  
+    if(BothProfiles)
         [Prof1length1,NumberofShots]=size(handles.Buffer.Prof); %SA=1024, SB number of data
         [Prof1length2,NumberofShots]=size(handles.Buffer.Prof2);
     else
         [Prof1length,NumberofShots]=size(handles.Buffer.Prof);
-    end    
+    end
     for ProcessCounter=1:handles.ProfileProcessNumber
         if(BasicProcessing(ProcessCounter))
             switch(ProcessCounter)
@@ -3378,7 +3368,7 @@ if(ReadProfile)
                             else
                                 FWHM2(II)=MV2-mv2+1;
                             end
-                        end   
+                        end
                         EvaluatedProfileQuantities(end+1,:)=FWHM1;
                         EvaluatedProfileQuantities2(end+1,:)=FWHM2;
                     else
@@ -3399,7 +3389,7 @@ if(ReadProfile)
                     end
             end
         end
-    end  
+    end
 end
 handles.Buffer.ProfQuant=EvaluatedProfileQuantities;
 handles.Buffer.ProfQuant2=EvaluatedProfileQuantities2;
@@ -3409,7 +3399,7 @@ for II=1:handles.NumberOfAvailableSignals
        if(SignalON(II))
            for III=1:numel(CodiceSig(II).Code)
                 eval(CodiceSig(II).Code{III})
-           end 
+           end
            NewSignals(SignalEvaluated,:)=CodeOutput;
            SignalEvaluated=SignalEvaluated+1;
        end
@@ -3557,7 +3547,7 @@ end
 for II=1:handles.ProfileProcessNumber
    Configuration.BasicProcessing(II)=eval(['get(','handles.c_opt',char(48+II),',''value'');']);
 end
-Configuration.CameraSize=get(handles.ProfileMonitorName,'UserData'); 
+Configuration.CameraSize=get(handles.ProfileMonitorName,'UserData');
 Configuration.Signale=handles.Signal;
 Configuration.Out=handles.Out;
 Configuration.Filter=handles.Filter;
@@ -3614,7 +3604,7 @@ end
 for II=1:numel(Configuration.BasicProcessing)
    eval(['set(','handles.c_opt',char(48+II),',''value'',Configuration.BasicProcessing(II));']);
 end
-set(handles.ProfileMonitorName,'UserData',Configuration.CameraSize); 
+set(handles.ProfileMonitorName,'UserData',Configuration.CameraSize);
 handles.Signal=Configuration.Signale;
 handles.Out=Configuration.Out;
 handles.Filter=Configuration.Filter;
@@ -3688,7 +3678,7 @@ set(handles.CVCRCIISSA,'UserData',UD);
 guidata(hObject, handles);
 Initialize_Figure(FiguresList(end),ChildrenSorting(end,:),handles,0);
 update_figure_list(handles)
-    
+
 function Initialize_Figure(PointerToFigure,PointerToFigureObjArray,handles,EXISTING)
 RESET=0;
 UD=get(handles.CVCRCIISSA,'UserData');
@@ -3775,12 +3765,12 @@ function outS=figureinputstructure_builder(PointerToFigureObjArray,handles)
     outS.binsx=str2double(get(PointerToFigureObjArray(10),'string'));
     outS.binsy=str2double(get(PointerToFigureObjArray(11),'string'));
     if(isnan(outS.binsy) || isinf(outS.binsy) || (outS.binsy>500) || (outS.binsy<3))
-        outS.binsy=10; set(PointerToFigureObjArray(11),'string','10'); 
+        outS.binsy=10; set(PointerToFigureObjArray(11),'string','10');
     else
         outS.binsy=round(outS.binsy);
     end
     if(isnan(outS.binsy) || isinf(outS.binsy) || (outS.binsx>500) || (outS.binsx<3))
-        outS.binsx=10; set(PointerToFigureObjArray(10),'string','10'); 
+        outS.binsx=10; set(PointerToFigureObjArray(10),'string','10');
     else
         outS.binsx=round(outS.binsx);
     end
@@ -3796,7 +3786,7 @@ function outS=figureinputstructure_builder(PointerToFigureObjArray,handles)
             TEMP=outS.lim_x2;
             outS.lim_x2=outS.lim_x1;
             outS.lim_x1=TEMP;
-        end 
+        end
     end
 
     if(~isnan(outS.lim_y1) && ~isnan(outS.lim_y2))
@@ -3806,7 +3796,7 @@ function outS=figureinputstructure_builder(PointerToFigureObjArray,handles)
             TEMP=outS.lim_y2;
             outS.lim_y2=outS.lim_y1;
             outS.lim_y1=TEMP;
-        end 
+        end
     end
 
     outS.Filt1=get(PointerToFigureObjArray(12),'value')-1;
@@ -3854,37 +3844,37 @@ for II=1:length(ListaDiscendenti)
        elseif(strcmp(ThisTag,'Y_SEL1'))
            OUT(3)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'Y_SEL2'))
-           OUT(4)=ListaDiscendenti(II);   
+           OUT(4)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'Y_SEL3'))
-           OUT(5)=ListaDiscendenti(II);     
+           OUT(5)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'e_x1'))
-           OUT(6)=ListaDiscendenti(II);   
+           OUT(6)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'e_x2'))
-           OUT(7)=ListaDiscendenti(II);  
+           OUT(7)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'e_y1'))
-           OUT(8)=ListaDiscendenti(II);   
+           OUT(8)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'e_y2'))
-           OUT(9)=ListaDiscendenti(II);  
+           OUT(9)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'e_binsx'))
-           OUT(10)=ListaDiscendenti(II);   
+           OUT(10)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'e_binsy'))
            OUT(11)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'popf1'))
-           OUT(12)=ListaDiscendenti(II);  
+           OUT(12)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'popf2'))
-           OUT(13)=ListaDiscendenti(II);  
+           OUT(13)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'popf3'))
-           OUT(14)=ListaDiscendenti(II); 
+           OUT(14)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'b_autoX'))
-           OUT(15)=ListaDiscendenti(II);  
+           OUT(15)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'b_autoY'))
            OUT(16)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'c_ShowOne'))
            OUT(17)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'c_ShowAverage'))
-           OUT(18)=ListaDiscendenti(II);  
+           OUT(18)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'OnScreen'))
-           OUT(19)=ListaDiscendenti(II);  
+           OUT(19)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'c_Fourier'))
            OUT(20)=ListaDiscendenti(II);
        elseif(strcmp(ThisTag,'Calibration'))
@@ -3910,8 +3900,8 @@ for II=1:length(ListaDiscendenti)
        elseif(strcmp(ThisTag,'XT4'))
            OUT(31)=ListaDiscendenti(II);
        else
-        
-           
+
+
            disp([ThisTag, ' ?this sounds strange ...'])
        end
    end
@@ -4533,24 +4523,24 @@ if(LINES==1)
     return
 end
 if(LINES>1)
-   if(CV==1) %cancella il primo 
+   if(CV==1) %cancella il primo
        for II=2:LINES
            NL{II-1}=CL{II};
        end
        set(handles.CurrentCode,'String',NL);
        return
    end
-   if(CV==LINES) %cancella il primo 
+   if(CV==LINES) %cancella il primo
        for II=1:(LINES-1)
            NL{II}=CL{II};
        end
        set(handles.CurrentCode,'String',NL);
        set(handles.CurrentCode,'value',LINES-1);
        return
-   end 
+   end
    for II=1:(CV-1)
            NL{II}=CL{II};
-   end 
+   end
    for II=(CV+1):LINES
        NL{end+1}=CL{II};
    end
@@ -4619,7 +4609,7 @@ for II=1:numel(CurrentCode)
 end
 CurrentCode
 for II=1:numel(CurrentCode)
-   eval(CurrentCode{II}); 
+   eval(CurrentCode{II});
 end
 
 size(CodeOutput)
@@ -4653,7 +4643,7 @@ end
 % --- Executes on button press in CodeExitPlease.
 function CodeExitPlease_Callback(hObject, eventdata, handles)
 for II=1:handles.OutVariablesNumber
-   eval(['set(handles.w',char(48+II),',''string'',[handles.PV(II).what,handles.PV(II).name])']) 
+   eval(['set(handles.w',char(48+II),',''string'',[handles.PV(II).what,handles.PV(II).name])'])
 end
 set(handles.uipanel1,'visible','on');
 set(handles.CodeVariablesPanel,'visible','off');
@@ -4757,7 +4747,7 @@ OldeDefs=get(handles.ReleaseeDefs,'Userdata');
 set(handles.ReleaseeDefs,'Userdata',[]);
 set(handles.ReleaseeDefs,'backgroundcolor',handles.ColorIdle);
 set(handles.ReleaseeDefs,'enable','off');
-        
+
 
 
 % --- Executes on button press in TakeOneProfile.
@@ -4867,50 +4857,50 @@ switch(get(handles.CodificaCosa,'value'))
         switch(VAL)
             case 1
                 for II=1:2
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''on'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''on'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''on'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''on'');'])
                 end
                 set(handles.Code_Parametro1_text,'string','From');
                 set(handles.Code_Parametro2_text,'string','To');
                 set(handles.Code_Parametro1_edit,'string','0');
                 set(handles.Code_Parametro2_edit,'string','1');
                 for II=3:4
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');'])
                 end
             case 2
                 for II=1:2
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''on'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''on'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''on'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''on'');'])
                 end
                 set(handles.Code_Parametro1_text,'string','Center');
                 set(handles.Code_Parametro2_text,'string','Width (rms)');
                 set(handles.Code_Parametro1_edit,'string','Average');
                 set(handles.Code_Parametro2_edit,'string','3');
                 for II=3:4
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');'])
                 end
             case 3
                 for II=1:2
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''on'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''on'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''on'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''on'');'])
                 end
                 set(handles.Code_Parametro1_text,'string','Center');
                 set(handles.Code_Parametro2_text,'string','Width (1=avg)');
                 set(handles.Code_Parametro1_edit,'string','Average');
                 set(handles.Code_Parametro2_edit,'string','1/50');
                 for II=3:4
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');'])
                 end
             case 4
-                eval(['set(handles.Code_Parametro',char(48+1),'_text,''visible'',''on'');']) 
+                eval(['set(handles.Code_Parametro',char(48+1),'_text,''visible'',''on'');'])
                 set(handles.Code_Parametro1_text,'string','N of shots');
                 set(handles.Code_Parametro1_edit,'string','30');
                 for II=2:4
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');'])
                 end
         end
     case 2 %signal
@@ -4919,18 +4909,18 @@ switch(get(handles.CodificaCosa,'value'))
         switch(VAL)
             case 1
                 for II=1:4
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');'])
                 end
             case 2
                 for II=1:4
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');'])
                 end
             case 3
                 for II=1:4
-                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');']) 
-                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');']) 
+                   eval(['set(handles.Code_Parametro',char(48+II),'_text,''visible'',''off'');'])
+                   eval(['set(handles.Code_Parametro',char(48+II),'_edit,''visible'',''off'');'])
                 end
         end
 end
@@ -4966,7 +4956,7 @@ switch(TF)
                 case 2
                     P1=get(handles.Code_Parametro1_edit,'string');
                     P2=get(handles.Code_Parametro2_edit,'string');
-                    
+
                     if(any(strcmp(upper(P1),{'MEDIA','AVG','MEDIA','AVERAGE'})))
                         Line{1}=['!1=mean(#',num2str(Quantity),');'];
                     else
@@ -4992,7 +4982,7 @@ switch(TF)
                         Line{3}=['!4=',P1,' - abs(!1*!2);'];
                         Line{4}=['!5=',P1,' + abs(!1*!2);'];
                         Line{5}=['CodeOutput=find( (#',num2str(Quantity),'>=!4).*(#',num2str(Quantity),'<=!5) );'];
-                       
+
                     end
                 case 4
                     P1=get(handles.Code_Parametro1_edit,'string');
@@ -5003,10 +4993,10 @@ switch(TF)
             set(handles.CurrentCode,'value',1);
             set(handles.CurrentCode,'String',Line);
         else
-            
-            
+
+
         end
-        
+
         switch(Tipo)
             case 1
                 P1=get(handles.Code_Parametro1_edit,'string');
@@ -5032,7 +5022,7 @@ switch(TF)
         end
         set(handles.CurrentCode,'value',1);
         set(handles.CurrentCode,'String',Line);
-        
+
 end
 
 
@@ -5190,7 +5180,7 @@ if(CameraSize.Rows*CameraSize.Columns>1)
               if(nova>=NumberOfBackgrounds)
                   break
               end
-          end  
+          end
       end
     end
     A=figure(1000);
@@ -5202,7 +5192,7 @@ if(CameraSize.Rows*CameraSize.Columns>1)
             handles.BackgroundBlock=handles.BackgroundBlock*NumberOfBackgrounds/nova;
             hold on, plot(handles.BackgroundBlock,'r');
         else
-            title(['Acquired',num2str(nova),' / ',num2str(NumberOfBackgrounds)],'Color',[0,1,0]) 
+            title(['Acquired',num2str(nova),' / ',num2str(NumberOfBackgrounds)],'Color',[0,1,0])
         end
     else
         imagesc(reshape(BackgroundBlock,CameraSize.Rows,CameraSize.Columns));
@@ -5212,7 +5202,7 @@ if(CameraSize.Rows*CameraSize.Columns>1)
             handles.BackgroundBlock=handles.BackgroundBlock*NumberOfBackgrounds/nova;
             hold on, plot(handles.BackgroundBlock,'r');
         else
-            title(['Acquired',num2str(nova),' / ',num2str(NumberOfBackgrounds)],'Color',[0,1,0]) 
+            title(['Acquired',num2str(nova),' / ',num2str(NumberOfBackgrounds)],'Color',[0,1,0])
         end
     end
     BackgroundSaved=handles.BackgroundBlock;
@@ -5235,7 +5225,7 @@ if(Init_Vars.usebsa)
     if(~Init_Vars.PvNumber)
         Init_Vars.usebsa=0;
         set(handles.c_BSA,'value',0);
-    else 
+    else
         [myeDefNumber,new_name1,new_name2]=Initialize_Double_Buffer(handles,Init_Vars);
         if(any(isnan(myeDefNumber)) || (any(myeDefNumber==0)))
             disp('eDef Initialization failed, going to non BSA mode')
@@ -5265,7 +5255,7 @@ if(Init_Vars.ReadProfile) % Get the size of the profile and decides if transpose
                backg1=mean(double(backg1),1);
                backg2=mean(double(backg2),2);
             else
-               backg1=0*proj1; backg2=0*proj2; 
+               backg1=0*proj1; backg2=0*proj2;
             end
         else
             prof=reshape(prof,Init_Vars.CameraSize.Rows,Init_Vars.CameraSize.Columns);
@@ -5307,7 +5297,7 @@ if(~Init_Vars.usebsa) %it is not a bsa acquisition, set up buffers
         if(Init_Vars.BothProfiles)
             ReadCueProf1=zeros(Init_Vars.blocksize,length(proj1));
             ReadCueProf2=zeros(Init_Vars.blocksize,length(proj2));
-        else 
+        else
             ReadCueProf=zeros(Init_Vars.blocksize,length(proj));
         end
         ReadCueProfTS=zeros(1,Init_Vars.blocksize);
@@ -5327,7 +5317,7 @@ else %it is a bsa acquisition, set up buffers
             ReadCueProf2=zeros(2800*2,length(proj2));
         end
     else
-       LastValidTime=-inf; 
+       LastValidTime=-inf;
     end
     ReadCueValid=1;
     Just_Started=1;
@@ -5367,19 +5357,19 @@ handles.SingleValuePvs=SingleValuePvs;
 if(usebsa) %bsa cycle for getting data synchronously
         ValidDataArray_PV=[];ValidPulseIDs=[];ValidTimeStamps=[];
         ValidDataArray_Pr1=[]; ValidDataArray_Pr2=[];  ValidDataArray_Pr=[];
-                
+
         switch(Phase_Cycle)
             case 0
                 eDefOn(myeDefNumber(1))
             case 1
             case 2
-            case 3    
+            case 3
         end
         tic
         % get Pvs if has to get Pvs
     while(toc < eDef_BASEDELAYTIMING) %just get profile monitor while you can
         if(ReadProfile)
-            [Image,ReadCueProfTS(1,ReadCueValid)]=lcaGetSmart(profile); 
+            [Image,ReadCueProfTS(1,ReadCueValid)]=lcaGetSmart(profile);
                 if(Image2D)
                     prof=reshape(Image,CameraSize.Rows,CameraSize.Columns);
                     prof=prof(ROIx(1):ROIx(2),ROIy(1):ROIy(2));
@@ -5388,7 +5378,7 @@ if(usebsa) %bsa cycle for getting data synchronously
                         proj2=transpose(mean(double(prof),2))-backg2;
                     else
                         proj=mean(double(prof),ProjectionDirection)-backg;
-                    end    
+                    end
                 else
                     proj=double(Image(ROIx(1):ROIx(2)))-backg;
                 end
@@ -5400,9 +5390,9 @@ if(usebsa) %bsa cycle for getting data synchronously
                         ReadCueProf(ReadCueValid,:)=transpose(proj);
                     else
                         ReadCueProf(ReadCueValid,:)=proj;
-                    end  
+                    end
                 end
-         ReadCueValid=ReadCueValid+1; %Processing should take the time 
+         ReadCueValid=ReadCueValid+1; %Processing should take the time
          pause(eDef_BASEDELAYTIMING/2800*2); %Not sure if it is needed, puts a safeguard agains buffer filling
         else %only BSA acquisition, wait the posted time and do nothing
             pause(0.05);
@@ -5412,7 +5402,7 @@ if(usebsa) %bsa cycle for getting data synchronously
     switch(Phase_Cycle)
         case 0
             eDefOn(myeDefNumber(2))
-            GrabTurn=0; 
+            GrabTurn=0;
         case 1
             eDefOff(myeDefNumber(1))
             %retrieve buffer 1
@@ -5426,7 +5416,7 @@ if(usebsa) %bsa cycle for getting data synchronously
         case 2
              %if(Just_Started)
                eDefOn(myeDefNumber(1));
-            GrabTurn=0;   
+            GrabTurn=0;
              %end
         case 3
             eDefOff(myeDefNumber(2))
@@ -5439,7 +5429,7 @@ if(usebsa) %bsa cycle for getting data synchronously
 
     end
 
-    Phase_Cycle=mod((Phase_Cycle+1),4);   
+    Phase_Cycle=mod((Phase_Cycle+1),4);
 
     %Does the timestamps matching for BSA case
     if(ReadProfile) %Must Have also Pvs, altrimenti va in non bsa mode automaticamente, e' il piu' comprensibile su cosa deve fare
@@ -5470,11 +5460,11 @@ if(usebsa) %bsa cycle for getting data synchronously
           else
           ValidDataArray_PV=[];
           ValidPulseIDs=[];
-          ValidTimeStamps=[]; 
+          ValidTimeStamps=[];
           ReadCueValid=1; %After Grabbing, resets readcue ...
         end
     else %Only Pvs, come fa a sapere da dove? (absolute time will do the trick, FILLING and Pointer =1 means just started)
-      if(GrabTurn) 
+      if(GrabTurn)
         %save TEMP
 %            pulseID_Buffer1_TS=bitand(uint32(imag(Buffer1_TS)),hex2dec('1FFFF'));
 %            pulseID_Buffer2_TS=bitand(uint32(imag(Buffer2_TS)),hex2dec('1FFFF'));
@@ -5487,7 +5477,7 @@ if(usebsa) %bsa cycle for getting data synchronously
        if(isempty(firstgoodthisset) && sum(any(~isnan(FullMatrixTemporary))))
            ValidDataArray_PV=[];
            ValidPulseIDs=[];
-           ValidTimeStamps=[]; 
+           ValidTimeStamps=[];
        else
            LastValidTime=max(SortedTimeStampsTemporary);
            ValidDataArray_PV=FullMatrixTemporary(:,SortedTimeStampsTemporaryOrder(firstgoodthisset:end));
@@ -5497,9 +5487,9 @@ if(usebsa) %bsa cycle for getting data synchronously
       else
         ValidDataArray_PV=[];
         ValidPulseIDs=[];
-        ValidTimeStamps=[]; 
+        ValidTimeStamps=[];
       end
-    end    
+    end
 else % not bsa data, just read and order in best effort mode
     ValidDataArray_Pr1=[];
     ValidDataArray_Pr2=[];
@@ -5519,7 +5509,7 @@ else % not bsa data, just read and order in best effort mode
                         proj2=transpose(mean(double(prof),2))-backg2;
                     else
                         proj=mean(double(prof),ProjectionDirection)-backg;
-                    end    
+                    end
                 else
                     proj=double(Image(ROIx(1):ROIx(2)))-backg;
                 end
@@ -5531,7 +5521,7 @@ else % not bsa data, just read and order in best effort mode
                         ReadCueProf(ReadID,:)=transpose(proj);
                     else
                         ReadCueProf(ReadID,:)=proj;
-                    end  
+                    end
                 end
             end
         else % This else if for test (works only in offline mode to try viewer features or re-play data)
@@ -5548,7 +5538,7 @@ else % not bsa data, just read and order in best effort mode
                         proj2=transpose(mean(double(prof),2))-backg2;
                     else
                         proj=mean(double(prof),ProjectionDirection)-backg;
-                    end    
+                    end
                 else
                     proj=double(Image(ROIx(1):ROIx(2)))-backg;
                 end
@@ -5560,9 +5550,9 @@ else % not bsa data, just read and order in best effort mode
                         ReadCueProf(ReadID,:)=transpose(proj);
                     else
                         ReadCueProf(ReadID,:)=proj;
-                    end  
+                    end
                 end
-            end  
+            end
         end % End of test else
     else
         if(ONLINE)
@@ -5604,7 +5594,7 @@ else % not bsa data, just read and order in best effort mode
         for PvID=1:PvNumber
             [dontcare, IR, dontcare2]=intersect(UniquePvPulseID{PvID},uniqueintersect);
             ValidDataArray_PV(PvID,:)=ReadCuePVs(PvID,UniquePvPulseID_Locations{PvID}(IR));
-        end 
+        end
     elseif(ReadProfile) %Only profile all good, just remove duplicates
         pulseID_Profile=bitand(uint32(imag(ReadCueProfTS)),hex2dec('1FFFF'));
         [uniquevalues_pr,uniquelocations_pr]=unique(pulseID_Profile);
@@ -5632,7 +5622,7 @@ else % not bsa data, just read and order in best effort mode
         end
         ValidPulseIDs=uniqueintersect;
         ValidTimeStamps=ReadCuePvsTS(PvID,uniquelocations{PvID}(IR));
-    end     
+    end
 end
 % we have ValidPulseIDs, ValidTimeStamps, ValidDataArray_PV,
 % ValidDataArray_Pr, ValidDataArray_Pr1, ValidDataArray_Pr2,
@@ -5660,14 +5650,14 @@ EvaluatedProfileQuantities2=[];
 EvaluatedProfileQuantities=[];
 
 if(ReadProfile)
-    
+
     if(BothProfiles)
-        
+
         [Prof1length1,NumberofShots]=size(ValidDataArray_Pr1); %SA=1024, SB number of data
         [Prof1length2,NumberofShots]=size(ValidDataArray_Pr2);
     else
         [Prof1length,NumberofShots]=size(ValidDataArray_Pr);
-    end    
+    end
     for ProcessCounter=1:handles.ProfileProcessNumber
         if(BasicProcessing(ProcessCounter))
             switch(ProcessCounter)
@@ -5738,7 +5728,7 @@ if(ReadProfile)
                             else
                                 FWHM2(II)=MV2-mv2+1;
                             end
-                        end   
+                        end
                         EvaluatedProfileQuantities(end+1,:)=FWHM1;
                         EvaluatedProfileQuantities2(end+1,:)=FWHM2;
                     else
@@ -5759,7 +5749,7 @@ if(ReadProfile)
                     end
             end
         end
-    end  
+    end
 end
 
 if(~isempty(EvaluatedProfileQuantities))
@@ -5775,7 +5765,7 @@ for II=1:handles.NumberOfAvailableSignals
        if(SignalON(II))
            for III=1:numel(CodiceSig(II).Code)
                 eval(CodiceSig(II).Code{III})
-           end 
+           end
            NewSignals(SignalEvaluated,:)=CodeOutput;
            SignalEvaluated=SignalEvaluated+1;
        end
@@ -5853,7 +5843,7 @@ for II=1:numel(Code)
           else
               Code{II}=regexprep(Code{II},['%',num2str(JJ)],['handles.Buffer.PV(',num2str(PvNumber+2+JJ-handles.NumberOfOnTheFlyVariables),',:)']);
           end
-      end 
+      end
    end
    for JJ=(PvNotSyncNumber+handles.TSandPulseIds+2*handles.ProfileProcessNumber+handles.NumberOfAvailableSignals):-1:1 % Only Single Value Pvs are the "Six Variables"
        if(JJ>2*handles.ProfileProcessNumber) %Pv or signals
@@ -5867,16 +5857,16 @@ for II=1:numel(Code)
            end
            Dove=find(JJ==SignalsResorting);
            if(~isempty(Dove))
-              Code{II}=regexprep(Code{II},['#',num2str(JJ)],['handles.Buffer.SignalEvaluated(',num2str(Dove),',:)']); 
+              Code{II}=regexprep(Code{II},['#',num2str(JJ)],['handles.Buffer.SignalEvaluated(',num2str(Dove),',:)']);
            end
        end
         if((JJ<=2*handles.ProfileProcessNumber) && (JJ > handles.ProfileProcessNumber)) %proc 2
             Dove=find(JJ==ProfQuantResorting);
-            Code{II}=regexprep(Code{II},['#',num2str(JJ)],['handles.Buffer.ProfQuant(',num2str(Dove),',:)']); 
+            Code{II}=regexprep(Code{II},['#',num2str(JJ)],['handles.Buffer.ProfQuant(',num2str(Dove),',:)']);
         end
         if(JJ<=handles.ProfileProcessNumber) %proc 1
             Dove=find(JJ==ProfQuantResorting);
-            Code{II}=regexprep(Code{II},['#',num2str(JJ)],['handles.Buffer.ProfQuant2(',num2str(Dove),',:)']); 
+            Code{II}=regexprep(Code{II},['#',num2str(JJ)],['handles.Buffer.ProfQuant2(',num2str(Dove),',:)']);
         end
    end
    Code{II}=regexprep(Code{II},'!','TemporaryVariable');
@@ -5887,7 +5877,7 @@ for II=1:numel(Code)
        Code{II}=regexprep(Code{II},'FirstProfile','handles.Buffer.Prof');
        Code{II}=regexprep(Code{II},'SecondProfile','handles.Buffer.Prof2');
    end
-   
+
 end
 for II=1:numel(Code)
     disp(Code{II})
@@ -6145,7 +6135,7 @@ else
         %ROIx=Init_Vars.ROIx; ROIy=Init_Vars.ROIy; profile=Init_Vars.profile; Pvlist=Init_Vars.Pvlist; ProjectionDirection=Init_Vars.ProjectionDirection; CameraSize=Init_Vars.CameraSize;
         %BasicProcessing=Init_Vars.BasicProcessing; FilterON=Init_Vars.FilterON; SignalON=Init_Vars.SignalON;
         ResortingX=Init_Vars.ResortingX; ResortingY=Init_Vars.ResortingY;FilterResorting=Init_Vars.FilterResorting;
-    
+
 %        ValidDataArray_PV=[EvaluatedProfileQuantities; real(ValidTimeStamps)+imag(ValidTimeStamps)/10^9 ;double(ValidPulseIDs); zeros(sum(SignalON),length(ValidPulseIDs)) ;  ValidDataArray_PV];
         [SA,SB]=size(Buffer.PV); LastValidData=SB;  FILLING=1;
         if(SA>2)
@@ -6159,7 +6149,7 @@ else
            ResortingY(end+1,1)=2;
            ResortingY(end,2)=SE-1+II;
            ResortingX(end+1,1)=2;
-           ResortingX(end,2)=SE-1+II; 
+           ResortingX(end,2)=SE-1+II;
         end
     if(~isempty(FiguresList))
         ScreenToBeUpdated=1;LastScreen=numel(FiguresList);
@@ -6169,7 +6159,7 @@ else
                 Petizione=get(ChildrenSorting(ScreenID,23),'userdata');
                 FigureStillOpen=1;
             catch ME
-                FigureStillOpen=0;    
+                FigureStillOpen=0;
             end
             %FiguresList
             %Petizione
@@ -6177,12 +6167,12 @@ else
             if(FigureStillOpen)
                 cla(ChildrenSorting(ScreenID,1),'reset');
                 hold(ChildrenSorting(ScreenID,1),'on');
-                
+
                 if(Petizione.SpecializedDisplay)
                 %save TEMPX
                 handles.FunctionAnalysisListHandles{Petizione.SpecializedDisplay}(Buffer.PV,Buffer.Prof,Buffer.Prof2,Init_Vars.SingleValuePvs(1:handles.NumberOfOnTheFlyVariables),[], LastValidData, [], ChildrenSorting(ScreenID,:), UD{1}, Init_Vars.PvNotSync , [], Petizione)
                 else
-                
+
 %                 save TEMP
                 switch(ResortingX(Petizione.X_SEL,1))
                     case 0 %SEL_X is off
@@ -6206,7 +6196,7 @@ else
                                 if(Petizione.Filt3)
                                    DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),handles.Buffer.FilterEvaluated{FilterResorting(Petizione.Filt3)});
                                 else
-                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData); 
+                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData);
                                 end
                                 plot(ChildrenSorting(ScreenID,1),DataY3,'.b')
                             end
@@ -6271,7 +6261,7 @@ else
                                           plot(ChildrenSorting(ScreenID,1),Xaxis,DATAY1(:,mod(round(rand(1)*10^7),s_temp2)+1),'k','LineWidth',2)
                                       end
                                   end
-                                  
+
                                   if(Petizione.Filt2)
                                       if(ResortingX(Petizione.X_SEL,2)==1)
                                           DATAY1=Buffer.Prof(:,handles.Buffer.FilterEvaluated{FilterResorting(Petizione.Filt2)});
@@ -6288,7 +6278,7 @@ else
                                           end
                                       end
                                   end
-                                  
+
                                   if(Petizione.Filt3)
                                       if(ResortingX(Petizione.X_SEL,2)==1)
                                           DATAY1=Buffer.Prof(:,handles.Buffer.FilterEvaluated{FilterResorting(Petizione.Filt3)});
@@ -6305,8 +6295,8 @@ else
                                           end
                                       end
                                   end
-                                  
-                                  
+
+
                                     if(~Petizione.b_autoX)
                                         CurrLim=xlim(ChildrenSorting(ScreenID,1));
                                         if(~isnan(Petizione.lim_x1)), CurrLim(1)=Petizione.lim_x1;, end
@@ -6336,7 +6326,7 @@ else
                                 end
                                 DataY1=KEEP_PV(ResortingY(Petizione.Y_SEL1,2),1:LastValidData);
                             end
-                            
+
                             if(Petizione.b_autoY)
                                 MapYMin=min(DataY1);
                                 MapYMax=max(DataY1);
@@ -6422,7 +6412,7 @@ else
                                     MatrixToPlot(:,BinsID)=mean(DATAX1(:,find(BinTheyFitInto==BinsID)),2);
                                 end
                             end
-                             
+
                             PointersOfThisPlot=plot(ChildrenSorting(ScreenID,1),XAxis,MatrixToPlot);
                             if(length(PointersOfThisPlot)<=10)
                                 if(exist('Legend','var')), clear Legend, end
@@ -6447,16 +6437,16 @@ else
                                     end
                         end
                     case 2 %SEL_X is a shot to shot value
-                         
+
                         DATAX1TEMP=KEEP_PV(ResortingX(Petizione.X_SEL,2),1:LastValidData);
                         if(~ResortingY(Petizione.Y_SEL1,1) && ~ResortingY(Petizione.Y_SEL2,1) && ~ResortingY(Petizione.Y_SEL3,1)) %Resort the buffer and plot
                                 if(~FILLING)
-                                   DataX1=DATAX1TEMP([ValidDataPointer:keepsize,1:(ValidDataPointer-1)]); 
+                                   DataX1=DATAX1TEMP([ValidDataPointer:keepsize,1:(ValidDataPointer-1)]);
                                 else
                                    DataX1=DATAX1TEMP;
                                 end
                                 plot(ChildrenSorting(ScreenID,1),DataX1,'.k');
-                        else    
+                        else
                             if(ResortingY(Petizione.Y_SEL1,1)) %something is selected on first
                                 if(Petizione.Filt1)
                                    DataY1=KEEP_PV(ResortingY(Petizione.Y_SEL1,2),handles.Buffer.FilterEvaluated{FilterResorting(Petizione.Filt1)});
@@ -6482,7 +6472,7 @@ else
                                    DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),handles.Buffer.FilterEvaluated{FilterResorting(Petizione.Filt3)});
                                    DataX1=DATAX1TEMP(:,handles.Buffer.FilterEvaluated{FilterResorting(Petizione.Filt3)});
                                 else
-                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData); 
+                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData);
                                    DataX1=DATAX1TEMP;
                                 end
                                 plot(ChildrenSorting(ScreenID,1),DataX1,DataY3,'.b');
@@ -6505,13 +6495,13 @@ else
                         DATAX1TEMP=DATAX1TEMP-min(DATAX1TEMP);
                         if(~ResortingY(Petizione.Y_SEL1,1) && ~ResortingY(Petizione.Y_SEL2,1) && ~ResortingY(Petizione.Y_SEL3,1)) %Resort the buffer and plot
                                 if(~FILLING)
-                                   DataX1=DATAX1TEMP([ValidDataPointer:keepsize,1:(ValidDataPointer-1)]); 
+                                   DataX1=DATAX1TEMP([ValidDataPointer:keepsize,1:(ValidDataPointer-1)]);
                                 else
                                    DataX1=DATAX1TEMP;
                                 end
                                 plot(ChildrenSorting(ScreenID,1),DataX1,'.k');
-                        else    
-                            if(Petizione.TrasformaFourier)                                    
+                        else
+                            if(Petizione.TrasformaFourier)
                                     FrequencyVectorDefined=0;
                             end
                             if(ResortingY(Petizione.Y_SEL1,1)) %something is selected on first
@@ -6522,7 +6512,7 @@ else
                                    DataY1=KEEP_PV(ResortingY(Petizione.Y_SEL1,2),1:LastValidData);
                                    DataX1=DATAX1TEMP;
                                 end
-                                if(Petizione.TrasformaFourier)                                    
+                                if(Petizione.TrasformaFourier)
                                     FrequencyEstimate=round(1/min(diff(DataX1))); % da lavorare
                                     if(FrequencyEstimate>120), FrequencyEstimate=120;, end
                                     FrequencyVector=linspace(0,round(FrequencyEstimate/2),Petizione.binsx);
@@ -6556,7 +6546,7 @@ else
                                    DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),handles.Buffer.FilterEvaluated{FilterResorting(Petizione.Filt3)});
                                    DataX1=DATAX1TEMP(:,handles.Buffer.FilterEvaluated{FilterResorting(Petizione.Filt3)});
                                 else
-                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData); 
+                                   DataY3=KEEP_PV(ResortingY(Petizione.Y_SEL3,2),1:LastValidData);
                                    DataX1=DATAX1TEMP;
                                 end
                                 if(Petizione.TrasformaFourier)
@@ -6567,7 +6557,7 @@ else
                                 else
                                     plot(ChildrenSorting(ScreenID,1),DataX1,DataY3,'.b');
                                 end
-                            end  
+                            end
                         end
                         if(~Petizione.b_autoX)
                             CurrLim=xlim(ChildrenSorting(ScreenID,1));
@@ -6581,12 +6571,12 @@ else
                             if(~isnan(Petizione.lim_y2)), CurrLim(2)=Petizione.lim_y2;, end
                             ylim(ChildrenSorting(ScreenID,1),CurrLim);
                         end
-                    
+
                 end
-            
-                end    
-            
-                
+
+                end
+
+
             if(Petizione.LogBookAndSave || Petizione.LogBookOnlyFigure)
                 CurrentTime=clock;
                 CurrentYearString=num2str(CurrentTime(1),'%.4d');
@@ -6596,7 +6586,7 @@ else
                 CurrentTempo2String=num2str(CurrentTime(5),'%.2d');
                 CurrentTempo3String=num2str(floor(CurrentTime(6)),'%.2d');
                 CurrentTempo4String=num2str(round((CurrentTime(6)-floor(CurrentTime(6)))*1000),'%.3d');
-                CurrentTimeString=[CurrentYearString,'-',CurrentMonthString,'-',CurrentDieiString,'--',CurrentTempo1String,'-',CurrentTempo2String,'-',CurrentTempo3String,'-',CurrentTempo4String]; 
+                CurrentTimeString=[CurrentYearString,'-',CurrentMonthString,'-',CurrentDieiString,'--',CurrentTempo1String,'-',CurrentTempo2String,'-',CurrentTempo3String,'-',CurrentTempo4String];
                 for II=1:Petizione.LogBookAndSave
                     NewFigure=figure; 			% Create a new figure
                     %NewAxes=axes;		% Create an axes object in the figure
@@ -6614,7 +6604,7 @@ else
                     Petizione.LogBookOnlyFigure=0;
                     set(ChildrenSorting(ScreenID,23),'userdata',Petizione);
                 end
-            end      
+            end
             else %Delete it from list
                 if ((ScreenID==1) && (numel(FiguresList)==1) )
                     FiguresList=[];
@@ -6636,9 +6626,9 @@ else
             end
         end
     end
-        
-        
-        
+
+
+
     end
 end
 
@@ -7006,8 +6996,8 @@ function CV_PlusOne_Callback(hObject, eventdata, handles)
         handles.extGui = 1;
         guidata(hObject, handles);
         Start3_Callback(hObject, [], handles)
-        
-        
+
+
         function handles =  sendImage(hObject, handles)
             [ho1, h1]=util_appFind('SXRSS_gui');
             SXRSS_gui('cpyImg', ho1, h1);

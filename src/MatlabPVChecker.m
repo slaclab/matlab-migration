@@ -1,5 +1,4 @@
 % Matlab Support PV Checker - Mike Zelazny
-aidainit;
 [ system, accelerator ] = getSystem;
 disp(' ');
 disp(sprintf('Matlab Support PV Checker for %s %s', accelerator, datestr(now)));

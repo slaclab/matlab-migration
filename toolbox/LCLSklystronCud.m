@@ -16,14 +16,13 @@ if isempty(sys)
     [sys, accelerator] = getSystem();
 end
 if ~strcmpi(accelerator, 'LCLS')
-   exit 
+   exit
 end
-aidainit;
 nLogLines = 24;
 toggleLogFile = 1;
 logStringHead = 'begin\nnumCols 3\nheaderAlign "ccclc"\nalign "ccclc"\nseparators "|"\ncomment "#"\nend\n';
 logStringList(1:nLogLines) = {''};
-err = getLogger(['klystronCud_', accelerator]);  
+err = getLogger(['klystronCud_', accelerator]);
 disp_log(sprintf('\nStarting Klystron Cud %s\n\n',datestr(now)'));
 format long
 statusStr =   {'OK '; 'ACC'; 'OFF'; 'MNT'; 'TBR'; 'ARU';  'CKP'; 'PSV'};
@@ -91,7 +90,7 @@ for bcIndex = 1:numel(beamCodes)
     end
 end
 % Remove SBST 20
-% klysPvs{2,9} =  'KLYS:LI28:00:ADES' 
+% klysPvs{2,9} =  'KLYS:LI28:00:ADES'
 pActPvs = pActPvs(2:end);
 pLimHihiPvs = pLimHihiPvs(2:end);
 pLimLoloPvs = pLimLoloPvs(2:end);
@@ -109,8 +108,8 @@ polyPvs = strrep(klysPvs,'ADES','POLY');
 sbstPolyPvs = strrep(pActPvs,'CUDSBST','SBST');
 sbstPolyPvs = strrep(sbstPolyPvs,'STATUS','POLY');
 % Create arrays to hold BV-related PVs
-bvPvs = strrep(klysPvs,'ADES','BVLT'); 
-bvJitterPvs = strrep(klysPvs,'ADES','MKBVFTPJASIGMA'); 
+bvPvs = strrep(klysPvs,'ADES','BVLT');
+bvJitterPvs = strrep(klysPvs,'ADES','MKBVFTPJASIGMA');
 bvJitterTolPvs = strrep(klysPvs,'ADES','BVJT');
 % Create yet more arrays to hold PVs - these ones contain status messgaes
 % of differing verbosities.
@@ -268,7 +267,7 @@ while(1)
                 try
                     amplVals(row,col) = lcaGetSmart(amplPvs(row,col));
                 catch
-                    
+
                     disp_log(sprintf('Could not get pv %s',char(amplPvs(row,col))))
                     continue;
                 end
@@ -296,7 +295,7 @@ while(1)
                 try
                     phaseVals(row,col) = lcaGetSmart(phasePvs(row,col));
                 catch
-                    
+
                     disp_log(sprintf('Could not get pv %s',char(phasePvs(row,col))))
                     continue;
                 end
@@ -398,7 +397,7 @@ while(1)
     useIndx = 1:sbstSize(1);
     nulIndx = strmatch(' ' , handles.sbstS);
     useIndx(nulIndx) = ''; % Removes unused station indices
-    try 
+    try
          [isACC,stat,swrd,hdsc,dsta1,dsta2]=deal(zeros(sbstSize));
          % 10/11/11 W. Colocho - Need to fix SBST string and isACC. control_klysStatGet.m does not
          % support SBST and status bits don't really translate.
@@ -433,7 +432,7 @@ while(1)
         put2log(sprintf('Failed on STAT or HDSC to string conversion: sum(STATs)=%i, sum(HDSC)= %i', sum(sum(stat)), sum(sum(hdsc)) )) ;
         dbstack
         continue
-    end 
+    end
     try  % Update the SBST PVs with the data we just retrieved
         lcaPutSmart(pisAccPvs{bcIndex}(useIndx), double(pisACC(useIndx)));
         lcaPutSmart(pstrPvs(useIndx), strS(useIndx));
@@ -446,7 +445,7 @@ while(1)
 end % End of main loop
 end
 
-function [strS strM strL strXL] = klysCudString(stat,swrd,hdsc,dsta, handles, type) 
+function [strS strM strL strXL] = klysCudString(stat,swrd,hdsc,dsta, handles, type)
 % info from REF_:[KLYSUTIL]KLYS_STRING.FOR
 % Input: act, stat, swrd, hdsc, dsta, handles
 % Output: strS - 3 leter character for CUD.
@@ -517,8 +516,8 @@ STinfo = { ...
 'ST', 9999, 'SN', 'ski', 'skip ', 'skip        ', ' None';...
 'ST',   30, 'Ss', 'UPD', 'UPDAT', 'UPDATE Req  ', 'Stat_Update Req ';...
 'ST', 9999, 'SN', 'ski', 'skip ', 'skip        ', ''};
-    
-SWinfo = {... 
+
+SWinfo = {...
 'SW',   55, 'SH', 'CBL', 'Cable', 'Bad Cable   ', 'BAD CABLE Status';...
 'SW',   80, 'SH', 'MKS', 'MKSU ', 'MKSU Protect', 'MKSU Protect';...
 'SW',   68, 'SH', 'TRG', 'TRIG ', 'NO Triggers ', 'NO Triggers';...
@@ -678,32 +677,32 @@ HDinfo = {...
 debugFlag = lcaGet(['SIOC:' sys ':ML00:AO324']);
 msg1 = [datestr(now) ' Warning: Found word with negative bits. '];
 warn=0;
-if min(min(stat)) < 0 
+if min(min(stat)) < 0
     if debugFlag, disp(msg1), disp(handles.klysS(stat<0)), end
-    stat(stat<0) = 0; warn = 1; 
+    stat(stat<0) = 0; warn = 1;
 end
-if min(min(swrd)) < 0, 
+if min(min(swrd)) < 0,
     if(debugFlag), disp(msg1), disp(handles.klysS(swrd<0)), end
     swrd(swrd<0) = 0; warn = 2;
 end
-if min(min(hdsc)) < 0, 
+if min(min(hdsc)) < 0,
     if(debugFlag), disp(msg1), disp(handles.klysS(hdsc<0)), end
     hdsc(hdsc<0) = 0; warn = 3;
 end
-if min(min(dsta(:,:,1))) < 0, 
+if min(min(dsta(:,:,1))) < 0,
     if(debugFlag), disp(msg1), disp(handles.klysS(dsta(:,:,1)<0)), end
     d1 = dsta(:,:,1); d1(d1<0) = 0;
-    dsta(:,:,1) = d1; warn = 4;  %dsta(dsta(:,:,1)<0) = 0;    
+    dsta(:,:,1) = d1; warn = 4;  %dsta(dsta(:,:,1)<0) = 0;
 end
-if min(min(dsta(:,:,2))) < 0, 
+if min(min(dsta(:,:,2))) < 0,
     if(debugFlag), disp(msg1),  disp(handles.klysS(dsta(:,:,2)<0)), end
     d2 = dsta(:,:,2); d2(d2<0) = 0;
-    dsta(:,:,2) = d2; warn = 5; %dsta(dsta(:,:,2)<0) = 0;  
+    dsta(:,:,2) = d2; warn = 5; %dsta(dsta(:,:,2)<0) = 0;
 end
 strS = cell(size(stat)); %initialize string matrix
 strM = strS;
 strL = strS;
-strXL = strS; 
+strXL = strS;
 if(debugFlag)
     warnStr = {'stat', 'swrd', 'hdsc', 'dsta1','dsta2'};
     if(warn)

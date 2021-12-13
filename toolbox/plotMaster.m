@@ -61,7 +61,7 @@ handles.figureList.h = '0';
 handles.timeRange = [now-2/24 now];
 handles.varCount = 0;
 handles.useAppliance = 1;
-if ~handles.useAppliance, aidainit; end 
+
 [sys, accelerator] = getSystem();
 handles.accelerator = lower(accelerator);
 handles.applianceOpts = {'Operator','', 'Bin', '60', 'Std', '3', 'OldBin', '60'};
@@ -79,7 +79,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = plotMaster_OutputFcn(hObject, eventdata, handles) 
+function varargout = plotMaster_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -128,7 +128,7 @@ for ii = lineIndx
     y = get( handles.figureList(figIndx).singleAxes.pltH(ii), 'YData');
     y = medfilt1(y,10); %TODO better medfilter for multiple filters applications
     y(1) = y(2);
-    set(handles.figureList(figIndx).singleAxes.pltH(ii), 'YData', y);    
+    set(handles.figureList(figIndx).singleAxes.pltH(ii), 'YData', y);
 end
 
 %TODO update legend so that stats are correct after medfilt
@@ -149,7 +149,7 @@ lineIndx = get(handles.lineListbox, 'Value');
 for ii = lineIndx
     x = get( handles.figureList(figIndx).singleAxes.pltH(ii), 'XData');
     y = get( handles.figureList(figIndx).singleAxes.pltH(ii), 'YData');
-    
+
     removeIndx = [find(( y > mean(y) + 3 * std(y))), ...
                 find(( y < mean(y) - 3 * std(y)))];
     x(removeIndx) = [];
@@ -386,8 +386,8 @@ function startRelativeEdit_Callback(hObject, eventdata, handles)
 
 value = get(hObject,'String');
 s1 = regexpi(value, '[hmdy]');
-if isempty(s1), 
-    warndlg('Relative string needs to be one of [hmdy] (hours, months, days, years)'); 
+if isempty(s1),
+    warndlg('Relative string needs to be one of [hmdy] (hours, months, days, years)');
     return
 end
 deltaT = str2double(value(1:s1-1))
@@ -446,7 +446,7 @@ switch get(handles.endRelativeEdit, 'String')
     case {'now', '->'}
         handles.timeRange(2) = now;
         set(hObject,'String', 'now')
-    otherwise 
+    otherwise
 end
 updateTimeRange(hObject,eventdata,handles);
 
@@ -494,12 +494,12 @@ val = get(hObject,'Value');
 oldRelativeDeltaT = diff(handles.timeRange);
 handles.timeRange(1) = val;
 relativeDeltaT = diff(handles.timeRange);
-if oldRelativeDeltaT <= 0 
+if oldRelativeDeltaT <= 0
 
     handles.timeRange(2) = handles.timeRange(1) + 23/24;
 elseif relativeDeltaT <= 1/24 && oldRelativeDeltaT > 0
 
-    handles.timeRange(2) = handles.timeRange(1) + oldRelativeDeltaT; 
+    handles.timeRange(2) = handles.timeRange(1) + oldRelativeDeltaT;
 end
 set(handles.endSlider,'Max', max(now,handles.timeRange(2) +1/24));
 updateTimeRange(hObject,eventdata,handles);
@@ -533,23 +533,23 @@ handles.timeRange(2) = val;
 relativeDeltaT = diff(handles.timeRange);
 
 %{
-if relativeDeltaT >= 0 
-    handles.timeRange(2) = handles.timeRange(2)-23/24;  
-    
+if relativeDeltaT >= 0
+    handles.timeRange(2) = handles.timeRange(2)-23/24;
+
 elseif relativeDeltaT < 0
-    handles.timeRange(2) = handles.timeRange(2) +23/24; 
-    
+    handles.timeRange(2) = handles.timeRange(2) +23/24;
+
 end
 %}
 
 
-if oldRelativeDeltaT <= 0 
-    handles.timeRange(1) = handles.timeRange(2)-2/24;  
-    
+if oldRelativeDeltaT <= 0
+    handles.timeRange(1) = handles.timeRange(2)-2/24;
+
 elseif relativeDeltaT <= 1/24 && oldRelativeDeltaT > 0
-    %handles.timeRange(1) = handles.timeRange(2) - oldRelativeDeltaT; 
+    %handles.timeRange(1) = handles.timeRange(2) - oldRelativeDeltaT;
     handles.timeRange(1) = handles.timeRange(2) - oldRelativeDeltaT;
-    
+
 end
 
 updateTimeRange(hObject,eventdata,handles);
@@ -589,20 +589,20 @@ isEndRelativeEdit = strcmp( 'endRelativeEdit', caller);
 
 relativeDeltaT = diff(handles.timeRange);
 
-for ii = 1:length(tagList) 
-    
+for ii = 1:length(tagList)
+
     if strcmp(tagList{ii}, caller), continue, end %Don't update the caller date
-    
+
     if isEnd && ~isEndRelativeEdit, set(handles.endRelativeEdit, 'String', '->'), end
-    
+
     switch tagList{ii}
         case 'endRelativeEdit'
-                      
+
         case 'endAbsoluteEdit',
             set(handles.endAbsoluteEdit,'String', datestr(handles.timeRange(2),'mm/dd/yyyy HH:MM:SS'));
 
-        case 'endSlider'                               
-            
+        case 'endSlider'
+
         case 'startRelativeEdit',
             if relativeDeltaT >365.25, stRelStr = sprintf('-%.1fY', relativeDeltaT/365.25);
             elseif relativeDeltaT > 31, stRelStr = sprintf('-%.1fM',relativeDeltaT/31);
@@ -612,19 +612,19 @@ for ii = 1:length(tagList)
             set(handles.startRelativeEdit', 'String', stRelStr)
         case 'startAbsoluteEdit'
             set(handles.startAbsoluteEdit,'String', datestr(handles.timeRange(1),'mm/dd/yyyy HH:MM:SS'));
-        
+
         case 'startSlider'
-                      
+
         case 'startCalendarButton'
-            if relativeDeltaT <= 0 
-                handles.timeRange(1) = handles.timeRange(2)-2/24;  
+            if relativeDeltaT <= 0
+                handles.timeRange(1) = handles.timeRange(2)-2/24;
                 set(handles.startAbsoluteEdit,'String', datestr(handles.timeRange(1),'mm/dd/yyyy HH:MM:SS'));
                 set(handles.startRelativeEdit,'String', '-2.0H');
               end
-                        
-        case 'endCalendarButton' 
-            if relativeDeltaT <= 0 
-                handles.timeRange(2) = handles.timeRange(1)+2/24;  
+
+        case 'endCalendarButton'
+            if relativeDeltaT <= 0
+                handles.timeRange(2) = handles.timeRange(1)+2/24;
                 set(handles.endAbsoluteEdit,'String', datestr(handles.timeRange(2),'mm/dd/yyyy HH:MM:SS'));
                 set(handles.startRelativeEdit,'String', '-2.0H');
             end
@@ -664,7 +664,7 @@ for I = 1:length(handles.varNames)%handles.varCount
             case 'Appliance'
                 try
                     if isempty(handles.varNames(I).requestStr)
-                        
+
                         [t v requestStr] = getHistory(handles.varNames(I).name, handles.timeRange, handles.applianceOpts{:});
                         handles.varNames(I).requestStr = requestStr;
                     else
@@ -699,7 +699,7 @@ for I = 1:length(handles.varNames)%handles.varCount
     end
     handles.varNames(I).time = {t};
     handles.varNames(I).value ={v};
-    
+
 end
 if isempty(handles.varNames(I).requestStr), handles.varNames(I).requestStr = handles.varNames(I).name{:}(2:end); end
 
@@ -711,13 +711,13 @@ if anyFormula
     for I = 1:handles.varCount
         evalStr = sprintf('%s = handles.varNames(I).value{:};', handles.varNames(I).variable{:}); %A = value
         if I ~= handles.varCount, eval(evalStr); end %skip new formula but calculate all other formulas.
-    end    
+    end
     for I = 1:handles.varCount
         if  handles.varNames(I).isFormula
             formula = sprintf('v %s;', handles.varNames(I).name{:} );
             eval(formula); % v = <input formula>
-            if normalize, 
-                v = normalizeVector(v);                
+            if normalize,
+                v = normalizeVector(v);
             end
             t = handles.varNames(1).time{:}; %All time vectors are the same since we used makeAllSameLength()
             handles.varNames(I).time = {t};
@@ -732,7 +732,7 @@ if normalize, handles = normalizeVectors(handles); end
 
 function handles = normalizeVectors(handles)
     valOffsetSum = 0;
-for I = 1:handles.varCount    
+for I = 1:handles.varCount
     v = handles.varNames(I).value{:};
     valOffset = (max(v) - min(v))/util_meanNan(v);
     valOffsetSum = valOffsetSum + valOffset;
@@ -770,7 +770,7 @@ catch
     keyboard
 end
 
-% --- Executes on button press in 
+% --- Executes on button press in
 
 function plotPushbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to plotPushbutton (see GCBO)
@@ -787,47 +787,47 @@ handles = updateHistoryValues(handles);
 figCnt = length(handles.figureList);
 lostFigI =  strmatch('0',{handles.figureList.h});
 newFigure = get(handles.newFigureCheckbox,'Value');
-if any(lostFigI), 
+if any(lostFigI),
     figIndx = lostFigI(1);
     newFigure = 1;
-else   
+else
     figIndx = figCnt + 1;
 end
 if newFigure,
     figH = figure;
     handles.figureList(figIndx).h = num2str(figH);
-    handles.figureList(figIndx).axesH(1:handles.varCount) = 0.1;    
-    for jj =1:length( [handles.figureList.h]),         
-        figListStr(jj) = {handles.figureList(jj).h} ;        
-    end    
-    set(handles.figureControlPopupmenu, 'String', figListStr) 
+    handles.figureList(figIndx).axesH(1:handles.varCount) = 0.1;
+    for jj =1:length( [handles.figureList.h]),
+        figListStr(jj) = {handles.figureList(jj).h} ;
+    end
+    set(handles.figureControlPopupmenu, 'String', figListStr)
     set(handles.figureControlPopupmenu, 'Value', figIndx)
-else    
+else
     figIndx = get(handles.figureControlPopupmenu,'Value');
     figCtrlStr = get(handles.figureControlPopupmenu,'String');
     figH = str2num(figCtrlStr{figIndx});
 end
 if get(handles.singleAxesTogglebutton,'Value'),
     handles.figureList(figIndx).isMultiAxes = 0;
-else  
+else
     handles.figureList(figIndx).isMultiAxes = 1;
 end
 figure(figH); %Raise or create figH
 if handles.isOpi,
-    figPos =  [5 1305  1192  516]; 
-else        
-    figPos = [1600 200 860 420];  
+    figPos =  [5 1305  1192  516];
+else
+    figPos = [1600 200 860 420];
 end
 set(figH,'Position', figPos)
 figX = get(handles.xAxisPopupmenu,'Value')
-if figX==1,     
-    xIsTime = 1;    
-else    
-    xIsTime = 0;         
+if figX==1,
+    xIsTime = 1;
+else
+    xIsTime = 0;
 end
-if xIsTime,     
-    x = [handles.varNames.time];          
-else    
+if xIsTime,
+    x = [handles.varNames.time];
+else
     x = handles.varNames(figX-1).value;
 end
 y = [handles.varNames.value];
@@ -838,31 +838,31 @@ m = [handles.varNames.marker];
 
 handles = updateStatsStr(handles);
 figHandles = num2cell([handles.figureList.h]);
-figIndx = strmatch(num2str(figH),figHandles); 
-if any(figIndx),    
-    figIndx = figIndx(1);    
-else    
+figIndx = strmatch(num2str(figH),figHandles);
+if any(figIndx),
+    figIndx = figIndx(1);
+else
 a = 1;
 end
 dcm_obj = datacursormode(figH);
 set(dcm_obj, 'UpdateFcn',@dataCursorShowTime)
 
-if handles.figureList(figIndx).isMultiAxes %Multiple axes     
-    clf(figH) 
-    handles.figureList(figIndx).singleAxes = [];    
-    %Plot it one per .EGU axes TODO pvs with same EGU don't add an axes.    
+if handles.figureList(figIndx).isMultiAxes %Multiple axes
+    clf(figH)
+    handles.figureList(figIndx).singleAxes = [];
+    %Plot it one per .EGU axes TODO pvs with same EGU don't add an axes.
     colorList =  [      0         0    1.0000; 0    0.5000         0; 1.0000         0         0;  0    0.7500    0.7500; ...
-        0.7500         0    0.7500; 0.7500    0.7500         0; 0.2500    0.2500    0.2500];    
+        0.7500         0    0.7500; 0.7500    0.7500         0; 0.2500    0.2500    0.2500];
     %TODO add more colors to color list
-    colorI = 0;            
+    colorI = 0;
     for I = 1:handles.varCount
-        if 1 %normalize  
+        if 1 %normalize
             if ~ishandle(handles.figureList(figIndx).axesH(I))
-               handles.figureList(figIndx).axesH(I) = axes;   
-            end             
-            linesLegH(I) = plot(handles.figureList(figIndx).axesH(I), x{I}, y{I}, 'Color',colorList(I,:));              
-            datetick            
-            hold on   
+               handles.figureList(figIndx).axesH(I) = axes;
+            end
+            linesLegH(I) = plot(handles.figureList(figIndx).axesH(I), x{I}, y{I}, 'Color',colorList(I,:));
+            datetick
+            hold on
         end
     end
     axesList = handles.figureList(figIndx).axesH(:);
@@ -871,11 +871,11 @@ if handles.figureList(figIndx).isMultiAxes %Multiple axes
     axesPos =[.1500 .1182 .7750 .7068];
     yWidth = .05;
     xLimit = xlim();
-    xOffset = -yWidth*diff(xLimit)/axesPos(3);    
-    for ii = 1:I, 
+    xOffset = -yWidth*diff(xLimit)/axesPos(3);
+    for ii = 1:I,
         set(axesList(ii),'Position', axesPos);
         axes(axesList(ii));
-        datetick(axesList(ii))  
+        datetick(axesList(ii))
         if ii == 1
             set(axesList(ii),'Visible','on',...
                 'Color', 'w', 'YColor', 'b')
@@ -884,42 +884,42 @@ if handles.figureList(figIndx).isMultiAxes %Multiple axes
             set(axesList(ii),'Visible','on', 'Position', axesPos+yWidth.*[-1 0 1 0],...
                 'Color', 'none', 'YColor', colorList(ii,:) ,'XLim', xLimit+[num*xOffset 0], 'XTick',[],'XTickLabel',[],'XColor', 'k')
             yWidth = yWidth + .05;
-        end        
-    end    
+        end
+    end
     xlabel(axesList(1), datestr(handles.timeRange))
     n=get(gca,'ytick');
     set(gca,'yticklabel',sprintf('%.5f|',n'));
     %TODO fix zoom for multiple axes
-    %TODO fix legend location for multiple axes    
-    handles.figureList(figIndx).linesLegH = linesLegH;     
+    %TODO fix legend location for multiple axes
+    handles.figureList(figIndx).linesLegH = linesLegH;
 else %plot in single axes
-    clf(figH) 
+    clf(figH)
     figH = str2num(handles.figureList(figIndx).h);
     figure(figH)
     %Plot it all in one axes
-    pltStr{1} = 'pltH = plot('; 
+    pltStr{1} = 'pltH = plot(';
     z=[];
-    for ii = 1:handles.varCount 
-        if xIsTime,       
-            xIndx = ii;        
-        else xIndx = 1;         
-        end %time plots use their own time vector, xIsTime=0 uses x{1} as x axis.       
-        pltStr{ii+1} = sprintf('x{%i},y{%i},''%s'' ', xIndx,ii,m{ii});        
-        if ii < handles.varCount,          
+    for ii = 1:handles.varCount
+        if xIsTime,
+            xIndx = ii;
+        else xIndx = 1;
+        end %time plots use their own time vector, xIsTime=0 uses x{1} as x axis.
+        pltStr{ii+1} = sprintf('x{%i},y{%i},''%s'' ', xIndx,ii,m{ii});
+        if ii < handles.varCount,
             pltStr{ii+1} = [pltStr{ii+1}, ', '];
-        end       
+        end
     end
     pltStr{end+1} = ');';
     eval([pltStr{:}])
     n=get(gca,'ytick');
     set(gca,'yticklabel',sprintf('%.5f|',n'));
-    xlabel(datestr(handles.timeRange));     
+    xlabel(datestr(handles.timeRange));
     handles.figureList(figIndx).singleAxes.pltH = pltH;
     handles.figureList(figIndx).singleAxes.legH = legend([handles.varNames.name],'Location','NorthOutside','Interpreter', 'none', 'FontSize', 10);
-    %TODO better datetick options or pass them to user via GUI?   
+    %TODO better datetick options or pass them to user via GUI?
     if xIsTime, datetick, end
 end
-% 
+%
 singleLineStr =  {handles.varNames.requestStr};
 set(handles.lineListbox, 'String', singleLineStr)
 handles.figureList(figIndx).singleLineStr = singleLineStr;
@@ -943,47 +943,47 @@ figCnt = length(handles.figureList);
 lostFigI =  strmatch('0',{handles.figureList.h});
 newFigure = get(handles.newFigureCheckbox,'Value');
 
-if any(lostFigI), 
+if any(lostFigI),
     figIndx = lostFigI(1);
     newFigure = 1;
-else   
+else
     figIndx = figCnt + 1;
 end
 if newFigure,
     figH = figure;
     handles.figureList(figIndx).h = num2str(figH);
-    handles.figureList(figIndx).axesH(1:handles.varCount) = 0.1;    
-    for jj =1:length( [handles.figureList.h]),         
-        figListStr(jj) = {handles.figureList(jj).h} ;        
-    end    
-    set(handles.figureControlPopupmenu, 'String', figListStr) 
+    handles.figureList(figIndx).axesH(1:handles.varCount) = 0.1;
+    for jj =1:length( [handles.figureList.h]),
+        figListStr(jj) = {handles.figureList(jj).h} ;
+    end
+    set(handles.figureControlPopupmenu, 'String', figListStr)
     set(handles.figureControlPopupmenu, 'Value', figIndx)
-else    
+else
     figIndx = get(handles.figureControlPopupmenu,'Value');
     figCtrlStr = get(handles.figureControlPopupmenu,'String');
     figH = str2num(figCtrlStr{figIndx});
 end
 if get(handles.singleAxesTogglebutton,'Value'),
     handles.figureList(figIndx).isMultiAxes = 0;
-else  
+else
     handles.figureList(figIndx).isMultiAxes = 1;
 end
 figure(figH); %Raise or create figH
 if handles.isOpi,
-    figPos =  [5 1305  1192  516];  
-else        
-    figPos = [1600 200 860 420];   
+    figPos =  [5 1305  1192  516];
+else
+    figPos = [1600 200 860 420];
 end
 set(figH,'Position', figPos)
 figX = get(handles.xAxisPopupmenu,'Value');
-if figX==1,     
-    xIsTime = 1;    
-else    
-    xIsTime = 0;         
+if figX==1,
+    xIsTime = 1;
+else
+    xIsTime = 0;
 end
-if xIsTime,     
+if xIsTime,
     x = [handles.varNames.time];
-else    
+else
     x = handles.varNames(figX-1).value;
 end
 y = [handles.varNames.value];
@@ -994,67 +994,67 @@ m = [handles.varNames.marker]
 
 handles = updateStatsStr(handles);
 figHandles = num2cell([handles.figureList.h]);
-figIndx = strmatch(num2str(figH),figHandles); 
-if any(figIndx),    
-    figIndx = figIndx(1);    
-else    
+figIndx = strmatch(num2str(figH),figHandles);
+if any(figIndx),
+    figIndx = figIndx(1);
+else
     a = 1;
 end
 dcm_obj = datacursormode(figH);
 set(dcm_obj, 'UpdateFcn',@dataCursorShowTime)
 
-if handles.figureList(figIndx).isMultiAxes %Multiple axes  
-    clf(figH)  
-    handles.figureList(figIndx).singleAxes = [];    
-    %Plot it one per .EGU axes TODO pvs with same EGU don't add an axes.    
+if handles.figureList(figIndx).isMultiAxes %Multiple axes
+    clf(figH)
+    handles.figureList(figIndx).singleAxes = [];
+    %Plot it one per .EGU axes TODO pvs with same EGU don't add an axes.
     colorList =  [      0         0    1.0000; 0    0.5000         0; 1.0000         0         0;  0    0.7500    0.7500; ...
-        0.7500         0    0.7500; 0.7500    0.7500         0; 0.2500    0.2500    0.2500];    
+        0.7500         0    0.7500; 0.7500    0.7500         0; 0.2500    0.2500    0.2500];
     %TODO add more colors to color list
-    colorI = 0;        
-    noIndx = get(handles.lineListbox, 'Value'); %Returns which PV is selected   
+    colorI = 0;
+    noIndx = get(handles.lineListbox, 'Value'); %Returns which PV is selected
     %z=[]; %Empty array
-    for I = 1:handles.varCount 
-        if 1 %normalize  
+    for I = 1:handles.varCount
+        if 1 %normalize
             if ~ishandle(handles.figureList(figIndx).axesH(I))
-               handles.figureList(figIndx).axesH(I) = axes;   
-            end           
-            if xIsTime,       
-                xIndx = I;        
-            else xIndx = 1;         
-            end %time plots use their own time vector, xIsTime=0 uses x{1} as x axis. 
-            if noIndx == I %Checks if selected PV is matched with current loop                     
-                upperLimit = handles.upperLimit; %User defined upper limit value                
-                lowerLimit = handles.lowerLimit; %User defined lower limit value                
-                z=y{I}'; %Transpose y array 
-                g=size(y{I}); %Returns size of y{I} array     
-                w=x{I}; %Time values stored in w array                
+               handles.figureList(figIndx).axesH(I) = axes;
+            end
+            if xIsTime,
+                xIndx = I;
+            else xIndx = 1;
+            end %time plots use their own time vector, xIsTime=0 uses x{1} as x axis.
+            if noIndx == I %Checks if selected PV is matched with current loop
+                upperLimit = handles.upperLimit; %User defined upper limit value
+                lowerLimit = handles.lowerLimit; %User defined lower limit value
+                z=y{I}'; %Transpose y array
+                g=size(y{I}); %Returns size of y{I} array
+                w=x{I}; %Time values stored in w array
                 for ii=1:g %Iterates through each value in g
-                    if z(ii) > upperLimit || z(ii) < lowerLimit  %If the value of z(iii), will change value of z(ii) to NaN (will no longer plot)            
-                        z(ii)=NaN;                        
-                    end        
+                    if z(ii) > upperLimit || z(ii) < lowerLimit  %If the value of z(iii), will change value of z(ii) to NaN (will no longer plot)
+                        z(ii)=NaN;
+                    end
                 end
-                linesLegH(I)=plot(w,z, 'Color',colorList(I,:));                 
+                linesLegH(I)=plot(w,z, 'Color',colorList(I,:));
             else
                 w=x{I};
                 z=y{I}';
                 linesLegH(I)=plot(w,z, 'Color',colorList(I,:));
-                
+
             end
             hold on
         end
-    end    
-    if xIsTime, datetick, end    
+    end
+    if xIsTime, datetick, end
     legend(linesLegH,[handles.varNames.name],'Location','NorthOutside','Interpreter','none', ...
-        'Fontsize', 10)    
-    axesList = handles.figureList(figIndx).axesH(:);    
+        'Fontsize', 10)
+    axesList = handles.figureList(figIndx).axesH(:);
     axesPos =[.1500 .1182 .7750 .7068];
     yWidth = .05;
     xLimit = xlim();
-    xOffset = -yWidth*diff(xLimit)/axesPos(3);    
-    for iii = 1:I, 
+    xOffset = -yWidth*diff(xLimit)/axesPos(3);
+    for iii = 1:I,
         set(axesList(iii),'Position', axesPos);
         axes(axesList(iii));
-        datetick(axesList(iii))                         
+        datetick(axesList(iii))
         if iii == 1
             set(axesList(iii),'Visible','on',...
                 'Color', 'w', 'YColor', 'b')
@@ -1063,41 +1063,41 @@ if handles.figureList(figIndx).isMultiAxes %Multiple axes
             set(axesList(iii),'Visible','on', 'Position', axesPos+yWidth.*[-1 0 1 0],...
                 'Color', 'none', 'YColor', colorList(iii,:) ,'XLim', xLimit+[num*xOffset 0], 'XTick',[],'XTickLabel',[],'XColor', 'k')
             yWidth = yWidth + .05;
-        end        
-    end    
+        end
+    end
     xlabel(axesList(1), datestr(handles.timeRange))
     n=get(gca,'ytick');
     set(gca,'yticklabel',sprintf('%.5f|',n'));
-else %plot in single axes   
-    
+else %plot in single axes
+
     clf(figH)
     colorList =  [      0         0    1.0000; 0    0.5000         0; 1.0000         0         0;  0    0.7500    0.7500; ...
-        0.7500         0    0.7500; 0.7500    0.7500         0; 0.2500    0.2500    0.2500]; 
+        0.7500         0    0.7500; 0.7500    0.7500         0; 0.2500    0.2500    0.2500];
     figH = str2num(handles.figureList(figIndx).h);
     figure(figH)
     %Plot it all in one axes
-    pltStr{1} = 'pltH = plot('; 
+    pltStr{1} = 'pltH = plot(';
     for ii = 1:handles.varCount
-        if xIsTime,       
-            xIndx = ii;        
-        else xIndx = 1;         
-        end %time plots use their own time vector, xIsTime=0 uses x{1} as x axis.      
+        if xIsTime,
+            xIndx = ii;
+        else xIndx = 1;
+        end %time plots use their own time vector, xIsTime=0 uses x{1} as x axis.
         upperLimit = handles.upperLimit; %User defined upper limit value
         lowerLimit = handles.lowerLimit; %User defined lower limit value
         if upperLimit <= lowerLimit
             h = msgbox('Check that the upper limit is larger than the lower limit', 'Error', 'error');
-        else         
-        
+        else
+
             z=y{ii}'; %Transpose y array
-            g=size(y{ii}); %Returns size of y{I} array    
+            g=size(y{ii}); %Returns size of y{I} array
             w=x{ii}; %Time values stored in w array
-            for iii=1:g %Iterates through each value in g                         
-                    if z(iii) > upperLimit || z(iii) < lowerLimit  %If the value of z(iii), will change value of z(ii) to NaN (will no longer plot)            
+            for iii=1:g %Iterates through each value in g
+                    if z(iii) > upperLimit || z(iii) < lowerLimit  %If the value of z(iii), will change value of z(ii) to NaN (will no longer plot)
                         z(iii)=NaN;
-                    end        
-            end 
+                    end
+            end
             plot(w,z, 'Color',colorList(ii,:))
-            hold on    
+            hold on
             end
     end
     xlabel(datestr(handles.timeRange));
@@ -1133,7 +1133,7 @@ tic
 %if handles.varNames(I).isFormula, egu = getFormulaEgu(handles); else egu =  lcaGetSmart( strcat(varPV,'.EGU')); end
 switch handles.varNames(I).dataSource
     case { 'Appliance'  'Archive'}, egu =  lcaGetSmart( strcat(varPV,'.EGU'));
-    case 'isFormula', egu = getFormulaEgu(handles); 
+    case 'isFormula', egu = getFormulaEgu(handles);
     case 'isFakeData', egu = {'apples', 'oranges', 'tomatoes','grapes'}; egu= egu( mod(fix(rand*10),4)+1);
 end
 tToc = toc;
@@ -1178,8 +1178,8 @@ if nargin < 3, isLoad = 1; varPV = handles.varNames.name; else isLoad = 0; end
     else
         handles.varNames(I).getNewData = 1;
     end
-   
-    
+
+
 function egu = getFormulaEgu(handles)
 %TODO use handles.egu and formula to calculate formula egu.
 egu = {':('};
@@ -1228,7 +1228,7 @@ function lineListbox_Callback(hObject, eventdata, handles)
 figureList = findobj('Type','Figure');
 figureList(figureList==handles.figure1) = [];
 if isempty(figureList), return, end
-figureList = cellfun(@num2str, num2cell(fix(figureList)), 'UniformOutput' , false); 
+figureList = cellfun(@num2str, num2cell(fix(figureList)), 'UniformOutput' , false);
 knownFigures = {handles.figureList.h};
 figureList = sort(intersect(figureList, knownFigures));
 
@@ -1240,7 +1240,7 @@ if any(figI)
 set(handles.figureControlPopupmenu,'String', figureList, 'Value', figI);
 else
     figureToUse = length(figureList);
-    set(handles.figureControlPopupmenu,'String', {num2str(sort(figureList))}, 'Value', figureToUse); 
+    set(handles.figureControlPopupmenu,'String', {num2str(sort(figureList))}, 'Value', figureToUse);
     figI = find(figureToUse==[handles.figureList.h]);
     set(hObject, 'String', handles.figureList(figI).singleLineStr)
 end
@@ -1291,21 +1291,21 @@ if handles.figureList(figCtrlVal).isMultiAxes
     linesHlist = [handles.figureList(figCtrlVal).linesLegH];
     oldYesI = strmatch('on', get(linesHlist, 'Visible'));
     set(axesList,'Visible','off')
-    yesIndx = union(oldYesI, yesIndx); 
+    yesIndx = union(oldYesI, yesIndx);
     noIndx = setdiff(allIndx,yesIndx);
-    if any(yesIndx), 
-        set(axesList(yesIndx(end)), 'Visible', 'on'); 
+    if any(yesIndx),
+        set(axesList(yesIndx(end)), 'Visible', 'on');
         axesList(yesIndx(end)) = [];
     end
-    
+
     for jj = axesList, axes(jj); end
     set(handles.figureList(figCtrlVal).linesLegH, 'Visible', 'off')
     set(handles.figureList(figCtrlVal).linesLegH(yesIndx), 'Visible', 'on')
     set(handles.figureList(figCtrlVal).linesLegH(noIndx), 'Visible', 'off')
-    
+
 else
     legIndx = get(handles.figureList(figCtrlVal).singleAxes.legH ,'UserData');
-    set(legIndx.handles(yesIndx),'Visible','on') 
+    set(legIndx.handles(yesIndx),'Visible','on')
 end
 
 figure(handles.figure1)
@@ -1350,13 +1350,13 @@ bin = handles.applianceOpts{4};
 std = handles.applianceOpts{6};
 if isempty(std), std = '3'; end
 oldBin = handles.applianceOpts{8};
-if v == 1, visible = 'off'; handles.applianceOpts{4} = '0';  
+if v == 1, visible = 'off'; handles.applianceOpts{4} = '0';
 else visible  = 'on'; handles.applianceOpts{4} = oldBin;
 end
 helpStr = {'Raw Data'  ['First Sample of each ' oldBin  ' sec. bin']  ...
     'Mean =  <X>'  'std = sqrt(<X^2> - <X>^2)' ...
     'RMS = sqrt(<X^2>)' 'jitter = RMS/Mean' ['Ignore Flyers in ' bin 'sec. bin with sigma ' std] };
-operatorStr =   {'', 'firstSample', 'mean', 'sigma', 'rms', 'jitter',  'ignoreflyers'}; 
+operatorStr =   {'', 'firstSample', 'mean', 'sigma', 'rms', 'jitter',  'ignoreflyers'};
 set(hObject, 'TooltipString', helpStr{v} )
 
 
@@ -1374,7 +1374,7 @@ guidata(hObject, handles);
 % --- Executes during object creation, after setting all properties.
 function appliancePopupmenu_CreateFcn(hObject, eventdata, handles)
 
-% 
+%
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
@@ -1414,19 +1414,19 @@ if handles.figureList(figCtrlVal).isMultiAxes
     set(axesList,'Visible','off')
 
 
-    if any(yesIndx), 
-        set(axesList(yesIndx(end)), 'Visible', 'on'); 
+    if any(yesIndx),
+        set(axesList(yesIndx(end)), 'Visible', 'on');
         axesList(yesIndx(end)) = [];
     end
-    
+
     for jj = axesList, axes(jj); end
     set(handles.figureList(figCtrlVal).linesLegH, 'Visible', 'off')
     set(handles.figureList(figCtrlVal).linesLegH(yesIndx), 'Visible', 'on')
     set(handles.figureList(figCtrlVal).linesLegH(noIndx), 'Visible', 'off')
-    
+
 else
     legIndx = get(handles.figureList(figCtrlVal).singleAxes.legH ,'UserData');
-    set(legIndx.handles(noIndx),'Visible','off') 
+    set(legIndx.handles(noIndx),'Visible','off')
 end
 
 figure(handles.figure1)

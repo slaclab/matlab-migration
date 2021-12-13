@@ -12,15 +12,8 @@ if nargin < 2
     beamcode = 10;  % BC10 is FACET
 end
 
-global da;
-aidainit;
-if isempty(da), 
-   import edu.stanford.slac.aida.lib.da.DaObject;
-   da=DaObject; 
-end
-
-da.reset;
-da.setParam('BEAM', num2str(beamcode));
+requestBuilder = pvaRequest('TRIG:LI02:813:TACT');
+requestBuilder.with('BEAM', beamcode);
 
 if state
     str = 'reactivate';
@@ -32,7 +25,7 @@ curr = get_2_9(beamcode);
 
 if curr ~= state
     try
-        da.setDaValue('TRIG:LI02:813//TACT', DaValue(java.lang.Short(state)));
+        requestBuilder.set(state);
         ok = 1;
     catch error
         ok = 0;

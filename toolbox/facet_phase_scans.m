@@ -609,22 +609,26 @@ for ix = 1:numel(handles.data.pdes)
             try
                 handles.data.b_ok(ix) = 1;
                 if ~handles.fakedata
-                    buffdata = pvaRequest(strcat(handles.measdef, ':BUFFACQ')).with('BPMD', handles.bpmd).with('NRPOS', handles.nsamp).with('BPMS', char(strcat('["', p, ':', m, ':', u, '"]'))).get().getValues();
+                    requestBuilder = pvaRequest(strcat(handles.measdef, ':BUFFACQ'));
+                    requestBuilder.with('BPMD', handles.bpmd);
+                    requestBuilder.with('NRPOS', handles.nsamp);
+                    requestBuilder.with('BPMS', { [ strcat(p, ':', m, ':', u) ] });
+                    buffdata = requestBuilder.get();
                 else
-                    buffdata = pvaRequest(strcat(handles.measdef, ':BUFFACQ')).get().getValues();
+                    buffdata = pvaGet(strcat(handles.measdef, ':BUFFACQ'));
                 end
             catch
                 handles.data.b_ok(ix) = 0;
             end
 
             if handles.data.b_ok(ix)
-                handles.data.tmit(ix, :) = buffdata.get('tmit');
-                handles.data.goodmeas(ix,:) = buffdata.get('goodmeas');
+                handles.data.tmit(ix, :) = toArray(buffdata.get('tmits'));
+                handles.data.goodmeas(ix,:) = toArray(buffdata.get('goodmeas'));
                 switch char(handles.data.plane)
                     case 'X'
-                        handles.data.bpmdata(ix,:) = buffdata.get('x');
+                        handles.data.bpmdata(ix,:) = toArray(buffdata.get('x'));
                     case 'Y'
-                        handles.data.bpmdata(ix,:) = buffdata.get('y');
+                        handles.data.bpmdata(ix,:) = toArray(buffdata.get('y'));
                     otherwise
                         handles.data.bpmdata(ix,:) = zeros(1,handles.nsamp);
                 end

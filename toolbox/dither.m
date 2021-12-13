@@ -93,7 +93,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = dither_OutputFcn(hObject, eventdata, handles) 
+function varargout = dither_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -263,16 +263,12 @@ gui_statusDisp(handles, 'Initializing dither...');
 % disable GUI elements
 handles = gui_enable(handles, 'off');
 
-% set up AIDA objects for control device
-aidainit;
 switch conf.control.type
     case 1 % EPICS PV
         % nothing to do here
     case 2 % SLC Multiknob
-        import edu.stanford.slac.aida.lib.da.DaObject;
-        dc = DaObject();
-
-        dc.setParam('MKB', sprintf('mkb:%s', lower(conf.control.name)));        
+        dc = pvaRequest('MKB:VAL');
+        dc.with('MKB', sprintf('mkb:%s', lower(conf.control.name)));
     otherwise
         gui_statusDisp(handles, sprintf('Oops, control type = %d not defined!  Aborting.', conf.control.type));
         abort = true;
@@ -284,7 +280,7 @@ switch conf.signal.type
         lcaSetMonitor(conf.signal.name);
 %         lcaSetTimeout(1e6);
         lcaSetSeverityWarnLevel(5);
-    case 2 % SLC BPM 
+    case 2 % SLC BPM
         bpmd = handles.bpmds{conf.signal.dgrp};
         dgrp = handles.dgrps{conf.signal.dgrp};
         [p,m,u,s] = model_nameSplit(conf.signal.name);
@@ -356,12 +352,12 @@ set(handles.text_signal_title,  'String', sprintf('%s vs Time', conf.signal.name
 gui_statusDisp(handles, 'Dither running.  Press stop to change parameters.');
 % main loop
 while ~abort
-    
+
     % variables to store response - 3 values (-, 0, +)
     control.range = zeros(3, 1);
     data = zeros(3, conf.signal.samples);
     ts = zeros(1, conf.signal.samples);
-    
+
     % construct dither range
     control.range = control.start + control.current + conf.control.step * [0 -1 1];
     control.deltas = [0 diff(control.range)];
@@ -382,8 +378,8 @@ while ~abort
                 ok = lcaPutSmart(conf.control.name, control.range(ix));
             case 2 % SLC multiknob
                 try
-                    ok = 1;                    
-                    dc.setDaValue('MKB//VAL', DaValue(java.lang.Float(control.deltas(ix))));
+                    ok = 1;
+                    dc.set(control.deltas(ix));
                 catch
                     ok = 0;
                 end
@@ -392,7 +388,7 @@ while ~abort
                 abort = true;
                 % this should never happen
         end
-        
+
         % save data into circular buffer
         if ~ok
             set(handles.status_txt, 'ForegroundColor', 'r');
@@ -409,9 +405,9 @@ while ~abort
         time_since = (bufcts(bufcts ~= 0) - now) * 24 * 3600;
         time_sorted = circshift(time_since, [-count 1]);
         vals = circshift(bufcval(bufcts ~= 0), [-count 1]);
-        
+
         plot(handles.axes_control, time_sorted, vals, 'm');
-        
+
         % settle
         pause(conf.control.settle);
 
@@ -427,24 +423,24 @@ while ~abort
             case 2 % SLC BPM
                 dsdata = ds.getDaValue(sprintf('%s//BUFFACQ', dgrp));
                 data(ix, :) = reshape(cell2mat(cell(out.get(dscol).toArray)),[],1);
-                
+
             otherwise
         end
-        
+
         bufsval(count) = mean(data(ix, :));
         bufsts(count) = now;
-        
+
         % plot signal val circular buffer
         filled = sum(bufsts ~= 0);
         time_since = (bufsts(bufsts ~= 0) - now) * 24 * 3600;
         time_sorted = circshift(time_since, [-count 1]);
         vals = circshift(bufsval(bufsts ~= 0), [-count 1]);
-        plot(handles.axes_signal, time_sorted, vals, 'b');        
+        plot(handles.axes_signal, time_sorted, vals, 'b');
 
     end
-    
+
     % average over samples
-    yavg = mean(data, 2); 
+    yavg = mean(data, 2);
     ystd = std(data, 0, 2);
 
     % fit to parabola
@@ -459,7 +455,7 @@ while ~abort
         xpeak = xfit(index);
     end
 %     xpeak = par(2);
-%     ypeak = par(3);    
+%     ypeak = par(3);
 
     % constrain peak value to scan range
     if conf.dither.constrain
@@ -472,7 +468,7 @@ while ~abort
             ypeak = yfit(100);
         end
     end
-    
+
     % flag out-of-range data
     if any(any(data > conf.signal.max)) || ...
         any(any(data < conf.signal.min))
@@ -480,7 +476,7 @@ while ~abort
     else
         signalok = 1;
     end
-    
+
 %     % flag upside-down fit
 %     if  ((conf.dither.mode == 1) && (par(1) < 0)) || ...
 %         ((conf.dither.mode == 2) && (par(1) > 0))
@@ -488,10 +484,10 @@ while ~abort
 %     else
 %         fitok = 0;
 %     end
-%     
+%
     % calculate new control value
     xnew = control.range(1) + ((xpeak - control.range(1)) * conf.dither.gain);
-    
+
     % plot data
     cla(handles.axes_plot, 'reset');
     hold(handles.axes_plot, 'all');
@@ -510,7 +506,7 @@ while ~abort
     plot(handles.axes_plot, xpeak, ypeak, 'ks', 'MarkerSize', 6, 'LineWidth', 3);
     lims = ylim(handles.axes_plot);
     plot(handles.axes_plot, repmat(xnew, [1 10]), linspace(min(lims), max(lims), 10), 'm--');
-    
+
     % move to new peak
     if fitok && signalok
         switch conf.control.type
@@ -526,7 +522,7 @@ while ~abort
             case 2 % SLC multiknobs are relative
                 try
                     ok = 1;
-                    dc.setDaValue('MKB//VAL', DaValue(java.lang.Float(xnew - control.range(end))));
+                    dc.set(xnew - control.range(end));
                 catch
                     ok = 0;
                 end
@@ -534,7 +530,7 @@ while ~abort
         end
         control.current = xnew - control.start;
     end
-        
+
     abort = abort | logical(get(handles.pushbutton_abort, 'Value'));
     if abort, break; end
 
@@ -560,7 +556,7 @@ function handles = gui_enable(handles, enable)
 
 set([handles.popupmenu_preset; ...
      handles.popupmenu_control_type; ...
-     handles.popupmenu_signal_type; ...     
+     handles.popupmenu_signal_type; ...
      handles.popupmenu_mode; ...
      handles.popupmenu_dgrp; ...
      handles.edit_control_name; ...
@@ -572,7 +568,7 @@ set([handles.popupmenu_preset; ...
      handles.edit_signal_samples; ...
      handles.edit_gain; ...
      handles.edit_wait; ...
-     handles.checkbox_constrain; ...     
+     handles.checkbox_constrain; ...
     ], 'Enable', enable);
 
 function edit_control_step_Callback(hObject, eventdata, handles)

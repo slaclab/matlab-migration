@@ -1119,7 +1119,6 @@ end
 function initialization(hObject, eventdata, handles)
 
 clear global
-aidainit;
 debug = 0
 
 global all_corrx all_corry all_bpm corrx_names corry_names bpm_names
@@ -1133,7 +1132,7 @@ if isNewRegion
         all_bpm = [all_bpm; model_nameRegion('BPMS',strtok(handles.regions{ii}))];
         all_bpm = model_nameConvert(all_bpm, 'MAD');
         all_corrx = model_nameConvert(all_corrx, 'MAD');
-        all_corry = model_nameConvert(all_corry, 'MAD');       
+        all_corry = model_nameConvert(all_corry, 'MAD');
     end
     if debug
         all_corrx = all_corrx(1:2);
@@ -1141,14 +1140,14 @@ if isNewRegion
         all_bpm = all_bpm(1:2);
     end
 %     switch handles.regions{:}
-%         case 'L0', 
-%         case 'L1', 
-%         case 'L2', 
+%         case 'L0',
+%         case 'L1',
+%         case 'L2',
 %         case 'L3',
 %         case 'LTU',
 %         case 'Undulator',
 %         case 'Dump',
-% 
+%
 % %        case 'L3 fbck On',
 % %             all_corrx =all_corrx(7:24);
 % %             all_corry = all_corry(6:24);
@@ -1156,13 +1155,13 @@ if isNewRegion
 % %             useCorrX = 2:2:length(all_corrx);
 % %             useCorrY = 2:2:length(all_corry);
 %     end
-%     
+%
 
-    bpm_ind = 1:length(all_bpm); 
+    bpm_ind = 1:length(all_bpm);
     corrx_ind = 1:length(all_corrx);
     corry_ind = 1:length(all_corry);
-    
- else 
+
+ else
     % all_corrx = {'XC01','XC02','XC03','XC04','XC05','XC06','XC07','XC08','XC09','XC10','XC11','XCA11','XCA12','XCM11','XCM13'};
     % all_corry = {'YC01','YC02','YC03','YC04','YC05','YC06','YC07','YC08','YC09','YC10','YC11','YCA11','YCA12','YCM11','YCM12'};
     % all_bpm = {'BPM3','BPM5','BPM6','BPM8','BPM9','BPM10','BPM11','BPM12','BPM13','BPM14','BPM15','BPMA11','BPMA12','BPM21201','BPMS11','BPMM12','BPM21301'};
@@ -1171,7 +1170,7 @@ if isNewRegion
      all_corry = {'YC01','YC02','YC03'};
      all_bpm = {'BPM3','BPM5','BPM6','BPM8'};
      bpm_ind = ([1:4]);
-     
+
      corrx_ind = (([1:1:length(all_corrx)]));
      corry_ind = (([1:1:length(all_corry)]));
 end
@@ -1196,7 +1195,7 @@ global RespMatH RespMatV
 for j = 1:length(all_bpm)
     %bpm_pos(j)    = aidaget([all_bpm_SLC{j} '//Z'])-2015;
     bpm_pos(j)    = model_rMatGet(all_bpm_SLC{j},{},{},'Z' );
-    
+
 end
 tic, disp('Generating Horizontal Response Matrix')
 for j = 1:length(all_corrx)
@@ -1210,7 +1209,7 @@ for j = 1:length(all_corrx)
             %Rm       = reshape(R,6,6);
             %Rm = cell2mat(Rm)';
             %RespMatH(i,j)=Rm(1,2);
-                        
+
             R = model_rMatGet(all_corrx_SLC{j},all_bpm_SLC{i});
             RespMatH(i,j) = R(1,2);
         end
@@ -1278,9 +1277,9 @@ if isNewRegion
     set(handles.text_BPM1, 'String', all_bpm)
     set(handles.text_BPM2, 'String', all_bpm)
     %set(handles.text_BPM1, 'String', all_bpm)
-    
 
-    
+
+
 end
 disp('Done with initialization')
 
@@ -1427,7 +1426,7 @@ regionList = {'L0', 'L1', 'L2', 'L3', 'LTU', 'Undulator', 'Dump'};
 regI = listdlg('PromptString','Select Regions(s)', 'SelectionMode', 'Multiple', ...
                                      'listString', regionList);
 handles.regions = regionList(regI);
-                                     
+
 initialization(hObject, eventdata, handles)
 
 
@@ -1439,7 +1438,7 @@ global all_corrx all_corry all_bpm
 
 feedbackOn= get(hObject,'Value');
 
-if feedbackOn, 
+if feedbackOn,
      set(hObject,'String', 'Feedbacks On');
      [bpmIndx xcorIndx ycorIndx] = isUsedInFeedback(all_bpm, all_corrx, all_corry);
 
@@ -1452,9 +1451,9 @@ else
     set(handles.BPM_selection, 'Value', 1:length(all_bpm));
     set(handles.corrx_selection, 'Value', 1:length(all_corrx));
     set(handles.corry_selection, 'Value', 1:length(all_corry));
-    
-    
-    
+
+
+
 end
 
 function [bpmIndx, xcorIndx, ycorIndx ] = selectElements(hObject, eventdata, handles)
@@ -1479,11 +1478,11 @@ for ii = 1:length(devList)
     thisName = devList{ii};
     indx = strmatch(thisName, devName);
     name = devName(indx);
-    
+
     devUsedPv = strrep(devNamePV(indx), 'DEVNAME','USED');
     devUsed = lcaGet(devUsedPv');
     usedIndx = strmatch('YES', devUsed);
-    
+
     inFeedback = name(usedIndx);
     inFeedback = strrep(inFeedback,':X', '');
     inFeedback = strrep(inFeedback,':Y', '');
@@ -1491,21 +1490,21 @@ for ii = 1:length(devList)
     inFeedback = unique(inFeedback)
     inFeedback = model_nameConvert(inFeedback,'MAD');
     switch thisName
-        case 'BPMS', 
+        case 'BPMS',
             bpmIndx = zeros(size(all_bpm));
-            [~,~,bpmIndxFound ] = intersect(inFeedback, all_bpm);  
+            [~,~,bpmIndxFound ] = intersect(inFeedback, all_bpm);
             bpmIndx(bpmIndxFound) = 1;
-        case 'XCOR', 
+        case 'XCOR',
             xcorIndx = zeros(size(all_corrx));
             [~,~,xcorIndxFound] = intersect(inFeedback, all_corrx);
             xcorIndx(xcorIndxFound) = 1;
         case 'YCOR',
-            ycorIndx = zeros(size(all_corry));           
+            ycorIndx = zeros(size(all_corry));
             [~,~,ycorIndxFound] = intersect(inFeedback, all_corry);
             ycorIndx(ycorIndxFound) = 1;
     end
 
-    
+
 end
 
 
@@ -1550,7 +1549,7 @@ xcorEplusIndx = zeros(size(selectedXcor));  ycorEplusIndx = zeros(size(selectedY
 xcorEplusIndx(xI) = 1; ycorEplusIndx(yI) = 1;
 
 
- 
+
 
 xcorRemoveIndx = selectedXcorIndx & ~xcorEplusIndx;
 ycorRemoveIndx = selectedYcorIndx & ~ycorEplusIndx;

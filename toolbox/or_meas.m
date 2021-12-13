@@ -63,7 +63,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = or_meas_OutputFcn(hObject, eventdata, handles) 
+function varargout = or_meas_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -83,8 +83,7 @@ do_or_meas(hObject, eventdata, handles)
 
 % --- Executes during object creation, after setting all properties.
 function orbit_response_measurement_CreateFcn(hObject, eventdata, handles)
-clear global
-aidainit;
+clear global;
 
 global all_corrx all_corry all_bpm corrx_names corry_names all_bpm
 global all_bpm_SLC all_bpm_EPICS all_corrx_EPICS all_corry_EPICS corrx_EPICS corry_EPICS bpm_ind
@@ -162,11 +161,11 @@ Nsamples=50;
 global ini_currx ini_curry lim_corrx lim_corry
 for j = 1:length(all_corrx_EPICS)
     pvlist_corrx{j} = [all_corrx_EPICS{j} ':BACT'];
-    pvlist_lim_corrx{j} = [all_corrx_EPICS{j} ':BACT.HOPR'];    
+    pvlist_lim_corrx{j} = [all_corrx_EPICS{j} ':BACT.HOPR'];
 end
 for j = 1:length(all_corry_EPICS)
     pvlist_corry{j} = [all_corry_EPICS{j} ':BACT'];
-    pvlist_lim_corry{j} = [all_corry_EPICS{j} ':BACT.HOPR']; 
+    pvlist_lim_corry{j} = [all_corry_EPICS{j} ':BACT.HOPR'];
 end
 ini_currx = lcaGet(pvlist_corrx(:), 0, 'double')';
 ini_curry = lcaGet(pvlist_corry(:), 0, 'double')';
@@ -512,7 +511,7 @@ end
 
 % --- Executes on selection change in bpm_selection.
 function bpm_selection_Callback(hObject, eventdata, handles)
-global bpm_ind ORBITX ORBITY SIGMAX SIGMAY dim kicks all_bpm h_bpm 
+global bpm_ind ORBITX ORBITY SIGMAX SIGMAY dim kicks all_bpm h_bpm
 global corr_names plot_ind KICKS p
 
 if isempty(plot_ind)
@@ -589,11 +588,11 @@ global max_kick nsteps dim corrx_names corry_names corr_names
 global curr0 KICKS kicks ini_curr ind
 global orbitx orbity sigmax sigmay
 global RespMatH RespMatV
-global orx ory sigma_orx sigma_ory or_t 
+global orx ory sigma_orx sigma_ory or_t
 global corrx_ind corry_ind max_bpm_diff
 global ini_currx ini_curry max_field actual lim_corrx lim_corry
 global corrx_EPICS corry_EPICS en_corrx en_corry
-global ORBITX ORBITY SIGMAX SIGMAY ORX ORY SIGMA_ORX SIGMA_ORY CORR_NAMES OR_T 
+global ORBITX ORBITY SIGMAX SIGMAY ORX ORY SIGMA_ORX SIGMA_ORY CORR_NAMES OR_T
 global FIELDS KICKS corrx_pos
 
 set(handles.save,'Visible','off')
@@ -708,7 +707,7 @@ for i=1:length(corr_names)
     ORX{i}=orx;
     ORY{i}=ory;
     SIGMA_ORX{i} = sigma_orx;
-    SIGMA_ORY{i} = sigma_ory; 
+    SIGMA_ORY{i} = sigma_ory;
     CORR_NAMES{i} = actual;
     KICKS{i} = kicks;
     FIELDS{i} = fields;
@@ -902,7 +901,7 @@ guidata(hObject,handles)
 function corr_selection_Callback(hObject, eventdata, handles)
 global plot_ind
 plot_ind = get(hObject,'Value');
-plot_or(hObject,eventdata,handles)    
+plot_or(hObject,eventdata,handles)
 % hObject    handle to corr_selection (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -956,7 +955,7 @@ if (get(hObject,'Value')==1)
 else
     plot_diff=0;
 end
-plot_or(hObject,eventdata,handles)    
+plot_or(hObject,eventdata,handles)
 % hObject    handle to show_difference (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)

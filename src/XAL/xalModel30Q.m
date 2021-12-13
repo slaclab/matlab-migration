@@ -8,13 +8,6 @@ debug=0;
 
 % initialize
 
-aidainit
-try
-  da=DaObject();
-catch
-  error('xalModel30Q: DaObject creation failed')
-end
-
 xalImport
 pFIELD=char(ElectromagnetPropertyAccessor.PROPERTY_FIELD);
 
@@ -45,55 +38,50 @@ for n=1:length(unit)
 
 % get QTRM IVBU polynomial
 
-  query=sprintf('QTRM:LI30:%d//IVBU',unit(n));
+  query=sprintf('QTRM:LI30:%d:IVBU',unit(n));
   try
-    d=da.getDaValue(query);
-  catch
-    error('xalModel30Q: failed to get %s',query)
+    ivb=flipud(pvaGet(query));
+  catch e
+    handleExceptions(e, 'xalModel30Q: failed to get %s',query);
   end
-  ivb=flipud(d.getFloats);
 
 % compute QTRM current
 
-  query=sprintf('QTRM:LI30:%d//%s',unit(n),secn);
+  query=sprintf('QTRM:LI30:%d:%s',unit(n),secn);
   try
-    d=da.getDaValue(query);
-  catch
-    error('xalModel30Q: failed to get %s',query)
+    bqtrm = pvaGet(query);
+  catch e
+    handleExceptions(e, 'xalModel30Q: failed to get %s',query);
   end
-  bqtrm=d.getFloat;
   iqtrm=polyval(ivb,bqtrm);
 
 % get QUAD IVBU polynomial
 
-  query=sprintf('QUAD:LI30:%d//IVBU',unit(n));
+  query=sprintf('QUAD:LI30:%d:IVBU',unit(n));
   try
-    d=da.getDaValue(query);
-  catch
-    error('xalModel30Q: failed to get %s',query)
+    ivb=flipud(pvaGet(query));
+  catch e
+    handleExceptions(e, 'xalModel30Q: failed to get %s',query);
   end
-  ivb=flipud(d.getFloats);
 
 % compute QUAD current
 
-  query=sprintf('QUAD:LI30:%d//%s',unit(n),secn);
+  query=sprintf('QUAD:LI30:%d:%s',unit(n),secn);
   try
-    d=da.getDaValue(query);
-  catch
-    error('xalModel30Q: failed to get %s',query)
+    bquad=pvaGet(query);
+  catch e
+    handleExceptions(e, 'xalModel30Q: failed to get %s',query);
   end
-  bquad=d.getFloat;
   iquad=polyval(ivb,bquad);
 
 % set polynomial inversion limits
 
-  query=sprintf('QUAD:LI30:%d//BMAX',unit(n));
+  query=sprintf('QUAD:LI30:%d:BMAX',unit(n));
   try
-    d=da.getDaValue(query);
-  catch
-    error('xalModel30Q: failed to get %s',query)
+    bmax=pvaGet(query);
+  catch e
+    handleExceptions(e, 'xalModel30Q: failed to get %s',query);
   end
-  bmax=d.getFloat;
   if (bmax>0)
     bmin=0;
   else

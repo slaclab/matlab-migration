@@ -14,8 +14,6 @@ persistent pbpms;
 persistent etoro;
 persistent ptoro;
 
-aidainit;
-
 % add timestamp
 state.timestamp.start = now;
 
@@ -203,7 +201,7 @@ state.klys.HSTA = lcaGetSmart(strcat(model_nameConvert(state.klys.name, 'EPICS')
 
 % calculate 'ISON' status (modulator not off, HSTA online, trigger active)
 trig_on =  bitget(state.klys.TACT, 1);  % TACT bit 1 is "ACCEL"
-hsta_on =  bitget(state.klys.HSTA, 1);  % HSTA bit 1 is online 
+hsta_on =  bitget(state.klys.HSTA, 1);  % HSTA bit 1 is online
 mod_ok  = ~bitget(state.klys.SWRD, 4);  % SWRD bit 4 is some mod fault
 state.klys.ISON = trig_on & hsta_on & mod_ok;
 
@@ -221,8 +219,8 @@ disp('Getting live SBST status...');
  state.sbst.DSTA, state.sbst.ENLD] = control_klysStatGet(state.sbst.name);
 
 state.klys.PACT = zeros(size(state.klys.PHAS));
- 
-for ix = 1:numel(state.sbst.name)  
+
+for ix = 1:numel(state.sbst.name)
     [p, m, s] = model_nameSplit(state.sbst.name(ix));
     sector_klys = strmatch(strcat('KLYS:', m), state.klys.name);
     state.klys.PACT(sector_klys) = state.klys.PHAS(sector_klys) + state.sbst.PHAS(ix);

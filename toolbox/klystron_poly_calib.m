@@ -25,7 +25,7 @@ function [varargout] = klystron_poly_calib(varargin)
 %"/u1/lcls/physics/amrf/klydata/PADcalibration"
 %
 %
-%Modified June 2014 
+%Modified June 2014
 %made to make spare files and fixed minor issues
 %Chris Eckman
 %
@@ -86,7 +86,7 @@ handles.sector_choice = 'LI';
 handles.unit_choice = '11';
 [a,process_variable_handle] = control_klysName([handles.type_choice ':' handles.sector_choice ':' handles.unit_choice]);
 handles.process_variable = char(process_variable_handle);
-handles.use_filename = []; 
+handles.use_filename = [];
 
 %grabs all the KLYS of type DR and LI and puts them into the list
 a = aidalist('KLYS:LI% POLY')';
@@ -141,7 +141,7 @@ function endWork(hObject,handles)
     set(handles.START,'Enable','on')
     guidata(hObject,handles);
 
-        
+
 
 function appRemote(hObject, type_in, sector_in, unit_in)
 
@@ -312,7 +312,7 @@ handles.PAD_ID_Database = '00000';
 if strcmp(handles.type_choice,'KLYS')
     %warns the user that it can kill the beam, needs to be replaced with a
     %check that will tell if klystron is on and deactivated from the beam Also
-    %tell user that (if clicked on active on klystron) it can not be done 
+    %tell user that (if clicked on active on klystron) it can not be done
     if status_klys == 1
         set(handles.check,'string',sprintf('Klystron Status:Accelerate'),'Backgroundcolor', 'red','ForegroundColor', 'black','fontsize',12)
         questdlg(['Can not run scan on ',handles.process_variable,'  This klystron is active and this action will kill the beam.'] , ...
@@ -430,8 +430,6 @@ end
 guidata(hObject, handles);
 
 function [handles] = update_putin_KLYS(hObject,handles)
-global da
-aidainit
 if isempty(handles.newpoly)
     questdlg(['No new gennerated data or loaded data from files to update ',handles.process_variable, ',  please generate or load file to update'] , ...
         'Warning!', ...
@@ -468,16 +466,15 @@ else
             %PUTTING INFO IN!!!!!!!!
             if on_scp
                 [process_variable_handle] = control_klysName(handles.process_variable);
-                da.reset();
-                da.setDaValue([process_variable_handle{:} '//POLY'],DaValue(single(handles.newpoly)));
+                pvaSet([process_variable_handle{:} ':POLY'], single(handles.newpoly));
             else
                 lcaPut([handles.process_variable ':POLY'],handles.newpoly);
             end
             %PUTTING INFO IN!!!!!!!!
-            
+
             handles.oldpoly = lcaGetSmart([handles.process_variable ':POLY']);
             handles.newpoly = 0;
-            
+
             set(handles.old,'String',(sprintf('In Database:\n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e', handles.oldpoly)), 'fontsize', 12);
             set(handles.new,'String',sprintf('New:'),'fontsize', 12);
             guidata(hObject, handles);
@@ -486,8 +483,6 @@ end
 
 
 function [handles] = update_putin_SBST(hObject,handles)
-global da
-aidainit
 if isempty(handles.newpoly) && isempty(handles.newvfnp)
     questdlg(['No new gennerated data or loaded data from files to update ',handles.process_variable, ',  please generate or load file to update'], ...
         'Warning!', ...
@@ -496,55 +491,53 @@ else
     choice = questdlg(['This will overwrite the polynomial data in the database for ',handles.process_variable,' with recently generated data or loaded data from file. Which polynomial would you like to update?'], ...
         'Warning!', ...
         'Ok','Cancel','Cancel');
-            
+
             set(handles.VFNP_radio_btn,'value',0)
             set(handles.POLY_radio_btn,'value',1)
             set(handles.fit_compair,'title','Polynomial POLY Fit Comparison')
-            
+
             [type_raw,micro,unit] = model_nameSplit(handles.process_variable);
             on_scp = strcmp(micro,'KLYS') || strcmp(micro,'SBST');
-            
+
             disp('New Poly')
             disp(handles.newpoly)
-            
+
             %PUTTING INFO IN!!!!!!!!
             if on_scp
             	[process_variable_handle] = control_klysName(handles.process_variable);
-            	da.reset();
-            	da.setDaValue([process_variable_handle{:} '//POLY'],DaValue(single(handles.newpoly)));
+            	pvaSet([process_variable_handle{:} ':POLY'],single(handles.newpoly));
             else
             	lcaPut([handles.process_variable ':POLY'],handles.newpoly);
             end
             %PUTTING INFO IN!!!!!!!!
-            
+
             handles.oldpoly = lcaGetSmart([handles.process_variable ':POLY']);
             handles.newpoly = [];
-    
+
             set(handles.old,'String',(sprintf('In Database:\n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e', handles.oldpoly)), 'fontsize', 12);
             set(handles.new,'String',sprintf('New:'),'fontsize', 12);
-            
-            
+
+
             %set(handles.VFNP_radio_btn,'value',1)
             %set(handles.POLY_radio_btn,'value',0)
             %set(handles.fit_compair,'title','Polynomial VFNP Fit Comparison')
-            
+
             disp('New VFNP')
             disp(handles.newvfnp)
-            
+
             [type_raw,micro,unit] = model_nameSplit(handles.process_variable);
             %PUTTING INFO IN!!!!!!!!
             if on_scp
             	[process_variable_handle] = control_klysName(handles.process_variable);
-            	da.reset();
-            	da.setDaValue([process_variable_handle{:} '//VFNP'],DaValue(single(handles.newvfnp)));
+            	pvaSet([process_variable_handle{:} ':VFNP'],single(handles.newvfnp));
             else
             	lcaPut([handles.process_variable ':VFNP'],handles.newvfnp);
             end
             %PUTTING INFO IN!!!!!!!!
-            
+
             handles.oldvfnp = lcaGetSmart([handles.process_variable ':VFNP']);
             handles.newvfnp = [];
-            
+
             set(handles.old,'String',(sprintf('In Database:\n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e', handles.oldvfnp)), 'fontsize', 12);
             set(handles.new,'String',sprintf('New:'),'fontsize', 12);
 end
@@ -566,13 +559,13 @@ filename = uigetfile(fullfile('/u1/lcls/physics/amrf/klydata/PADcalibration','*.
 handles.use_filename = filename;
 guidata(hObject,handles);
 
-set(handles.status_box,'String',sprintf('')) 
+set(handles.status_box,'String',sprintf(''))
 %checks if there is a file, but if not return
-if filename ~= 0 % exist(filename) 
+if filename ~= 0 % exist(filename)
     sh = cell2mat(regexp(filename,'(?<=_)[\w]+(?=_00)','match'));
     uh = cell2mat(regexp(filename,'(?<=_00)[\d]+(?=.)','match'));
     type = cell2mat(regexp(filename,'[\w]{0,4}(?=_L)','match'));
-    
+
     spare_only = cell2mat(regexp(filename,'[\w]{0,5}(?=_)','match'));
 else
     return
@@ -608,11 +601,11 @@ elseif strcmp(type,'KLYS') || strcmp(spare_only,'SPARE')
     [handles] = KLYS_read_txt(hObject,handles,filename);
     set(handles.spare, 'visible', 'on')
     set(handles.POLY_radio_btn,'value',1)
-    set(handles.VFNP_radio_btn,'value',0)    
+    set(handles.VFNP_radio_btn,'value',0)
     set(handles.VFNP_radio_btn, 'visible','off')
     set(handles.POLY_radio_btn, 'visible','off')
     set(handles.fit_compair,'title','Polynomial POLY Fit Comparison')
-    
+
     if strcmp(spare_only,'SPARE')
         set(handles.status_box,'string',sprintf('SPARE file name: %s', filename))
         set(handles.spare,'value',1)
@@ -629,25 +622,25 @@ elseif strcmp(type,'KLYS') || strcmp(spare_only,'SPARE')
                     [handles] = update_putin_KLYS(hObject,handles);
             end
         end
-    else 
+    else
         set(handles.record,'String',sprintf('Loaded data file for Klystron Phase Calibration for %s \n With loaded PAD ID: %s  (HEX)',handles.process_variable, handles.PAD_ID_Loaded), 'fontsize', 12);
         set(handles.path,'String',sprintf('Loaded data file for: %s', handles.process_variable),'fontsize', 15);
         set(handles.new,'String',(sprintf('From File:\n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e', handles.newpoly)), 'fontsize', 12);
     end
 elseif strcmp(type,'SBST')
     [hObject,handles] = prep_load(hObject,handles,handles.SBST_list,filename,type,sh,num2str(str2num(uh)));
-    
+
     set(handles.spare, 'visible', 'off')
     set(handles.check,'string','Subbooster Systems','Backgroundcolor', 'green','ForegroundColor', 'black','fontsize', 12)
     set(handles.POLY_radio_btn,'value',1)
-    set(handles.VFNP_radio_btn,'value',0)    
+    set(handles.VFNP_radio_btn,'value',0)
     set(handles.VFNP_radio_btn, 'visible','on')
     set(handles.POLY_radio_btn, 'visible','on')
     set(handles.fit_compair,'title','Polynomial POLY Fit Comparison')
 
     [status_klys,handles] = sector_unit(hObject,handles);
     [hObject,handles] = SBST_read_txt(hObject,handles,filename);
-    
+
     set(handles.path,'String',sprintf('Loaded data file for: %s', handles.process_variable),'fontsize', 15);
     set(handles.record,'String',sprintf('Loaded data file for Subbooster Phase Calibration for %s \n With loaded PAD ID:%s  (HEX)',handles.process_variable, handles.PAD_ID_Loaded), 'fontsize', 12);
     set(handles.new,'String',(sprintf('From File:\n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e', handles.newpoly)), 'fontsize', 12);
@@ -775,7 +768,7 @@ elseif (exist(fullfile('/u1/lcls/physics/amrf/klydata/PADcalibration',file_of_in
 
     filename = file_of_intrest_SBST;
     [hObject,handles] = SBST_read_txt(hObject,handles,filename);
-    
+
     set(handles.spare, 'visible', 'off')
     set(handles.path,'string',sprintf('Current data from file for %s', handles.process_variable),'fontsize', 15);
     set(handles.new,'String',(sprintf('From File:\n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e \n\n %1.2e', handles.newpoly)), 'fontsize', 12);
@@ -954,7 +947,6 @@ guidata(hObject,handles)
 %SBST Files
 
 function [handles] = sbst_scan(hObject,handles)
-global da;
 handles.newtime = now;
 PAD_ID_check = lcaGetSmart([handles.process_variable ':SID']);
 if PAD_ID_check(2) < 0
@@ -993,12 +985,8 @@ on_scp = strcmp(micro,'KLYS') || strcmp(micro,'SBST');
 %if it is 1 then it is on scp
 if on_scp == 1
     [process_variable,a] = control_klysName(handles.process_variable);
-    aidainit;
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    da=DaObject;
-    da.reset;
-    old_FEMN = da.getDaValue(strcat(process_variable,'//FEMN')).get(0);
-    da.setDaValue(strcat(process_variable,'//FEMN'),DaValue(1))
+    old_FEMN = pvaGet(strcat(process_variable,':FEMN'), AIDA_BOOLEAN);
+    pvaSet(strcat(process_variable,':FEMN'), true);
 else
     KPHR_trim = lcaGetSmart([handles.process_variable ':PTRM']);
     lcaPut([handles.process_variable ':PTRM'],0)
@@ -1070,11 +1058,7 @@ end
 control_phaseSet(handles.process_variable,SBST_old,0,0,'KPHR');
 if on_scp == 1
     [process_variable,a] = control_klysName(handles.process_variable);
-    aidainit;
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    da=DaObject;
-    da.reset;
-    da.setDaValue(strcat(process_variable,'//FEMN'),DaValue(old_FEMN));
+    pvaSet(strcat(process_variable,':FEMN'), old_FEMN);
 else
     lcaPut([handles.process_variable ':PTRM'],KPHR_trim);
       for counter = 1:length(unit_choices)
@@ -1177,7 +1161,7 @@ SWOBBLED = SBST_data(:,3);
 SSTAT = SBST_data(:,4);
 [hObject,handles,True_Phase,AACT,SPRAW,SWOBBLED,SSTAT] = SBST_calculations(hObject,handles,AACT,SPRAW,SWOBBLED,SSTAT,KPRAW,KWOBBLED,KSTAT);
 fclose(fid);
-[handles] = check_PAD_ID(hObject,handles); 
+[handles] = check_PAD_ID(hObject,handles);
 
 function [hObject,handles,True_Phase,AACT,SPRAW,SWOBBLED,SSTAT] = SBST_calculations(hObject,handles,AACT,SPRAW,SWOBBLED,SSTAT,KPRAW,KWOBBLED,KSTAT)
 %This makes the PPAD from KPRAW and KWOBBLED and then check them for error
@@ -1227,7 +1211,7 @@ for I = 1:handles.count
         if KWOBBLED_intrested == 3
             KPRAW_intrested = KPRAW_intrested + 180;
         end
-        
+
         [a,process_varible_name] = control_klysName(['KLYS:' handles.sector_choice ':' unit_choices{J}]); %NEW!!!
         KPOLY = lcaGetSmart(strcat(process_varible_name, ':POLY')); %NEW!!!
 
@@ -1456,12 +1440,8 @@ on_scp = strcmp(micro,'KLYS') || strcmp(micro,'SBST');
 %if it is 1 then it is on scp
 if on_scp == 1
     [process_variable,a] = control_klysName(handles.process_variable);
-    aidainit;
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    da=DaObject;
-    da.reset;
-    old_FEMN = da.getDaValue(strcat(process_variable,'//FEMN')).get(0);
-    da.setDaValue(strcat(process_variable,'//FEMN'),DaValue(1));
+    old_FEMN = pvaGet(strcat(process_variable,':FEMN'), AIDA_BOOLEAN);
+    pvaSet(strcat(process_variable,':FEMN'), true);
 else
     KPHR_trim = lcaGetSmart([handles.process_variable ':PTRM']);
     lcaPut([handles.process_variable ':PTRM'],0);
@@ -1519,11 +1499,7 @@ set(handles.scanProgress_txt,'Position',val_pos);
 control_phaseSet(handles.process_variable,KPHR_old,0,0,'KPHR');
 if on_scp == 1
     [process_variable,a] = control_klysName(handles.process_variable);
-    aidainit;
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    da=DaObject;
-    da.reset;
-    da.setDaValue(strcat(process_variable,'//FEMN'),DaValue(old_FEMN));
+    pvaSet(strcat(process_variable,':FEMN'), old_FEMN);
 else
     lcaPut([handles.process_variable ':PTRM'],KPHR_trim);
 end
@@ -1586,7 +1562,7 @@ handles.time_loaded = ['Date Data ' DATE '  ' TIME];
 guidata(hObject,handles)
 set(handles.time,'String',sprintf('%s',handles.time_loaded))
 [handles] = KLYS_plotting(hObject,handles,KPHR,PRAW,WOBBLED,STAT);
-[handles] = check_PAD_ID(hObject,handles); 
+[handles] = check_PAD_ID(hObject,handles);
 
 function [handles] = KLYS_plotting(hObject,handles,KPHR,PRAW,WOBBLED,STAT)
 PRAW = PRAW(2:length(PRAW));

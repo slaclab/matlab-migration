@@ -55,7 +55,7 @@ function wakeloss_gui_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for wakeloss_gui
 handles.output = hObject;
 handles.appName = 'wakeloss_gui';
-% 
+%
 % set(hObject, 'Toolbar', 'figure');
 
 set(handles.axes2, 'Position', get(handles.axes1, 'Position'));
@@ -79,14 +79,14 @@ handles.bpms = {'BPMS:LI10:3448'  'BPMS:LI02:201'
                 'BPMS:LI20:2160'  'BPMS:EP01:190'
                 'BPMS:LI20:2223'  'BPMS:LI02:201'
                 };
-            
+
 handles.wakeloss.name = {'BPMS:LI20:2147:X'     'BPMS:EP01:185:X';
                          'SIOC:SYS1:ML00:AO058' 'SIOC:SYS1:ML00:AO067'};
 handles.wakeloss.fbpv = {'LI09:FBCK:200:HSTA'   'LI09:FBCK:200:HSTA';
                          'SIOC:SYS1:ML00:AO084' 'SIOC:SYS1:ML00:AO060'};
 handles.wakeloss.isFbck = [0 0; 1 1];
 handles.wakeloss.isBPM = [1 1; 0 0];
-                         
+
 handles.rate = lcaGetSmart(handles.rates);
 [d, handles.beam] = max(handles.rate);
 
@@ -137,7 +137,7 @@ handles.config.plot.avg = get(handles.checkbox_plotavg, 'Value');
 handles.config.plot.fit = get(handles.checkbox_plotfit, 'Value');
 
 % --- Outputs from this function are returned to the command line.
-function varargout = wakeloss_gui_OutputFcn(hObject, eventdata, handles) 
+function varargout = wakeloss_gui_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -341,13 +341,11 @@ end
 gui_statusDisp(handles, 'Setting up AIDA...');
 
 % create aida control object
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
+requestBuilder = pvaRequest('MKB:VAL');
 if handles.config.isMKB
-    da.setParam('MKB', strcat('mkb:', handles.config.setup_name));
+    requestBuilder.with('MKB', strcat('mkb:', handles.config.setup_name));
 elseif handles.config.isSLC
-    da.setParam('TRIM', 'YES');
+    requestBuilder.with('TRIM', 'YES');
 end
 
 gui_statusDisp(handles, 'Setting up BSA...');
@@ -395,13 +393,13 @@ abort = 0;
 
 % main scan loop
 for ix = 1:handles.config.nstep
-    
+
     if get(handles.pushbutton_abort, 'Value')
         gui_statusDisp(handles, 'Aborting...');
         abort = 1;
         break
     end
-    
+
     handles.scanstep = ix;
 
     gui_statusDisp(handles, sprintf('Setting %s to %.1f (step %d/%d)', ...
@@ -409,26 +407,27 @@ for ix = 1:handles.config.nstep
 
     % set phase
     if handles.config.isMKB
-       pact = da.setDaValue('MKB//VAL', DaValue(java.lang.Float(handles.data.deltas(ix))));
+       pact = requestBuilder.set(handles.data.deltas(ix));
        handles.data.pact(ix) = handles.data.pdes(ix);
     elseif handles.config.isSLC
-       pact = da.setDavalue(sprintf('%s:%s:%s//%s', char(m), char(p), char(u), char(s)));
+       daslc = pvaRequest(sprintf('%s:%s:%s:%s', char(m), char(p), char(u), char(s)));
+       pact = daslc.set(pdes0); %% Original code has a bug in it so this is just a guess
        handles.data.pact(ix) = double(java.lang.Float(pact));
     end
-    
+
     pchange = pchange + handles.data.deltas(ix);
-    
+
     % wait for settle time
     pause(handles.config.settle);
-    
+
     gui_statusDisp(handles, sprintf('Acquiring %d pulses at %d Hz...', ...
         handles.config.nsamp, handles.config.rates(handles.config.beam)));
-    
+
     % turn on eDef
     eDefOn(eDef);
-    
+
     if handles.config.isBPM
-        
+
         % start buffered acquisition
         [x, y, tmit, pulseid, stat] = control_bpmAidaGet(...
             handles.config.bpms, handles.config.nsamp, handles.config.bpmd);
@@ -439,38 +438,38 @@ for ix = 1:handles.config.nstep
         handles.data.bpm.tmit(ix,:) = tmit(bpmidx,:);
         handles.data.bpm.pulseid(ix,:) = pulseid(bpmidx,:);
         handles.data.bpm.stat(ix,:) = stat(bpmidx,:);
-                
+
     elseif handles.config.isFbck
-        
+
         % do sequential lcaGets
 
         for jx = 1:handles.config.nsamp
 
             % get sector 10 bpm
             handles.data.x0(ix, jx) = lcaGetSmart('BPMS:LI10:2050:X57');
-            
+
             % get the energy
             [handles.data.fbck.e(ix,jx) handles.data.fbck.ts(ix,jx)] = lcaGetSmart(handles.config.wakeloss_name);
             pause(1/handles.config.rates(handles.beam));
-            
+
             % convert timestamp to pulseid
             handles.data.fbck.pulseid(ix,jx) = lcaTs2PulseId(handles.data.ts(ix,jx));
         end
-       
-        
+
+
     end
-    
+
     % turn off eDef
     eDefOff(eDef);
-    
+
     % wait for eDEF thingy to process
     pause(1);
-    
+
     % get BSA pulseid and data
-    BSA_count = lcaGetSmart(sprintf('EDEF:SYS1:%d:CNT', eDef));    
+    BSA_count = lcaGetSmart(sprintf('EDEF:SYS1:%d:CNT', eDef));
     BSA_pulseid = lcaGetSmart(strcat('PATT:SYS1:1:PULSEIDHST', num2str(eDef)), BSA_count);
     BSA_data = lcaGetSmart(strcat(handles.config.blen, 'HST', num2str(eDef)), BSA_count);
-    
+
     % match BSA samples to BPM data
     for jx = 1:handles.config.nsamp
         index = find(BSA_pulseid == handles.data.bpm.pulseid(ix, jx));
@@ -486,33 +485,33 @@ for ix = 1:handles.config.nstep
     end
 
     handles = fit_and_plot(handles);
-    
+
 end
 
 if abort
     % restore phase knob
     if handles.config.isMKB
-        da.setDaValue('MKB//VAL', DaValue(java.lang.Float(-1 * pchange)));
+        requestBuilder.set(DaValue(-1 * pchange));
     elseif handles.config.isSLC
-        pact = da.setDavalue(sprintf('%s:%s:%s//%s', char(m), char(p), char(u), char(s)),...
-            DaValue(java.lang.Float(pdes0)));
+        daslc = pvaRequest(sprintf('%s:%s:%s:%s', char(m), char(p), char(u), char(s)));
+        pact = daslc.set(pdes0);
     end
-    
+
     gui_statusDisp(handles, 'Acquisition aborted.');
-    
+
     set(handles.pushbutton_abort, 'Value', 0);
     set(handles.pushbutton_abort, 'String', 'Abort');
-    
+
 else
 
     % restore phase knob
     if handles.config.isMKB
-        da.setDaValue('MKB//VAL', DaValue(java.lang.Float(handles.data.deltas(end))));
+        requestBuilder.set(handles.data.deltas(end));
     elseif handles.config.isSLC
-        pact = da.setDavalue(sprintf('%s:%s:%s//%s', char(m), char(p), char(u), char(s)),...
-            DaValue(java.lang.Float(pdes0)));
+        daslc = pvaRequest(sprintf('%s:%s:%s:%s', char(m), char(p), char(u), char(s)));
+        pact = daslc.set(pdes0);
     end
-    
+
     gui_statusDisp(handles, 'Acquisition finished.');
 end
 
@@ -573,7 +572,7 @@ else
     ax(1) = axes;
     ax(2) = axes('YAxisLocation', 'right');
 end
-    
+
 
 cla(ax(1)); hold(ax(1), 'all');
 cla(ax(2)); hold(ax(2), 'all');

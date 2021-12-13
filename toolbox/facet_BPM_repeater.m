@@ -38,10 +38,7 @@ bpmd = '57';
 dgrp = 'FACET-II';
 
 % set up AIDA acquisition
-disp_log('Initializing aida...');
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
+
 da.setParam('BPMD',char(bpmd));
 
 
@@ -50,7 +47,7 @@ pvs.in = {...
     'EVNT:SYS1:1:SCAVRATE'; ...    % ELECEP01 beam rate
     'EVNT:SYS1:1:BEAMRATE'; ...    % NDRFACET beam rate
     char(script_setupPV('SIOC:SYS1:ML00:AO102', 'Enable/disable BPM repeater', 'on/off', 1, scr)); ...     % enable/disable
-    char(script_setupPV('SIOC:SYS1:ML00:AO103', 'Loop delay', 'sec', 2, scr)); ...    
+    char(script_setupPV('SIOC:SYS1:ML00:AO103', 'Loop delay', 'sec', 2, scr)); ...
     char(script_setupPV('SIOC:SYS1:ML00:AO104', 'Preferred beam (8 or 57)', 'num', 0, scr));
     char(script_setupPV('SIOC:SYS1:ML00:AO105', 'Beam rate threshold', 'Hz', 0, scr));
     };
@@ -68,7 +65,6 @@ bpm_list = bpms.roots2; % roots2 is list of FACET-II BPMs
 nbpms = numel(bpm_list);
 
 attribs = {'X', 'Y', 'TMIT', 'HSTA', 'STAT'}; % everything except Z
-attrib_index = [1, 2, 4, 5, 6];  %position of attribs in Java array (starts at 0 !)
 
 disp_log('Initializing PV list...');
 
@@ -76,7 +72,7 @@ pvs.bpms = [];
 for attrib = attribs
     pvs.bpms = [pvs.bpms; strcat(bpm_list,{':'},attrib, bpmd)];
 end
-    
+
 
 disp_log('Script running!');
 
@@ -91,8 +87,8 @@ while 1
     end
 
     pause(loopdelay);
-    
-    
+
+
     % get controls
     try
         [ctrl.val, ctrl.ts] = lcaGetSmart(pvs.in, 0, 'double');
@@ -108,8 +104,8 @@ while 1
         pause(3);
         continue;
     end
-    
-    
+
+
     % update controls
     enable = ctrl.val(3);
     loopdelay = ctrl.val(4);
@@ -122,36 +118,36 @@ while 1
     end
 
     % zero all readback if not enough rate
-    fast_enough = ctrl.val(1:2) >= min_rate; 
+    fast_enough = ctrl.val(1:2) >= min_rate;
     if ~any(fast_enough)
         lcaPutSmart(pvs.bpms, zeros(nbpms * numel(attribs), 1));
         stat.val(4) = 0;
         lcaPutSmart(pvs.out(4), stat.val(4));
         continue
     end
-    
-    
-    
+
+
+
     % zero out all output data
     outvals = zeros(nbpms * numel(attribs), 1);
 
-    
+
     % get BPM data from AIDA
     t0 = datevec(now);
     try
         acq_ok = 1;
-        data = da.getDaValue(char(strcat(dgrp, {'//BPMS'})));
+        data = pvaGet(char(strcat(dgrp, {':BPMS'})));
     catch
         % zero everything
         acq_ok = 0;
     end
     acq_time = etime(datevec(now), t0);
-    
-    
+
+
     % output 'last acquisition' stuff
     stat.val(1) = acq_time;
     stat.val(2) = acq_ok;
-    stat.val(3) = str2int(char(bpmd));    
+    stat.val(3) = str2int(char(bpmd));
     try
         lcaPut(pvs.out, stat.val);
     catch
@@ -159,17 +155,18 @@ while 1
         pause(3);
         continue
     end
-    
+
 
     % extract BPM data from java into matlab
-    
+
     if acq_ok
-        for jx = 1:numel(attribs)
-            outvals((nbpms * (jx - 1)) + (1:nbpms)) = ...
-                double(data.get(attrib_index(jx)).getAsDoubles());
-        end
+        outvals((nbpms * 0) + (1:nbpms)) = toArray(data.get('x'));
+        outvals((nbpms * 1) + (1:nbpms)) = toArray(data.get('y'));
+        outvals((nbpms * 2) + (1:nbpms)) = toArray(data.get('tmits'));
+        outvals((nbpms * 3) + (1:nbpms)) = toArray(data.get('hsta'));
+        outvals((nbpms * 4) + (1:nbpms)) = toArray(data.get('stat'));
     end
-    
+
     try
         lcaPut(pvs.bpms, outvals);
     catch
@@ -177,6 +174,6 @@ while 1
         pause(3);
         continue
     end
-    
-    
+
+
 end

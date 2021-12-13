@@ -54,8 +54,7 @@ function mlhist_pvListBuilder_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for mlhist_pvListBuilder
 handles.output = hObject;
-aidainit;
-lcaSetSeverityWarnLevel(5); 
+lcaSetSeverityWarnLevel(5);
 defPVs = {...
     'SIOC:SYS0:ML00:AO470';...
     'SIOC:SYS0:ML00:CALC252';...
@@ -158,11 +157,11 @@ set(handles.tablePVdisplay,...
     'columnwidth',cwidth);
 setappdata(handles.mainFigure,'pvTable',handles.pvTable);
 guidata(handles.mainFigure,handles);
-    
-    
+
+
 
 % --- Outputs from this function are returned to the command line.
-function varargout = mlhist_pvListBuilder_OutputFcn(hObject, eventdata, handles) 
+function varargout = mlhist_pvListBuilder_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB

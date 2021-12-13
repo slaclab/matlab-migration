@@ -109,7 +109,7 @@ set(handles.popupmenu_plot_fitorder, 'String', cellstr(num2str(reshape(1:handles
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = facet_dispersion_OutputFcn(hObject, eventdata, handles) 
+function varargout = facet_dispersion_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -142,7 +142,7 @@ notch = {'COLL:LI20:2072'};
 handles.jaws.lvdt = strcat(jaws, ':LVPOS');
 handles.jaws.motr = strcat(jaws, ':MOTR');
 handles.notch.lvdt = strcat(notch, ':LVPOS');
-handles.notch.motr = strcat(notch, ':MOTR');   
+handles.notch.motr = strcat(notch, ':MOTR');
 
 isbpm = strncmpi(handles.model.name, 'BPMS', 4);
 handles.bpms.name = handles.model.name(isbpm);
@@ -256,10 +256,8 @@ gui_statusDisp(handles, sprintf('Calculated knob steps: [%s]', rangestr));
 phase_deltas = diff([0 handles.data.range 0]);
 
 % set up AIDA for knob control
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
-da.setParam('MKB', strcat('mkb:', handles.data.knob));
+requestBuilder = PvaRequest('MKB:VAL');
+requestBuilder.with('MKB', strcat('mkb:', handles.data.knob));
 
 % turn off energy feedbacks
 fbpv = {'SIOC:SYS1:ML00:AO060'; 'SIOC:SYS1:ML00:AO084'};
@@ -274,7 +272,7 @@ if handles.check_colls
     str1 = 'Scan anyway';
     str2 = 'Extract';
     str3 = 'Abort scan';
-    
+
     % prompt user to extract notch if inserted
     notchout = 3000;
     notchlim = 1000;
@@ -309,7 +307,7 @@ if handles.check_colls
                 handles.abort = 1;
         end
     end
-    
+
     % prompt user to extract jaws if inserted
     jawlim = 10;
     if any(abs(handles.data.jaws) < jawlim)
@@ -355,16 +353,16 @@ phase_sum = 0;
 
 % iterate over steps
 for ix = 1:handles.data.nstep
-    
+
     handles.abort = handles.abort || get(handles.pushbutton_abort, 'Value');
     if handles.abort
         gui_statusDisp(handles, 'Aborting scan...');
         break;
     end
-    
+
     % set energy here
     gui_statusDisp(handles, sprintf('Setting %s to %.1f', handles.data.knob, handles.data.range(ix)));
-    da.setDaValue('MKB//VAL', DaValue(java.lang.Float(phase_deltas(ix))));
+    requestBuilder.set(phase_deltas(ix));
     phase_sum = phase_sum + phase_deltas(ix);
 
     % calculate energy from phase readback here
@@ -382,7 +380,7 @@ end
 
 % restore energy multiknob
 gui_statusDisp(handles, sprintf('Resetting %s by %.1f', handles.data.knob, -phase_sum));
-da.setDaValue('MKB//VAL', DaValue(java.lang.Float(-phase_sum)));
+requestBuilder.setDaValue(-phase_sum);
 
 % turn feedbacks back on
 lcaPutSmart(fbpv,fbstate);
@@ -449,7 +447,7 @@ plots.energy = reshape(handles.data.energy, [], 1);
 % check and flag data quality
 plots.stat = plots.stat & (plots.tmit > 0);
 if handles.tmitcut
-    plots.stat = plots.stat & (plots.tmit > handles.tmitmin);     
+    plots.stat = plots.stat & (plots.tmit > handles.tmitmin);
 end
 
 handles.plots = plots;
@@ -465,7 +463,7 @@ fit.stat = reshape(plots.stat, nbpms, []);
 fit.use = any(fit.stat, 2) & handles.use;
 fit.energy = reshape(plots.energy, nbpms, []);
 fit.fitorder = handles.fitorder;
-% 
+%
 % fit.x(~fit.stat) = NaN;
 % fit.y(~fit.stat) = NaN;
 % fit.x = reshape(fit.x, size(fit.stat));
@@ -520,7 +518,7 @@ if handles.normalize
             util_polyFit(fit.energy(ix,fit.stat(ix,:))'/handles.fitenergy, fit.y(ix,fit.stat(ix,:))', handles.fitorder, [], eFit);
         end
     end
-    
+
     handles.fit.coef.x    = fliplr(permute(parx, [2 1]));
     handles.fit.coef.y    = fliplr(permute(pary, [2 1]));
     handles.fit.coef.xStd = fliplr(permute(parStdx, [2 1]));
@@ -559,7 +557,7 @@ for ix = 1:numel(plotdims)
         set(ax, 'XLim', [z_start-1 z_end+1]);
         if ~export, set(get(handles.axes_tmit, 'XLabel'), 'String', 'Z [m]'); end
     end
-    
+
     if handles.plotraw && handles.bpmselect ~= 0
             % plot raw bpm data
             alldata = handles.data.(plotdims{ix});
@@ -572,8 +570,8 @@ for ix = 1:numel(plotdims)
             % plot fit
             data = handles.fit.(strcat(plotdims{ix}, 'Fit'));
             energydata = handles.fit.eFit;
-            plot(ax, energydata, data(:, handles.bpmselect), 'k-');        
-        end 
+            plot(ax, energydata, data(:, handles.bpmselect), 'k-');
+        end
     elseif handles.plotraw && handles.bpmselect == 0
         data = plots.(plotdims{ix});
         stem(ax, plots.z(plots.stat & plots.use), data(plots.stat & plots.use), 'bo');
@@ -606,13 +604,13 @@ for ix = 1:numel(plotdims)
         errorbar(ax, fit.z(fit.use), data(fit.use, handles.plot_fitorder + 1) - design_bpms(fit.use), dataStd(fit.use, handles.plot_fitorder + 1), ...
             'LineStyle', ':', 'Color', 'r', 'LineWidth', 2, 'Parent', ax);
     end
-    
+
     if handles.plotip
         ylims = ylim(ax);
         ys = linspace(min(ylims), max(ylims), 10);
         plot(ax, repmat(handles.ip.z, size(ys)), ys, 'm--');
     end
-    
+
     if ix == 1
         if isfield(handles.data, 'jaws') && isfield(handles.data, 'notch')
             collstr = sprintf('%s %.1f\n%s %.1f\n%s %.1f', ...

@@ -3,7 +3,7 @@
 %
 % ==============================================================
 %
-%  Name:  aidainit
+%  Name:  aidapvainit
 %
 %  Rem:   Aida requires a classpath, certain import statements, and
 %         an instantiated Err singleton, to operate. aidasetup does
@@ -83,6 +83,7 @@ if isempty(aidapvainitdone)
     pvaRequest = @(channel) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaRequest(channel);
     pvaSet = @(channel, value) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaSet(channel, value);
     pvaUnpack = @(response) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaUnpack(response);
+    AidaPvaStruct = @() edu.stanford.slac.aida.client.AidaPvaClientUtils.newStruct();
 
     aidapvainitdone = 1;
     disp 'Aida PVA client initialization completed';

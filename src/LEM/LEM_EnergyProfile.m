@@ -31,10 +31,6 @@ function [oldFudge,newFudge]=LEM_EnergyProfile()
 %    when computing kAmpl (i.e. kAmpl = kAmpl_from_DB * kEerr)
 % ------------------------------------------------------------------------------
 
-aidainit
-da=DaObject;
-da.reset
-
 global controlFlags
 useIdeal=controlFlags(2); % use "ideal" fudge factors
 twoPhase=controlFlags(5); % include SLC KLYS PDES for units with "global" phase control
@@ -45,7 +41,7 @@ useDesign=debugFlags(3); % use design energy profile
 global lemPVs lemGlobalPhasePVs
 global KLYS
 global lemEref lemFudge noFudgeCalc
-                     
+
 % hard-wired for LCLS
 
 BEAM='1';            % LCLS beam code
@@ -59,22 +55,28 @@ deg2rad=pi/180;      % phase units conversion
 
 lemEref=zeros(5,1);
 try
-  Query='GUN:IN20:1:GN1_ADES//VAL';
-  lemEref(1)=MeV2GeV*da.get(Query,4); % L0 begin
-  Query=strcat(lemPVs(5),'//VAL');
-  da.setDaValue(Query,DaValue(lemEref(1)));
-  Query='BEND:IN20:751:BDES//VAL';
-  lemEref(2)=da.get(Query,4);         % L1 begin
-  Query=strcat(lemPVs(6),'//VAL');
-  da.setDaValue(Query,DaValue(lemEref(2)));
-  Query=strcat(lemPVs(7),'//VAL');
-  lemEref(3)=da.get(Query,4);         % L2 begin
-  Query=strcat(lemPVs(8),'//VAL');
-  lemEref(4)=da.get(Query,4);         % L3 begin
-  Query=strcat(lemPVs(9),'//VAL');
-  lemEref(5)=da.get(Query,4);         % L3 end
-catch
-  error('Failed to get reference energy values')
+  Query='GUN:IN20:1:GN1_ADES:VAL';
+  lemEref(1) = MeV2GeV * pvaGet(Query, AIDA_DOUBLE); % L0 begin
+
+  Query=strcat(lemPVs(5),':VAL');
+  pvaSet(Query, lemEref(1));
+
+  Query='BEND:IN20:751:BDES:VAL';
+  lemEref(2) = pvaGet(Query, AIDA_DOUBLE);         % L1 begin
+
+  Query = strcat(lemPVs(6), ':VAL');
+  pvaSet(Query, lemEref(2));
+
+  Query=strcat(lemPVs(7),':VAL');
+  lemEref(3)=pvaGet(Query, AIDA_DOUBLE);         % L2 begin
+
+  Query=strcat(lemPVs(8),':VAL');
+  lemEref(4)=pvaGet(Query, AIDA_DOUBLE);         % L3 begin
+
+  Query=strcat(lemPVs(9),':VAL');
+  lemEref(5)=pvaGet(Query, AIDA_DOUBLE);         % L3 end
+catch e
+    handleExceptions(e, 'Failed to get reference energy values');
 end
 
 % if no selected LEM regions contain acceleration, we're done
@@ -89,11 +91,11 @@ end
 
 oldFudge=ones(4,1);
 for n=1:4
-  Query=strcat(lemPVs(n),'//VAL');
+  Query=strcat(lemPVs(n),':VAL');
   try
-    oldFudge(n)=da.get(Query,4);
-  catch
-    error('Failed to get current fudge factors')
+    oldFudge(n)=pvaGet(Query, AIDA_DOUBLE);
+  catch e
+    handleExceptions(e, 'Failed to get current fudge factors');
   end
 end
 
@@ -101,11 +103,11 @@ end
 
 sphas=zeros(4,1);
 for n=1:4
-  Query=strcat(lemGlobalPhasePVs(n),'//VAL');
+  Query=strcat(lemGlobalPhasePVs(n),':VAL');
   try
-    sphas(n)=da.get(Query,4);
-  catch
-    error('*** %s',Query)
+    sphas(n)=pvaGet(Query, AIDA_DOUBLE);
+  catch e
+    handleExceptions(e);
   end
 end
 
@@ -126,13 +128,13 @@ for n=1:kCount
 
   switch n
     case 1
-      statQuery='KLYS:LI20:71//TACT'; % L0A
+      statQuery='KLYS:LI20:71:TACT'; % L0A
     case 2
-      statQuery='KLYS:LI20:81//TACT'; % L0B
+      statQuery='KLYS:LI20:81:TACT'; % L0B
     case 4
-      statQuery='KLYS:LI21:21//TACT'; % L1X
+      statQuery='KLYS:LI21:21:TACT'; % L1X
     otherwise
-      statQuery=sprintf('KLYS:LI%s:%s1//TACT',name(2:3),name(5));
+      statQuery=sprintf('KLYS:LI%s:%s1:TACT',name(2:3),name(5));
   end
 
 % construct KLYS amplitude query
@@ -140,9 +142,9 @@ for n=1:kCount
   s=kList(n).dbAName;
   if (ctrl(1)==0) % SLC
     ic=strfind(s,':');ic=ic(3);
-    s=strcat(s(1:ic-1),'//',s(ic+1:end));
+    s=strcat(s(1:ic-1),':',s(ic+1:end));
   else % EPICS
-    s=strcat(s,'//VAL');
+    s=strcat(s,':VAL');
   end
   amplQuery=s;
 
@@ -152,12 +154,12 @@ for n=1:kCount
   if (ctrl(2)==0) % SLC
     if (twoPhase)
       ic=strfind(s,':');ic=ic(3);
-      s=strcat(s(1:ic-1),'//',s(ic+1:end));
+      s=strcat(s(1:ic-1),':',s(ic+1:end));
     else
       s=[];
     end
   else % EPICS
-    s=strcat(s,'//VAL');
+    s=strcat(s,':VAL');
   end
   phasQuery=s;
 
@@ -170,15 +172,16 @@ for n=1:kCount
     kPhas(n,:)=[designPhas(n),0]; % degrees
   else
     try
-      da.setParam('BEAM',BEAM)
-      da.setParam('DGRP',DGRP)
-      stat=da.get(statQuery,10);
-      da.reset
-      ampl=da.get(amplQuery,4);
+        requestBuilder = pvaRequest(statQuery);
+        requestBuilder.with('BEAM', BEAM);
+        requestBuilder.with('DGRP', DGRP);
+        stat = requestBuilder.returning(AIDA_STRING);
+        ampl = pvaGet(amplQuery, AIDA_DOUBLE);
+
       if (isempty(phasQuery))
         phas=0;
       else
-        phas=da.get(phasQuery,4);
+        phas = pvaGet(phasQuery, AIDA_DOUBLE);
       end
     catch
       disp(sprintf('Failed to get DB data for %s',name))

@@ -35,9 +35,6 @@ localFiles=0; % MAD patch file to working directory
 saveMatFile=1; % save a mat-file that corresponds to xml upload files
 
 % initialize (1): AIDA
-
-aidainit
-da=edu.stanford.slac.aida.lib.da.DaObject();
 clc
 
 % initialize (2): path and file definitions
@@ -93,11 +90,11 @@ if (syncMode>1)
 
 % get initial Twiss ...
 
-  da.reset
-  da.setParam('MODE=5')
-  query=sprintf('MARK:VX00:%d//twiss',markBeg(seqIdList(1)));
-  twssv=da.geta(query,55);
-  Twissi=double(twssv);
+  query=sprintf('MARK:VX00:%d:twiss', markBeg(seqIdList(1)));
+  requestBuilder = pvaRequest(query);
+  requestBuilder.with('MODE', 5);
+  requestBuilder.returning(AIDA_FLOAT_ARRAY);
+  Twissi=requestBuilder.get();
   Twissi=Twissi(2:end);
 
 % ... and provide abort opportunity

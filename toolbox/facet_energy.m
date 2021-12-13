@@ -109,7 +109,7 @@ model_init('source', 'SLC');
 % reference trajectory
 [x, y, tmit, pulseId, stat, x0, y0] = deal(zeros([numel(bpms) nsamp]));
 [x00, y00] = control_bpmAidaGet(bpms, nsamp, dgrp);
-% 
+%
 % x0 = x00;
 % y0 = y00;
 
@@ -124,27 +124,27 @@ while 1
 
     ok = 1;
     pause(data.in.delay);
-    
+
 %% Increment watchdog counter and pause
-    
+
     W = watchdog_run(W);
     if get_watchdog_error(W)
         disp_log('Some sort of watchdog timer error');
         ok = 0;
         continue;
     end
-    
+
 %% Get some fresh data
 
     % Get the EPICS controls
     olddata = data;  oldts = ts;        % store the old data
     [data, ts] = lcaGetStruct(pvs);     % get some new stuff
-    
+
     % Clear the flags
     data.out.acq_ok = 1;  data.out.data_ok = 1;
-    
+
     % Get the AIDA orbit (only if there's rate)
-    if data.in.rate > 0                 
+    if data.in.rate > 0
         tic;
         [x, y, tmit, pulseId, stat] = control_bpmAidaGet(bpms, nsamp, dgrp);
         data.out.acq_time = toc;
@@ -153,15 +153,15 @@ while 1
         data.out.acq_time = 0;
         ok = 0;
     end
-    
+
     % Get the LI17-LI18 phases
     [phase, gain, total] = get_scavengy();
-    
+
     % Extract the model energy from LEMG
     lemg = model_energySetPoints;
     energy = lemg(end) * 1e3; % in MeV
     data.out.eend = lemg(end);
-    
+
 %% Save actuators if save pressed
     if data.in.update_acts
         [ref_phase, ref_gain, ref_total] = get_scavengy();
@@ -170,7 +170,7 @@ while 1
         lcaPutSmart(pvs.in.update_acts, 0);
         continue;
     end
-    
+
 %% Restore actuators if reset pressed
 
     if data.in.restore_acts
@@ -180,7 +180,7 @@ while 1
         lcaPutSmart(pvs.in.restore_acts, 0);
         continue;
     end
-    
+
 %% Check orbit data for reasonable-ness
 
 % TODO add messages here?
@@ -207,7 +207,7 @@ while 1
     if any(any(x > max_orbit)) || any(any(y > max_orbit))
         data.out.data_ok = 0;
         ok = 0;
-        if data.in.rate > 0        
+        if data.in.rate > 0
             disp_log(deblank(sprintf('BPMS with large orbit: %s\n', badorbit{:})));
         end
     end
@@ -230,7 +230,7 @@ while 1
     eta_EP01_185_X = -280;  % in mm
     energy_EP01_185_X = 20.9 * 1000; % MeV
     old_E = x(1) * energy_EP01_185_X / eta_EP01_185_X;
-    
+
 %     % w.r.t ref orbit x00 y00
 %     [xfit, yfit, p, dp, chisq, q, v] = ...
 %         xy_traj_fit(x', 1, y', 1, x00', y00', ...
@@ -241,7 +241,7 @@ while 1
 
 %% Feed forward if setpoint change
 
-    d_setpoint = data.in.setpoint - olddata.in.setpoint;    
+    d_setpoint = data.in.setpoint - olddata.in.setpoint;
     if d_setpoint ~= 0
         disp_log(sprintf('Setpoint changed from %.3f to %.3f', ...
             olddata.in.setpoint, data.in.setpoint));
@@ -257,26 +257,26 @@ while 1
     d_phase = (err_E / slope) * data.in.gain.p;
     set_phase = phase + d_phase;
     if debug, disp(sprintf('d=%.3f \tset=%.3f', d_phase, set_phase)); end
-    
+
     if set_phase > lim.high || set_phase < lim.low
         ok = 0;
     end
-    
+
     data.out.val = gain;
     data.out.ampl = total;
     data.out.delta = d_phase;
     data.out.command = set_phase;
-    
-%% Output loop diagnostic stuff 
-    
+
+%% Output loop diagnostic stuff
+
     lcaPutStruct(pvs.out, data.out);
-    
+
 %% Set the energy knob
 
     if data.in.enable && data.in.enable2 && ok
         out_phase = set_scavengy(d_phase);
     end
-        
+
 
 end
 
@@ -285,36 +285,30 @@ function [phase, gain, total] = get_scavengy()
     % figure out how strong 17/18 are
     k17 = strcat({'17-'}, {'1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'});
     k18 = strcat({'18-'}, {'1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'});
-    
+
     p17 = aidaget('AMPL:EP01:171//VDES');
     p18 = aidaget('AMPL:EP01:181//VDES');
-    
+
     phas = control_phaseGet([k17; k18]);
     fphas = [(phas(1:8) + p17); (phas(9:16) + p18)];
-    
+
     [acts, stat, swrd, d, d, enld] = control_klysStatGet([k17; k18], 10);
     accl = bitget(acts, 1) .* ~bitget(swrd, 4);
     ampl = enld .* accl .* cosd(fphas);
-    
+
     total = sum(enld .* accl .* cosd(phas));
     phase = mean([-p17; p18]);
     gain = sum(ampl);
 
 function new_phase = set_scavengy(phase)
 
-    persistent d;
-    if isempty(d)
-        aidainit;
-        import edu.stanford.slac.aida.lib.da.DaObject;
-        d = DaObject();
-        d.setParam('MKB', 'MKB:SCAVENGY.MKB');        
-    end
-    
+
     try
-        answer = d.setDaValue('MKB//VAL', ...
-        edu.stanford.slac.aida.lib.util.common.DaValue(java.lang.Float(phase)));
-        ansstr = answer.getAsStrings();
-        new_phase = eval(ansstr(2,:));
+        d = pvaRequest('MKB:VAL');
+        d.with('MKB', 'MKB:SCAVENGY.MKB');
+        results = d.set(phase);
+        values = toArray(results.get('value'));
+        new_phase = values(:);
     catch
         disp_log('AIDA error when setting SCAVENGY');
         new_phase = phase;

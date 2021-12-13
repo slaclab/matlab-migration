@@ -12,10 +12,6 @@ function [kname,kstat,kenld,kphas,kfudg,kgain]=FACET_getEnergyProfile(LEMG,tnum)
 % NOTE: the outputs are [18,8] arrays ... one row per sector; to get
 %       a beamline-ordered list, use reshape(k....',[],1)
 
-aidainit
-import edu.stanford.slac.aida.lib.da.DaObject;
-da=DaObject();
-
 getHist=((nargin>1)&&~isempty(tnum)&&(tnum~=0));
 if (getHist)
   dt=datenum('01:00')-datenum('00:00'); % 1 hour
@@ -75,7 +71,7 @@ for m=1:Nmicr
         end
       end
       if (getNow)
-        query=strcat(SLCname(kname{m,n}),'//ENLD');
+        query=strcat(SLCname(kname{m,n}),':ENLD');
         bval=aidaget(query);
       end
       kenld(m,n)=bval(end);
@@ -99,11 +95,11 @@ for n=2:19
     [tval,bval]=getHistory(query,timerange);
   else
     if (strcmp(micr,'LI17'))
-      query='AMPL:EP01:171//VACT'; % feedback
+      query='AMPL:EP01:171:VACT'; % feedback
     elseif (strcmp(micr,'LI18'))
-      query='AMPL:EP01:181//VACT'; % feedback
+      query='AMPL:EP01:181:VACT'; % feedback
     else
-      query=sprintf('SBST:%s:1//PDES',micr);
+      query=sprintf('SBST:%s:1:PDES',micr);
     end
     bval=aidaget(query);
   end
@@ -118,7 +114,7 @@ if (kstat(8,1)) % start with LI02
   if (getHist)
     [tval,bval]=getHistory('LI09:PHAS:12:VDES',timerange); % feedback
   else
-    bval=aidaget('PHAS:LI09:12//VACT'); % LEM uses VACT
+    bval=aidaget('PHAS:LI09:12:VACT'); % LEM uses VACT
   end
   pklys(8,1)=bval(end);
 end
@@ -126,7 +122,7 @@ if (kstat(8,2)) % start with LI02
   if (getHist)
     [tval,bval]=getHistory('LI09:PHAS:22:VDES',timerange); % feedback
   else
-    bval=aidaget('PHAS:LI09:22//VACT'); % LEM uses VACT
+    bval=aidaget('PHAS:LI09:22:VACT'); % LEM uses VACT
   end
   pklys(8,2)=bval(end);
 end
@@ -142,9 +138,8 @@ if (getHist)
     [arch_times,arch_data]=getHistoryWfm(query,timerange);
     bval=arch_data(end,:);
   catch % FUDG for this LEMG not in EPICS Channel Archiver ... get it from SLC History Buffer
-    query=sprintf('LEMG:VX00:%d//FUDG',LEMG);
-    d=da.getDaValue(query);
-    bval=d.getFloats;
+    query=sprintf('LEMG:VX00:%d:FUDG',LEMG);
+    bval=toArray(pvaGet(query));
   end
 else
   query=sprintf('VX00:LEMG:%d:FUDG',LEMG);

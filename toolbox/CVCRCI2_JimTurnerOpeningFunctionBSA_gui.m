@@ -6,37 +6,27 @@ try
 %handles.output = hObject;
 handles.new_model = 1;
 
- 
-% Connect to Aida
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject; 
-da = DaObject();
 
 % Get the BSA Names.
 disp('Getting LCLS BSA elements from Aida');
-%v = da.getDaValue('LCLS//BSA.elements.byZ'); 
+%v = da.getDaValue('LCLS//BSA.elements.byZ');
 %v = da.getDaValue('LCLS//BSA.PVs.byZ');
-v = da.getDaValue([ accelerator '//BSA.PVs.byZ' ] );
+v = pvaGet([ accelerator ':BSA.PVs.byZ' ] );
 
-% Extract the number of BSA element names returned (the number of rows)
-Mrows = v.get(0).size(); 
+% Extract the number of elements
+Mrows = v.size;
 
 % Extract just the element names and Z positions.
-root_name = (char(v.get(4).getStrings()));
-
-z_pos = (v.get(3).getStrings()); 
-
-for i=1:Mrows
-    z_positions(i) = str2double(z_pos(i,:));
-end
+root_name = toArray(v.get('name'));
+z_positions = toArray(v.get('z'));
 
 %Eliminate SLC database stuff and other unnecessary variables
 
 % id_bsa_1 = find(((root_name(:,1)=='L')&(root_name(:,2)=='I'))~=1);
 %
 % initially, now morphed into...
-% not LIxx.xxxx.xxxx.xxxx, or 
-% not LMxx.xxxx.xxxx.xxxx, or 
+% not LIxx.xxxx.xxxx.xxxx, or
+% not LMxx.xxxx.xxxx.xxxx, or
 % not xxxx.INxx.821x.xxxx, or
 % not xxxx.INxx.945x.xxxx, or
 % not xxxx.INxx.925x.xxxx, or
@@ -59,18 +49,18 @@ id_bsa_1 = find( (((root_name(:,1)=='L')&(root_name(:,2)=='I'))...
     &(root_name(:,13)=='5'))...
     |((root_name(:,6)=='I')&(root_name(:,7)=='N')...
     &(root_name(:,11)=='9')&(root_name(:,12)=='8')...
-    &(root_name(:,13)=='1'))...      
+    &(root_name(:,13)=='1'))...
     |((root_name(:,1)=='I')&(root_name(:,2)=='O')...
-    &(root_name(:,3)=='C'))...      
+    &(root_name(:,3)=='C'))...
     |((root_name(:,14)=='S')&(root_name(:,15)=='E')...
-    &(root_name(:,16)=='C'))...      
+    &(root_name(:,16)=='C'))...
     |((root_name(:,13)=='S')&(root_name(:,14)=='E')...
-    &(root_name(:,15)=='C'))...      
+    &(root_name(:,15)=='C'))...
     )~=1);
 
 % maybe should take FARC out???
 %    |((root_name(:,1)=='F')&(root_name(:,2)=='A')...
-%    &(root_name(:,3)=='R')&(root_name(:,4)=='C'))...      
+%    &(root_name(:,3)=='R')&(root_name(:,4)=='C'))...
 
 
 for j=1:length(id_bsa_1)

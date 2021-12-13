@@ -36,10 +36,6 @@ function [kName,kStat,kAmpl,kPhas,kEerr,kFudge,kEGain,kPower,Eref,oldFudge,newFu
 %    when computing kAmpl (i.e. kAmpl = kAmpl_from_DB * kEerr)
 % ------------------------------------------------------------------------------
 
-aidainit
-da=DaObject();
-da.reset
-
 % hard-wired for LCLS
 
 lemPVs=[ ...
@@ -61,7 +57,7 @@ lemGlobalPhasePVs=[ ...
   {'ACCL:LI30:0:KLY_PDES'}  ... % (4) LI30 energy feedback phase
 ];
 
-BEAM='1';            % LCLS beam code
+BEAM=1;              % LCLS beam code
 DGRP='LIN_KLYS';     % for KLYS status
 idref=[0;2;4;32;80]; % locations of reference points in klysList
 
@@ -87,11 +83,11 @@ MeV2GeV=1e-3;   % energy units conversion
 oldFudge=zeros(4,1);
 Eref=zeros(5,1);
 for n=1:9
-  Query=strcat(lemPVs(n),'//VAL');
+  Query=strcat(lemPVs(n),':VAL');
   try
-    val=da.get(Query,4);
-  catch
-    error('*** %s',Query)
+    val=pvaGet(Query, AIDA_DOUBLE);
+  catch e
+    handleExceptions(e, '*** %s', Query);
   end
   if (n<=4)
     oldFudge(n)=val;
@@ -104,11 +100,11 @@ end
 
 sphas=zeros(4,1);
 for n=1:4
-  Query=strcat(lemGlobalPhasePVs(n),'//VAL');
+  Query=strcat(lemGlobalPhasePVs(n),':VAL');
   try
-    sphas(n)=da.get(Query,4);
-  catch
-    error('*** %s',Query)
+    sphas(n)=pvaGet(Query, AIDA_DOUBLE);
+  catch e
+    handleExceptions(e, '*** %s', Query);
   end
 end
 
@@ -129,23 +125,23 @@ for n=1:klysCount
 
   switch n
     case 1
-      statQuery='KLYS:LI20:71//TACT'; % L0A
+      statQuery='KLYS:LI20:71:TACT'; % L0A
     case 2
-      statQuery='KLYS:LI20:81//TACT'; % L0B
+      statQuery='KLYS:LI20:81:TACT'; % L0B
     case 4
-      statQuery='KLYS:LI21:21//TACT'; % L1X
+      statQuery='KLYS:LI21:21:TACT'; % L1X
     otherwise
-      statQuery=sprintf('KLYS:LI%s:%s1//TACT',name(2:3),name(5));
+      statQuery=sprintf('KLYS:LI%s:%s1:TACT',name(2:3),name(5));
   end
-  
+
 % construct KLYS amplitude query
 
   s=klysList(n).dbAName;
   if (ctrl(1)==0) % SLC
     ic=strfind(s,':');ic=ic(3);
-    s=strcat(s(1:ic-1),'//',s(ic+1:end));
+    s=strcat(s(1:ic-1),':',s(ic+1:end));
   else % EPICS
-    s=strcat(s,'//VAL');
+    s=strcat(s,':VAL');
   end
   amplQuery=s;
 
@@ -155,30 +151,31 @@ for n=1:klysCount
   if (ctrl(2)==0) % SLC
     if (twoPhase)
       ic=strfind(s,':');ic=ic(3);
-      s=strcat(s(1:ic-1),'//',s(ic+1:end));
+      s=strcat(s(1:ic-1),':',s(ic+1:end));
     else
       s=[];
     end
   else % EPICS
-    s=strcat(s,'//VAL');
+    s=strcat(s,':VAL');
   end
   phasQuery=s;
 
 % get the data
 
   try
-    da.setParam('BEAM',BEAM)
-    da.setParam('DGRP',DGRP)
-    stat=da.get(statQuery,10);
-    da.reset
-    ampl=da.get(amplQuery,4);
+    requestBuilder = pvaRequest(statQuery);
+    requestBuilder.with('BEAM', BEAM);
+    requestBuilder.with('DGRP', DGRP);
+    requestBuilder.returning(AIDA_STRING);
+    stat=requestBuilder.get(statQuery);
+    ampl=pvaGet(amplQuery, AIDA_DOUBLE);
     if (isempty(phasQuery))
       phas=0;
     else
-      phas=da.get(phasQuery,4);
+      phas=pvaGet(phasQuery, AIDA_DOUBLE);
     end
-  catch
-    error('*** Failed to get DB data for %s',name)
+  catch e
+      handleExceptions(e, '*** Failed to get DB data for %s', name );
   end
 
   klysStat(n)=strcmp(stat,'activated');

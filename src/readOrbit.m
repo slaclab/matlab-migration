@@ -19,50 +19,32 @@ if ~isequal('FACET',accelerator)
 end
 
 try
-
-    aidainit;
-
-    if isempty(da)
-        import edu.stanford.slac.aida.lib.da.DaObject; 
-        da = DaObject();
-    end
-
-    da.reset();
-    
     if nargin < 1
         dgrp = 'NDRFACET';
     end
 
-    aida_command = [ dgrp '//BPMS' ];
+    aida_command = [ dgrp ':BPMS' ];
 
-    da.setParam(sprintf('BPMD=%d',getBPMD(dgrp)));
+    requestBuilder = pvaRequest(aida_command);
+
+    requestBuilder.with('BPMD', getBPMD(dgrp));
 
     if nargin < 2
-        da.setParam('N=1');
+        requestBuilder.with('N', 1);
     else
-        da.setParam(sprintf('N=%d',navg));
+        requestBuilder.with('N', navg);
     end
 
-    vBPMS = da.getDaValue(aida_command);
+    vBPMS = requestBuilder.get();
 
-
-    names = Vector(vBPMS.get(0));
-    xvals = Vector(vBPMS.get(1));
-    yvals = Vector(vBPMS.get(2));
-    zvals = Vector(vBPMS.get(3));
-    tmits = Vector(vBPMS.get(4));
-    hstas = Vector(vBPMS.get(5));
-    stats = Vector(vBPMS.get(6));
-    nBPMS = names.size();
-    for i = 1:nBPMS
-        name(i) = {names.elementAt(i-1)};
-        hsta(i) = hstas.elementAt(i-1);
-        stat(i) = stats.elementAt(i-1);
-        x(i) = xvals.elementAt(i-1);
-        y(i) = yvals.elementAt(i-1);
-        z(i) = zvals.elementAt(i-1);
-        tmit(i) = tmits.elementAt(i-1);
-    end
+    nBPMS = vBPMS.size;
+    name = toArray(vBPMS.get('name'));
+    hsta = toArray(vBPMS.get('hsta'));
+    stat = toArray(vBPMS.get('stat'));
+    x = toArray(vBPMS.get('x'));
+    y = toArray(vBPMS.get('y'));
+    z = toArray(vBPMS.get('z'));
+    tmit = toArray(vBPMS.get('tmits'));
 
 catch
     put2log(sprintf('Sorry,Unable to read %s from Aida', dgrp));

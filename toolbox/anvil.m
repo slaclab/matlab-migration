@@ -10,7 +10,7 @@ function varargout = anvil(varargin)
 % resetting until a number of resets have accumulated.
 % At that time, Anvil.m will put in BYKIK and check for
 % beam loss, regardless of other insertion devices
-% 
+%
 % Anvil.m IS NOT MEANT TO REPLACE MCC HAMMER
 % It is a band-aid to prevent wasted operations time
 % resetting nuissance trips. It will be turned off from
@@ -64,7 +64,7 @@ set(handles.textDate,'String',curdat);
 end
 
 % --- Outputs from this function are returned to the command line.
-function varargout = anvil_OutputFcn(hObject, eventdata, handles) 
+function varargout = anvil_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -80,38 +80,38 @@ function toggleStart_Callback(hObject, eventdata, handles)
 Amask = get(hObject,'Value');
 switch Amask
     case 1.0
-       broadcast('Anvil started by user or operator',handles);       
+       broadcast('Anvil started by user or operator',handles);
        resetcount = 0;
        msg('You know the rules, and so do I.',handles);
        set(handles.toggleStart,'BackgroundColor',[.690 .701 .381]);
 
        % INFINITE LOOP while certain conditions are met
        while Amask==1.0
-           lcaPut('SIOC:SYS0:ML01:AO699','1'); % Tell Matlab Support PV that Anvil is ON           
+           lcaPut('SIOC:SYS0:ML01:AO699','1'); % Tell Matlab Support PV that Anvil is ON
             totresets = lcaGet('SIOC:SYS0:ML01:AO700');
             newtot = resetcount + totresets;
             lcaPut('SIOC:SYS0:ML01:AO700',newtot);
             curdat = datestr(floor(now));
-            set(handles.textDate,'String',curdat);            
-            set(handles.toggleStart','String','Running');         
-                       
+            set(handles.textDate,'String',curdat);
+            set(handles.toggleStart','String','Running');
+
             % Check trip / no trip status of BIG RED
             bigred = lcaGet('SIOC:SYS0:ML00:CALC011.STAT',0,'String'); % 0 = ok, 4 = high / trip
-            
+
             % Get stopper states and beam loss stats for logic
             %   this assumes the toroids are working.
-            bcsok = lcaGet('BCS:IN20:1:BEAMPERM',0,'String');     
+            bcsok = lcaGet('BCS:IN20:1:BEAMPERM',0,'String');
             td11out = lcaGet('DUMP:LI21:305:TD11_PNEU',0,'String'); % 1 = allows beam (out), 0 = stops beam (in)
             im01_ = lcaGet('TORO:IN20:215:TMIT1H'); % IM01 TORO TMIT off the gun - reference for all beam losses
             imbc1I_ = lcaGet('TORO:LI21:205:TMIT1H'); % IMBC1 Input TORO TMIT to chicane BC1
             imbc2O_ = lcaGet('TORO:LI25:235:TMIT1H'); % IMBC2 Output TORO TMIT from chicane BC2
             imdl2O_ = lcaGet('TORO:LTU1:605:TMIT1H'); % IM36 Output TORO TMIT from DL2
-            
+
             % Calc beam loss for logic
             DL1loss = (imbc1I_ - im01_)/imbc1I_;
             BC2loss = (imbc2O_ - imbc1I_)/imbc2O_;
             DL2loss = (imdl2O_ - imbc2O_)/imdl2O_;
-            
+
             % Determine how to RESET BIG RED
             if bigred~=0&&resetcount==0&&bcsok
                 lcaPut('IOC:BSY0:MP01:UNLATCHALL','1');
@@ -125,22 +125,22 @@ switch Amask
             elseif bigred~=0&&resetcount>0&&resetcount<4&&bcsok
                 if abs(DL2loss)<.1
                     lcaPut('IOC:BSY0:MP01:UNLATCHALL','1');
-                    
+
                 % For debug mode
                 % msg('I would have reset the beam here',handles);
-                % fprintf('Reset count is %d \n',resetcount);                
-                    
+                % fprintf('Reset count is %d \n',resetcount);
+
                     resetcount = resetcount + 1;
                     rickroll(resetcount,handles);
                 elseif abs(DL2loss)>=.1&&~td11out
                     broadcast('Excessive beam loss but TD11 in. Reset ok.',handles);
                     msg('TD11 is in. Gotta make you understand.',handles);
                     lcaPut('IOC:BSY0:MP01:UNLATCHALL','1');
-                    
+
                 % For debug mode
-                % msg('I would have reset the beam here',handles);         
-                % fprintf('Reset count is %d \n',resetcount);                
-                    
+                % msg('I would have reset the beam here',handles);
+                % fprintf('Reset count is %d \n',resetcount);
+
                     resetcount = resetcount + 1;
                     rickroll(resetcount,handles);
                 elseif abs(DL2loss)>=.1&&td11out
@@ -149,11 +149,11 @@ switch Amask
                     lcaPut('IOC:BSY0:MP01:UNLATCHALL','1');
                     pause(1);
                     lcaPut('IOC:BSY0:MP01:BYKIKCTL',bykiknow); % BYKIK on whatever state it was before
-                    
+
                   % For debug mode
                   % msg('I would have reset the beam here',handles);
-                  
-                    fprintf('Reset count is %d \n',resetcount);                    
+
+                    fprintf('Reset count is %d \n',resetcount);
                     resetcount = resetcount + 1;
                     rickroll(resetcount,handles);
                     pause(2);
@@ -167,12 +167,12 @@ switch Amask
                 bcsflatch=1;
             elseif bigred~=0&&bcsok&&resetcount>=4
                 msg('Out of resets! Inside we both know whats been going on',handles); pause(0.5);
-                msg('Fix the beam! We know the game and were gonna play it.',handles);                
+                msg('Fix the beam! We know the game and were gonna play it.',handles);
             end
-            
+
             % Check if beam recovered
             pause(1);
-            bigred = lcaGet('SIOC:SYS0:ML00:CALC011.STAT',0,'String'); % 0 = ok, 4 = high / trip            
+            bigred = lcaGet('SIOC:SYS0:ML00:CALC011.STAT',0,'String'); % 0 = ok, 4 = high / trip
             if bigred==0
                 resetcount = 0;
                 if bcsok
@@ -182,22 +182,22 @@ switch Amask
 
             % If beam not recovered then check if Anvil still running then loop again
             Amask = get(hObject,'Value');
-            
+
             % For debugging
             % msg('Still alive',handles);
-            % fprintf('Reset count is %d \n',resetcount);            
-            
-        end       
-       
-       
+            % fprintf('Reset count is %d \n',resetcount);
+
+        end
+
+
     otherwise
         curdat = datestr(floor(now));
-        set(handles.textDate,'String',curdat);        
+        set(handles.textDate,'String',curdat);
         set(handles.toggleStart','String','Stopped');
         lcaPut('SIOC:SYS0:ML01:AO699','0');
         set(handles.toggleStart,'BackgroundColor',[.526 .702 .586]);
         msg('But weve known each other for so long.',handles);
-        broadcast('Anvil stopped by user or operator',handles);       
+        broadcast('Anvil stopped by user or operator',handles);
 end
 
 end
@@ -229,22 +229,13 @@ end
 % TESTED OK
 function cmlog(msg) % Print global error messages to CM Log
 
-% Initialize Aida for error logging
-aidainit;
-
 % Store err variables in function memory
 persistent err % This is the last thing we need
 persistent da % Like the song...
 
 % Initialize error instance
 if(isempty(err))
-    err=getLogger('anvil');  % Stutter, much? 
-end
-
-if(isempty(da))  
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    da = DaObject
-();  % Seriously, this nomenclature is ridiculous
+    err=getLogger('anvil');  % Stutter, much?
 end
 
 % Print msg to cmLog

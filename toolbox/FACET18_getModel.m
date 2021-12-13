@@ -211,13 +211,12 @@ if (~getDB&&~exist(dbFile,'file'))
 end
 if (getDB)
   if (hstb)
-    aidainit
     Bps=zeros(Nps,1);
     Ips=zeros(Nps,1);
     for n=1:Nps
       Bps(n)=dbGetHist(pslist{n},tnum);
-      query=strcat(SLCname(pslist{n}),'//IVBU');
-      d=aidaget(query,'doublea');
+      query=strcat(SLCname(pslist{n}),':IVBU');
+      d=num2cell(toArray(pvaGet(query, AIDA_DOUBLE_ARRAY)));
       ivb=fliplr([d{:}]);
       Ips(n)=polyval(ivb,Bps(n));
     end

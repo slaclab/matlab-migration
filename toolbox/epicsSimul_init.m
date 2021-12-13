@@ -21,7 +21,7 @@ function epicsSimul_init(varargin)
 %         Sonya Hoobler, SLAC 17-Apr-2017, Removed obsolete BSY area name
 %                        'BSY0' and added new names 'CLTH' and 'BSYH'
 %         Greg White, SLAC 5-Apr-2016, Added MOTR_ENABLED_STS for FWS
-% 
+%
 
 % --------------------------------------------------------------------
 
@@ -34,9 +34,6 @@ optsdef=struct( ...
     'all',1 ...
 );
 %}
-
-% Make sure Aida is initialized to avoid javaaddpath clearing globals later.
-aidainit;
 
 % Set simulation state.
 epicsSimul_status(1);
@@ -194,14 +191,14 @@ setProp(pvList,props);
 % props={'LOCATIONSTAT' 'OUT'; ...
 %       };
 % setProp(pvList,props);
-% 
+%
 % pvList=[strcat(pvList0([1 1 2 2 3 4 5 5 5]),':',{'X';'Y';'X';'Y';'P';'X';'X';'P';'O'});pvList0(6:7)];
 % props={'DES' 0; ...
 %        'ACT' 0; ...
 %       };
 % setProp(pvList,props,[0 -4 50 0 -30 50 50 0 0 0 0]);
 % %MOTOR.TWV
-% 
+%
 % props={'IN_LIMIT_MPS.SEVR' 0; ...
 %       };
 % setProp(pvList0,props);
