@@ -580,11 +580,11 @@ function facet_li20()
 %     end
 %
 %     try
-%         answer = d.setDaValue('MKB:VAL', ...
-%         edu.stanford.slac.aida.lib.util.common.DaValue(java.lang.Float(phase)));
-%         ansstr = answer.getAsStrings();
-%         new_phase = eval(ansstr(2,:));
-%     catch
+%         answer = pvaSet('MKB:VAL',phase);
+%         answers= answer.get('value');
+%         new_phase = answers(1);
+%     catch e
+%         handleExceptions(e);
 %         disp_log('AIDA error when setting SCAVENGY');
 %     end
 %

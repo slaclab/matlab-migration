@@ -380,7 +380,7 @@ end
 
 % restore energy multiknob
 gui_statusDisp(handles, sprintf('Resetting %s by %.1f', handles.data.knob, -phase_sum));
-requestBuilder.setDaValue(-phase_sum);
+requestBuilder.set(-phase_sum);
 
 % turn feedbacks back on
 lcaPutSmart(fbpv,fbstate);
