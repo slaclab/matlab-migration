@@ -266,7 +266,7 @@ if isStatusBits(mag_name(1:4),mag_name(6:9),str2double(mag_name(11:end)),'hsta',
 end
 
 immostring = strcat(mag_name,':IMMO');
-immo = toArray(da.pvaGet(immostring));
+immo = toArray(pvaGet(immostring));
 
 %If before sector 5 or single LGPS quad supply use trim, otherwise perturb
 if (str2double(mag_name(8:9)) <= 4) || immo(2) == 0
@@ -279,9 +279,9 @@ inData = AidaPvaStruct();
 inData.put('names', { mag_name });
 inData.put('values', { new_bdes });
 
-da = pvaRequest('MAGNETSET:BDES');
-da.with('MAGFUNC', mag_func);
-outData = da.set(inData);
+requestBuilder = pvaRequest('MAGNETSET:BDES');
+requestBuilder.with('MAGFUNC', mag_func);
+outData = requestBuilder.set(inData);
 
 
 function [pos, good, errstring] = getBPMs(bpms, plane, n_averages)

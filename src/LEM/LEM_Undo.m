@@ -76,7 +76,6 @@ if (~isempty(idEPICS))
 
   % first loop ... restore BDES, set CTRL to TRIM
 
-    da.reset
     for m=1:nEPICS
       n=idEPICS(m);
       dbname=PS(n).dbname;

@@ -63,10 +63,10 @@ mytime;
 
 function [values,times] = get_archive_multiple(pvs,start_time,end_time)
 
-da = pvaRequest(pvs);
-da.with('STARTTIME', start_time);
-da.with('ENDTIME', end_time);
-hist = da.get();
+requestBuilder = pvaRequest(pvs);
+requestBuilder.with('STARTTIME', start_time);
+requestBuilder.with('ENDTIME', end_time);
+hist = requestBuilder.get();
 
 %You can extract the data like this:
 

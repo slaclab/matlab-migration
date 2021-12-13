@@ -89,19 +89,15 @@ if any(isMTC)
 end
 
 % Activate/deactivate klystrons.
-global da
-if any(isSet & isSLC & ~isMK2)
-    da.setParam('BEAM',num2str(beamCode(1,1)));
-    if ~any(isTrig), da.setParam('DGRP','LIN_KLYS');end
-end
-
 for j=find(isSet & isSLC & ~isMK2)'
     statj=stat(min(j,end));
     disp(['Trying ' name{j} ' to set to ' num2str(statj)]);
     try
         requestBuilder=pvaRequest([name{j} ':TACT']);
         requestBuilder.with('BEAM', beamCode(1,1));
-        if ~any(isTrig), requestBuilder.with('DGRP', 'LIN_KLYS'); end
+        if ~any(isTrig)
+            requestBuilder.with('DGRP', 'LIN_KLYS');
+        end
         out=requestBuilder.set(statj);
     catch e
         handleExceptions(e, ['Failed to set ' name{j} ' to activation ' num2str(statj)]);

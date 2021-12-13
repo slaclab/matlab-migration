@@ -9,8 +9,8 @@ handles.new_model = 1;
 
 % Get the BSA Names.
 disp('Getting LCLS BSA elements from Aida');
-%v = da.getDaValue('LCLS//BSA.elements.byZ');
-%v = da.getDaValue('LCLS//BSA.PVs.byZ');
+%v = pvaGet('LCLS//BSA.elements.byZ');
+%v = pvaGet('LCLS//BSA.PVs.byZ');
 v = pvaGet([ accelerator ':BSA.PVs.byZ' ] );
 
 % Extract the number of elements

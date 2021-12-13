@@ -49,14 +49,14 @@ function [name,x,y,z,tmit,stat,hsta] = orbitDemo(query, bpmd, n, cnftype, ...
 
 err = getLogger('orbitDemo');
 
-da = pvaRequest(query);
-da.setParam('BPMD',num2str(bpmd));                   % Required parameter
-da.setParam('CNFTYPE',cnftype);
-da.setParam('CNFNUM',num2str(cnfnum));
-da.setParam('N',num2str(n));
-da.setParam('SORTORDER',num2str(sortorder));
+requestBuilder = pvaRequest(query);
+requestBuilder.setParam('BPMD',num2str(bpmd));                   % Required parameter
+requestBuilder.setParam('CNFTYPE',cnftype);
+requestBuilder.setParam('CNFNUM',num2str(cnfnum));
+requestBuilder.setParam('N',num2str(n));
+requestBuilder.setParam('SORTORDER',num2str(sortorder));
 
-v = da.get(query);                   % Acquire BPM data
+v = requestBuilder.get(query);                   % Acquire BPM data
 
 Mbpm = v.size;                  % Number of Bpms
 name = toArray(v.get('name'));

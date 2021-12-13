@@ -13,9 +13,6 @@ function stat=LEM_DbEnergy(opCode,Esecn)
 %
 %   stat = completion status
 
-global da
-da.reset
-
 global lemRegions lemGroups
 global MAGNET
 global theAccelerator

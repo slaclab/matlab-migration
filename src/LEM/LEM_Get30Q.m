@@ -4,9 +4,6 @@ function stat=LEM_Get30Q(scenario)
 
 debug=0;
 
-global da
-da.reset
-
 xalImport
 
 global controlFlags

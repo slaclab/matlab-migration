@@ -63,11 +63,6 @@ E = get_energy_new(1); % get starting energy
 
 % fb1pv = 'KLYS:LI24:11//PDES'; % aida phase for feedback klystron
 % fb2pv = 'KLYS:LI24:21//PDES';
-% aidainit;
-% import java.util.Vector;
-% da = DaObject();
-% da.setParam('BEAM', '1');
-% da.setParam('DGRP', 'LIN_KLYS');
 
 while 1
     pause(delay);
@@ -84,15 +79,15 @@ while 1
         disp_log('Error on PV list read');
         continue
     end
-    
+
     if isempty(newE)
         % errors in get_energy_new return []
         continue
     end
-    
+
     Eold = E;
     E = newE;
-    
+
     % update the "out" pvlist with info from get_energy()
     out = pl_set(out, 'L2 energy',              E.L2_energy);
     out = pl_set(out, 'L3 flat energy',         E.L3_flat_energy);
@@ -142,7 +137,7 @@ while 1
     if any(any(klys_changes))
         %klys_change_namelist = [];
         % TODO make a list of which stations changed
-        disp_log('Klystron complement changed');       
+        disp_log('Klystron complement changed');
         pause(3);
     else
         out = pl_write(out);

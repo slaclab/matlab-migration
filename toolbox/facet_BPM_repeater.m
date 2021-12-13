@@ -37,11 +37,6 @@ end
 bpmd = '57';
 dgrp = 'FACET-II';
 
-% set up AIDA acquisition
-
-da.setParam('BPMD',char(bpmd));
-
-
 % control PV definitions
 pvs.in = {...
     'EVNT:SYS1:1:SCAVRATE'; ...    % ELECEP01 beam rate
@@ -136,7 +131,9 @@ while 1
     t0 = datevec(now);
     try
         acq_ok = 1;
-        data = pvaGet(char(strcat(dgrp, {':BPMS'})));
+        requestBuilder = pvaRequest(char(strcat(dgrp, {':BPMS'})));
+        requestBuilder.with('BPMD',bpmd);
+        data = requestBuilder.get();
     catch
         % zero everything
         acq_ok = 0;

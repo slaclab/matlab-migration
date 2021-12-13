@@ -62,13 +62,13 @@ namel = [name ':HIST.facet'];
 disp 'Acquisition begins.'
 
 try
-    da = pvaRequest(namel);
-    da.with('STARTTIME', starttime);
-    da.with('ENDTIME', endtime);
+    requestBuilder = pvaRequest(namel);
+    requestBuilder.with('STARTTIME', starttime);
+    requestBuilder.with('ENDTIME', endtime);
     if density
-        da.with('DENSITY','NORMAL');
+        requestBuilder.with('DENSITY','NORMAL');
     end
-    hist = da.get();
+    hist = requestBuilder.get();
     disp ('Acquisition ends successfully');
 catch e
     handleExceptions(e);

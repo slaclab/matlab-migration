@@ -235,9 +235,6 @@ end
 
 function [bmin,bmax]=LEM_MagnetLimits(epics,dbname)
 
-global da
-da.reset
-
 if (epics)
   Query=strcat(dbname,':BMIN:VAL');
   try

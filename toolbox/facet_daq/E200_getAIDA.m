@@ -7,12 +7,12 @@ try
 
     aida_command = [ dgrp ':BUFFACQ' ];
 
-    da = pvaRequest(aida_command);
-    da.with('BPMD', getBPMD(dgrp));
-    da.with('NRPOS', nrpos);
-    da.with('BPMS', device_list);
+    requestBuilder = pvaRequest(aida_command);
+    requestBuilder.with('BPMD', getBPMD(dgrp));
+    requestBuilder.with('NRPOS', nrpos);
+    requestBuilder.with('BPMS', device_list);
 
-    vDeviceData = da.get();
+    vDeviceData = requestBuilder.get();
     disp(['FINITA! ' datestr(clock,'HH:MM:SS')]);
 
     names = vDeviceData.get('name');

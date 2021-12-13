@@ -35,13 +35,13 @@ startTime = timeRange{1};
 endTime = timeRange{2};
 timeString = '';
 
-da = pvaRequest([ waveformPV ':HIST.lcls']);
-da.with('STARTTIME', startTime);
-da.with('ENDTIME',  endTime);
-da.with('DATEFORMAT', 'MMDDYYYY_FRAC');
+requestBuilder = pvaRequest([ waveformPV ':HIST.lcls']);
+requestBuilder.with('STARTTIME', startTime);
+requestBuilder.with('ENDTIME',  endTime);
+requestBuilder.with('DATEFORMAT', 'MMDDYYYY_FRAC');
 
 %Get the value
-valueHist = da.get();
+valueHist = requestBuilder.get();
 
 pts = valueHist.size;
 if(pts==0),

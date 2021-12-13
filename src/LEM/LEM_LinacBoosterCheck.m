@@ -4,9 +4,6 @@ function stat=LEM_LinacBoosterCheck()
 
 debug=0;
 
-global da
-da.reset
-
 global MAGNET PS
 
 % set up list of micros

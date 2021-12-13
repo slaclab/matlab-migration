@@ -29,10 +29,6 @@ klys2_pv = 'ACCL:LI24:200:KLY_PDES';
 % pause(2);
 % aidainit;
 % pause(2);
-% import java.util.Vector;
-% da = DaObject();
-% da.setParam('BEAM', '1');
-% da.setParam('DGRP', 'LIN_KLYS');
 %
 %
 % pmdl_phase_raw = pvaGet('SBST:LI24:1:PMDL', AIDA_DOUBLE);

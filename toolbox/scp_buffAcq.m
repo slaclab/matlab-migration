@@ -33,18 +33,18 @@ bpms = reshape(cellstr(bpms), 1, []);
 
 % set up aida query
 
-da = pvaRequest(strcat(char(dgrp), ':BUFFACQ'));
-da.with('BPMD', bpmd);
-da.with('NRPOS', num);
+requestBuilder = pvaRequest(strcat(char(dgrp), ':BUFFACQ'));
+requestBuilder.with('BPMD', bpmd);
+requestBuilder.with('NRPOS', num);
 convertedBpms
 for ix = 1:numel(bpms)
     convertedBpms(ix) = model_nameConvert(bpms(ix), 'SLC');
 end
-da.with('BPMD', convertedBpms);
+requestBuilder.with('BPMD', convertedBpms);
 
 % call AIDA
 try
-    buffdata = da.get();
+    buffdata = requestBuilder.get();
 catch e
     handleExceptions(e);
     [x, y, tmit, pulseid] = deal(nan(num, numel(bpms)));
