@@ -567,7 +567,7 @@ requestBuilder = pvaRequest('MKB:VAL');
 requestBuilder.with('MKB',handles.knob);
 
 CurrentNullPhase=lcaGetSmart('TCAV:LI20:2400:0:POC');
-PhaseRampSet = DaValue(java.lang.Float(handles.knobDelta));
+PhaseRampSet = handles.knobDelta;
 XTCAV_OFFSET=-handles.knobDelta*4;
 NewNullPhase=CurrentNullPhase+XTCAV_OFFSET;
 answer = requestBuilder.set(PhaseRampSet);

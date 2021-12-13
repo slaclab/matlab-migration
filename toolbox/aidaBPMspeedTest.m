@@ -3,7 +3,7 @@ function aidaBPMspeedTest()
 [sys,accelerator]=getSystem();
 rate_pv = ['EVNT:' sys ':1:' accelerator 'BEAMRATE'];
 count = 0;
-pause_time = 1; % seconds between each getDaValue
+pause_time = 1; % seconds between each pvaGet
 
 Logger = getLogger('Aida BPM Speed Test');
 put2log(sprintf('Aida BPM Speed test started, interval = %.0f second(s)', pause_time));

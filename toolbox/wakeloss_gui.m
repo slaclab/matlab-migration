@@ -491,7 +491,7 @@ end
 if abort
     % restore phase knob
     if handles.config.isMKB
-        requestBuilder.set(DaValue(-1 * pchange));
+        requestBuilder.set(-1 * pchange);
     elseif handles.config.isSLC
         daslc = pvaRequest(sprintf('%s:%s:%s:%s', char(m), char(p), char(u), char(s)));
         pact = daslc.set(pdes0);

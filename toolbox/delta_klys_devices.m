@@ -110,7 +110,7 @@ for j=1:length(unit),
   catch e
 %    warndlg('Unknown error caught on phase set in "delta_klys_devices.m" - may not be a real problem.','da.setDaValue error');
     handleExceptions(e, 'Unknown error caught on phase set in "delta_klys_devices.m" - may not be a real problem.')
-    put2log('Unknown error caught on phase set in "delta_klys_devices.m" - may not be a real problem. - da.setDaValue error');
+    put2log('Unknown error caught on phase set in "delta_klys_devices.m" - may not be a real problem.');
     merr = lasterror;
     merr.message
     iok = 0;

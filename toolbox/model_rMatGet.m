@@ -251,7 +251,7 @@ try
     o = pvaGet(name);
     len = o.size;
 catch
-    put2log(sprintf('Aida getDaValue(%s) failure in function getLen(%s).',name,name));
+    put2log(sprintf('Aida pvaGet(%s) failure in function getLen(%s).',name,name));
 end
 if ~strcmp(class(len),'double')
     len=len.getDouble;
@@ -305,7 +305,7 @@ try
 catch
     [nameEpics,pos,nameMad]=deal(cell(0,1));
     [r,zPos]=deal(zeros(0,1));
-    put2log(sprintf('Aida getDaValue(%s) failure in function getAllR.',['modelRmats:' type '.' name]));
+    put2log(sprintf('Aida pvaGet(%s) failure in function getAllR.',['modelRmats:' type '.' name]));
 end
 r=permute(reshape(r,6,6,[]),[2 1 3]);
 
@@ -367,7 +367,7 @@ try
 catch
     [nameEpics,pos,nameMad]=deal(cell(0,1));
     [twiss,lEff,zPos]=deal(zeros(0,1));
-    put2log(sprintf('Aida getDaValue(%s) failure in function getAllTwiss.',['modelTwiss:' type '.' name]));
+    put2log(sprintf('Aida pvaGet(%s) failure in function getAllTwiss.',['modelTwiss:' type '.' name]));
 end
 
 
