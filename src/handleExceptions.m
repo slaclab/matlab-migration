@@ -11,5 +11,5 @@ function handleExceptions(e, varargin)
         reason = sprintf('%s: %s', sprintf(varargin{1}, varargin{2:end}), reason);
     end
     disp (reason);
-    error(reason);
+%    error(reason);
 end
