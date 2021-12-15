@@ -24,7 +24,7 @@ if ( ~isempty(strfind(epicsActs{1,1}, 'XCOR')) || ~isempty(strfind(epicsActs{1,1
 
 
    for i=1:numactPVs
-      tws = toArray(pvaGet([epicsActs{i,1},':twiss'], AIDA_DOUBLE_ARRAY));
+      tws = pvaGetM([epicsActs{i,1},':twiss'], AIDA_DOUBLE_ARRAY);
       energy(i) = cell2mat(tws(1));
    end
 

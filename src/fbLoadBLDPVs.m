@@ -24,7 +24,7 @@ fmatrix = pinv(rmatrix);
 % now get dispersion values
 dspr_BPMs = {'BPMS:LTU1:250'; 'BPMS:LTU1:450' };
 for i=1:2
-  tws = toArray(pvaGet([dspr_BPMs{i,1}, ':twiss'], AIDA_DOUBLE_ARRAY)); % get value from aida Model
+  tws = pvaGetM([dspr_BPMs{i,1}, ':twiss'], AIDA_DOUBLE_ARRAY); % get value from aida Model
   dspr(i) = cell2mat(tws(5))*1000;
 end
 %lcaPut(dispersionPVs, dspr);

@@ -82,7 +82,7 @@ if isempty(aidapvainitdone)
 
     pvaRequest = @(channel) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaRequest(channel);
     pvaSet = @(channel, value) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaSet(channel, value);
-    pvaUnpack = @(response) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaUnpack(response);
+    pvaSetM = @(channel, value) ML(edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaSet(channel, value));
     AidaPvaStruct = @() edu.stanford.slac.aida.client.AidaPvaClientUtils.newStruct();
 
     aidapvainitdone = 1;
