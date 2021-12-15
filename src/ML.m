@@ -23,6 +23,7 @@ function [ matlabResult ] = ML( pvaResult )
         else
             matlabResult.descriptions = [];
         end
+        matlabResult.fieldnames = toArray(pvaResult.fieldNames);
         matlabResult.values = [];
         for fieldNumber = 1:pvaResult.fieldNames.length
             fieldName = pvaResult.fieldNames(fieldNumber);
