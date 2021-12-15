@@ -1,15 +1,15 @@
 function [ matlabResult ] = ML( pvaResult )
     % Unpack using java first if this is still a PVStructure
-    if ( strcmp(class(pvaResult), 'org.epics.pvdata.factory.BasePVStructure'))
+    if ( isa(pvaResult, 'org.epics.pvdata.factory.BasePVStructure'))
         pvaResult = edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaUnpack(pvaResult);
     end
 
     % If this is a Java array then convert to a matlab array and return
-    if (strcmp(class(pvaResult), 'java.lang.Object[]'))
+    if (isa(pvaResult, 'java.lang.Object[]'))
         matlabResult = toArray(pvaResult);
 
     % If this is a PvaTable then convert to a matlab structure
-    elseif ( strcmp(class(pvaResult), 'edu.stanford.slac.aida.client.PvaTable'))
+    elseif ( isa(pvaResult, 'edu.stanford.slac.aida.client.PvaTable'))
         matlabResult = struct;
         matlabResult.size = pvaResult.size.intValue;
         matlabResult.labels = toArray(pvaResult.labels);
@@ -31,28 +31,28 @@ function [ matlabResult ] = ML( pvaResult )
         end
 
     % A java type will never be returned but we keep these just in case
-    elseif (strcmp(class(pvaResult), 'java.lang.Byte'))
+    elseif (isa(pvaResult, 'java.lang.Byte'))
         matlabResult = pvaResult.byteValue;
 
-    elseif (strcmp(class(pvaResult), 'java.lang.Boolean'))
+    elseif (isa(pvaResult, 'java.lang.Boolean'))
         matlabResult = pvaResult.booleanValue;
 
-    elseif (strcmp(class(pvaResult), 'java.lang.Short'))
+    elseif (isa(pvaResult, 'java.lang.Short'))
         matlabResult = pvaResult.shortValue;
 
-    elseif (strcmp(class(pvaResult), 'java.lang.Integer'))
+    elseif (isa(pvaResult, 'java.lang.Integer'))
         matlabResult = pvaResult.intValue;
 
-    elseif (strcmp(class(pvaResult), 'java.lang.Long'))
+    elseif (isa(pvaResult, 'java.lang.Long'))
         matlabResult = pvaResult.longValue;
 
-    elseif (strcmp(class(pvaResult), 'java.lang.Float'))
+    elseif (isa(pvaResult, 'java.lang.Float'))
         matlabResult = pvaResult.floatValue;
 
-    elseif (strcmp(class(pvaResult), 'java.lang.Double'))
+    elseif (isa(pvaResult, 'java.lang.Double'))
         matlabResult = pvaResult.doubleValue;
 
-    elseif (strcmp(class(pvaResult), 'java.lang.String'))
+    elseif (isa(pvaResult, 'java.lang.String'))
         matlabResult = char(pvaResult) ;
 
     else
