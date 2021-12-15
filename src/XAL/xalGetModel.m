@@ -94,7 +94,7 @@ if (syncMode>1)
   requestBuilder = pvaRequest(query);
   requestBuilder.with('MODE', 5);
   requestBuilder.returning(AIDA_FLOAT_ARRAY);
-  Twissi=requestBuilder.get();
+  Twissi=ML(requestBuilder.get());
   Twissi=Twissi(2:end);
 
 % ... and provide abort opportunity

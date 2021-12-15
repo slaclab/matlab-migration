@@ -68,15 +68,15 @@ try
     if density
         requestBuilder.with('DENSITY','NORMAL');
     end
-    hist = requestBuilder.get();
+    hist = ML(requestBuilder.get());
     disp ('Acquisition ends successfully');
 catch e
     handleExceptions(e);
 end
 
 pts = hist.size;
-values1 = toArray(hist.get('values'));
-times1 = toArray(hist.get('times'));
+values1 = hist.values.values;
+times1 = hist.values.times;
 
 if show_plot==1
   egu = lcaGet([name '.EGU']);

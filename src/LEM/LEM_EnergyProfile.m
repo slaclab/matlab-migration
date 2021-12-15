@@ -175,7 +175,8 @@ for n=1:kCount
         requestBuilder = pvaRequest(statQuery);
         requestBuilder.with('BEAM', BEAM);
         requestBuilder.with('DGRP', DGRP);
-        stat = requestBuilder.returning(AIDA_STRING);
+        requestBuilder.returning(AIDA_STRING);
+        stat = ML(requestBuilder.get());
         ampl = pvaGet(amplQuery, AIDA_DOUBLE);
 
       if (isempty(phasQuery))

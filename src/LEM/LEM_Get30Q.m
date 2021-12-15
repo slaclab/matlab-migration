@@ -37,8 +37,8 @@ for n=1:length(id)
 % get QTRM IVBU polynomial
 
   Query=strcat(strrep(dbname(n,:),'QUAD','QTRM'),':IVBU');
-  d=pvaGet(Query);
-  ivb=flipud(toArray(d));
+  d=ML(pvaGet(Query));
+  ivb=flipud(d);
 
 % compute QTRM current
 
@@ -49,8 +49,8 @@ for n=1:length(id)
 % get QUAD IVBU polynomial
 
   Query=strcat(dbname(n,:),':IVBU');
-  d=pvaGet(Query);
-  ivb=flipud(toArray(d));
+  d=ML(pvaGet(Query));
+  ivb=flipud(d);
 
 % compute QUAD current
 

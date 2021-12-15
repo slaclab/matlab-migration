@@ -52,7 +52,7 @@ for sector = 20:30
             requestBuilder.returning(AIDA_SHORT);
             requestBuilder.with('BEAM',1);
             requestBuilder.with('DGRP','LIN_KLYS');
-            out.klystrons.act(sector,station) = requestBuilder.get();
+            out.klystrons.act(sector,station) = ML(requestBuilder.get());
         catch e
             handleExceptions(e)
         end

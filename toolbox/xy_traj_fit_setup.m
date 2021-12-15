@@ -29,7 +29,7 @@ for j = 1:nbpms
     requestBuilder = pvaRequest({[prim0 ':' micr0 ':' int2str(unit0) ':R']});
     requestBuilder.returning(AIDA_DOUBLE_ARRAY);
     requestBuilder.with('B', ['BPMS:' BPM_micrs(j,:) ':' int2str(BPM_units(j))]);
-    R        = requestBuilder.get();
+    R        = ML(requestBuilder.get());
   catch e
     handleExceptions(e);
     errordlg('Fatal error on AIDAGET for database R-matrices.','AIDAGET ERROR');

@@ -152,12 +152,12 @@ if handles.online
   requestBuilder = pvaRequest('BPMS:LTU1:250:twiss');
   requestBuilder.returning(AIDA_DOUBLE_ARRAY);
   requestBuilder.with('TYPE','DESIGN');
-  twiss(:,1) = toArray(requestBuilder.get());
+  twiss(:,1) = ML(requestBuilder.get());
 
   requestBuilder = pvaRequest('BPMS:LTU1:450:twiss');
   requestBuilder.returning(AIDA_DOUBLE_ARRAY);
   requestBuilder.with('TYPE','DESIGN');
-  twiss(:,2) = toArray(requestBuilder.get());
+  twiss(:,2) = ML(requestBuilder.get());
 
   twiss = cell2mat(twiss);
   handles.dl2_eta = twiss(5,:)*1000;

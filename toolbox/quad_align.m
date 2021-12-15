@@ -466,7 +466,7 @@ for j = 1:length(all_quad)
                 requestBuilder = pvaRequest({[all_quad_SLC{j} ':R']});
                 requestBuilder.returning(AIDA_DOUBLE_ARRAY);
                 requestBuilder.with('B',all_bpm_SLC{i});
-                R = toArray(requestBuilder.get());
+                R = ML(requestBuilder.get());
             catch
                 disp(sprintf('aidaget failure for %s:R', all_quad_SLC{j}));
             end
@@ -481,9 +481,9 @@ end
 
 for i=1:length(all_quad_SLC)
     try
-        twiss = cell2mat(aidaget([all_quad_SLC{i} ':twiss'],'doublea'));
+        twiss = cell2mat(pvaGetM([all_quad_SLC{i} ':twiss'],AIDA_DOUBLE_ARRAY));
     catch
-        disp(sprintf('aidaget failure for %s:twiss', all_quad_SLC{i}));
+        disp(sprintf('pvaGet failure for %s:twiss', all_quad_SLC{i}));
     end
     en_quad(i)=twiss(1)*1000;
 end

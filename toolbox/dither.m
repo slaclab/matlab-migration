@@ -287,9 +287,9 @@ switch conf.signal.type
         bpmroot = sprintf('%s:%s:%s', char(p), char(m), char(u));
 
         ds = pvaRequest([ dgrp ':BUFFACQ' ]);
-        ds.setParam('NRPOS', conf.signal.samples);
-        ds.setParam('BPMD', bpmd);
-        ds.setParam('DEV1', bpmroot);
+        ds.with('NRPOS', conf.signal.samples);
+        ds.with('BPMD', bpmd);
+        ds.with('DEVS', { bpmroot });
 
         % map columns from aida buffacq data to devices
         % http://www.slac.stanford.edu/grp/cd/soft/aida/slcBuffDpGuide.html
@@ -422,14 +422,14 @@ while ~abort
                 end
 
             case 2 % SLC BPM
-                dsdata = pvaGet(sprintf('%s:BUFFACQ', dgrp));
+                dsdata = pvaGetM(sprintf('%s:BUFFACQ', dgrp));
                 switch n
                     case 3
-                        data(ix, :) = reshape(cell2mat(cell(toArray(dsdata.get('x')))),[],1);
+                        data(ix, :) = reshape(cell2mat(cell(dsdata.values.x)),[],1);
                     case 4
-                        data(ix, :) = reshape(cell2mat(cell(toArray(dsdata.get('y')))),[],1);
+                        data(ix, :) = reshape(cell2mat(cell(dsdata.values.y)),[],1);
                     case 5
-                        data(ix, :) = reshape(cell2mat(cell(toArray(dsdata.get('tmit')))),[],1);
+                        data(ix, :) = reshape(cell2mat(cell(dsdata.values.tmit)),[],1);
                 end
             otherwise
         end

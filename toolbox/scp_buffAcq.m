@@ -44,7 +44,7 @@ requestBuilder.with('BPMD', convertedBpms);
 
 % call AIDA
 try
-    buffdata = requestBuilder.get();
+    buffdata = ML(requestBuilder.get());
 catch e
     handleExceptions(e);
     [x, y, tmit, pulseid] = deal(nan(num, numel(bpms)));
@@ -53,8 +53,8 @@ catch e
 end
 
 % extract java stuff to matlab and reformat arrays
-pulseid = flipdim(reshape(toArray(buffdata.get('id')), num, numel(bpms)), 2);
-x = flipdim(reshape(toArray(buffdata.get('x')), num, numel(bpms)), 2);
-y = flipdim(reshape(toArray(buffdata.get(3)), num, numel(bpms)), 2);
-tmit = flipdim(reshape(toArray(buffdata.get(4)), num, numel(bpms)), 2);
-good = flipdim(reshape(toArray(buffdata.get(6)), num, numel(bpms)), 2);
+pulseid = flipdim(reshape(buffdata.values.pulsId, num, numel(bpms)), 2);
+x = flipdim(reshape(buffdata.values.x, num, numel(bpms)), 2);
+y = flipdim(reshape(buffdata.values.y, num, numel(bpms)), 2);
+tmit = flipdim(reshape(buffdata.values.tmit, num, numel(bpms)), 2);
+good = flipdim(reshape(buffdata.values.goodmeas, num, numel(bpms)), 2);

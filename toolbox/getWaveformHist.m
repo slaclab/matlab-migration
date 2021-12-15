@@ -41,7 +41,7 @@ requestBuilder.with('ENDTIME',  endTime);
 requestBuilder.with('DATEFORMAT', 'MMDDYYYY_FRAC');
 
 %Get the value
-valueHist = requestBuilder.get();
+valueHist = ML(requestBuilder.get());
 
 pts = valueHist.size;
 if(pts==0),
@@ -52,27 +52,27 @@ end
 
 % Make it usable
 
-value = toArray(valueHist.get('values'));
+value = valueHist.value.values;
 
 % Get wavefrom info
 
-waveformCount = toArray(valueHist.get('waveformCount'));
+waveformCount = valueHist.value.waveformCount;
 nWaveforms = waveformCount.length;
 nWavePts = waveformCount(1);
 value = reshape(value, nWavePts, nWaveforms);
 
 % Process time
-time = toArray(valueHist.get('times'));
+time = valueHist.value.times;
 %Account for Daylight savigns times
 try
-    isdst = toArray(valueHist.get('isdst'));
+    isdst = valueHist.value.isdst;
 catch
     fprintf('Warning: no DST/PST flag from Archiver data time may be off by 1 hour\n');
     isdst = ones(size(time));
 end
 
 %Add tenth of seconds value from timeString.
-timeString = toArray(valueHist.get('timeString'));
+timeString = valueHist.value.timeString;
 tenthSec = str2num(timeString(:,end-1:end)) / 100/24/60/60; %#ok<ST2NM>
 time = time + tenthSec;
 

@@ -109,7 +109,6 @@ handles.pv_list = {
                     'LASR:IN20:1:LSR_P_FB_PND'   0
                     'LASR:IN20:1:LSR_P_FB_PND'   0
                     'LASR:IN20:1:LSR_SEND'       0
-                    'LASR:IN20:1:LSR_SEND'       0
                     'LASR:IN20:1:LSR_S_PS'       0
                                             };
 handles.klys_pv_list = {

@@ -206,8 +206,8 @@ set(hObject, 'String', oldstr);
 function val = dith(requestBuilder, handles, stepsize)
 
 try
-    answer = requestBuilder.set(stepsize);
-    values = toArray(answer.get('value'));
+    answer = ML(requestBuilder.set(stepsize));
+    values = answer.values.value;
     val = mean(values);
 catch
     gui_statusDisp(handles, strcat('AIDA Error setting ', handles.knob));

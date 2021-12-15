@@ -9,14 +9,14 @@ function root_names = getBSAnames(arg)
 [ system, accelerator ] = getSystem;
 
 if ~isequal(accelerator,'LCLS') || ((nargin > 0) && isfield(arg,'aida'))
-    v = pvaGet([ accelerator ':BSA.rootnames' ]);
+    v = pvaGetM([ accelerator ':BSA.rootnames' ]);
     remove_slc = 0;
     if nargin == 1
         if isfield(arg,'epics')
             remove_slc = 1;
         end
     end
-    root_names = v.get('name');
+    root_names = v.values.name;
     if remove_slc
         pared_root_names = cell(0);
         for i = 1 : length(root_names)

@@ -81,16 +81,16 @@ if 0
             bpmd, aida_command));
         d = pvaRequest(aida_command);
         d.with(BPMD, 56);
-        vBPMS = d.get();
+        vBPMS = ML(d.get());
 
         nBPMS = vBPMS.size;
-        name = toArray(vBPMS.get('name'));
-        hsta = toArray(vBPMS.get('hsta'));
-        stat = toArray(vBPMS.get('stat'));
-        x = toArray(vBPMS.get('x'));
-        y = toArray(vBPMS.get('y'));
-        z = toArray(vBPMS.get('z'));
-        tmit = toArray(vBPMS.get('tmits'));
+        name = vBPMS.values.name;
+        hsta = vBPMS.values.hsta;
+        stat = vBPMS.values.stat;
+        x = vBPMS.values.x;
+        y = vBPMS.values.y;
+        z = vBPMS.values.z;
+        tmit = vBPMS.values.tmits;
         put2log('Aida ok');
         % plot
         subplot(3,1,1), plot(z,x), title ([aida_command ' ' bpmd]), ylabel('x (mm)');

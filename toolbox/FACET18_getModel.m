@@ -216,7 +216,7 @@ if (getDB)
     for n=1:Nps
       Bps(n)=dbGetHist(pslist{n},tnum);
       query=strcat(SLCname(pslist{n}),':IVBU');
-      d=num2cell(toArray(pvaGet(query, AIDA_DOUBLE_ARRAY)));
+      d=num2cell(pvaGetM(query, AIDA_DOUBLE_ARRAY));
       ivb=fliplr([d{:}]);
       Ips(n)=polyval(ivb,Bps(n));
     end

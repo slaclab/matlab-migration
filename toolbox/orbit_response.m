@@ -203,7 +203,7 @@ for j = 1:length(all_bpm)
 end
 
 for j = 1:length(all_corrx)
-    corrx_pos(j)    = aidaget([all_corrx_SLC{j} ':Z'])-2015;
+    corrx_pos(j)    = pvaGet([all_corrx_SLC{j} ':Z'])-2015;
     for i=1:length(all_bpm_SLC)
         if bpm_pos(i)<corrx_pos(j)
             RespMatH(i,j)=0;
@@ -211,7 +211,7 @@ for j = 1:length(all_corrx)
             requestBuilder = pvaRequest({[all_corrx_SLC{j} ':R']});
             requestBuilder.returning(AIDA_DOUBLE_ARRAY);
             requestBuilder.with('B',all_bpm_SLC{i});
-            R        = toArray(requestBuilder.get());
+            R        = ML(requestBuilder.get());
             Rm       = reshape(R,6,6);
             Rm = cell2mat(Rm)';
             RespMatH(i,j)=Rm(1,2);
@@ -220,12 +220,15 @@ for j = 1:length(all_corrx)
 end
 
 for j = 1:length(all_corry)
-    corry_pos(j)    = aidaget([all_corry_SLC{j} ':Z'])-2015;
+    corry_pos(j)    = pvaGet([all_corry_SLC{j} ':Z'])-2015;
     for i=1:length(all_bpm_SLC)
         if bpm_pos(i)<corry_pos(j)
             RespMatV(i,j)=0;
         else
-            R        = aidaget({[all_corry_SLC{j} ':R']},'doublea',{['B=' all_bpm_SLC{i}]});
+            requestBuilder = pvaRequest({[all_corry_SLC{j} ':R']});
+            requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+            requestBuilder.with('B',all_bpm_SLC{i});
+            R        = ML(requestBuilder.get());
             Rm       = reshape(R,6,6);
             Rm = cell2mat(Rm)';
             RespMatV(i,j)=Rm(3,4);
@@ -236,12 +239,12 @@ end
 
 
 for i=1:length(all_corrx_SLC)
-    twiss = cell2mat(aidaget([all_corrx_SLC{i} ':twiss'],'doublea'));
+    twiss = cell2mat(pvaGetM([all_corrx_SLC{i} ':twiss'],AIDA_DOUBLE_ARRAY));
     en_corrx(i)=twiss(1)*1000;
 end
 
 for i=1:length(all_corry_SLC)
-    twiss = cell2mat(aidaget([all_corry_SLC{i} ':twiss'],'doublea'));
+    twiss = cell2mat(pvaGetM([all_corry_SLC{i} ':twiss'],AIDA_DOUBLE_ARRAY));
     en_corry(i)=twiss(1)*1000;
 end
 %

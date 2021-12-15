@@ -222,7 +222,7 @@ end
         singleWireVal = [];
         try
             for ii = 1:length(singleWireAidaList)
-                v = pvaGet(singleWireAidaList{ii});
+                v = pvaGetM(singleWireAidaList{ii});
                 singleWireVal = [singleWireVal, v.get(7)];
             end
 

@@ -341,10 +341,11 @@ end
 gui_statusDisp(handles, 'Setting up AIDA...');
 
 % create aida control object
-requestBuilder = pvaRequest('MKB:VAL');
 if handles.config.isMKB
+    requestBuilder = pvaRequest('MKB:VAL');
     requestBuilder.with('MKB', strcat('mkb:', handles.config.setup_name));
 elseif handles.config.isSLC
+    requestBuilder = pvaRequest(sprintf('%s:%s:%s//%s', char(m), char(p), char(u), char(s)));
     requestBuilder.with('TRIM', 'YES');
 end
 
@@ -410,9 +411,8 @@ for ix = 1:handles.config.nstep
        pact = requestBuilder.set(handles.data.deltas(ix));
        handles.data.pact(ix) = handles.data.pdes(ix);
     elseif handles.config.isSLC
-       daslc = pvaRequest(sprintf('%s:%s:%s:%s', char(m), char(p), char(u), char(s)));
-       pact = daslc.set(pdes0); %% Original code has a bug in it so this is just a guess
-       handles.data.pact(ix) = double(java.lang.Float(pact));
+       pact = requestBuilder.set(pdes0); % TODO Original code has a bug in it so this is just a guess
+       handles.data.pact(ix) = pact;     % TODO Original code expected a float return value from set but that is not possible so this needs checking
     end
 
     pchange = pchange + handles.data.deltas(ix);
@@ -493,8 +493,7 @@ if abort
     if handles.config.isMKB
         requestBuilder.set(-1 * pchange);
     elseif handles.config.isSLC
-        daslc = pvaRequest(sprintf('%s:%s:%s:%s', char(m), char(p), char(u), char(s)));
-        pact = daslc.set(pdes0);
+        pact = requestBuilder.set(pdes0);
     end
 
     gui_statusDisp(handles, 'Acquisition aborted.');
@@ -508,8 +507,7 @@ else
     if handles.config.isMKB
         requestBuilder.set(handles.data.deltas(end));
     elseif handles.config.isSLC
-        daslc = pvaRequest(sprintf('%s:%s:%s:%s', char(m), char(p), char(u), char(s)));
-        pact = daslc.set(pdes0);
+        pact = requestBuilder.set(pdes0);
     end
 
     gui_statusDisp(handles, 'Acquisition finished.');

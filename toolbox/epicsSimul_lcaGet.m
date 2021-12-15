@@ -15,7 +15,7 @@ if epicsUseAida
             str=strrep(pvList{j},'.',':');
         end
         try
-            val(j,:)=toArray(pvaGet(str,AIDA_DOUBLE_ARRAY));
+            val(j,:)=pvaGetM(str,AIDA_DOUBLE_ARRAY);
         catch
             val(j,:)={NaN};
         end

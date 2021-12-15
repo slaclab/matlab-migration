@@ -66,10 +66,10 @@ function [values,times] = get_archive_multiple(pvs,start_time,end_time)
 requestBuilder = pvaRequest(pvs);
 requestBuilder.with('STARTTIME', start_time);
 requestBuilder.with('ENDTIME', end_time);
-hist = requestBuilder.get();
+hist = ML(requestBuilder.get());
 
 %You can extract the data like this:
 
 pts = hist.size;
-values = toArray(hist.get('values'));
-times = toArray(hist.get('times'));
+values = hist.values.values;
+times = hist.values.times;

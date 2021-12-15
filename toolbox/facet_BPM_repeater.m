@@ -133,7 +133,7 @@ while 1
         acq_ok = 1;
         requestBuilder = pvaRequest(char(strcat(dgrp, {':BPMS'})));
         requestBuilder.with('BPMD',bpmd);
-        data = requestBuilder.get();
+        data = ML(requestBuilder.get());
     catch
         % zero everything
         acq_ok = 0;
@@ -157,11 +157,11 @@ while 1
     % extract BPM data from java into matlab
 
     if acq_ok
-        outvals((nbpms * 0) + (1:nbpms)) = toArray(data.get('x'));
-        outvals((nbpms * 1) + (1:nbpms)) = toArray(data.get('y'));
-        outvals((nbpms * 2) + (1:nbpms)) = toArray(data.get('tmits'));
-        outvals((nbpms * 3) + (1:nbpms)) = toArray(data.get('hsta'));
-        outvals((nbpms * 4) + (1:nbpms)) = toArray(data.get('stat'));
+        outvals((nbpms * 0) + (1:nbpms)) = data.values.x;
+        outvals((nbpms * 1) + (1:nbpms)) = data.values.y;
+        outvals((nbpms * 2) + (1:nbpms)) = data.values.tmits;
+        outvals((nbpms * 3) + (1:nbpms)) = data.values.hsta;
+        outvals((nbpms * 4) + (1:nbpms)) = data.values.stat;
     end
 
     try

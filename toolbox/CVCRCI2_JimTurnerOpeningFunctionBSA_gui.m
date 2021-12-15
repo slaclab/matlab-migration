@@ -11,14 +11,14 @@ handles.new_model = 1;
 disp('Getting LCLS BSA elements from Aida');
 %v = pvaGet('LCLS//BSA.elements.byZ');
 %v = pvaGet('LCLS//BSA.PVs.byZ');
-v = pvaGet([ accelerator ':BSA.PVs.byZ' ] );
+v = pvaGetM([ accelerator ':BSA.PVs.byZ' ] );
 
 % Extract the number of elements
 Mrows = v.size;
 
 % Extract just the element names and Z positions.
-root_name = toArray(v.get('name'));
-z_positions = toArray(v.get('z'));
+root_name = v.values.name;
+z_positions = v.values.z;
 
 %Eliminate SLC database stuff and other unnecessary variables
 

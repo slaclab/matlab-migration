@@ -18,7 +18,7 @@ requestBuilder = pvaRequest([ dev0 ':R']);
 requestBuilder.returning(AIDA_DOUBLE_ARRAY);
 for j = 2:nXs	% get all Rmats from dev0 to 2nd & 3rd x-BPMs
   requestBuilder.with('B',bpm_XPVs{j,1});
-  R = reshape(toArray(requestBuilder.get()),6,6)';
+  R = reshape(ML(requestBuilder.get()),6,6)';
   R1s(j,:) = [R(1,1) R(1,2)];
 end
 

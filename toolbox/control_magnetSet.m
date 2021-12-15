@@ -234,8 +234,8 @@ requestBuilder.with('MAGFUNC', func);
 requestBuilder.with('LIMITCHECK', 'SOME');
 
 try
-    out=requestBuilder.set(in);
-    val=toArray(out.get('value'));
+    out=ML(requestBuilder.set(in));
+    val=out.values.value;
 catch e
     handleExceptions(e, 'Aida error trimming %s ... %s', name{unique([1 end])});
     val=nan(size(name));

@@ -23,17 +23,17 @@ while 1
         requestBuilder.with('N', 1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         tic;
-        vBPMS = requestBuilder.get();
+        vBPMS = ML(requestBuilder.get());
         count = count + 1;
         t(count) = toc;
         nBPMS = vBPMS.size;
-        name = toArray(vBPMS.get('name'));
-        hsta = toArray(vBPMS.get('hsta'));
-        stat = toArray(vBPMS.get('stat'));
-        x = toArray(vBPMS.get('x'));
-        y = toArray(vBPMS.get('y'));
-        z = toArray(vBPMS.get('z'));
-        tmit = toArray(vBPMS.get('tmits'));
+        name = vBPMS.values.name;
+        hsta = vBPMS.values.hsta;
+        stat = vBPMS.values.stat;
+        x = vBPMS.values.x;
+        y = vBPMS.values.y;
+        z = vBPMS.values.z;
+        tmit = vBPMS.values.tmits;
 
         % plot
         title_s = sprintf('%s %s time(%d)=%.2fs time_{avg}=%.2fs time_{min}=%.2fs time_{max}=%.2fs', ...

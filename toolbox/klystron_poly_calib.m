@@ -1440,8 +1440,9 @@ on_scp = strcmp(micro,'KLYS') || strcmp(micro,'SBST');
 %if it is 1 then it is on scp
 if on_scp == 1
     [process_variable,a] = control_klysName(handles.process_variable);
-    old_FEMN = pvaGet(strcat(process_variable,':FEMN'), AIDA_BOOLEAN);
-    pvaSet(strcat(process_variable,':FEMN'), true);
+    response = pvaGetM(strcat(process_variable,':FEMN'));
+    old_FEMN = response(1);
+    pvaSet(strcat(process_variable,':FEMN'), 1);
 else
     KPHR_trim = lcaGetSmart([handles.process_variable ':PTRM']);
     lcaPut([handles.process_variable ':PTRM'],0);

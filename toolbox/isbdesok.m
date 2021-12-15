@@ -20,23 +20,23 @@ if ans==1
 else
     ivbstring = strcat(upper(prim),':',upper(micro),':',int2str(unit),':IVBU');
 end
-ivb = toArray(pvaGet(ivbstring));
+ivb = pvaGetM(ivbstring);
 
 immostring = strcat(upper(prim),':',upper(micro),':',int2str(unit),':IMMO');
-immo = toArray(pvaGet(immostring));
+immo = pvaGetM(immostring);
 
 % Deal with possible shunt/boost (if HSTA bit 4000 is set then magnet is shunt/boost)
 ans=isStatusBits(prim,micro,unit,'HSTA','4000');
 if ans==1
     pscpstring = strcat(upper(prim),':',upper(micro),':',int2str(unit),':PSCP');
-    scp = toArray(pvaGet(pscpstring));
+    scp = pvaGetM(pscpstring);
     blkIstring = strcat('LGPS',':',upper(micro),':',int2str(scp),':IACT');
-    blkI = toArray(pvaGet(blkIstring));
+    blkI = pvaGetM(blkIstring);
 
     %Check if magnet is single unit or part of string
     if immo(2) == 0
         immostring = strrep(blkIstring,':IACT',':IMMO');  %If single unit, use LGPS IMMO value and solve for req. current
-        immo = toArray(pvaGet(immostring));
+        immo = pvaGetM(immostring);
         ireq = polyval(flipud(ivb),value);
     else % If part of a string take difference of bulk current from calculated current
         ireq=polyval(flipud(ivb),value)-blkI;

@@ -613,22 +613,22 @@ for ix = 1:numel(handles.data.pdes)
                     requestBuilder.with('BPMD', handles.bpmd);
                     requestBuilder.with('NRPOS', handles.nsamp);
                     requestBuilder.with('BPMS', { [ strcat(p, ':', m, ':', u) ] });
-                    buffdata = requestBuilder.get();
+                    buffdata = ML(requestBuilder.get());
                 else
-                    buffdata = pvaGet(strcat(handles.measdef, ':BUFFACQ'));
+                    buffdata = pvaGetM(strcat(handles.measdef, ':BUFFACQ'));
                 end
             catch
                 handles.data.b_ok(ix) = 0;
             end
 
             if handles.data.b_ok(ix)
-                handles.data.tmit(ix, :) = toArray(buffdata.get('tmits'));
-                handles.data.goodmeas(ix,:) = toArray(buffdata.get('goodmeas'));
+                handles.data.tmit(ix, :) = buffdata.values.tmits;
+                handles.data.goodmeas(ix,:) = buffdata.values.goodmeas;
                 switch char(handles.data.plane)
                     case 'X'
-                        handles.data.bpmdata(ix,:) = toArray(buffdata.get('x'));
+                        handles.data.bpmdata(ix,:) = buffdata.values.x;
                     case 'Y'
-                        handles.data.bpmdata(ix,:) = toArray(buffdata.get('y'));
+                        handles.data.bpmdata(ix,:) = buffdata.values.y;
                     otherwise
                         handles.data.bpmdata(ix,:) = zeros(1,handles.nsamp);
                 end

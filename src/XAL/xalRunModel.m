@@ -82,7 +82,7 @@ if (syncMode>1)
   query=sprintf('MARK:VX00:%d:twiss',markBeg(seqIdList(1)));
   requestBuilder = pvaRequest(query);
   requestBuilder.with('MODE', 5);
-  Twissi=pvGet(query, AIDA_FLOAT_ARRAY);
+  Twissi=pvGetM(query, AIDA_FLOAT_ARRAY);
   Twissi=Twissi(2:end);
 
 % ... and provide abort opportunity

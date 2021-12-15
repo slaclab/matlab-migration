@@ -40,7 +40,7 @@ for n=1:length(unit)
 
   query=sprintf('QTRM:LI30:%d:IVBU',unit(n));
   try
-    ivb=flipud(pvaGet(query));
+    ivb=flipud(pvaGetM(query));
   catch e
     handleExceptions(e, 'xalModel30Q: failed to get %s',query);
   end
@@ -59,7 +59,7 @@ for n=1:length(unit)
 
   query=sprintf('QUAD:LI30:%d:IVBU',unit(n));
   try
-    ivb=flipud(pvaGet(query));
+    ivb=flipud(pvaGetM(query));
   catch e
     handleExceptions(e, 'xalModel30Q: failed to get %s',query);
   end

@@ -12,16 +12,16 @@ try
     requestBuilder.with('NRPOS', nrpos);
     requestBuilder.with('BPMS', device_list);
 
-    vDeviceData = requestBuilder.get();
+    vDeviceData = ML(requestBuilder.get());
     disp(['FINITA! ' datestr(clock,'HH:MM:SS')]);
 
-    names = vDeviceData.get('name');
-    id = vDeviceData.get('id');
-    x = vDeviceData.get('x');
-    y = vDeviceData.get('y');
-    tmits = vDeviceData.get('tmits');
-    stat = vDeviceData.get('stat');
-    goodmeas = vDeviceData.get('goodmeas');
+    names = vDeviceData.values.name;
+    id = vDeviceData.values.id;
+    x = vDeviceData.values.x;
+    y = vDeviceData.values.y;
+    tmits = vDeviceData.values.tmits;
+    stat = vDeviceData.values.stat;
+    goodmeas = vDeviceData.values.goodmeas;
 
     for i = 1:vDeviceData.size
         if isequal(1,i)

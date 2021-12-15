@@ -95,7 +95,7 @@ if any(is.SLC)
         if jTry < 5, pause(5.);end
         for j=find(isBad)'
             try
-                requestBuilder = pvaRequest([model_nameConvert(name{j},'SLC') '//' type{j}]);
+                requestBuilder = pvaRequest([model_nameConvert(name{j},'SLC') ':' type{j}]);
                 if ~trim
                     requestBuilder.with('TRIM','NO');
                 end

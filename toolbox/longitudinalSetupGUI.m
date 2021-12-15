@@ -570,8 +570,10 @@ CurrentNullPhase=lcaGetSmart('TCAV:LI20:2400:0:POC');
 PhaseRampSet = handles.knobDelta;
 XTCAV_OFFSET=-handles.knobDelta*4;
 NewNullPhase=CurrentNullPhase+XTCAV_OFFSET;
-answer = requestBuilder.set(PhaseRampSet);
-PhaseRampAsSet=answer.get(1).get(0);
+answer = ML(requestBuilder.set(PhaseRampSet));
+% TODO What the hell are these.  Need to implement correct references
+%PhaseRampAsSet=answer.get(1).get(0);
+PhaseRampAsSet=answer.values.phaseramp(1);
 handles.ansstr = getStrings(answer);
 lcaPutSmart('TCAV:LI20:2400:0:POC',NewNullPhase);
 handles.updateText=sprintf('Phase Ramp changed to %3.1fdeg, XTCAV changed to %3.1fdeg',PhaseRampAsSet,NewNullPhase);

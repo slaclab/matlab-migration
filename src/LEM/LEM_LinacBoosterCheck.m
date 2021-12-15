@@ -27,11 +27,11 @@ for n=1:length(isect)
 
     Query=strcat(dbname,':IVBU');
     try
-      d=pvaGet(Query);
+      d=ML(pvaGet(Query));
     catch
       error('*** %s',Query)
     end
-    ivb=flipud(toArray(d));
+    ivb=flipud(d);
 
   % evaluate the IVBU polynomial to get desired current
 
@@ -47,11 +47,11 @@ for n=1:length(isect)
 
   Query=sprintf('LGPS:LI%02d:1:IMMO',imicr);
   try
-    d=pvaGet(Query);
+    d=ML(pvaGet(Query));
   catch
     error('*** %s',Query)
   end
-  immo=toArray(d);
+  immo=d;
   bad=((Ilgps<min(immo))|(Ilgps>max(immo)));
 
   if (debug)
@@ -68,11 +68,11 @@ for n=1:length(isect)
     dbname=[dbname(6:10),dbname(1:5),dbname(11:end)]; % unmunge
     Query=strcat(dbname,':IMMO');
     try
-      d=pvaGet(Query);
+      d=ML(pvaGet(Query));
     catch
       error('*** %s',Query)
     end
-    immo=toArray(d);
+    immo=d;
     Iboost=Iquad(m)-Ilgps;
     bad=(bad&&(Iboost>max(immo))); % if the LGPS is bad, QUADs are bad as well
     idps=strmatch(name,char(PS.name));

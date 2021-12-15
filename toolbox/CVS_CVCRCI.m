@@ -902,14 +902,14 @@ handles.TOOT_NAME={'PATT:SYS0:1:NSEC',...
 
 try
 % Get the BSA Names.
-v = pvaGet('LCLS:BSA.elements.byZ');
+v = pvaGetM('LCLS:BSA.elements.byZ');
 
 % Extract the number of BSA elements
 Mrows = v.size;
 
 % Extract just the element names and Z positions.
-root_name = toArray(v.get('name'));
-z_positions = toArray(v.get('z'));
+root_name = v.values.name;
+z_positions = v.values.z;
 
 %Eliminate SLC database stuff and other unnecessary variables
 

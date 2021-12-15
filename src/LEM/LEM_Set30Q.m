@@ -38,11 +38,11 @@ for n=1:length(idm)
 
   Query=strcat(PS(idq).dbname,':IVBU');
   try
-    d=pvaGet(Query);
+    d=ML(pvaGet(Query));
   catch
     error('*** %s',Query)
   end
-  ivb=flipud(toArray(d));
+  ivb=flipud(d);
 
 % use QUAD IVB to compute total desired current
 
@@ -85,11 +85,11 @@ for n=1:length(idm)
 
   Query=strcat(PS(idt).dbname,':IVBU');
   try
-    d=pvaGet(Query);
+    d=ML(pvaGet(Query));
   catch
     error('*** %s',Query)
   end
-  ivb=flipud(toArray(d));
+  ivb=flipud(d);
 
 % invert QTRM IVBU polynomial to get QTRM BDES
 

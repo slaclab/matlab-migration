@@ -50,21 +50,21 @@ function [name,x,y,z,tmit,stat,hsta] = orbitDemo(query, bpmd, n, cnftype, ...
 err = getLogger('orbitDemo');
 
 requestBuilder = pvaRequest(query);
-requestBuilder.setParam('BPMD',num2str(bpmd));                   % Required parameter
-requestBuilder.setParam('CNFTYPE',cnftype);
-requestBuilder.setParam('CNFNUM',num2str(cnfnum));
-requestBuilder.setParam('N',num2str(n));
-requestBuilder.setParam('SORTORDER',num2str(sortorder));
+requestBuilder.with('BPMD',num2str(bpmd));                   % Required parameter
+requestBuilder.with('CNFTYPE',cnftype);
+requestBuilder.with('CNFNUM',num2str(cnfnum));
+requestBuilder.with('N',num2str(n));
+requestBuilder.with('SORTORDER',num2str(sortorder));
 
-v = requestBuilder.get(query);                   % Acquire BPM data
+v = ML(requestBuilder.get());                   % Acquire BPM data
 
 Mbpm = v.size;                  % Number of Bpms
-name = toArray(v.get('name'));
-hsta = toArray(v.get('hsta'));
-stat = toArray(v.get('stat'));
-x = toArray(v.get('x'));
-y = toArray(v.get('y'));
-z = toArray(v.get('z'));
-tmit = toArray(v.get('tmit'));
+name = v.values.name;
+hsta = v.values.hsta;
+stat = v.values.stat;
+x = v.values.x;
+y = v.values.y;
+z = v.values.z;
+tmit = v.values.tmit;
 
 return;

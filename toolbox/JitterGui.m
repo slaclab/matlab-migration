@@ -253,13 +253,12 @@ for j = 1:(NE)
     % handles.BPM_units(j)   = str2int(BPM_SLC_name(11:end));
     try
       %twiss = aidaget([BPM_SLC_name ':twiss'],'doublea',{'TYPE=DATABASE'});
-      requestBuilder = pvaRequest([ XCORs{j,1} ':R']);
+      requestBuilder = pvaRequest([EBPM_pvs{j} ':twiss']);
+      requestBuilder.with('TYPE','DESIGN');
       requestBuilder.returning(AIDA_DOUBLE_ARRAY);
-      requestBuilder.with('B',dev0);
-      R = reshape(toArray(requestBuilder.get()),6,6)';
-      twiss = aidaget([EBPM_pvs{j} ':twiss'],'doublea',{'TYPE=DESIGN'});
+      twiss = ML(requestBuilder.get());
     catch
-      disp (sprintf('aidaget failed for %s:twiss', BPM_SLC_name));
+      disp (sprintf('pvaGet failed for %s:twiss', BPM_SLC_name));
     end
     handles.twiss(:,j) = cell2mat(twiss(1:11));
 end

@@ -17,7 +17,7 @@ for j = 1:r		% get Rmats from both XCOR's to dev0
   requestBuilder = pvaRequest([ XCORs{j,1} ':R']);
   requestBuilder.returning(AIDA_DOUBLE_ARRAY);
   requestBuilder.with('B',dev0);
-  R = reshape(toArray(requestBuilder.get()),6,6)';
+  R = reshape(ML(requestBuilder.get()),6,6)';
   switch r
    case 1
      G(:,j) = [R(1,2) R(3,2)]';
@@ -31,7 +31,7 @@ for j = 1:r		% get Rmats from both YCOR's to dev0
   requestBuilder = pvaRequest([ YCORs{j,1} ':R']);
   requestBuilder.returning(AIDA_DOUBLE_ARRAY);
   requestBuilder.with('B',dev0);
-  R = reshape(toArray(requestBuilder.get()),6,6)';
+  R = reshape(ML(requestBuilder.get()),6,6)';
   switch r
    case 1
      G(:,j+r) = [R(1,4) R(3,4)]';

@@ -35,16 +35,16 @@ try
         requestBuilder.with('N', navg);
     end
 
-    vBPMS = requestBuilder.get();
+    vBPMS = ML(requestBuilder.get());
 
     nBPMS = vBPMS.size;
-    name = toArray(vBPMS.get('name'));
-    hsta = toArray(vBPMS.get('hsta'));
-    stat = toArray(vBPMS.get('stat'));
-    x = toArray(vBPMS.get('x'));
-    y = toArray(vBPMS.get('y'));
-    z = toArray(vBPMS.get('z'));
-    tmit = toArray(vBPMS.get('tmits'));
+    name = vBPMS.values.name;
+    hsta = vBPMS.values.hsta;
+    stat = vBPMS.values.stat;
+    x = vBPMS.values.x;
+    y = vBPMS.values.y;
+    z = vBPMS.values.z;
+    tmit = vBPMS.values.tmits;
 
 catch
     put2log(sprintf('Sorry,Unable to read %s from Aida', dgrp));

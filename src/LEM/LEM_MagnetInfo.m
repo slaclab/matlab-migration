@@ -252,11 +252,11 @@ else
   munge=strcat(dbname(6:10),dbname(1:5),dbname(11:end));
   Query=strcat(munge,':IMMO');
   try
-    d=pvaGet(Query);
+    d=ML(pvaGet(Query));
   catch
     error('*** %s',Query)
   end
-  immo=toArray(d);
+  immo=d;
   bipolar=(prod(immo)<0);
   Query=strcat(munge,':BMAX');
   try

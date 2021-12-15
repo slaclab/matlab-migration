@@ -84,7 +84,7 @@ else
 end
 
 % Extract the device name from the query (ie minus :TACT).
-device = query(1:length(query)-length(reverse(strtok(reverse(query), ':')))-1);
+device = getInstance(query);
 
 % Get Klystron Status. Are we assuming all Klystrons are SLC?
 [linklysta,stat,swrd, hdsc, dstaback] = control_klysStatGet(device);

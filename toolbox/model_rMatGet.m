@@ -196,7 +196,7 @@ if modelOnline && ~ismember(modelSource,{'MATLAB'})
                 requestBuilder = pvaRequest([name ':twiss']);
                 requestBuilder.returning(AIDA_DOUBLE_ARRAY);
 %                requestBuilder.with(opt);  % TODO put in options
-                t=cell2mat(toArray(requestBuilder.get()));
+                t=cell2mat(ML(requestBuilder.get()));
                 twiss(:,j)=t(1:11);energy(j)=t(1);
             catch
                 disp(['AIDA Error: No twiss parameters available for ' name]);
@@ -248,7 +248,7 @@ function len = getLen(name)
 Logger = getLogger('model_rMatGet.m');
 
 try
-    o = pvaGet(name);
+    o = pvaGetM(name);
     len = o.size;
 catch
     put2log(sprintf('Aida pvaGet(%s) failure in function getLen(%s).',name,name));
@@ -283,7 +283,7 @@ for opt=opts(:)
 end
 
 try
-    tbl=requestBuilder.get();
+    tbl=ML(requestBuilder.get());
 %{
     num=tbl.get(0).getDoubles;
     nameMad=cellstr(char(tbl.get(1).getStrings));
@@ -291,11 +291,11 @@ try
     pos=cellstr(char(tbl.get(3).getStrings));
     zPos=tbl.get(4).getDoubles;
 %}
-    num=cell2mat(cell(toArray(tbl.get('num'))));
-    nameMad=cellstr(char(toArray(tbl.get('nameMad'))));
-    nameEpics=cellstr(char(toArray(tbl.get('nameEpics'))));
-    pos=cellstr(char(toArray(tbl.get('pos'))));
-    zPos=cell2mat(cell(toArray(tbl.get('zPos'))));
+    num=cell2mat(cell(tbl.values.num));
+    nameMad=cellstr(char(tbl.values.nameMad));
+    nameEpics=cellstr(char(tbl.values.nameEpics));
+    pos=cellstr(char(tbl.values.pos));
+    zPos=cell2mat(cell(tbl.values.zPos));
 
     r=zeros(36,length(num));
     for j=1:36
@@ -311,7 +311,7 @@ r=permute(reshape(r,6,6,[]),[2 1 3]);
 
 
 function [nameEpics, pos, twiss, lEff, nameMad, zPos] = getAllTwiss(name, opts)
-model = pvaGet('SIMULACRUM:SYS0:1:CU_HXR:DESIGN:TWISS');  %TODO parse name= beamPath and opts for DESIGN
+model = pvaGetM('SIMULACRUM:SYS0:1:CU_HXR:DESIGN:TWISS');  %TODO parse name= beamPath and opts for DESIGN
 nameEpics = model.device_name;
 pos = ones(size(nameEpics)); %TODO Don't knwo what this is
 twiss = [model.p0c model.psi_x model.beta_x model.alpha_x model.eta_x model.etap_x model.psi_y model.beta_y model.alpha_y model.eta_y model.etap_y];
@@ -343,7 +343,7 @@ for opt=opts(:)
     requestBuilder.with(nv(1), nv(2));
 end
 try
-    tbl=requestBuilder.get();
+    tbl=ML(requestBuilder.get());
 %{
     num=tbl.get(0).getDoubles;
     nameMad=cellstr(char(tbl.get(1).getStrings));
@@ -352,12 +352,12 @@ try
     zPos=tbl.get(3).getDoubles;
     lEff=tbl.get(5).getDoubles;
 %}
-    num=cell2mat(cell(toArray(tbl.get('num'))));
-    nameMad=cellstr(char(toArray(tbl.get('nameMad'))));
-    nameEpics=cellstr(char(toArray(tbl.get('nameEpics'))));
-    pos=cellstr(char(toArray(tbl.get('pos'))));
-    zPos=cell2mat(cell(toArray(tbl.get('zPos'))));
-    lEff=cell2mat(cell(toArray(tbl.get('lEff'))));
+    num=cell2mat(cell(tbl.values.num));
+    nameMad=cellstr(char(tbl.values.nameMad));
+    nameEpics=cellstr(char(tbl.values.nameEpics));
+    pos=cellstr(char(tbl.values.pos));
+    zPos=cell2mat(cell(tbl.values.zPos));
+    lEff=cell2mat(cell(tbl.values.lEff));
 
     twiss=zeros(11,length(num));
     for j=1:11

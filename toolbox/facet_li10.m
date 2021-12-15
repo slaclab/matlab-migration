@@ -159,8 +159,8 @@ klys = {'KLYS:LI09:11'; 'KLYS:LI09:21'};
 [m,p,u] = model_nameSplit(paus);
 paus = strcat(p, ':', m, ':', u);
 
-p1 = pvaGet(strcat(paus{1}, ':VDES'));
-p2 = pvaGet(strcat(paus{2}, ':VDES'));
+p1 = pvaGetM(strcat(paus{1}, ':VDES'));
+p2 = pvaGetM(strcat(paus{2}, ':VDES'));
 
 fphas = [p1; p2];
 
@@ -183,8 +183,8 @@ function new_phase = set_engy(phase, knob)
     end
 
     try
-        answer = d.set(phase);
-        values = toArray(answer.get('value'));
+        answer = ML(d.set(phase));
+        values = answer.values.value;
         new_phase = values(:);
     catch
         disp_log(strcat('AIDA error when setting ', knob));

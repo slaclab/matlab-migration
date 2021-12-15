@@ -306,8 +306,8 @@ function new_phase = set_scavengy(phase)
     try
         d = pvaRequest('MKB:VAL');
         d.with('MKB', 'MKB:SCAVENGY.MKB');
-        results = d.set(phase);
-        values = toArray(results.get('value'));
+        results = ML(d.set(phase));
+        values = results.values.value;
         new_phase = values(:);
     catch
         disp_log('AIDA error when setting SCAVENGY');

@@ -266,7 +266,7 @@ if isStatusBits(mag_name(1:4),mag_name(6:9),str2double(mag_name(11:end)),'hsta',
 end
 
 immostring = strcat(mag_name,':IMMO');
-immo = toArray(pvaGet(immostring));
+immo = pvaGetM(immostring);
 
 %If before sector 5 or single LGPS quad supply use trim, otherwise perturb
 if (str2double(mag_name(8:9)) <= 4) || immo(2) == 0
