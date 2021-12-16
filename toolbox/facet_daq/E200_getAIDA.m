@@ -16,7 +16,7 @@ try
     disp(['FINITA! ' datestr(clock,'HH:MM:SS')]);
 
     names = vDeviceData.values.name;
-    id = vDeviceData.values.id;
+    id = vDeviceData.values.pulseId;
     x = vDeviceData.values.x;
     y = vDeviceData.values.y;
     tmits = vDeviceData.values.tmits;
