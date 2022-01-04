@@ -1,12 +1,6 @@
-global aidapvainitdone;
-global pvaRequest pvaSet pvaSetM AidaPvaStruct;
-global AIDA_BOOLEAN AIDA_BYTE AIDA_CHAR AIDA_SHORT AIDA_INTEGER AIDA_LONG AIDA_FLOAT AIDA_DOUBLE AIDA_STRING AIDA_BOOLEAN_ARRAY AIDA_BYTE_ARRAY AIDA_CHAR_ARRAY AIDA_SHORT_ARRAY AIDA_INTEGER_ARRAY AIDA_LONG_ARRAY AIDA_FLOAT_ARRAY AIDA_DOUBLE_ARRAY AIDA_STRING_ARRAY AIDA_TABLE;
-
-if isempty(aidapvainitdone)
-    %    setupjavapath(strcat(getenv('PHYSICS_TOP'),'/release/aida-pva-client/R1.0.0/lib/aida-pva-client.jar'))
-    %    setupjavapath(strcat(getenv('PHYSICS_TOP'),'/release/epics-pvaccess/R1.0.0/lib/epics-pvaccess.jar'))
-    setupjavapath(strcat(getenv('PWD'),'/aida-pva-client.jar'))
-    setupjavapath(strcat(getenv('PWD'),'/epics-pvaccess.jar'))
+function aidapvafninit()
+    global pvaRequest pvaSet pvaSetM AidaPvaStruct;
+    global AIDA_BOOLEAN AIDA_BYTE AIDA_CHAR AIDA_SHORT AIDA_INTEGER AIDA_LONG AIDA_FLOAT AIDA_DOUBLE AIDA_STRING AIDA_BOOLEAN_ARRAY AIDA_BYTE_ARRAY AIDA_CHAR_ARRAY AIDA_SHORT_ARRAY AIDA_INTEGER_ARRAY AIDA_LONG_ARRAY AIDA_FLOAT_ARRAY AIDA_DOUBLE_ARRAY AIDA_STRING_ARRAY AIDA_TABLE;
 
     % aida-pva-client imports
     import('edu.stanford.slac.aida.client.AidaPvaClientUtils.*');
@@ -49,9 +43,5 @@ if isempty(aidapvainitdone)
     pvaSet = @(channel, value) edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaSet(channel, value);
     pvaSetM = @(channel, value) ML(edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaSet(channel, value));
     AidaPvaStruct = @() edu.stanford.slac.aida.client.AidaPvaClientUtils.newStruct();
-    aidapvafninit
-
-    aidapvainitdone = 1;
-    disp 'Aida PVA client initialization completed';
 end
 
