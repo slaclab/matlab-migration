@@ -225,6 +225,9 @@ end
 % --------------------------------------------------------------------
 function val = magnetSet(name, val, secn, func)
 
+% AIDA-PVA imports
+global pvaRequest AidaPvaStruct;
+
 if isempty(name), val=[];return, end
 in = AidaPvaStruct();
 in.put('names', { name } ) ;

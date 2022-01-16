@@ -10,6 +10,9 @@ function stat=LEM_SaveOptics()
 
 global MAGNET
 
+% AIDA-PVA imports
+global pvaSet;
+
 % check for old data ... provide abort option
 
 stat=LEM_Prompt(1);

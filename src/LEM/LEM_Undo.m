@@ -13,6 +13,10 @@ debug=debugFlags(4);
 global lemPVs
 global MAGNET PS unLEM
 
+% AIDA-PVA imports
+global pvaRequest pvaSet AidaPvaStruct;
+global AIDA_STRING;
+
 if (isempty(unLEM))
   disp('*** Nothing to unLEM')
   stat=1;

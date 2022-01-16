@@ -306,6 +306,10 @@ function pushbutton_acquire_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_acquire (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% AIDA-PVA imports
+global pvaRequest;
+
 set(hObject, 'String', 'Acquiring...');
 tic;
 % clear out data

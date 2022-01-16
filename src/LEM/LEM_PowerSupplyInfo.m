@@ -9,6 +9,9 @@ function stat=LEM_PowerSupplyInfo()
 
 global MAGNET PS
 
+% AIDA-PVA imports
+global AIDA_DOUBLE;
+
 N=0;
 scaleType=[MAGNET.scaleType]';
 

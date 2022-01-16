@@ -42,6 +42,10 @@ global lemPVs lemGlobalPhasePVs
 global KLYS
 global lemEref lemFudge noFudgeCalc
 
+% AIDA-PVA imports
+global pvaRequest pvaSet;
+global AIDA_DOUBLE AIDA_STRING;
+
 % hard-wired for LCLS
 
 BEAM='1';            % LCLS beam code

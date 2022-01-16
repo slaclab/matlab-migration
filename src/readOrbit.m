@@ -3,11 +3,11 @@ function [ name , x, y, z, tmit, hsta, stat ] = readOrbit(dgrp, navg)
 %   dgrp (optional) defaults to NDRFACET
 %   navg (optional) defaults to no averaging
 
-import java.util.Vector;
-
-persistent da;
 persistent sys;
 persistent accelerator;
+
+% AIDA-PVA imports
+global pvaRequest;
 
 if isempty(sys)
     [ sys , accelerator ] = getSystem();

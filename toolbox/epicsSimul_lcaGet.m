@@ -2,6 +2,9 @@ function [val, ts] = epicsSimul_lcaGet(pv, varargin)
 
 global epicsDataBase epicsUseAida epicsVerbose
 
+% AIDA-PVA imports
+global AIDA_DOUBLE_ARRAY;
+
 if isempty(epicsDataBase), epicsSimul_clear;end
 
 pvList=cellstr(pv);

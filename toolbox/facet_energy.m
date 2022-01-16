@@ -282,6 +282,9 @@ end
 
 function [phase, gain, total] = get_scavengy()
 
+    % AIDA-PVA imports
+    global pvaRequest;
+
     % figure out how strong 17/18 are
     k17 = strcat({'17-'}, {'1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'});
     k18 = strcat({'18-'}, {'1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'});
@@ -301,7 +304,8 @@ function [phase, gain, total] = get_scavengy()
     gain = sum(ampl);
 
 function new_phase = set_scavengy(phase)
-
+    % AIDA-PVA imports
+    global pvaRequest;
 
     try
         d = pvaRequest('MKB:VAL');

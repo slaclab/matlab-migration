@@ -28,6 +28,10 @@ function [act, stat, swrd, hdsc, dsta, enld] = control_klysStatGet(name, beamCod
 % Modified 28-May-2021 to always report 26-3 as DEACT'd as missing PVs and
 % nonfunctional. See lines 113-121 (v 1.36->1.37) --T. Maxwell
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_SHORT;
+
 % --------------------------------------------------------------------
 % Check input arguments
 if nargin < 2

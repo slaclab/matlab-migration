@@ -14,6 +14,10 @@ global lemPVs
 global MAGNET PS unLEM
 global lemFudge lemScaleTime noFudgeCalc
 
+% AIDA-PVA imports
+global pvaSet;
+global AIDA_DOUBLE;
+
 % check for old data ... provide abort option
 
 stat=LEM_Prompt(1);

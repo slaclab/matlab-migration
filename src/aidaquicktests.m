@@ -1,6 +1,5 @@
 echo on
 
-
 % Test service
 pvaGet('TEST:VAL')
 

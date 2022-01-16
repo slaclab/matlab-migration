@@ -15,6 +15,9 @@ function slcDbSetDemo(query, value)
   % value - new float value.
   %
 
+% AIDA-PVA imports
+global pvaSet;
+
 pvaSet(query, value);
 
 return;

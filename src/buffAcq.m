@@ -1,4 +1,7 @@
 function [ buffAcqData ] = buffAcq(dgrp, device_list, nrpos)
+% AIDA-PVA imports
+global pvaRequest;
+
 % Read FACET SLC buffered Data Orbit with Aida - Zelazny
 
 import java.util.Vector;

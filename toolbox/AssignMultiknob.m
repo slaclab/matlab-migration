@@ -19,6 +19,10 @@ function PVName = AssignMultiknob(mkbfilename, mkbpath, showDlg)
 
 % --------------------------------------------------------------------
 global mkbRequestBuilder;
+
+% AIDA-PVA imports
+global pvaRequest;
+
 if nargin < 3, showDlg=0;end
 if nargin < 2, mkbpath='/u1/lcls/physics/mkb';end
 if nargin < 1, showDlg=1;end

@@ -1,6 +1,10 @@
 function stat=LEM_SetLTUBend()
 
 global controlFlags
+
+% AIDA-PVA imports
+global AIDA_DOUBLE;
+
 useBDES=controlFlags(1); % use BDES values ... otherwise use BACT
 if (useBDES)
   secn='BDES';

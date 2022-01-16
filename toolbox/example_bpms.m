@@ -67,7 +67,6 @@ end
 % same exact electron pulse) using Aida in the following way:
 %
 if 0
-    import java.util.Vector;
     try
 %         bpmd = 'BPMD=53';
 %         aida_command = 'LCLS_GUN//BPMS'; % Gun to Gun Spect

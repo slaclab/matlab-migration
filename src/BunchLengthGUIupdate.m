@@ -7,6 +7,10 @@ global gBunchLength;
 global gBunchLengthGUI;
 global gIMG_MAN_DATA;
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_STRING;
+
 if isfield(gBunchLengthGUI,'skip')
     if isequal(1,gBunchLengthGUI.skip)
         return;

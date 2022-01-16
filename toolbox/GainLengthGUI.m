@@ -64,6 +64,9 @@ function GainLengthGUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to GainLengthGUI (see VARARGIN)
 
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE_ARRAY;
 
 % Choose default command line output for GainLengthGUI
 handles.output = hObject;

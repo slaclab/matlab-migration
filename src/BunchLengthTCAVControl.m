@@ -6,6 +6,10 @@ function BunchLengthTCAVControl (action)
 
 global gBunchLength;
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_STRING;
+
 if strcmp('ACTIVATE',action)
 
     if isfield(gBunchLength,'fb')

@@ -8,6 +8,9 @@ function set_2_9(state, beamcode)
 %
 % Author: Nate Lipkowitz, SLAC
 
+% AIDA-PVA imports
+global pvaRequest;
+
 if nargin < 2
     beamcode = 10;  % BC10 is FACET
 end

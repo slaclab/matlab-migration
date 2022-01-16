@@ -17,6 +17,10 @@ global lemRegions lemGroups
 global MAGNET
 global theAccelerator
 
+% AIDA-PVA imports
+global pvaSet;
+global AIDA_DOUBLE;
+
 % get pointers to MAGNETs that are in the selected LEM region(s)/groups
 
 idr=find(ismember([MAGNET.region]',find(lemRegions))); % in selected region(s)
@@ -47,7 +51,7 @@ for m=1:length(id)
     end
   end
   name=MAGNET(n).name;
-  node=
+%  node=
 end
 
 stat=1;

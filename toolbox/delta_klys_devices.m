@@ -48,6 +48,11 @@
 
 
 function iok = delta_klys_devices(prim,micro,unit,secn,delta,trimflag)
+
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_FLOAT;
+
 TRIM=''
 if nargin==6,
   ans1 = trimflag(1);

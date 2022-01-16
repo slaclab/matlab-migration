@@ -4,6 +4,9 @@ function facet_li10()
 % modify Dec-10-2015 for e-
 % revert 3-mar-2016
 
+% AIDA-PVA imports
+global pvaRequest;
+
 %% boilerplate
 mf = strcat(mfilename, '.m');
 disp_log(strcat(mf, {' starting, ver 1.1 12/10/2015'}));
@@ -175,6 +178,9 @@ gain = sum(ampl);
 
 
 function new_phase = set_engy(phase, knob)
+
+    % AIDA-PVA imports
+    global pvaRequest;
 
     persistent d;
     if isempty(d)

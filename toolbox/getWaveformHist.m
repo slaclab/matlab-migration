@@ -20,6 +20,9 @@ function [time, value, timeRange, timeString] = getWaveformHist(waveformPV,timeR
 
 % William Colocho, October 2007
 
+% AIDA-PVA imports
+global pvaRequest;
+
 %Get time span
 if(~exist('timeRange'))
    theEnd = now - 30 * 60/(24*60*60); %now - n * 60 seconds

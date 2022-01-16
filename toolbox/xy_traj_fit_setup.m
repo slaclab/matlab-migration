@@ -1,4 +1,6 @@
 function [R1s,R3s,Zs,Zs0] = xy_traj_fit_setup(prim0,micr0,unit0,BPM_micrs,BPM_units)
+% AIDA-PVA imports
+global pvaRequest;
 
 name=[prim0 ':' micr0 ':' int2str(unit0)];
 nameList=strcat('BPMS:',cellstr(char(BPM_micrs)),':',cellstr(int2str(BPM_units(:))));

@@ -190,6 +190,9 @@ function pushbutton_acquire_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% AIDA-PVA imports
+global pvaRequest;
+
 set(hObject, 'String', 'Scanning...');
 set(hObject, 'Enable', 'off');
 handles.issaved = 0;
@@ -256,7 +259,7 @@ gui_statusDisp(handles, sprintf('Calculated knob steps: [%s]', rangestr));
 phase_deltas = diff([0 handles.data.range 0]);
 
 % set up AIDA for knob control
-requestBuilder = PvaRequest('MKB:VAL');
+requestBuilder = pvaRequest('MKB:VAL');
 requestBuilder.with('MKB', strcat('mkb:', handles.data.knob));
 
 % turn off energy feedbacks

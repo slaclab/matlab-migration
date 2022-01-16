@@ -27,6 +27,10 @@
 xalImport
 global scenario
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_FLOAT_ARRAY;
+
 % some control flags
 
 testModel=0; % run XAL from test area

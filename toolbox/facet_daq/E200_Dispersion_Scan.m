@@ -6,6 +6,9 @@ function s_name = E200_Dispersion_Scan(E_range_low, E_range_high, n_step, n_shot
 %   n_shot: Number of shots per step
 %   cam_config: Usually #6
 
+% AIDA-PVA imports
+global pvaRequest;
+
 par = E200_Param(); % Load default parameters
 if nargin < 4
    par.camera_config = 6;

@@ -778,6 +778,9 @@ set(gca,'NextPlot',hold_state);    % restore original hold state
 
 function bact = setQuad(handles, name, bdes)
 
+% AIDA-PVA imports
+global pvaRequest AidaPvaStruct;
+
 % LCLS stuff just works
 if strcmp(handles.accelerator, 'LCLS')
 % DEBUG
@@ -807,6 +810,9 @@ bact = sbact(qindex);
 
 
 function bact = setCorr(handles, name, bdes, varargin)
+
+% AIDA-PVA imports
+global pvaRequest AidaPvaStruct;
 
 % LCLS stuff just works
 if strcmp(handles.accelerator, 'LCLS')

@@ -3,6 +3,9 @@ function asset_elec(state)
 % asset_elec(0) disables ASSET electrons for E-208
 % auth. nate 11/26/14
 
+% AIDA-PVA imports
+global pvaRequest;
+
 requestBuilder = pvaRequest('BGRP:VAL');
 requestBuilder.with('BGRP', 'FACET_POSI');
 requestBuilder.with('VARNAME', 'ASSET_ON');

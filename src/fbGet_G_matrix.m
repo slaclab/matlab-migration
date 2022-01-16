@@ -11,6 +11,10 @@ function G = fbGet_G_matrix(dev0,XCORs,YCORs)
 
 %===============================================================================
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE_ARRAY;
+
 %set the B device for all RMAT_ATOB calls
 r=length(XCORs);
 for j = 1:r		% get Rmats from both XCOR's to dev0

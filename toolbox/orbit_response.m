@@ -1,6 +1,9 @@
 function simple_orbit_response
 % Measure first order transfer matrix elements
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE_ARRAY;
 
    %  Create and then hide the GUI as it is being constructed.
    f = figure('Visible','off','Position',[360,500,809,550]);

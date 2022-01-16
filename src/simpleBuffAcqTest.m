@@ -1,3 +1,4 @@
+global pvaRequest;
 try
     requestBuilder = pvaRequest('INJ_ELEC:BUFFACQ');
     requestBuilder.with('NRPOS', 10);

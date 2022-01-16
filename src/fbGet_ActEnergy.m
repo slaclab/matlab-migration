@@ -10,6 +10,9 @@ function energy = fbGet_ActEnergy(act)
 %==========================================================================
 % get the SLC names of the actuators
 %
+% AIDA-PVA imports
+global AIDA_DOUBLE_ARRAY;
+
 %actuator PVs
 numactPVs = length(act.allactPVs);
 

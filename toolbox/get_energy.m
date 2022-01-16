@@ -4,6 +4,10 @@
 
 
 function out = get_energy()
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_SHORT;
+
 BSY_energy_factor = 1000/.5794666;
 BC2_energy_factor = 4300 * 361.6275 / 4.98009; % energy * position / field
 persistent initialized

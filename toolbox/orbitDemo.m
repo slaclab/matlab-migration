@@ -47,6 +47,9 @@ function [name,x,y,z,tmit,stat,hsta] = orbitDemo(query, bpmd, n, cnftype, ...
 % [name,x,y,z,tmit,stat,hsta] = orbitDemo('P2BPMHER//BPMS',38,1024,'GOLD',0,2);
 %
 
+% AIDA-PVA imports
+global pvaRequest;
+
 err = getLogger('orbitDemo');
 
 requestBuilder = pvaRequest(query);

@@ -1,6 +1,9 @@
 function fbLoadBLDPVs()
 %
 %
+% AIDA-PVA imports
+global AIDA_DOUBLE_ARRAY;
+
 %
 % set up the BLD PV names
 dispersionPVs = {'BLD:SYS0:500:DSPR1'; 'BLD:SYS0:500:DSPR2'}; %ai records

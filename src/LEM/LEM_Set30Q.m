@@ -9,6 +9,9 @@ function stat=LEM_Set30Q()
 %    Put new BDES into PS.bnew (rather than PS.bdes) for QUADs
 % ------------------------------------------------------------------------------
 
+% AIDA-PVA imports
+global AIDA_DOUBLE;
+
 debug=0;
 
 global controlFlags

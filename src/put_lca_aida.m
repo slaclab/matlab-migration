@@ -1,4 +1,6 @@
 function put_lca_aida(pvs, val,varargin)
+global pvaSet;
+
 %
 %   put_lca_aida.m
 %

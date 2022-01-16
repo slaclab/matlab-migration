@@ -1,4 +1,6 @@
 function put_aida(pvs, vals)
+global pvaSet;
+
 %
 %   put_aida.m
 %

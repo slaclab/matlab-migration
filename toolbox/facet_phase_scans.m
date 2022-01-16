@@ -513,6 +513,9 @@ toc;
 
 function handles = scan(handles)
 
+% AIDA-PVA imports
+global pvaRequest;
+
 %clear the New pdes, phas, gold and kphr values so there is no risk
 %reassigning them
 clear_new_phase(handles);

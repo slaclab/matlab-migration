@@ -258,6 +258,9 @@ function [errstring] = setbdestrim(mag_name,new_bdes)
 %
 %        HVS 11/1/07
 
+% AIDA-PVA imports
+global pvaRequest AidaPvaStruct;
+
 errstring=[];
 mag_name = model_nameConvert(mag_name,'SLC');
 if isStatusBits(mag_name(1:4),mag_name(6:9),str2double(mag_name(11:end)),'hsta','0040')

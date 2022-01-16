@@ -1,4 +1,6 @@
 function SetBgrpVariable(bgrp, variableName, value)
+global pvaRequest;
+
 
 % Author: Bob Hall
 %

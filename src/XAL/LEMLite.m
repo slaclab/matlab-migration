@@ -36,6 +36,10 @@ function [kName,kStat,kAmpl,kPhas,kEerr,kFudge,kEGain,kPower,Eref,oldFudge,newFu
 %    when computing kAmpl (i.e. kAmpl = kAmpl_from_DB * kEerr)
 % ------------------------------------------------------------------------------
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE AIDA_STRING;
+
 % hard-wired for LCLS
 
 lemPVs=[ ...

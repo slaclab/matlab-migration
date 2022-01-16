@@ -1,4 +1,7 @@
 function [R1s,R3s] = fbGet_BPM_Rmats(dev0, BPM_Xs, BPM_Ys);
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE_ARRAY;
 
 %	[R1s,R3s] = get_bpm_Rmats(dev0,BPM_Xs,BPM_Ys);
 %

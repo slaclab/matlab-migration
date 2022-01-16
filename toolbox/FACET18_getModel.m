@@ -20,6 +20,9 @@ function model=FACET18_getModel(request)
 %
 %   model : see help for xtfft2mat, xtffr2mat, xtffs2mat, and xtffw2mat
 
+% AIDA-PVA imports
+global AIDA_DOUBLE_ARRAY;
+
 LEMG=5; % LEM_FCET
 Cb=1e10/2.99792458e8;
 

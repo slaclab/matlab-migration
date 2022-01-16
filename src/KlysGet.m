@@ -24,6 +24,10 @@ function [status] = KlysGet(query, beam, dgrp)
   % is activated or deactivated on the specified beam code.
   %
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_STRING;
+
 requestBuilder = pvaRequest(query);
 requestBuilder.with('BEAM', beam);
 requestBuilder.with('DGRP', dgrp);

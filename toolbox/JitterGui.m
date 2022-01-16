@@ -131,6 +131,10 @@ function START_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE_ARRAY;
+
 set(handles.START,'String','Abort');
 set(hObject,'BackgroundColor',[1 1 0]);
 %set(handles.START,'BackgroundColor',
