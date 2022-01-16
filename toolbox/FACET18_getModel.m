@@ -20,6 +20,9 @@ function model=FACET18_getModel(request)
 %
 %   model : see help for xtfft2mat, xtffr2mat, xtffs2mat, and xtffw2mat
 
+% AIDA-PVA imports
+global AIDA_DOUBLE_ARRAY;
+
 LEMG=5; % LEM_FCET
 Cb=1e10/2.99792458e8;
 
@@ -211,13 +214,12 @@ if (~getDB&&~exist(dbFile,'file'))
 end
 if (getDB)
   if (hstb)
-    aidainit
     Bps=zeros(Nps,1);
     Ips=zeros(Nps,1);
     for n=1:Nps
       Bps(n)=dbGetHist(pslist{n},tnum);
-      query=strcat(SLCname(pslist{n}),'//IVBU');
-      d=aidaget(query,'doublea');
+      query=strcat(SLCname(pslist{n}),':IVBU');
+      d=num2cell(pvaGetM(query, AIDA_DOUBLE_ARRAY));
       ivb=fliplr([d{:}]);
       Ips(n)=polyval(ivb,Bps(n));
     end

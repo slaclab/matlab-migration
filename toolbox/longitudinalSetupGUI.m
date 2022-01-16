@@ -386,7 +386,7 @@ PrintData=handles;
 %%%%GRAB BG
 function bg_btn_Callback(hObject, eventdata, handles)
 handles=guidata(hObject);
-try 
+try
     bg3=profmon_grabBG(handles.PV{3},handles.nAverage,'bufd',1);
     if exist('bg3')
         handles.bg3=mean(cat(4,bg3.img),4);
@@ -563,17 +563,20 @@ guidata(hObject,handles);
 
 
 function handles=SetPhaseRamp(handles)
-aidainit
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
-da.setParam('MKB',handles.knob);
+% AIDA-PVA imports
+global pvaRequest;
+
+requestBuilder = pvaRequest('MKB:VAL');
+requestBuilder.with('MKB',handles.knob);
 
 CurrentNullPhase=lcaGetSmart('TCAV:LI20:2400:0:POC');
-PhaseRampSet = DaValue(java.lang.Float(handles.knobDelta));
+PhaseRampSet = handles.knobDelta;
 XTCAV_OFFSET=-handles.knobDelta*4;
 NewNullPhase=CurrentNullPhase+XTCAV_OFFSET;
-answer = da.setDaValue('MKB//VAL', PhaseRampSet);
-PhaseRampAsSet=answer.get(1).get(0);
+answer = ML(requestBuilder.set(PhaseRampSet));
+% TODO What the hell are these.  Need to implement correct references
+%PhaseRampAsSet=answer.get(1).get(0);
+PhaseRampAsSet=answer.values.phaseramp(1);
 handles.ansstr = getStrings(answer);
 lcaPutSmart('TCAV:LI20:2400:0:POC',NewNullPhase);
 handles.updateText=sprintf('Phase Ramp changed to %3.1fdeg, XTCAV changed to %3.1fdeg',PhaseRampAsSet,NewNullPhase);
@@ -691,7 +694,7 @@ handles=printTCAV(handles);
 
 
 function handles=printTCAV(handles)
-%if ~isfield(handles,'Size') || 
+%if ~isfield(handles,'Size') ||
 scrsz = get(0,'ScreenSize'); %[left, bottom, width, height]
 TCAVFig=figure('Position',[scrsz(1) scrsz(4)/2 900 480],...
         'Name','TCAV Calibration and Bunch Length Measurement');
@@ -769,7 +772,7 @@ Line_minBG = Lineout-Lineout(1);
 tcav_prof = flipud(Line_minBG);
 prof = tcav_prof;
 degXband = 72.9; % um
-tcav_cal = abs(lcaGetSmart('SIOC:SYS1:ML00:AO025')*degXband);  
+tcav_cal = abs(lcaGetSmart('SIOC:SYS1:ML00:AO025')*degXband);
 prof_cent = sum((BoxY').*Line_minBG)/sum(Line_minBG);
 tcav_axis = BoxY;
 zz_axis  = flipud(1000*degXband*(BoxY-prof_cent)'/tcav_cal);

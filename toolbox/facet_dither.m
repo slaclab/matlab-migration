@@ -63,7 +63,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = facet_dither_OutputFcn(hObject, eventdata, handles) 
+function varargout = facet_dither_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -78,6 +78,9 @@ function pushbutton_start_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_start (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% AIDA-PVA imports
+global pvaRequest;
 
 oldstr = get(hObject, 'String');
 set(hObject, 'String', 'Dithering...');
@@ -97,12 +100,10 @@ drawnow;
 
 % start AIDA multiknob
 try
-    aidainit;
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    daknob = DaObject();
-    daknob.setParam('MKB', strcat('MKB:', handles.knob));
+    requestBuilder = pvaRequest('MKB:VAL');
+    requestBuilder.with('MKB', strcat('MKB:', handles.knob));
 catch
-    gui_statusDisp(handles, strcat({'Error starting AIDA multiknob utility for '}, handles.knob));    
+    gui_statusDisp(handles, strcat({'Error starting AIDA multiknob utility for '}, handles.knob));
     return;
 end
 
@@ -120,31 +121,31 @@ y = zeros(3, handles.samp);
 % main loop
 while get(hObject, 'Value')
 
-    % get data at starting value    
-    x(1) = dith(daknob, handles, handles.step * 0);     
+    % get data at starting value
+    x(1) = dith(requestBuilder, handles, handles.step * 0);
     gui_statusDisp(handles, strcat({'Set '}, handles.knob, {' to '}, num2str(x(1))));
     pause(handles.settle);
-    gui_statusDisp(handles, strcat({'Acquiring '}, num2str(handles.samp), {' points'}));   
+    gui_statusDisp(handles, strcat({'Acquiring '}, num2str(handles.samp), {' points'}));
     for ix = 1:handles.samp
         lcaNewMonitorWait(handles.diag);
         y(1, ix) = lcaGetSmart(handles.diag);
-    end    
-    
+    end
+
     % facet_dither positive
-    x(2) = dith(daknob, handles, handles.step * 1);
+    x(2) = dith(requestBuilder, handles, handles.step * 1);
     gui_statusDisp(handles, strcat({'Set '}, handles.knob, {' to '}, num2str(x(2))));
     pause(handles.settle);
-    gui_statusDisp(handles, strcat({'Acquiring '}, num2str(handles.samp), {' points'}));   
+    gui_statusDisp(handles, strcat({'Acquiring '}, num2str(handles.samp), {' points'}));
     for ix = 1:handles.samp
         lcaNewMonitorWait(handles.diag);
         y(2, ix) = lcaGetSmart(handles.diag);
     end
 
     % facet_dither negative
-    x(3) = dith(daknob, handles, handles.step * -2);
+    x(3) = dith(requestBuilder, handles, handles.step * -2);
     gui_statusDisp(handles, strcat({'Set '}, handles.knob, {' to '}, num2str(x(3))));
     pause(handles.settle);
-    gui_statusDisp(handles, strcat({'Acquiring '}, num2str(handles.samp), {' points'}));   
+    gui_statusDisp(handles, strcat({'Acquiring '}, num2str(handles.samp), {' points'}));
     for ix = 1:handles.samp
         lcaNewMonitorWait(handles.diag);
         y(3, ix) = lcaGetSmart(handles.diag);
@@ -161,10 +162,10 @@ while get(hObject, 'Value')
     [par, yfit, parstd, yfitstd] = util_parabFit(x, yavg, ystd, xfit);
     xpeak = par(2);
     ypeak = par(3);
-    
+
     if handles.constrain
         if xpeak < min(x)
-            xpeak = min(x); 
+            xpeak = min(x);
             ypeak = yfit(1);
         end
         if xpeak > max(x)
@@ -172,32 +173,32 @@ while get(hObject, 'Value')
             ypeak = yfit(100);
         end
     end
-        
+
     axes(handles.axes1);
     reset(handles.axes1);
-    
+
     % plot data
     for ix = 1:numel(x)
         plot(handles.axes1, x(ix), y(ix, :), 'ko');
         hold all;
     end
-    
+
     % plot fit
     plot(handles.axes1, xfit, yfit, 'b-');
-    
+
     % draw peak
     plot(xpeak, ypeak, 'r*');
 
     % make some whitespace
     xlim('auto');
-    
+
     % move to new peak
     xdiff = xpeak - x(1);
     % add stepsize because we have left off at the low point
-    dx = (handles.gain * xdiff) + handles.step; 
-    xnew = dith(daknob, handles, dx);
+    dx = (handles.gain * xdiff) + handles.step;
+    xnew = dith(requestBuilder, handles, dx);
     gui_statusDisp(handles, strcat({'New setpoint is '}, num2str(xnew)), {' degS.'});
-    
+
     % wait
     drawnow;
     pause(handles.wait);
@@ -205,13 +206,12 @@ end
 
 set(hObject, 'String', oldstr);
 
-function val = dith(daobj, handles, stepsize)
+function val = dith(requestBuilder, handles, stepsize)
 
 try
-    answer = daobj.setDaValue('MKB//VAL', ...
-        edu.stanford.slac.aida.lib.util.common.DaValue(java.lang.Float(stepsize)));
-    ansstr = getStrings(answer);
-    val = mean(eval(ansstr(2,:)));
+    answer = ML(requestBuilder.set(stepsize));
+    values = answer.values.value;
+    val = mean(values);
 catch
     gui_statusDisp(handles, strcat('AIDA Error setting ', handles.knob));
     val = NaN;

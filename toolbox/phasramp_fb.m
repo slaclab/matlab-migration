@@ -23,7 +23,7 @@ multiknob = 'MKB:PHSRMP.MKB';
 % loop delay
 delay = 1;
 
-% phase cavity KLYS 
+% phase cavity KLYS
 klys = 'LI02:KLYS:91';
 secn = {'ADES' 'AJTN' 'AMPL' 'BVLT' 'ENLD' 'GOLD' 'KPHR' 'PDES' 'PHAS' 'PJTN'};
 list = strcat(klys, ':', secn');
@@ -52,9 +52,9 @@ pvs.in.ramp_max     = script_setupPV('SIOC:SYS1:ML00:AO411', ...
 pvs.in.ramp_min     = script_setupPV('SIOC:SYS1:ML00:AO412', ...
                     'DR12:PHAS:61 phase min',     'degS', 2, sname);
 pvs.in.trimtol      = script_setupPV('SIOC:SYS1:ML00:AO413', ...
-                    'DR12:PHAS:61 trim tol','degS', 2, sname);                
+                    'DR12:PHAS:61 trim tol','degS', 2, sname);
 pvs.in.window       = script_setupPV('SIOC:SYS1:ML00:AO414', ...
-                    'OutsideT slope window','min',  1, sname);                
+                    'OutsideT slope window','min',  1, sname);
 
 % diagnostic inputs
 pvs.charge          = 'LI02:TORO:912:DATA';
@@ -79,7 +79,7 @@ pvs.msgstring       = 'SIOC:SYS1:ML00:CA003';  lcaPutSmart(strcat(pvs.msgstring,
 
 [data, ts] = lcaGetStruct(pvs);
 mkbPV = AssignMultiknob(multiknob);
-global da_mkb;
+global mkbRequestBuilder;
 total = 0;
 
 %% main loop starts here
@@ -96,17 +96,17 @@ while 1
         break;  % Exit program
     end
 
-%% get some fresh data    
+%% get some fresh data
 
     old = data;  oldts = ts;
     [data, ts] = lcaGetStruct(pvs);
-    
+
 %% check for communication broken and bail out if found
 
     good = 1;
     if any(structfun(@isnan, data.klys))
         disp_log(strcat({'Error getting data from '}, klys));
-        good = good && 0;        
+        good = good && 0;
     end
     if any([structfun(@isnan, data.in); structfun(@isnan, data.out)])
         disp_log('Error getting SIOC:SYS1:ML00 PVs');
@@ -129,31 +129,31 @@ while 1
         if new_phas, fprintf(1, '* NEW *'), end
         fprintf(1, 'PHAS = %.2f, ts = %s\n', data.klys.phas, datestr(cav_ts));
     end;
-    
+
 %% check everything is within limits
 
-    msg = []; 
+    msg = [];
 
     % feedback disabled
     if ~data.in.enable
         good = good && 0; msg = [msg, sprintf('Disabled by user\n')];
     end
-    
+
     % beam charge below limit
-    if (data.charge * 1e10 < data.in.q_min)  
-        good = good && 0; msg = [msg, sprintf('%s below limit of %.3g\n', pvs.charge, data.in.q_min * 1e10)]; 
+    if (data.charge * 1e10 < data.in.q_min)
+        good = good && 0; msg = [msg, sprintf('%s below limit of %.3g\n', pvs.charge, data.in.q_min * 1e10)];
     end
- 
+
     % amplitude readback out of limit
-    if (data.klys.ampl > data.in.ampl_max) 
+    if (data.klys.ampl > data.in.ampl_max)
         good = good && 0; msg = [msg, sprintf('%s above limit of %.2f\n', pvs.klys.ampl, data.in.ampl_max)];
     end
     if (data.klys.ampl < data.in.ampl_min)
         good = good && 0; msg = [msg, sprintf('%s below limit of %.2f\n', pvs.klys.ampl, data.in.ampl_min)];
     end
-    
+
     % phase readback out of limit
-    if (data.klys.phas > data.in.phas_max) 
+    if (data.klys.phas > data.in.phas_max)
         good = good && 0; msg = [msg, sprintf('%s above limit of %.2f\n', pvs.klys.phas, data.in.phas_max)];
     end
     if (data.klys.phas < data.in.phas_min)
@@ -161,44 +161,44 @@ while 1
     end
 
     % phase ramp out of limit
-    if (data.phase.vdes > data.in.ramp_max) 
+    if (data.phase.vdes > data.in.ramp_max)
         good = good && 0; msg = [msg, sprintf('%s above limit of %.2f\n', pvs.phase.vdes, data.in.ramp_max)];
     end
     if (data.phase.vdes < data.in.ramp_min)
         good = good && 0; msg = [msg, sprintf('%s below limit of %.2f\n', pvs.phase.vdes, data.in.ramp_min)];
     end
-    
+
     % phase ramp out-of-tol
     if (abs(data.phase.vdes - data.phase.vact) > data.in.trimtol)
         good = good && 0; msg = [msg, sprintf('%s out of tol, trim within %.2f\n', pvs.phase.vact, data.in.trimtol)];
     end
-    
+
     if good, msg = 'Running, all OK'; end
 
 %% calculate outside temp slope
-    
+
     % do this eventually
     tslope = 0;
 
-%% calculate knob change 
+%% calculate knob change
 
-    knob_set = data.in.gain * (data.klys.phas - data.in.setpoint);    
+    knob_set = data.in.gain * (data.klys.phas - data.in.setpoint);
 
 %% output some diagnostic info
-    
+
     out = data.out;
     out.phase = knob_set;
     out.total = total;
     out.tslope = tslope;
-    out.enable = good;    
+    out.enable = good;
     lcaPutStruct(pvs.out, out);
     disp_msg(pvs.msgstring, msg);
 
-%% actually write the knob output    
+%% actually write the knob output
 
     if ~debug && good
         total = total + knob_set;
-        da_mkb.setDaValue(mkbPV, knob_set);
+        mkbRequestBuilder.set(knob_set);
     end
 
 end

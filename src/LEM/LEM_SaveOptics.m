@@ -8,10 +8,10 @@ function stat=LEM_SaveOptics()
 %
 %   stat = completion status
 
-aidainit
-da=DaObject;da.reset
-
 global MAGNET
+
+% AIDA-PVA imports
+global pvaSet;
 
 % check for old data ... provide abort option
 
@@ -34,11 +34,11 @@ for m=1:length(id)
     ic=strfind(dbname,':');ic1=ic(1);ic2=ic(2);
     dbname=strcat(dbname(ic1+1:ic2),dbname(1:ic1),dbname(ic2+1:end)); % unmunge
   end
-  Query=strcat(dbname,':EDES//VAL');
+  Query=strcat(dbname,':EDES:VAL');
   try
-    da.setDaValue(Query,DaValue(MAGNET(n).energy0));
-  catch
-    error('*** %s',Query)
+      pvaSet(Query, MAGNET(n).energy0);
+  catch e
+    handleExceptions(e);
   end
 end
 

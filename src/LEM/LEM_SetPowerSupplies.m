@@ -3,14 +3,14 @@ function stat=LEM_SetPowerSupplies()
 % Set new BDES values for selected power supplies and trim; save extant BDES
 % values so that we can unLEM
 
-aidainit
-da=DaObject;da.reset
-dav=DaValue;dav.reset
-
 global debugFlags
 debug=debugFlags(4);
 
 global PS unLEM
+
+% AIDA-PVA imports
+global pvaRequest pvaSet AidaPvaStruct;
+global AIDA_DOUBLE AIDA_STRING;
 
 % extract lists of pointers to SLC and EPICS magnets to be set
 
@@ -46,36 +46,36 @@ if (~isempty(idSLC))
   for m=1:nSLC
     n=idSLC(m);
     dbname=PS(n).dbname;
-    bdesQuery=strcat(dbname,'//BDES');
+    bdesQuery=strcat(dbname,':BDES');
     try
-      bsave=da.get(bdesQuery,4);
+      bsave=pvaGet(bdesQuery, AIDA_DOUBLE);
       unLEM.PS.bdesSLC(m)=bsave;
-    catch
-      error('*** %s',bdesQuery)
+    catch e
+        handleExceptions(e);
     end
   end
 
 % set up properly formatted lists of dbnames and BDES values
 
   magnet=cellstr(char(PS(idSLC).dbname));
-  bdes=[PS(idSLC).bnew]';
-  dav.type=0; % DaValue.Type.STRUCT;
-  dav.addElement(DaValue(magnet));
-  dav.addElement(DaValue(bdes));
+  bdes=[PS(idSLC).bnew];
+  value = AidaPvaStruct();
+  value.put('names', { magnet });
+  value.put('values', { bdes });
 
 % put the BDES values and trim all
-
   if (debug)
     disp('*** debugLEM: no SLC BDES values set')
   else
-    da.setParam('MAGFUNC=TRIM');
     try
-      result=da.setDaValue('MAGNETSET//BDES',dav); % (0)=status, (1)=BACT
+      requestBuilder = pvaRequest('MAGNETSET:BDES');
+      requestBuilder.with('MAGFUNC', 'TRIM');
+      result = requestBuilder.set(value);
+
       errorLog.log('LEM: SLC magnet TRIM successful');
       disp('*** SLC TRIM successful')
-    catch
-      errorLog.log('LEM: SLC magnet TRIM returned with errors, please see Message Log');
-      disp('*** one or more SLC magnets failed TRIM')
+    catch e
+        handleExceptions(e, '*** one or more SLC magnets failed TRIM');
     end
   end
 end
@@ -87,22 +87,21 @@ if (~isempty(idEPICS))
 % first loop ... get extant BDES value (for unLEM), set new BDES, set CTRL to
 % TRIM
 
-  da.reset
   for m=1:nEPICS
     n=idEPICS(m);
     dbname=PS(n).dbname;
-    bdesQuery=strcat(dbname,':BDES//VAL');
+    bdesQuery=strcat(dbname,':BDES:VAL');
     try
-      bsave=da.get(bdesQuery,4);
-    catch
-      error('*** %s',bdesQuery)
+      bsave=pvaGet(bdesQuery, AIDA_DOUBLE);
+    catch e
+        handleExceptions(e, '');
     end
     unLEM.PS.bdesEPICS(m)=bsave;
     if (~debug)
       bdes=PS(n).bnew;
-      da.setDaValue(bdesQuery,DaValue(bdes));
-      ctrlQuery=strcat(dbname,':CTRL//VAL');
-      da.setDaValue(ctrlQuery,DaValue('TRIM'));
+      pvaSet(bdesQuery, bdes);
+      ctrlQuery=strcat(dbname, ':CTRL:VAL');
+      pvaSet(ctrlQuery, 'TRIM');
     end
   end
 
@@ -121,12 +120,12 @@ if (~isempty(idEPICS))
       for m=1:length(id)
         n=idEPICS(id(m));
         dbname=PS(n).dbname;
-        ctrlStateQuery=strcat(dbname,':CTRLSTATE//VAL');
+        ctrlStateQuery=strcat(dbname,':CTRLSTATE:VAL');
         try
-          state=da.get(ctrlStateQuery,10);
+          state=pvaGet(ctrlStateQuery, AIDA_STRING);
           notDone(m)=~strcmp(state,'Done');
-        catch
-          error('*** %s',ctrlStateQuery)
+        catch e
+            handleExceptions(e, '*** %s',ctrlStateQuery)
         end
       end
       nTry=nTry+1;

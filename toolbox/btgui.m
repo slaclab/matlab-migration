@@ -58,7 +58,6 @@ function btgui_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 global modelSource
-aidainit;
 
 handles.ScanComplete = 0;
 
@@ -98,14 +97,14 @@ varargout{1} = handles.output;
 function btgui_CloseRequestFcn(hObject, eventdata, handles)
 % --- Executes when user attempts to close test_btplot.
 
-% Hint: delete(hObject) closes the figure 
-delete(gcf); 
+% Hint: delete(hObject) closes the figure
+delete(gcf);
 
-% exit from Matlab when not running the desktop 
-if usejava('desktop') 
+% exit from Matlab when not running the desktop
+if usejava('desktop')
   % don't exit from Matlab
 else
-  exit 
+  exit
 end
 
 
@@ -163,7 +162,7 @@ if handles.DANGER
             unix(stcmd)
             pause(0.1)  % Pause to let system command finish
         end
-        
+
         disp_log(['Starting bow tie scan for quad ',maglist{1},'.'])  % print msg to cmLog on start
         set(hObject,'String','Scanning...','BackgroundColor','white');
         set([handles.START_SCAN,handles.SCAN_X,handles.SCAN_Y,handles.Man_QUAD,handles.Man_XCOR, ...
@@ -203,7 +202,7 @@ else
 end
 
 reset_Controls(hObject, eventdata, handles);
-        
+
 disp('Scan completed!')
 handles.ScanComplete = 1;
 
@@ -241,7 +240,7 @@ devname = get(handles.Man_QUAD_BPM,'String');
 handles.old_offset = lcaGet([devname,secondary]);
 offsetdiff = handles.old_offset - handles.data.center;
 
-%  Check that new offset error is within 20% of difference 
+%  Check that new offset error is within 20% of difference
 if handles.data.dcenter <= (0.2*offsetdiff)
     warning = 'Proceed?';
 else
@@ -340,7 +339,7 @@ util_printLog(handles.fig, opts)
 function [maglist, samplist, ranges] = scan_array(hObject, handles)
 % Creates cell array of devices (datalist) to pass to scan function
 % maglist - 1st cell (i.e. maglist(1) is the quadrupole to be scanned
-%           2nd cell is the XCOR if scanning the x-plane 
+%           2nd cell is the XCOR if scanning the x-plane
 %           3rd cell is the YCOR if scanning the y-plane
 % samplist - lists all of the BPMs to be sampled during the scan in cells
 % modes - lists whether the quad and correctors are LCLS or SLC type
@@ -385,12 +384,12 @@ if ~isempty(name)
     % Format PV name and remove any secondaries
     if strfind(name,type)
         n_colon = find(name == ':');
-        if length(n_colon) > 2; name = name(1:(n_colon(3)-1));end   
+        if length(n_colon) > 2; name = name(1:(n_colon(3)-1));end
         [name, stat, isSLC] = model_nameConvert(name, 'EPICS');
         if ~isSLC && name(1) ~= type
             name = [name(6:9),':',name(1:4),name(10:end)];
         end
-        
+
         % If device is magnet, retrieve current BDES
         if strcmp(type,'B')
             init = [];
@@ -411,11 +410,11 @@ end
 
 function modelcheck(hObject, eventdata, handles)
 
-quad = get(handles.Man_QUAD,'STRING'); 
+quad = get(handles.Man_QUAD,'STRING');
 if get(handles.GetModel,'Value') && ~isempty(quad)
    if get(handles.SCAN_X,'Value') || get(handles.SCAN_Y,'Value')
        disp('Querying Model for optimal devices for Quad...')
-       
+
        set([handles.Man_QUAD_BPM,handles.Man_TARGET_BPM,handles.Man_XCOR,handles.Man_YCOR], ...
            'String','Finding device ...','BackgroundColor','red'); pause(0.1)
        try
@@ -427,11 +426,11 @@ if get(handles.GetModel,'Value') && ~isempty(quad)
            set([handles.XDES, handles.YDES],'String',[]);
            return
        end
-       
+
        disp('Model query successful!')
        set(handles.Man_QUAD_BPM,'String',deblank(char(quad_bpm)),'BackgroundColor','white');
        set(handles.Man_TARGET_BPM,'String',deblank(char(target_bpm)),'BackgroundColor','white');
-       
+
        if get(handles.SCAN_X,'Value')
            set(handles.Man_XCOR,'String',deblank(char(corrector)),'BackgroundColor','white');
            set(handles.Man_YCOR,'String',[],'BackgroundColor','white');
@@ -479,7 +478,7 @@ qbpm = handles.BPMS.names(handles.BPMS.pos == Qpos);
 if isempty(qbpm)
     disp(['No BPM at z-position for ',char(QUAD),'.  Using next best BPM...'])
     prev_bpm = handles.BPMS.pos(find(handles.BPMS.pos < Qpos,1,'last'));
-    next_bpm = handles.BPMS.pos(find(handles.BPMS.pos > Qpos,1,'first'));  
+    next_bpm = handles.BPMS.pos(find(handles.BPMS.pos > Qpos,1,'first'));
     if abs(Qpos - next_bpm) > abs(Qpos - prev_bpm)
         qbpm = handles.BPMS.names(handles.BPMS.pos == prev_bpm);
         ind = find(handles.BPMS.pos == prev_bpm) + 1;
@@ -497,12 +496,12 @@ MatCmp = 0;
 for k = 1:10
   tmpmat = inv(rMat(:,:,k));
   MatCmp1 = abs(tmpmat(1+index,2+index));
-  
+
   %   Look for largest R12 for x or R34 for y
   if MatCmp1 > MatCmp
     MatCmp = MatCmp1;
     target_bpm = handles.BPMS.names(ind+k);
-  end  
+  end
 end
 
 % Now find upstream corrector
@@ -520,12 +519,12 @@ MatCmp = 0;
 for k = 10:-1:1
   tmpmat = rMat(:,:,k);
   MatCmp1 = abs(tmpmat(1+index,2+index));
-  
+
   %   Look for largest R12 for x or R34 for y
   if MatCmp1 > MatCmp
     MatCmp = MatCmp1;
     corrector = corr(k);
-  end 
+  end
 end
 
 
@@ -619,11 +618,11 @@ if get(hObject,'Value')
   set(handles.Man_YCOR,'Visible','off');
   set(handles.YDES,'String',[])
   pause(0.1)
-  
+
   if ~isempty(get(handles.Man_QUAD,'String'))
      modelcheck(hObject, eventdata, handles)
      Man_XCOR_Callback(hObject, eventdata, handles)
-  end  
+  end
 else
   set(handles.Man_XCOR,'Visible','off')
   set(handles.SCAN_X,'Value',0);
@@ -645,11 +644,11 @@ if get(handles.SCAN_Y,'Value')
   set(handles.SCAN_X,'Value',0);
   set(handles.XDES,'String',[])
   pause(0.1)
-  
+
   if ~isempty(get(handles.Man_QUAD,'String'))
      modelcheck(hObject, eventdata, handles)
      Man_YCOR_Callback(hObject, eventdata, handles)
-  end  
+  end
 else
   set(handles.Man_YCOR,'Visible','off');
   set(handles.SCAN_Y,'Value',0);
@@ -712,7 +711,7 @@ function striptool_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % Hint: get(hObject,'Value') returns toggle state of striptool
-   
+
 
 function numSteps_Callback(hObject, eventdata, handles)
 % hObject    handle to numSteps (see GCBO)

@@ -1,55 +1,42 @@
 function aidaBPMspeedTest()
 
-import java.util.Vector;
-aidainit;
+% AIDA-PVA imports
+global pvaRequest;
+
 [sys,accelerator]=getSystem();
 rate_pv = ['EVNT:' sys ':1:' accelerator 'BEAMRATE'];
 count = 0;
-pause_time = 1; % seconds between each getDaValue
+pause_time = 1; % seconds between each pvaGet
 
 Logger = getLogger('Aida BPM Speed Test');
 put2log(sprintf('Aida BPM Speed test started, interval = %.0f second(s)', pause_time));
 
-bpmd = 'BPMD=55';
-aida_command = 'LCLS_SL2//BPMS';
-import edu.stanford.slac.aida.lib.da.DaObject; 
-d = DaObject;
-d.setParam(bpmd);
-d.setParam('SORTORDER=1');
+aida_command = 'LCLS_SL2:BPMS';
 
 while 1
 
     try
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% the following lines were added it make this test 
+%% the following lines were added it make this test
 %% more like Glen White's Matlab script, which exhibits
 %% the 58 second problem:
-        d.setParam('N=1');
-        d.setParam('BPMD=55');
-        d.setParam('SORTORDER=1');
+        requestBuilder = pvaRequest(aida_command);
+        requestBuilder.with('BPMD', 55);
+        requestBuilder.with('SORTORDER', 1);
+        requestBuilder.with('N', 1);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         tic;
-        vBPMS = d.getDaValue(aida_command);
+        vBPMS = ML(requestBuilder.get());
         count = count + 1;
         t(count) = toc;
-        names = Vector(vBPMS.get(0));
-        xvals = Vector(vBPMS.get(1));
-        yvals = Vector(vBPMS.get(2));
-        zvals = Vector(vBPMS.get(3));
-        tmits = Vector(vBPMS.get(4));
-        hstas = Vector(vBPMS.get(5));
-        stats = Vector(vBPMS.get(6));
-        nBPMS = names.size();
-        for i = 1:nBPMS
-            name(i) = {names.elementAt(i-1)};
-            hsta(i) = hstas.elementAt(i-1);
-            stat(i) = stats.elementAt(i-1);
-            x(i) = xvals.elementAt(i-1);
-            y(i) = yvals.elementAt(i-1);
-            z(i) = zvals.elementAt(i-1);
-            tmit(i) = tmits.elementAt(i-1);
-            % testname = sprintf('%s:',char(name(i)));
-        end
+        nBPMS = vBPMS.size;
+        name = vBPMS.values.name;
+        hsta = vBPMS.values.hsta;
+        stat = vBPMS.values.stat;
+        x = vBPMS.values.x;
+        y = vBPMS.values.y;
+        z = vBPMS.values.z;
+        tmit = vBPMS.values.tmits;
 
         % plot
         title_s = sprintf('%s %s time(%d)=%.2fs time_{avg}=%.2fs time_{min}=%.2fs time_{max}=%.2fs', ...

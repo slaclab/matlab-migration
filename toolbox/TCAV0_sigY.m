@@ -3,13 +3,19 @@ model_init('source','MATLAB','online',0);  % use Matlab model with instantaneous
 R = model_rMatGet('OTR2','YC06');
 RTCAV = model_rMatGet('YC06','BPM10');
 
-actstr = aidaget('KLYS:LI20:71//TACT','string',{'BEAM=1'}); % see if L0a is activated
+requestBuilder = pvaRequest('KLYS:LI20:71:TACT');
+requestBuilder.returning(AIDA_STRING);
+requestBuilder.with('BEAM',1);
+actstr = requestBuilder.get(); % see if L0a is activated
 if actstr(1)=='a'
   L0a_ON = 1;
 else
   L0a_ON = 0;
 end
-actstr = aidaget('KLYS:LI20:81//TACT','string',{'BEAM=1'}); % see if L0b is activated
+requestBuilder = pvaRequest('KLYS:LI20:81:TACT');
+requestBuilder.returning(AIDA_STRING);
+requestBuilder.with('BEAM',1);
+actstr = requestBuilder.get(); % see if L0b is activated
 if actstr(1)=='a'
   L0b_ON = 1;
 else

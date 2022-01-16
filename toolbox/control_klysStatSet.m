@@ -23,6 +23,9 @@ function act = control_klysStatSet(name, stat, beamCode)
 
 % --------------------------------------------------------------------
 
+% AIDA-PVA imports
+global pvaRequest;
+
 % Check input arguments
 if nargin < 3
     [sys,accel]=getSystem;
@@ -89,26 +92,18 @@ if any(isMTC)
 end
 
 % Activate/deactivate klystrons.
-global da
-if any(isSet & isSLC & ~isMK2)
-    aidainit;
-    if isempty(da), 
-       import edu.stanford.slac.aida.lib.da.DaObject;       
-       da=DaObject;
-    end
-    da.reset;
-    da.setParam('BEAM',num2str(beamCode(1,1)));
-    if ~any(isTrig), da.setParam('DGRP','LIN_KLYS');end
-end
-
 for j=find(isSet & isSLC & ~isMK2)'
     statj=stat(min(j,end));
-    in=DaValue(java.lang.Short(statj));
     disp(['Trying ' name{j} ' to set to ' num2str(statj)]);
     try
-        out=da.setDaValue([name{j} '//TACT'],in);
-    catch
-        disp(['Failed to set ' name{j} ' to activation ' num2str(statj)]);
+        requestBuilder=pvaRequest([name{j} ':TACT']);
+        requestBuilder.with('BEAM', beamCode(1,1));
+        if ~any(isTrig)
+            requestBuilder.with('DGRP', 'LIN_KLYS');
+        end
+        out=requestBuilder.set(statj);
+    catch e
+        handleExceptions(e, ['Failed to set ' name{j} ' to activation ' num2str(statj)]);
     end
 end
 %import java.util.Vector;

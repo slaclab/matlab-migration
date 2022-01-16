@@ -64,7 +64,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = SXRSS_corrPlot_gui_OutputFcn(hObject, eventdata, handles) 
+function varargout = SXRSS_corrPlot_gui_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -169,7 +169,7 @@ switch accelerator
             23 83:86 49 25 26 30 61:62 28:29 31:40 68 87 88 50:51 42 70 52 71 73 89 90];
         if strcmp(accelerator,'FACET')
             handles.profmonMap = [0 98 53 75 45 54 47 55 78 48 79 56:59 ...
-                106:108 99:105 91:97]; 
+                106:108 99:105 91:97];
             % nate 5/22/14 update PVs, put things in Z order and remove duplicates
             % handles.profmonMap =[0 46 53 75 45 54 47 76 48 55 77:79 56:59 74 60 80:82 91:98];
         end
@@ -317,7 +317,7 @@ handles=appSetup(hObject,handles);
 
 % % % ------------------------------------------------------------------------
 % % function appSave(hObject, handles)
-% % 
+% %
 % % for tag=handles.configList
 % %     config.(tag{:})=handles.(tag{:});
 % % end
@@ -326,13 +326,13 @@ handles=appSetup(hObject,handles);
 
 % % % ------------------------------------------------------------------------
 % % function handles = appLoad(hObject, handles, config)
-% % 
+% %
 % % if nargin < 3, config=1;end
 % % if ~isstruct(config)
 % %     config=util_configLoad('SXRSS_corrPlot_gui',config);
 % % end
 % % if isempty(config), return, end
-% % 
+% %
 % % %handles.ctrlMKBName='';handles.acquireZigzagOrder=0;
 % % for tag=handles.configList
 % %     if isfield(config,tag{:})
@@ -410,19 +410,19 @@ guidata(hObject,handles);
 
 % ------------------------------------------------------------------------
 % % function handles = ctrlPVWaitControl(hObject, handles, val, num)
-% % 
+% %
 % % handles=gui_editControl(hObject,handles,'ctrlPVWait',val,num);
 
 
 % ------------------------------------------------------------------------
 % % function handles = ctrlPVWaitInitControl(hObject, handles, val)
-% % 
+% %
 % % handles=gui_editControl(hObject,handles,'ctrlPVWaitInit',val);
 
 
 % ------------------------------------------------------------------------
 function handles = ctrlPVControl(hObject, handles, val, num)
-  
+
 handles = guidata(hObject);
 pv = handles.pv;
 
@@ -445,7 +445,7 @@ handles.ctrlPV(num)=util_readPV(handles.ctrlPVName(num),1);
 %handles.ctrlPVNum=sum(~cellfhun('isempty',handles.ctrlPVName));
 str={'' '2'};
 
-if strcmpi(handles.ctrlPVName(num), 'MKB//VAL')
+if strcmpi(handles.ctrlPVName(num), 'MKB:VAL')
     handles.ctrlPV(num).val = 0;
 end
 
@@ -594,14 +594,14 @@ handles=dataMethodControl(hObject,handles,[],6);
 
 % ------------------------------------------------------------------------
 % % function handles = profmonNumBGControl(hObject, handles, val)
-% % 
+% %
 % % handles=gui_editControl(hObject,handles,'profmonNumBG',val,1,any(handles.profmonId));
 % % handles=useStaticBGControl(hObject,handles,[]);
 
 
 % % % ------------------------------------------------------------------------
 % % function handles = useStaticBGControl(hObject, handles, val)
-% % 
+% %
 % % vvl=any(handles.profmonId) & handles.profmonNumBG;
 % % handles=gui_checkBoxControl(hObject,handles,'useStaticBG',val,vvl);
 % % handles.staticBG=0;
@@ -612,7 +612,7 @@ handles=dataMethodControl(hObject,handles,[],6);
 
 % % % ------------------------------------------------------------------------
 % % function handles = profmonNumAveControl(hObject, handles, val)
-% % 
+% %
 % % handles=gui_editControl(hObject,handles,'profmonNumAve',val,1,any(handles.profmonId));
 
 
@@ -646,7 +646,7 @@ handles=plotAxisControl(hObject,handles,[]);
 
 % % % ------------------------------------------------------------------------
 % % function handles = emitControl(hObject, handles, val)
-% % 
+% %
 % % [handles,cancd,val]=gui_dataRemove(hObject,handles,val);
 % % handles=gui_listControl(hObject,handles,'emit',val);
 % % if cancd, return, end
@@ -665,16 +665,16 @@ handles=plotAxisControl(hObject,handles,[]);
 
 % % % ------------------------------------------------------------------------
 % % function handles = emitTypeControl(hObject, handles, tag)
-% % 
+% %
 % % [handles,cancd,tag]=gui_dataRemove(hObject,handles,tag);
 % % handles=gui_radioBtnControl(hObject,handles,'emitType',tag,handles.emitId);
 % % if cancd, return, end
 % % handles=acquireReset(hObject,handles);
 
-% % 
+% %
 % % % ------------------------------------------------------------------------
 % % function handles = blenControl(hObject, handles, val)
-% % 
+% %
 % % [handles,cancd,val]=gui_dataRemove(hObject,handles,val);
 % % handles=gui_listControl(hObject,handles,'blen',val);
 % % if cancd, return, end
@@ -691,7 +691,7 @@ handles=plotAxisControl(hObject,handles,[]);
 
 % % % ------------------------------------------------------------------------
 % % function handles = calcPVControl(hObject, handles, val)
-% % 
+% %
 % % handles=gui_textControl(hObject,handles,'calcPVNameList',val);
 % % handles=plotAxisControl(hObject,handles,[]);
 
@@ -772,18 +772,18 @@ handles=acquireUpdate(hObject,handles, prescan);
 
 % % % ------------------------------------------------------------------------
 % % function handles = showFitOrderControl(hObject, handles, val, prescan)
-% % 
+% %
 % % if nargin<4, prescan=0; end
 % % if isfield(handles.data,'prescan')
 % %     prescan=1;
 % % end
 % % handles=gui_editControl(hObject,handles,'showFitOrder',val,1,handles.showFit == 1);
 % % handles=acquireUpdate(hObject,handles,prescan);
-% % 
-% % 
+% %
+% %
 % % % ------------------------------------------------------------------------
 % % function handles = showFitControl(hObject, handles, val)
-% % 
+% %
 % % prescan=0;
 % % if isfield(handles.data,'prescan')
 % %     prescan=1;
@@ -796,23 +796,23 @@ handles=acquireUpdate(hObject,handles, prescan);
 % % handles=showFitOrderControl(hObject,handles,[],prescan);
 % % guidata(hObject,handles);
 
-% % 
+% %
 % % % --- Executes on change in showWindowSize_box.
 % % function showWindowSize_sl_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % showSmoothingWindowControl(hObject,handles,round(get(hObject,'Value')));
 
 
 % % % --- Executes on button press in showSmoothing_box.
 % % function showSmoothing_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles=showAverageControl(handles.showAverage_box,handles,0);
 % % showSmoothingControl(hObject,handles,get(hObject,'Value'));
 
 
 % % % ------------------------------------------------------------------------
 % % function handles = showSmoothingWindowControl(hObject, handles, val, prescan)
-% % 
+% %
 % % if nargin<4, prescan=0; end
 % % if isfield(handles.data,'prescan')
 % %     prescan=1;
@@ -840,10 +840,10 @@ else
 end
 %handles=showSmoothingWindowControl(hObject,handles,winSize,prescan);
 
-% % 
+% %
 % % % ------------------------------------------------------------------------
 % % function handles = show2DControl(hObject, handles, val)
-% % 
+% %
 % % if isempty(val)
 % %     val=handles.show2D;
 % % end
@@ -852,7 +852,7 @@ end
 % % guidata(hObject,handles);
 % % handles=acquirePlot(hObject,handles);
 
-% % 
+% %
 % % % ------------------------------------------------------------------------
 % % function handles = showAverageControl(hObject, handles, val)
 % % prescan=0;
@@ -876,24 +876,23 @@ end
 % ------------------------------------------------------------------------
 function pvSet(pv, val)
 
-global da
-global da_mkb
+global mkbRequestBuilder
+
+% AIDA-PVA imports
+global pvaSet;
+
 [micro, prim, unit, secn] = model_nameSplit(pv);
-if strncmp(pv,'LI',2) || strncmp(pv,'TA',2) || strncmp(pv,'DR12',4) || strncmp(pv,'MKB//VAL',8)
+if strncmp(pv,'LI',2) || strncmp(pv,'TA',2) || strncmp(pv,'DR12',4) || strncmp(pv,'MKB:VAL',8)
 %    if strcmp(secn,'BDES') || strcmp(secn,'VDES')
     if strcmp(secn,'BDES')
         control_magnetSet(strcat(micro, ':', prim, ':', unit), val);
     else
         if ~ispc
-            aidainit;
-            if isempty(da),import edu.stanford.slac.aida.lib.da.DaObject;  da=DaObject;end
-            in=DaValue(java.lang.Float(val));
             try
-                if strncmp(pv,'MKB//VAL',8)
-                    da_mkb.setDaValue(pv,in);
+                if strncmp(pv,'MKB:VAL',8)
+                    mkbRequestBuilder.set(val);
                 else
-                    da.reset;
-                    da.setDaValue(strcat(prim, ':', micro, ':',unit,'//',secn),in);
+                    pvaSet(strcat(prim, ':', micro, ':',unit,':',secn), val);
                 end
             catch
                 disp(['Error in setting value for ' pv]);
@@ -941,7 +940,7 @@ set(handles.(['ctrlPVSet' str{num} '_btn']),'BackgroundColor','g');pause(.1);
 pvSet(pv,val);
 
 handles.ctrlPVWait = [1 1]; %settle time [2 1] is 2 seconds
-handles.ctrlPVWaitInit = 1; %inital 
+handles.ctrlPVWaitInit = 1; %inital
 
 pause(handles.ctrlPVWait(num)*(1-2*init)+handles.ctrlPVWaitInit*init);
 set(handles.(['ctrlPVSet' str{num} '_btn']),'BackgroundColor','default');
@@ -973,7 +972,7 @@ for num=1:handles.ctrlPVNum
     if handles.extGui
     handles = updateExtGui(hObject, handles,val);
     end
-    
+
     str={'' '2'};
 %     set(handles.ctrlPVReset_btn,'BackgroundColor','g');pause(.1);
     pvSet(pv,val);
@@ -1004,7 +1003,7 @@ handles=acquireUpdate(hObject,handles);
 
 % ------------------------------------------------------------------------
 function handles = dataCurrentDeviceControl(hObject, handles, val, num)
-    
+
 
 for j=num
     str=sprintf('%7.5g %s',handles.ctrlPVValList{j}(val),handles.ctrlPV(j).egu);
@@ -1040,14 +1039,14 @@ handles=gui_sliderControl(hObject,handles,'dataSample',iVal,nVal);
 
 % % % ------------------------------------------------------------------------
 % % function handles = acquireSampleDelayControl(hObject, handles, val)
-% % 
+% %
 % % handles=gui_editControl(hObject,handles,'acquireSampleDelay',val);
-% % 
+% %
 
 % ------------------------------------------------------------------------
 function handles = acquireBSAControl(hObject, handles, val)
 
-    
+
 if handles.process.loading, return, end
 update=1;if isempty(val),update=0;end
 eDef=0;if isfield(handles,'eDefNumber'), eDef=handles.eDefNumber;end
@@ -1079,24 +1078,24 @@ guidata(hObject,handles);
 
 % ------------------------------------------------------------------------
 % % function handles = acquireRandomOrderControl(hObject, handles, val)
-% % 
+% %
 % % handles=gui_checkBoxControl(hObject,handles,'acquireRandomOrder',val);
 
-% % 
+% %
 % % % ------------------------------------------------------------------------
 % % function handles = acquireSpiralOrderControl(hObject, handles, val)
-% % 
+% %
 % % handles=gui_checkBoxControl(hObject,handles,'acquireSpiralOrder',val);
 
 % % % ------------------------------------------------------------------------
 % % function handles = acquireZigzagOrderControl(hObject, handles, val)
-% % 
+% %
 % % handles=gui_checkBoxControl(hObject,handles,'acquireZigzagOrder',val);
 
 
 % ------------------------------------------------------------------------
 % % function handles = acquireUseLEMControl(hObject, handles, val)
-% % 
+% %
 % % if ~isempty(val) && val
 % %     val=strcmp(questdlg('Do you really want to LEM at each data point?','LEM Selected'),'Yes');
 % % end
@@ -1145,9 +1144,9 @@ handles.process.saved=0;
 iVal=handles.dataDevice.iVal;
 isQuasiBSA=strncmp(handles.readPVNameList,'SIOC:SYS0:ML00:FWF',18);
 isFELeLoss=strncmp(handles.readPVNameList,'PHYS:SYS0:1:ELOSSENERGY',20);
-if strcmp(handles.ctrlPV(1).name, 'MKB//VAL')
+if strcmp(handles.ctrlPV(1).name, 'MKB:VAL')
     handles.data.ctrlPV(:,iVal) = util_readPV('');
-    handles.data.ctrlPV(:,iVal).name = 'MKB//VAL';
+    handles.data.ctrlPV(:,iVal).name = 'MKB:VAL';
     handles.data.ctrlPV(:,iVal).desc = handles.ctrlMKBName;
     handles.data.ctrlPV(:,iVal).val = handles.ctrlPVValList{handles.ctrlPVNum}(iVal);
 else
@@ -1415,7 +1414,6 @@ handles=acquireUpdate(hObject,handles,prescan);
 
 % ------------------------------------------------------------------------
  function handles = acquireStart(hObject, handles, prescan)
-global da
 if nargin < 3, prescan=0;end
 % Set running or return if already running.
 %handles.readPVNameList='GDET:FEE1:242:ENRC';
@@ -1453,19 +1451,19 @@ relative=0; %flag for relative PV set vs. absolute
 % %     else
 % %         mkbPV = AssignMultiknob(mkb_name);
 % %     end
-% %     if ~isempty(mkbPV) && ~strcmpi(mkbPV, 'MKB//VAL')
+% %     if ~isempty(mkbPV) && ~strcmpi(mkbPV, 'MKB:VAL')
 % %         set(handles.ctrlPVName_txt,'String',[mkbPV ':VAL']);
 % %         handles=ctrlPVControl(hObject,handles,[mkbPV ':VAL'],1);
-% %     elseif ~isempty(mkbPV) && strcmpi(mkbPV, 'MKB//VAL')
-% %         set(handles.ctrlPVName_txt,'String','MKB//VAL');
-% %         handles=ctrlPVControl(hObject,handles,'MKB//VAL',1);
+% %     elseif ~isempty(mkbPV) && strcmpi(mkbPV, 'MKB:VAL')
+% %         set(handles.ctrlPVName_txt,'String','MKB:VAL');
+% %         handles=ctrlPVControl(hObject,handles,'MKB:VAL',1);
 % %         relative=1;
 % %     end
 % % end
 
 dataAcquire=1;
 while dataAcquire
-    
+
     if handles.ctrlPVNum > 0 && ~handles.acquireRandomOrder && ~handles.acquireZigzagOrder
         handles=ctrlPVSet(hObject,handles,1,1);
     end
@@ -1494,7 +1492,7 @@ while dataAcquire
             disp(str);set(handles.status_txt,'String',str);
             handles=ctrlPVSet(hObject,handles,1,0,relative,slowList,j);
         end
-        
+
         for k=fastList(min(end,jj(end)),:)
             if handles.ctrlPVNum > 1
                 handles=dataCurrentDeviceControl(hObject,handles,k,2);
@@ -1507,9 +1505,9 @@ while dataAcquire
         end
         if ~gui_acquireStatusGet(hObject,handles), break, end
     end
-    
 
-    
+
+
     dataAcquire=0;
     if prescan
         handles.data.prescan=1;
@@ -1630,7 +1628,7 @@ end
 function handles = plotData(hObject, handles, prescan)
 if nargin<3
     if isfield (handles.data, 'prescan')
-        prescan=handles.data.prescan; 
+        prescan=handles.data.prescan;
     else
     prescan=0;
     end
@@ -1769,7 +1767,7 @@ xFit=linspace(min(xValList(:)),max(xValList(:)),100);
 par=[];
 for j=1:size(yPVVal,1)
     xVal=xValList(min(j,end),:);yVal=yValList(j,:);yStd=yStdList(j,:);
-    
+
     switch handles.showFit
         case 0 % No Fit
             yFit(j,:)=NaN*xFit;
@@ -1952,7 +1950,7 @@ ts=ts(1);
 
 % % % -----------------------------------------------------------
 % % function handles = dataExport(hObject, handles, val)
-% % 
+% %
 % % handles.process.displayExport=1;
 % % handles=acquireUpdate(hObject,handles);
 % % handles.process.displayExport=0;
@@ -1967,7 +1965,7 @@ ts=ts(1);
 
 % % % -----------------------------------------------------------
 % % function handles = dataSave(hObject, handles, val)
-% % 
+% %
 % % data=handles.data;
 % % if ~any(data.status), return, end
 % % if isfield(data,'dataList')
@@ -1980,7 +1978,7 @@ ts=ts(1);
 % %     end
 % % end
 % % if isfield(data,'use'), data=rmfield(data,'use');end
-% % 
+% %
 % % for tag=handles.configList
 % %     data.config.(tag{:})=handles.(tag{:});
 % % end
@@ -1989,12 +1987,12 @@ ts=ts(1);
 % % if ~ischar(fileName), return, end
 % % handles.fileName=fileName;
 % % handles.process.saved=1;
-% % 
+% %
 % % str={'*' ''};
 % % set(handles.output,'Name',['Correlation Plot - [' handles.fileName ']' str{handles.process.saved+1}]);
 % % guidata(hObject,handles);
 
-% % 
+% %
 % % % -----------------------------------------------------------
 % % function handles = dataOpen(hObject, handles, val)
 % % prescan=0; handles.ctrlMKBName=''; handles.acquireZigzagOrder=0;
@@ -2007,9 +2005,9 @@ ts=ts(1);
 % % handles=acquireReset(hObject,handles);
 % % handles.process.saved=1;
 % % handles.process.loading=1;
-% % 
+% %
 % % if 0, data_test(data);end
-% % 
+% %
 % % % Initialize.
 % % for tag=handles.configList
 % %     if isfield(data.config,tag{:})
@@ -2018,7 +2016,7 @@ ts=ts(1);
 % % end
 % % data=rmfield(data,'config');
 % % handles=appSetup(hObject,handles);
-% % 
+% %
 % % % Put data in storage and update.
 % % handles.data=data;
 % % handles.fileName=fileName;
@@ -2073,7 +2071,7 @@ end
 if isfield(data,'twissPV')
     if ~isfield(data,'twissStd'), keyboard;end
 end
-    
+
 emitName='';emitId=0;
 if isfield(data,'twissPV')
     emitName=data.twissPV(1).name(1:end-6);emitId=1;
@@ -2114,38 +2112,38 @@ if wireId && ~strcmp(handles.wireList(config.wireId),wireName), keyboard;end
 
 % % % --- Executes on slider movement.
 % % function dataDevice_sl_Callback(hObject, eventdata, handles, num)
-% % 
+% %
 % % handles=dataCurrentDeviceControl(hObject,handles,round(get(hObject,'Value')),num);
 % % acquirePlot(hObject,handles);
 
 
 % % % --- Executes on slider movement.
 % % function dataMethod_sl_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % dataMethodControl(hObject,handles,round(get(hObject,'Value')),[]);
 
 
 % % % --- Executes on slider movement.
 % % function dataSample_sl_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles=dataCurrentSampleControl(hObject,handles,round(get(hObject,'Value')),[]);
 % % acquirePlot(hObject,handles);
 
 
 % % function acquireSampleNum_txt_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % acquireSampleNumControl(hObject,handles,round(str2double(get(hObject,'String'))));
 
 
 % % % --- Executes on button press in appSave_btn.
 % % function appSave_btn_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % appSave(hObject,handles);
 
 
 % % % --- Executes on button press in appLoad_btn.
 % % function appLoad_btn_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % appLoad(hObject,handles);
 
 
@@ -2170,12 +2168,12 @@ gui_acquireAbortAll;
 
 
 % % function ctrlPVValNum_txt_Callback(hObject, eventdata, handles, num)
-% % 
+% %
 % % ctrlPVValNumControl(hObject,handles,round(str2double(get(hObject,'String'))),num);
 
-% % 
+% %
 % % function ctrlPVRange_txt_Callback(hObject, eventdata, handles, tag, num)
-% % 
+% %
 % % %If the value in the textbox is not parsable as a double, check if it is of
 % % %the format 'number*init'.  If it is, use the inital value for the PV
 % % %multiplied by 'number' for the low or high limit.
@@ -2188,12 +2186,12 @@ gui_acquireAbortAll;
 % %         parsedNum = NaN;
 % %     end
 % % end
-% % 
+% %
 % % ctrlPVRangeControl(hObject,handles,tag,parsedNum,num);
 
-% % 
+% %
 % % function ctrlPVValStep_txt_Callback(hObject, eventdata, handles, num)
-% % 
+% %
 % % ctrlPVValStepControl(hObject,handles,str2double(get(hObject,'String')),num);
 
 
@@ -2202,37 +2200,37 @@ function ctrlPVSet_btn_Callback(hObject, eventdata, handles, num)
 
 ctrlPVSet(hObject,handles,num);
 
-% % 
+% %
 % % % --- Executes on button press in ctrlPVReset_btn.
 % % function ctrlPVReset_btn_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % ctrlPVReset(hObject,handles);
 
 
 % % % --- Executes on button press in acquireCurrentGet_btn.
 % % function acquireCurrentGet_btn_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % acquireCurrentGet(hObject,handles,'query');
 
 
 % % function ctrlPVName_txt_Callback(hObject, eventdata, handles, num)
-% % 
+% %
 % % ctrlPVControl(hObject,handles,get(hObject,'String'),num);
 
-% % 
+% %
 % % function readPVNameList_txt_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % readPVControl(hObject,handles,get(hObject,'String'));
 
-% % 
+% %
 % % function ctrlPVWait_txt_Callback(hObject, eventdata, handles, num)
-% % 
+% %
 % % ctrlPVWaitControl(hObject,handles,str2double(get(hObject,'String')),num);
 
 
 % % % --- Executes on selection change in plotXAxisID_pmu.
 % % function plotXAxisId_pmu_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % plotXAxisControl(hObject,handles,get(hObject,'Value')-1);
 
 
@@ -2244,7 +2242,7 @@ plotYAxisControl(hObject,handles,get(handles.plotYAxisId_lbx,'Value'));
 
 % % % --- Executes on selection change in plotUAxisId_pmu.
 % % function plotUAxisId_pmu_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % plotUAxisControl(hObject,handles,get(hObject,'Value')-1);
 
 
@@ -2255,7 +2253,7 @@ plotHeaderControl(hObject,handles,get(hObject,'String'));
 
 % % % --- Executes on button press in showAverage_box.
 % % function showAverage_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles=showSmoothingControl(handles.showSmoothing_box,handles,0);
 % % showAverageControl(hObject,handles,get(hObject,'Value'));
 
@@ -2264,137 +2262,137 @@ function ctrlPVWaitInit_txt_Callback(hObject, eventdata, handles)
 
 ctrlPVWaitInitControl(hObject,handles,str2double(get(hObject,'String')));
 
-% % 
+% %
 % % % --- Executes on button press in showFit_pmu.
 % % function showFit_pmu_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % showFitControl(hObject,handles,get(hObject,'Value')-1);
 
 
 % % function showFitOrder_txt_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % showFitOrderControl(hObject,handles,str2double(get(hObject,'String')));
 
 
 % % % --- Executes on button press in show2D_pmu.
 % % function show2D_pmu_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % show2DControl(hObject,handles,get(hObject,'Value')-1);
 
 
 % % % --- Executes on button press in showLines_box.
 % % function showLines_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % showLinesControl(hObject,handles,get(hObject,'Value'));
 
 
 % % % --- Executes on selection change in profmonYAxisId_lbx_pmu.
 % % function profmon_pmu_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % profmonControl(hObject,handles,get(hObject,'Value'));
 
 
 % % --- Executes on selection change in wire_pmu.
 % function wire_pmu_Callback(hObject, eventdata, handles)
-% 
+%
 % wireControl(hObject,handles,get(hObject,'Value'));
 
 
 % % % --- Executes on button press in wirePlaneX_rbn.
 % % function wirePlane_rbn_Callback(hObject, eventdata, handles, tag)
-% % 
+% %
 % % wirePlaneControl(hObject,handles,tag);
 
 
 % % % --- Executes on button press in acquireBSA_box.
 % % function acquireBSA_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % acquireBSAControl(hObject,handles,get(hObject,'Value')-1);
 
 
 % % function profmonNumBG_txt_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % profmonNumBGControl(hObject,handles,str2double(get(hObject,'String')));
 
-% % 
+% %
 % % function profmonNumAve_txt_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % profmonNumAveControl(hObject,handles,str2double(get(hObject,'String')));
 
 
 % % % --- Executes on selection change in emit_pmu.
 % % function emit_pmu_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % emitControl(hObject,handles,get(hObject,'Value'));
 
 
 % % % --- Executes on button press in emitTypeMulti_rbn.
 % % function emitType_rbn_Callback(hObject, eventdata, handles, tag)
-% % 
+% %
 % % emitTypeControl(hObject,handles,tag);
 
-% % 
+% %
 % % function acquireSampleDelay_txt_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % acquireSampleDelayControl(hObject,handles,str2double(get(hObject,'String')));
 
 
 % % % --- Executes on button press in acquireRandomOrder_box.
 % % function acquireRandomOrder_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % acquireRandomOrderControl(hObject,handles,get(hObject,'Value'));
 
 
 % % % --- Executes on button press in acquireSpiralOrder_box.
 % % function acquireSpiralOrder_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % acquireSpiralOrderControl(hObject,handles,get(hObject,'Value'));
 
 
 % % % --- Executes on button press in acquireZigzagOrder_box.
 % % function acquireZigzagOrder_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % acquireZigzagOrderControl(hObject,handles,get(hObject,'Value'));
 
 
 % % % --- Executes on button press in acquireUseLEM_box.
 % % function acquireUseLEM_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % acquireUseLEMControl(hObject,handles,get(hObject,'Value'));
-% % 
-% % 
+% %
+% %
 % % function calcPVNameList_txt_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % calcPVControl(hObject,handles,get(hObject,'String'));
 
 
 % % % --- Executes on selection change in blen_pmu.
 % % function blen_pmu_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % blenControl(hObject,handles,get(hObject,'Value'));
 
 
 % % --- Executes on button press in dataExport_btn.
 % function dataExport_btn_Callback(hObject, eventdata, handles, val)
-% 
+%
 % dataExport(hObject,handles,val);
 
 
 % % --- Executes on button press in dataSave_btn.
 % function dataSave_btn_Callback(hObject, eventdata, handles, val)
-% 
+%
 % dataSave(hObject,handles,val);
 
-% % 
+% %
 % % % --- Executes on button press in dataOpen_btn.
 % % function handles = dataOpen_btn_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % dataOpen(hObject,handles);
 
 
 % % % --- Executes on button press in dataSaveImg_box.
 % % function dataSaveImg_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % %dataSaveImgControl(hObject,handles,get(hObject,'Value'));
 % % handles.process.saveImg=get(hObject,'Value');
 % % guidata(hObject,handles);
@@ -2402,25 +2400,25 @@ ctrlPVWaitInitControl(hObject,handles,str2double(get(hObject,'String')));
 
 % % % --- Executes on button press in showImg_box.
 % % function showImg_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles.process.showImg=get(hObject,'Value');
 % % guidata(hObject,handles);
 % % plotProfile(hObject,handles);
-% % 
-% % 
+% %
+% %
 % % % --- Executes on button press in dataHoldImg_box.
 % % function dataHoldImg_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % %dataHoldImgControl(hObject,handles,get(hObject,'Value'));
 % % handles.process.holdImg=get(hObject,'Value');
 % % guidata(hObject,handles);
 % % vis={'off' 'on'};
 % % set([handles.dataSaveImg_box handles.showImg_box handles.showAutoScale_box],'Visible',vis{1+handles.process.holdImg});
-% % 
+% %
 
 % % % --- Executes on button press in dataProcImg_box.
 % % function dataProcImg_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles.process.procImg=get(hObject,'Value');
 % % guidata(hObject,handles);
 % % vis={'off' 'on'};
@@ -2430,7 +2428,7 @@ ctrlPVWaitInitControl(hObject,handles,str2double(get(hObject,'String')));
 
 % % % --- Executes on button press in dataDisp_btn.
 % % function dataDisp_btn_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles.process.dataDisp=1;
 % % handles=plotData(hObject,handles);
 % % handles.process.dataDisp=0;
@@ -2439,7 +2437,7 @@ ctrlPVWaitInitControl(hObject,handles,str2double(get(hObject,'String')));
 
 % % % --- Executes on button press in acquireSampleForce_box.
 % % function acquireSampleForce_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % %acquireSampleForceControl(hObject,handles,get(hObject,'Value'));
 % % handles.acquireSampleForce=get(hObject,'Value');
 % % guidata(hObject,handles);
@@ -2447,7 +2445,7 @@ ctrlPVWaitInitControl(hObject,handles,str2double(get(hObject,'String')));
 
 % % % --- Executes on button press in dataDeviceUse_box.
 % % function dataDeviceUse_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % val=get(handles.dataDeviceUse_box,'Value');
 % % use=reshape(handles.data.use,[handles.dataDevice.nVal([2 1]) handles.dataSample.nVal]);
 % % use(:,handles.dataDevice.jVal(1),:)=val;
@@ -2458,7 +2456,7 @@ ctrlPVWaitInitControl(hObject,handles,str2double(get(hObject,'String')));
 
 % % % --- Executes on button press in dataDeviceUse2_box.
 % % function dataDeviceUse2_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles.data.use(handles.dataDevice.iVal,:)=get(handles.dataDeviceUse2_box,'Value');
 % % guidata(hObject,handles);
 % % acquirePlot(hObject,handles);
@@ -2474,7 +2472,7 @@ acquirePlot(hObject,handles);
 
 % --- Executes on button press in showLogY_box.
 % % function showLogY_box_Callback(hObject, eventdata, handles)
-% % prescan=0; 
+% % prescan=0;
 % % if isfield(handles.data,'prescan')
 % %     prescan=1;
 % % end
@@ -2485,7 +2483,7 @@ acquirePlot(hObject,handles);
 
 % % % --- Executes on button press in showLogX_box.
 % % function showLogX_box_Callback(hObject, eventdata, handles)
-% % prescan=0; 
+% % prescan=0;
 % % if isfield(handles.data,'prescan')
 % %     prescan=1;
 % % end
@@ -2493,16 +2491,16 @@ acquirePlot(hObject,handles);
 % % guidata(hObject,handles);
 % % acquirePlot(hObject,handles,prescan);
 
-% % 
+% %
 % % % --- Executes on button press in useStaticBG_box.
 % % function useStaticBG_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % useStaticBGControl(hObject,handles,get(hObject,'Value'));
 
 
 % % % --- Executes on button press in staticBG_btn.
 % % function staticBG_btn_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % if handles.useStaticBG && ~isempty(handles.profmonName)
 % %     if handles.profmonNumBG
 % %         opts.nBG=0;opts.bufd=1;opts.doPlot=1;opts.doProcess=0;opts.axes=handles.plotProf_ax;
@@ -2516,10 +2514,10 @@ acquirePlot(hObject,handles);
 % % end
 % % guidata(hObject,handles);
 
-% % 
+% %
 % % % --- Executes on button press in showAutoScale_box.
 % % function showAutoScale_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles.process.showAutoScale=get(hObject,'Value');
 % % guidata(hObject,handles);
 % % plotProfile(hObject,handles);
@@ -2527,14 +2525,14 @@ acquirePlot(hObject,handles);
 
 % % % --- Executes on button press in profmonBSA_box.
 % % function profmonBSA_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles.profmonBSA=get(hObject,'Value');
 % % guidata(hObject,handles);
 
 
 % % % --- Executes on button press in useImgCrop_box.
 % % function useImgCrop_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles.useImgCrop=get(hObject,'Value');
 % % guidata(hObject,handles);
 
@@ -2547,27 +2545,27 @@ guidata(hObject,handles);
 
 
 % % function profmonXSig_txt_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles.profmonXSig=str2num(get(hObject,'String'));
 % % guidata(hObject,handles);
 
 
 % % function profmonYSig_txt_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles.profmonYSig=str2num(get(hObject,'String'));
 % % guidata(hObject,handles);
 
 
 % % % --- Executes on button press in dataImgProc_btn.
 % % function dataImgProc_btn_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % handles=acquireImgProc(hObject,handles);
 % % acquirePlot(hObject,handles);
 
 
 % % % --- Executes on button press in prescan_btn.
 % % function prescan_btn_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % set(hObject,'Value',~get(hObject,'Value'));
 % % acquireStart(handles.acquireStart_btn,handles,1);
 
@@ -2713,18 +2711,18 @@ function handles=ctrlMKBControl(hObject,handles,val)
 handles=gui_textControl(hObject,handles,'ctrlMKBName',val);
 if cancd, return, end
 if strncmpi(handles.ctrlMKBName, 'MKB:', 4)
-    set(handles.ctrlPVName_txt,'String','MKB//VAL');
-    handles=ctrlPVControl(hObject,handles,'MKB//VAL',1);
+    set(handles.ctrlPVName_txt,'String','MKB:VAL');
+    handles=ctrlPVControl(hObject,handles,'MKB:VAL',1);
 end
 
 
 % % % ------------------------------------------------------------------------
 % % function handles = profmonMultiControl(hObject, handles, val)
-% % 
+% %
 % % [handles,cancd,val]=gui_dataRemove(hObject,handles,val);
 % % handles=gui_checkBoxControl(hObject,handles,'profmonMulti',val);
 % % if cancd, return, end
-% % 
+% %
 % % if handles.profmonMulti
 % %     set(handles.profmon_pmu,'Style','listbox','Position',[167 35 20 25],'Max',2);
 % %     set(handles.text27,'Position',[167 60.5 17 1.1538461538461537]);
@@ -2739,7 +2737,7 @@ end
 
 % % % --- Executes on button press in profmonMulti_box.
 % % function profmonMulti_box_Callback(hObject, eventdata, handles)
-% % 
+% %
 % % profmonMultiControl(hObject,handles,get(hObject,'Value'));
 
 
@@ -2760,7 +2758,7 @@ function [slowList, fastList]=acquireZigzagList(handles,slowList,fastList)
 
 for num=1:2
     nmax=handles.ctrlPVValNum(num);
-    
+
     if mod(nmax,2)
         scan_array=[nmax:-2:1 2:2:nmax-1];
     else
@@ -2800,7 +2798,7 @@ end
 
 
 function pauseDataAcq(hObject, handles)
-    
+
 pausePV=get(handles.pausePVName_txt, 'string');
 pauseValue = lcaGetSmart(pausePV);
     if pauseValue == 1
@@ -2813,9 +2811,9 @@ pauseValue = lcaGetSmart(pausePV);
         warndlg('Data acqusition restarted');
         beep;
     end
-    
-  
-    
+
+
+
     % --- Executes on button press in test_btn.
     function test_btn_Callback(hObject, eventdata, handles)
         [hu, handle1]=util_appFind('SXRSS_gui');

@@ -1,31 +1,27 @@
 function epicsSimul_lcaPut(pv, val, varargin)
 
 global epicsDataBase epicsUseAida epicsVerbose
-global da
+
+% AIDA-PVA imports
+global pvaSet;
 
 if isempty(epicsDataBase), epicsSimul_clear;end
 
 pvList=cellstr(pv);
 
 if epicsUseAida
-    aidainit;
-    if isempty(da), 
-       import edu.stanford.slac.aida.lib.da.DaObject;
-       da=DaObject;
-    end
 
     for j=1:length(pvList)
         v=val(max(1,min(j,end)):min(j,end),:);
         if ~any(strcmp(pvList{j},'.'))
-            str=[pvList{j} '//VAL'];
+            str=[pvList{j} ':VAL'];
         else
-            str=strrep(pvList{j},'.','//');
+            str=strrep(pvList{j},'.',':');
         end
-        in=DaValue(v);
-        da.reset;
         try
-            da.setDaValue(str,in);
-        catch
+            pvaSet(str, v);
+        catch e
+            handleExceptions(e);
         end
     end
     return

@@ -1,7 +1,7 @@
 function [myval,mytime] = get_taper(start_time)
 
 %================================================================
-% Enter time in format 'mm/dd/yyyy HH:MM:SS.' 
+% Enter time in format 'mm/dd/yyyy HH:MM:SS.'
 % For example: '07/01/2009 00:00:00'.  Returns undulator K values
 % between that time and one second later.
 % Author D. Ratner
@@ -24,9 +24,9 @@ end_time = datestr(end_num+onesec,'mm/dd/yyyy HH:MM:SS');
 %     n = length(pv);
 %     pvs(j,1:n) = pv;
 % end
-% 
+%
 % und_names = mat2str(pvs);
-% 
+%
 % [values,times] = get_archive_multiple(und_names,start_time,end_time);
 
 
@@ -37,7 +37,7 @@ for j=1:und_num
     %[values,times] = get_archive(und_name,start_time,end_time,0);  % doesn't work after '03/12/2014 06:29:57'
     time_range={start_time;end_time};
     [times,values] =history(und_name,time_range);
-    
+
     myval(j) = values(1);
     first_time{j} = times(1,:);
   catch ME
@@ -63,20 +63,16 @@ mytime;
 
 function [values,times] = get_archive_multiple(pvs,start_time,end_time)
 
+% AIDA-PVA imports
+global pvaRequest;
 
-
-
-aidainit
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
-da.setParam('STARTTIME',start_time);
-da.setParam('ENDTIME',end_time); 
-hist = da.getDaValue(pvs);
+requestBuilder = pvaRequest(pvs);
+requestBuilder.with('STARTTIME', start_time);
+requestBuilder.with('ENDTIME', end_time);
+hist = ML(requestBuilder.get());
 
 %You can extract the data like this:
 
-pts = hist.get(0).size();
-dblArray = javaArray('java.lang.Double',pts);
-values = double(hist.get(0).toArray(dblArray));
-StringArray = javaArray('java.lang.String',pts);
-times = char(hist.get(1).toArray(StringArray));
+pts = hist.size;
+values = hist.values.values;
+times = hist.values.times;

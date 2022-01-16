@@ -12,7 +12,7 @@ function state = facet_getMachine(nsamp, dgrp)
 %   STATE: Struct containing Z-sorted lists of the following devices:
 %       MAGS:       FACET magnets (names, Z, BDES, BACT, BMAX)
 %       KLYS:       FACET klystrons (names, Z, phases, amplitude, status)
-%           ENLD:   Zero-phase energy gain for this klystron (MeV) 
+%           ENLD:   Zero-phase energy gain for this klystron (MeV)
 %           PACT:   Phase readback including subbooster and fast phase shifter offsets.
 %           ISON:   Boolean indicating this klystron is accelerating
 %       SBST:       FACET sub-boosters (names, Z, phases, amplitude, status)
@@ -32,8 +32,6 @@ persistent sbst;
 persistent wire;
 
 persistent bpms;
-
-aidainit;
 
 % add timestamp
 state.timestamp.start = now;
@@ -92,7 +90,7 @@ state.lem.Z      = [zini; zend(zend > 0)'];
 state.lem.fudge  = fudg(fudg > 0)';
 
 % as of writing, these magnets have :Z = NaN and also choke control_magnetGet:
-% 
+%
 %     'BNDS:DR13:570'
 %     'QUAD:LI10:802'
 %     'XCOR:LI20:3276'
@@ -119,7 +117,7 @@ state.klys.HSTA = lcaGetSmart(strcat(model_nameConvert(state.klys.name, 'EPICS')
 
 % calculate 'ISON' status (modulator not off, HSTA online, trigger active)
 trig_on =  bitget(state.klys.TACT, 1);  % TACT bit 1 is "ACCEL"
-hsta_on =  bitget(state.klys.HSTA, 1);  % HSTA bit 1 is online 
+hsta_on =  bitget(state.klys.HSTA, 1);  % HSTA bit 1 is online
 mod_ok  = ~bitget(state.klys.SWRD, 4);  % SWRD bit 4 is some mod fault
 state.klys.ISON = trig_on & hsta_on & mod_ok;
 
@@ -138,15 +136,15 @@ disp('Getting live SBST status...');
 
 % get fast phase shifters
 disp('Getting pulsed phases...');
-state.phase.k_9_1 = aidaget('PHAS:LI09:12//VACT');    % 9-1 pulsed phase shifter SPPS
-state.phase.k_9_2 = aidaget('PHAS:LI09:22//VACT');    % 9-2 pulsed phase shifter SPPS
-state.phase.s_17 = aidaget('AMPL:EP01:171//VACT');   % S17 pulsed phase shifter SPPS
-state.phase.s_18 = aidaget('AMPL:EP01:181//VACT');   % S18 pulsed phase shifter SPPS  
+state.phase.k_9_1 = pvaGetM('PHAS:LI09:12:VACT');    % 9-1 pulsed phase shifter SPPS
+state.phase.k_9_2 = pvaGetM('PHAS:LI09:22:VACT');    % 9-2 pulsed phase shifter SPPS
+state.phase.s_17 = pvaGetM('AMPL:EP01:171:VACT');   % S17 pulsed phase shifter SPPS
+state.phase.s_18 = pvaGetM('AMPL:EP01:181:VACT');   % S18 pulsed phase shifter SPPS
 
 % caclulate total phase (klys PHAS + sbst PHAS)
 state.klys.PACT = zeros(size(state.klys.PHAS));
- 
-for ix = 1:numel(state.sbst.name)  
+
+for ix = 1:numel(state.sbst.name)
     [p, m, s] = model_nameSplit(state.sbst.name(ix));
     sector_klys = strmatch(strcat('KLYS:', m), state.klys.name);
     state.klys.PACT(sector_klys) = state.klys.PHAS(sector_klys) + state.sbst.PHAS(ix);
@@ -187,7 +185,7 @@ end
 use = false(size(state.bpms.name));
 for ix = 1:numel(state.bpms.name)
     use(ix) = any(strcmp(state.bpms.name(ix), bpmlist));
-end    
+end
 
 state.bpms.X = repmat(nan(size(state.bpms.name)), 1, nsamp);
 state.bpms.Y = repmat(nan(size(state.bpms.name)), 1, nsamp);

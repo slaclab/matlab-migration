@@ -1,6 +1,8 @@
 function facet_sdr_fb()
 % FACET SDR charge feedback
 
+% AIDA-PVA imports
+global pvaRequest;
 
 %% basic initialization
 mf = strcat(mfilename, '.m');
@@ -47,7 +49,7 @@ pvs.in.enable       = script_setupPV('SIOC:SYS1:ML00:AO403', ...
 pvs.in.gain         = script_setupPV('SIOC:SYS1:ML00:AO404', ...
                     'SDR feedback gain',        'arb',  3, mf);
 pvs.in.setpoint     = script_setupPV('SIOC:SYS1:ML00:AO405', ...
-                    'SDR feedback setpoint',    'n e+', 3, mf);                
+                    'SDR feedback setpoint',    'n e+', 3, mf);
 pvs.in.q_min        = script_setupPV('SIOC:SYS1:ML00:AO406', ...
                     'SLTR charge min',          'n e-', 3, mf);
 pvs.in.phas_max     = script_setupPV('SIOC:SYS1:ML00:AO407', ...
@@ -59,18 +61,18 @@ pvs.in.slope        = script_setupPV('SIOC:SYS1:ML00:AO409', ...
 pvs.in.spare        = script_setupPV('SIOC:SYS1:ML00:AO410', ...
                     'spare',     'egu', 0, mf);
 pvs.in.spare        = script_setupPV('SIOC:SYS1:ML00:AO411', ...
-                    'spare',     'egu', 0, mf);                
+                    'spare',     'egu', 0, mf);
 pvs.in.spare        = script_setupPV('SIOC:SYS1:ML00:AO412', ...
-                    'spare',     'egu', 0, mf);           
+                    'spare',     'egu', 0, mf);
 pvs.in.spare        = script_setupPV('SIOC:SYS1:ML00:AO413', ...
-                    'spare',     'egu', 0, mf);                
+                    'spare',     'egu', 0, mf);
 pvs.in.spare        = script_setupPV('SIOC:SYS1:ML00:AO414', ...
-                    'spare',     'egu', 0, mf);                
+                    'spare',     'egu', 0, mf);
 
 pvs.rate.beam = 'EVNT:SYS1:1:BEAMRATE';
 pvs.rate.scav = 'EVNT:SYS1:1:SCAVRATE';
 pvs.rate.posi = 'EVNT:SYS1:1:POSITRONRATE';
-                
+
 pvs.temp      = 'MC00:ASTS:OUTSIDET';
 
 pvs.toro.in  = 'DR01:TORO:1481:DATA';
@@ -96,15 +98,13 @@ pvs.msgstring       = 'SIOC:SYS1:ML00:CA003';  lcaPutSmart(strcat(pvs.msgstring,
 
 %% set up compressor knob
 
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject;
-da_mkb = DaObject;
-da_mkb.reset;
-da_mkb.setParam('MKB', multiknob);
-mkbPV = 'MKB//VAL';
-% 
+mkbPV = 'MKB:VAL';
+mkbRequestBuilder = pvaRequest(mkbPV);
+mkbRequestBuilder.with('MKB', multiknob);
+
+%
 % mkbPV = AssignMultiknob(multiknob);
-% global da_mkb;
+% global mkbRequestBuilder;
 
 %% first iteration stuff
 
@@ -123,8 +123,8 @@ while 1
         disp_log('Some sort of watchdog error - exiting');
         break;  % Exit program
     end
-    
-%% get some fresh data    
+
+%% get some fresh data
 
     old = data;  oldts = ts;  oldtmit = tmit;
 
@@ -134,13 +134,13 @@ while 1
     % use below instead for buffered acquisition
     %     tmit(1) = control_bpmAidaGet('TORO:DR01:1481', 1, 'SCAVPOSI');
     %     tmit(2) = control_bpmAidaGet('TORO:DR03:71', 1, 'SCAVPOSI');
-    
+
 %% check for communication broken and bail out if found
 
     good = 1;
     if any(structfun(@isnan, data.klys))
         disp_log(strcat({'Error getting data from '}, klys));
-        good = good && 0;        
+        good = good && 0;
     end
     if any([structfun(@isnan, data.in); structfun(@isnan, data.out)])
         disp_log('Error getting SIOC:SYS1:ML00 PVs');
@@ -166,35 +166,35 @@ while 1
 
 %% check everything is within limits
 
-    msg = []; 
+    msg = [];
 
     % feedback disabled
     if ~data.in.enable
         good = good && 0; msg = [msg, sprintf('Disabled by user\n')];
     end
-    
+
     % beam charge below limit
-    if (tmit(2) < data.in.q_min)  
-        good = good && 0; msg = [msg, sprintf('%s below limit of %.3g\n', pvs.toro.out, data.in.q_min)]; 
+    if (tmit(2) < data.in.q_min)
+        good = good && 0; msg = [msg, sprintf('%s below limit of %.3g\n', pvs.toro.out, data.in.q_min)];
     end
-    
+
     % phase readback out of limit
-    if (data.klys.phas > data.in.phas_max) 
+    if (data.klys.phas > data.in.phas_max)
         good = good && 0; msg = [msg, sprintf('%s above limit of %.2f\n', pvs.klys.phas, data.in.phas_max)];
     end
     if (data.klys.phas < data.in.phas_min)
         good = good && 0; msg = [msg, sprintf('%s below limit of %.2f\n', pvs.klys.phas, data.in.phas_min)];
     end
-    
+
     if good, msg = 'Running, all OK'; end
-    
+
 
 %% calculate knob set
 
     pdes = (data.in.setpoint - tmit(2) ) / data.in.slope;
     knob_set = data.in.gain * pdes;
-    
-%% write PVs out    
+
+%% write PVs out
 
     out = data.out;
     out.phase = pdes;
@@ -203,15 +203,15 @@ while 1
     out.enable = good;
     lcaPutStruct(pvs.out, out);
     disp_msg(pvs.msgstring, msg);
-    
-%% actually write the knob output    
+
+%% actually write the knob output
 
     if ~debug && good
         total = total + knob_set;
         disp_log(sprintf('Writing %.3f to knob', knob_set));
-        da_mkb.setDaValue(mkbPV,DaValue(java.lang.Float(knob_set)));
+        mkbRequestBuilder.set(knob_set);
     end
-    
+
 end
 
 function disp_msg(strpv, msg)

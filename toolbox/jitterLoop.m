@@ -7,64 +7,64 @@ handles.numavg =50; %++20 %+get from epics
 RunNum = handles.numavg;
 navg = handles.numavg;
 nCalc = navg;
-handles.wait = 1.5; %+ get from epics        
+handles.wait = 1.5; %+ get from epics
 lowChargeCounter = 0;
 % Energy BPMs
 EBPM_pvs =  {'BPMS:IN20:221'; 'BPMS:IN20:731';  'BPMS:LI21:233'; 'BPMS:LI24:801'; 'BPMS:LTUH:250'; 'BPMS:LTUH:450' };
 % Injector Jitter BPMs
-XYInjBPM_pvs =        {'BPMS:IN20:771'; 'BPMS:IN20:781'; 'BPMS:LI21:131'; 'BPMS:LI21:161'; 'BPMS:LI21:201'; 'BPMS:LI21:278'; 'BPMS:LI21:301'};  
-                                    
+XYInjBPM_pvs =        {'BPMS:IN20:771'; 'BPMS:IN20:781'; 'BPMS:LI21:131'; 'BPMS:LI21:161'; 'BPMS:LI21:201'; 'BPMS:LI21:278'; 'BPMS:LI21:301'};
+
 % Sector 28 Jitter BPMs
-XY28BPM_pvs =        {'BPMS:LI27:301'; 'BPMS:LI27:401'; 'BPMS:LI27:701'; 'BPMS:LI27:801'; 'BPMS:LI28:301'; 'BPMS:LI28:401'; 'BPMS:LI28:701'; 'BPMS:LI28:801' };  
+XY28BPM_pvs =        {'BPMS:LI27:301'; 'BPMS:LI27:401'; 'BPMS:LI27:701'; 'BPMS:LI27:801'; 'BPMS:LI28:301'; 'BPMS:LI28:401'; 'BPMS:LI28:701'; 'BPMS:LI28:801' };
 
 % Undulator Jitter BPMs
 XYUndBPM_pvs =        {'BPMS:UNDH:1305'; 'BPMS:UNDH:1590'; 'BPMS:UNDH:1890' ; 'BPMS:UNDH:2190' ; 'BPMS:UNDH:2490'; 'BPMS:UNDH:2790'; 'BPMS:UNDH:3090';  ...
-                       'BPMS:UNDH:3390'; 'BPMS:UNDH:3690'; 'BPMS:UNDH:3990';  'BPMS:UNDH:4290' };  
+                       'BPMS:UNDH:3390'; 'BPMS:UNDH:3690'; 'BPMS:UNDH:3990';  'BPMS:UNDH:4290' };
 
  % LTU Jitter BPMs
-XYLTUBPM_pvs = {'BPMS:LTUH:720'; 'BPMS:LTUH:730'; 'BPMS:LTUH:740'; 'BPMS:LTUH:750'; 'BPMS:LTUH:760'; 'BPMS:LTUH:770'};  
-                                    
+XYLTUBPM_pvs = {'BPMS:LTUH:720'; 'BPMS:LTUH:730'; 'BPMS:LTUH:740'; 'BPMS:LTUH:750'; 'BPMS:LTUH:760'; 'BPMS:LTUH:770'};
+
 BSY_mag = 2;
-                   
+
 
 % Number of Energy BPMs
 NE = size((EBPM_pvs),1);
-NxyInj = length(XYInjBPM_pvs); 
-Nxy28 = length(XY28BPM_pvs);  
+NxyInj = length(XYInjBPM_pvs);
+Nxy28 = length(XY28BPM_pvs);
 NxyUnd = length(XYUndBPM_pvs);
 NxyLTU = length(XYLTUBPM_pvs);
 
-% Injector BPMs initialization                                  
+% Injector BPMs initialization
 XsInj = zeros(RunNum,NxyInj);
 YsInj = zeros(RunNum,NxyInj);
 ioksInj = zeros(RunNum,NxyInj);
-               
-% Sector 28 BPMs initialization                                  
+
+% Sector 28 BPMs initialization
 Xs28 = zeros(RunNum,Nxy28);
 Ys28 = zeros(RunNum,Nxy28);
 ioks28 = zeros(RunNum,Nxy28);
 
-% Undulator BPMs initialization                                  
+% Undulator BPMs initialization
 XsUnd = zeros(RunNum,NxyUnd);
 YsUnd = zeros(RunNum,NxyUnd);
 ioksUnd = zeros(RunNum,NxyUnd);
 
-% LTU BPMs initialization                                  
+% LTU BPMs initialization
 XsLTU = zeros(RunNum,NxyLTU);
 YsLTU = zeros(RunNum,NxyLTU);
 ioksLTU = zeros(RunNum,NxyLTU);
-                  
+
 for j = 1:(NE)
-    %--handles.output = hObject; 
+    %--handles.output = hObject;
     %BPM_SLC_name = model_nameConvert(EBPM_pvs{j},'SLC');
     % handles.BPM_micrs(j,:) = BPM_SLC_name(6:9);
     % handles.BPM_units(j)   = str2int(BPM_SLC_name(11:end));
     try
       %twiss = aidaget([BPM_SLC_name '//twiss'],'doublea',{'TYPE=DATABASE'});
       [r, z, l, twiss] = model_rMatGet(EBPM_pvs{j}, [], {'TYPE=DESIGN' 'BEAMPATH=CU_HXR'});
-      %twiss = aidaget([EBPM_pvs{j} '//twiss'],'doublea',{'TYPE=DESIGN'});      
+      %twiss = aidaget([EBPM_pvs{j} '//twiss'],'doublea',{'TYPE=DESIGN'});
     catch
-      dispStr (sprintf('%s model_rMatGet failed for %s//twiss', datestr(now), BPM_SLC_name));
+      dispStr (sprintf('%s model_rMatGet failed for %s:twiss', datestr(now), BPM_SLC_name));
     end
     handles.twiss(:,j) = twiss(1:11);
 end
@@ -76,8 +76,8 @@ for i=2:size(handles.etax,2);
         fprintf('%s Error on aidaget for twiss values\n',datestr(now));
         return;
     end
-end                   
-    
+end
+
 % Hard code LTU dispersion value  (is this in model yet?)
 %BSY_eta = 84.6158;
 %handles.etax(NE-1) = 125;
@@ -120,7 +120,7 @@ IRLasPowHist = zeros(1,RunNum);
 % initialize counts (tracks when averaging buffer is full)
 count = 0;
 count28Und = 0;
-countUnd = 0; 
+countUnd = 0;
 countLTU = 0;
 count28 = 0;
 
@@ -146,7 +146,7 @@ lastBpmToFit = '';
 % Incrementor to show gui is alive
 JoesInc = 0;
 
-% Get data indefinitely 
+% Get data indefinitely
 counter = 0;
 while(1)
     counter = counter + 1;
@@ -154,97 +154,97 @@ while(1)
     tic
     %'Laser Mark'
     % Laser shape RMS (completely flat is 0)
-    try LasRMS = lcaGetSmart('SIOC:SYS0:ML00:AO071'); catch dispStr('Error on lcaGet for Laser RMS SIOC:SYS0:ML00:AO071');  end         
-    
+    try LasRMS = lcaGetSmart('SIOC:SYS0:ML00:AO071'); catch dispStr('Error on lcaGet for Laser RMS SIOC:SYS0:ML00:AO071');  end
+
     % Laser aperture
-    try UVLasAp = lcaGetSmart('SIOC:SYS0:ML00:AO072'); catch dispStr('Error on lcaGet for Laser Aperture SIOC:SYS0:ML00:AO072'); end  
+    try UVLasAp = lcaGetSmart('SIOC:SYS0:ML00:AO072'); catch dispStr('Error on lcaGet for Laser Aperture SIOC:SYS0:ML00:AO072'); end
    % UV Laser X position
-    XUVLasRun = circshift(XUVLasRun,[0,-1]);                
-    try  XUVLasRun(:,RunNum) = lcaGetSmart('CAMR:IN20:186:CTRD_H'); catch dispStr('Error on lcaGet for Laser XPos CAMR:IN20:186:CTRD_H'); end 
+    XUVLasRun = circshift(XUVLasRun,[0,-1]);
+    try  XUVLasRun(:,RunNum) = lcaGetSmart('CAMR:IN20:186:CTRD_H'); catch dispStr('Error on lcaGet for Laser XPos CAMR:IN20:186:CTRD_H'); end
     % X variation relative to measured aperture diameter divided by 4
     % (approx RMS)
-    XUVLasRMS = util_stdNan(XUVLasRun)/(UVLasAp/4);       
-    
+    XUVLasRMS = util_stdNan(XUVLasRun)/(UVLasAp/4);
+
     % UV Laser Y Position
-    YUVLasRun = circshift(YUVLasRun,[0,-1]);    
+    YUVLasRun = circshift(YUVLasRun,[0,-1]);
     try YUVLasRun(:,RunNum) = lcaGetSmart('CAMR:IN20:186:CTRD_V');
-    catch dispStr('Error on lcaGet for Laser YPos CAMR:IN20:186:CTRD_V'); end 
-    % X variation relative to measured aperture diameter divided by 4 (approx RMS)    
-    YUVLasRMS = util_stdNan(YUVLasRun)/(UVLasAp/4);  
+    catch dispStr('Error on lcaGet for Laser YPos CAMR:IN20:186:CTRD_V'); end
+    % X variation relative to measured aperture diameter divided by 4 (approx RMS)
+    YUVLasRMS = util_stdNan(YUVLasRun)/(UVLasAp/4);
 
     % UV Laser Power
-    UVLasPowRun = circshift(UVLasPowRun,[0,-1]);  
-    try UVLasPowRun(:,RunNum) = lcaGetSmart('LASR:IN20:196:PWRTH'); catch dispStr('Error on lcaGet for Laser Power LASR:IN20:196:PWRTH'); end       
+    UVLasPowRun = circshift(UVLasPowRun,[0,-1]);
+    try UVLasPowRun(:,RunNum) = lcaGetSmart('LASR:IN20:196:PWRTH'); catch dispStr('Error on lcaGet for Laser Power LASR:IN20:196:PWRTH'); end
     UVLasPowMean = mean(UVLasPowRun);
-    UVLasPowRMS = util_stdNan(UVLasPowRun)/UVLasPowMean;    
-    
+    UVLasPowRMS = util_stdNan(UVLasPowRun)/UVLasPowMean;
+
     % hard coded IR laser size in mm
     IRLasAp = 0.2;
-    
+
     % IR Laser X position
-    XIRLasRun = circshift(XIRLasRun,[0,-1]);                
-    try XIRLasRun(:,RunNum) = lcaGetSmart('CAMR:IN20:469:CTRD_H'); catch dispStr('Error on lcaGet for Laser XPos CAMR:IN20:469:CTRD_H'); end 
+    XIRLasRun = circshift(XIRLasRun,[0,-1]);
+    try XIRLasRun(:,RunNum) = lcaGetSmart('CAMR:IN20:469:CTRD_H'); catch dispStr('Error on lcaGet for Laser XPos CAMR:IN20:469:CTRD_H'); end
     % X variation relative to 200um approx RMS
     % (approx RMS)
-    XIRLasRMS = util_stdNan(XIRLasRun)/(IRLasAp);       
-  
+    XIRLasRMS = util_stdNan(XIRLasRun)/(IRLasAp);
+
      % IR Laser Y Position
-    YIRLasRun = circshift(YIRLasRun,[0,-1]);    
+    YIRLasRun = circshift(YIRLasRun,[0,-1]);
     try YIRLasRun(:,RunNum) = lcaGetSmart('CAMR:IN20:469:CTRD_V');
-    catch dispStr('Error on lcaGet for Laser YPos CAMR:IN20:469:CTRD_V'); end 
-    % X variation relative to 200um approx RMS    
-    YIRLasRMS = util_stdNan(YIRLasRun)/(IRLasAp);  
+    catch dispStr('Error on lcaGet for Laser YPos CAMR:IN20:469:CTRD_V'); end
+    % X variation relative to 200um approx RMS
+    YIRLasRMS = util_stdNan(YIRLasRun)/(IRLasAp);
 
     % IR Laser Power
-    IRLasPowRun = circshift(IRLasPowRun,[0,-1]);  
-    try IRLasPowRun(:,RunNum) = lcaGetSmart('LASR:IN20:475:PWRTH');       
-    catch dispStr('Error on lcaGet for Laser Power LASR:IN20:475:PWRTH'); end       
+    IRLasPowRun = circshift(IRLasPowRun,[0,-1]);
+    try IRLasPowRun(:,RunNum) = lcaGetSmart('LASR:IN20:475:PWRTH');
+    catch dispStr('Error on lcaGet for Laser Power LASR:IN20:475:PWRTH'); end
     IRLasPowMean = mean(IRLasPowRun);
-    IRLasPowRMS = util_stdNan(IRLasPowRun)/IRLasPowMean;        
-   
-    
-    % default status of beam in sector 28
-    status28Und = 1;    
+    IRLasPowRMS = util_stdNan(IRLasPowRun)/IRLasPowMean;
 
-    
+
+    % default status of beam in sector 28
+    status28Und = 1;
+
+
     %'Beamrate Mark'
-    handles.tstr = get_time;    
+    handles.tstr = get_time;
     [sys,accelerator]=getSystem();
     try rate = lcaGet(['EVNT:' sys ':1:' accelerator 'BEAMRATE']);  % rep. rate [Hz]
     catch dispStr(['Error on lcaGet for EVNT:' sys ':1:' accelerator 'BEAMRATE - defaulting to 1 Hz rate.']); rate = 1; end
-    
+
     % Some old programs die on rate=0
     if rate < 1, rate = 1;  end
-    
-     %'YAG02 Mark'    
-    
+
+     %'YAG02 Mark'
+
     % Skip scan if YAG02 is in.  (Schottky scan will mess up RMS)
     try
         YAG02 = lcaGetSmart('YAGS:IN20:241:PNEUMATIC');
     catch
-        dispStr('Error on lcaGet for YAGS:IN20:241:PNEUMATIC.  Assume YAG02 not in')     
+        dispStr('Error on lcaGet for YAGS:IN20:241:PNEUMATIC.  Assume YAG02 not in')
     end
     if (strcmp(YAG02,'IN'))
         dispStr('YAG02 is in.  Wait for scan to finish');
-        logStatus('YAG02 is in.  Waiting for scan to finish...'); 
+        logStatus('YAG02 is in.  Waiting for scan to finish...');
         dispStr(handles.tstr);
         pause(handles.wait + 15);
         continue;
-    end    
-    
+    end
+
 
     % Check LTU status and adjust energy BPMs accordingly
     BSY_mag = 0;
     if BSY_mag < 1
         statusLTU = 1;
         handles.statusLTU = 1;
-        %--set(handles.RMS4,'String','LTU dE/E RMS (%) =');         
+        %--set(handles.RMS4,'String','LTU dE/E RMS (%) =');
     else
-        statusLTU = 0;        
+        statusLTU = 0;
         handles.statusLTU = 0;
-        %--set(handles.RMS4,'String','BSY dE/E RMS (%) =');         
-    end                 
-    
+        %--set(handles.RMS4,'String','BSY dE/E RMS (%) =');
+    end
+
     % Check TDUND status and adjust XY Jitter BPMs accordingly
     try
         TDUND = lcaGetSmart('DUMP:LTUH:970:TDUND_PNEU');
@@ -257,34 +257,34 @@ while(1)
     %TDUND = 'IN';
     if strcmp(TDUND,'OUT')
         statusUnd = 1;
-        handles.statusUnd = 1;        
+        handles.statusUnd = 1;
     else
         statusUnd = 0;
         handles.statusUnd = 0;
     end
-    
-    
+
+
     if statusUnd;
-        TotBPM_pvs = cat(1,EBPM_pvs,XYInjBPM_pvs,XYUndBPM_pvs); 
+        TotBPM_pvs = cat(1,EBPM_pvs,XYInjBPM_pvs,XYUndBPM_pvs);
         bpmToFit = 'BPM UNDH 190';
     elseif statusLTU
-        
-        TotBPM_pvs = cat(1,EBPM_pvs,XYInjBPM_pvs,XYLTUBPM_pvs);    
+
+        TotBPM_pvs = cat(1,EBPM_pvs,XYInjBPM_pvs,XYLTUBPM_pvs);
         bpmToFit = 'BPM LTUH 720';
     else
-           
-        TotBPM_pvs = cat(1,EBPM_pvs,XYInjBPM_pvs,XY28BPM_pvs); 
+
+        TotBPM_pvs = cat(1,EBPM_pvs,XYInjBPM_pvs,XY28BPM_pvs);
         bpmToFit = 'BPM LI27 301';
     end
-    
-    if ~strcmp(lastBpmToFit, bpmToFit), 
+
+    if ~strcmp(lastBpmToFit, bpmToFit),
         lcaPutSmart('SIOC:SYS0:ML00:CA007' ,double(int8(bpmToFit)));  end
         lcaPutSmart('SIOC:SYS0:ML00:AO178.DESC',['X RMS Jitter at ' bpmToFit]);
         lcaPutSmart('SIOC:SYS0:ML00:AO179.DESC',['Y RMS Jitter at ' bpmToFit]);
     lastBpmToFit = bpmToFit;
-  
-    %'All BPMs Mark'        
-    %lcaPut('SIOC:SYS0:ML00:AO186',1); 
+
+    %'All BPMs Mark'
+    %lcaPut('SIOC:SYS0:ML00:AO186',1);
     % Read in all BPMs
     try
         [TotX,TotY,TotT,TotdX,TotdY,TotdT,Totiok] = read_BPMsBSA(TotBPM_pvs,1,rate, nCalc);  % read first BPM, X, Y, & TMIT with averaging
@@ -304,20 +304,20 @@ while(1)
     iokInj = Totiok(NE+1:NE+NxyInj,:);
     X28Und = TotX(NE+NxyInj+1:end,:);
     Y28Und = TotY(NE+NxyInj+1:end,:);
-    iok28Und = Totiok(NE+NxyInj+1:end,:);        
+    iok28Und = Totiok(NE+NxyInj+1:end,:);
 
 
 
 
     % Check if beam is down
     %if 1.602E-10*ET(1,:) < 1e-3
-    if sum(iokInj(1,:)+0) < nCalc    
+    if sum(iokInj(1,:)+0) < nCalc
         lowChargeCounter = lowChargeCounter + 1;
         if (lowChargeCounter < 2)
            msgStr = [handles.tstr ' No Charge: Waiting for beam...'];
            logStatus(msgStr);
 %            dispStr(msgStr);
-%            try lcaPut('SIOC:SYS0:ML00:CA003' ,double(int8(msgStr))); 
+%            try lcaPut('SIOC:SYS0:ML00:CA003' ,double(int8(msgStr)));
 %            catch fprintf('%s Failed to write to SIOC:SYS0:ML00:CA003\n', datestr(now)); end
         end
         pause(handles.wait);
@@ -332,21 +332,21 @@ while(1)
     %1 ERun = circshift(ERun,[0,-1]);      % Shift register of energy values from last iteration
     for ii = 1:NE-1
     %ERun(:,RunNum) = EX(1:NE-2)./etax(1:NE-2);      % convert X to energy and add to last value in ERun register
-        ERun(ii,:) = EX(ii,:)./etax(ii); 
+        ERun(ii,:) = EX(ii,:)./etax(ii);
     end
     % Check if in LTU. In this case, use LTU BPMs for final energy jitter
-    if statusLTU         
+    if statusLTU
         % Check beam reaches end of DL2.  If not, just use first LTU BPM
-        if ET(NE,:) > ET(NE-1,:)/2          
+        if ET(NE,:) > ET(NE-1,:)/2
             ERun(NE-1,:) = (EX(NE-1,:)/etax(NE-1)+EX(NE,:)/etax(NE))/2;
         else
-            ERun(NE-1,:) = EX(NE-1,:)/etax(NE-1);            
+            ERun(NE-1,:) = EX(NE-1,:)/etax(NE-1);
         end
     end
     ERMS = util_stdNan(ERun,0,2);               % Calculate new standard deviation
 
 
-    
+
     %TRun = circshift(TRun,[0,-1]);      % Shift register of TMIT values
     %1TRun(1,RunNum) = ET(1);              % update last value of register to TMIT from BPM2
     TRun(1,:) = ET(1,:);              % update last value of register to TMIT from BPM2
@@ -364,27 +364,27 @@ while(1)
     catch
         dispStr('Error on lcaGet for BC monitor BLEN:LI21:265:AIMAXHSTBR')
         val = zeros(1,nCalc);
-    end  
+    end
     try
     LBC1Run(:,:) = val(end-nCalc+1:end);
     catch
         fprintf('%s problem with LBC1Run, %i\n', datestr(now), size(LBC1Run));
     end
-    LBC1Mean = mean(LBC1Run); 
+    LBC1Mean = mean(LBC1Run);
     LBC1RMS = util_stdNan(LBC1Run)/abs(LBC1Mean);
 
     %1LBC2Run = circshift(LBC2Run,[0,-1]);
     try
-         val = lcaGet('BLEN:LI24:886:BIMAXHSTBR');  
+         val = lcaGet('BLEN:LI24:886:BIMAXHSTBR');
     catch
         dispStr('Error on lcaGet for BC Monitor BLEN:LI24:886:BIMAX')
          val = zeros(1,nCalc);
-    end  
-    
+    end
+
     LBC2Run(:,:) = val(end-nCalc+1:end);
-    LBC2Mean = mean(LBC2Run); 
-    LBC2RMS = util_stdNan(LBC2Run)/abs(LBC2Mean); 
-    
+    LBC2Mean = mean(LBC2Run);
+    LBC2RMS = util_stdNan(LBC2Run)/abs(LBC2Mean);
+
     %'Gas Detector mark'
     %1FEEGD1Run = circshift(FEEGD1Run,[0,-1]);
     try
@@ -392,22 +392,22 @@ while(1)
     catch
         dispStr('Error on lcaGet for GDET:FEE1:241:ENRCHSTBR or GDET:FEE1:242:ENRCHSTBR')
         val = zeros(1,nCalc);
-    end        
+    end
     FEEGD1Run(:,:) = val(end-nCalc+1:end);
-    FEEGD1Mean = mean(FEEGD1Run); 
+    FEEGD1Mean = mean(FEEGD1Run);
     FEEGD1RMS = util_stdNan(FEEGD1Run)/abs(FEEGD1Mean);
-    
+
     %1FEEGD2Run = circshift(FEEGD2Run,[0,-1]);
     try
          val = (lcaGet('GDET:FEE1:361:ENRCHSTBR') + lcaGet('GDET:FEE1:362:ENRCHSTBR'))/2 ;
     catch
         dispStr('Error on lcaGet for GDET:FEE1:361:ENRCHSTBR or GDET:FEE1:362:ENRCHSTBR')
         val = zeros(1,nCalc);
-    end        
+    end
     FEEGD2Run(:,:) = val(end-nCalc+1:end);
-    FEEGD2Mean = mean(FEEGD2Run); 
+    FEEGD2Mean = mean(FEEGD2Run);
     FEEGD2RMS = util_stdNan(FEEGD2Run)/abs(FEEGD2Mean);
-        
+
 
     %Photon energy
     PhotonEngyRun = circshift(PhotonEngyRun,[0,-1]);
@@ -416,14 +416,14 @@ while(1)
     end
     PhotonEngyMean = mean(PhotonEngyRun);
     PhotonEngyRMS =  util_stdNan(PhotonEngyRun)/abs(PhotonEngyMean);
-    
+
     % Check for beam at all injector BPMs
-    if ~(all(iokInj))                       
+    if ~(all(iokInj))
         logStatus('Error reading Injector BPMs');
         %--dips(handles.tstr);
         pause(handles.wait);
         msgStr = 'No Inj BPM Signal: Waiting for beam...';
-        try lcaPut('SIOC:SYS0:ML00:CA003' ,double(int8(msgStr))); 
+        try lcaPut('SIOC:SYS0:ML00:CA003' ,double(int8(msgStr)));
            catch fprintf('%s Failed to write to SIOC:SYS0:ML00:CA003\n', datestr(now));
         end
         logStatus('No Inj BPM Signal: Waiting for beam...');
@@ -431,72 +431,72 @@ while(1)
     end
 
     % Count successful run in injector
-    count = count+1;    
+    count = count+1;
 
     % Check for beam at all sector 28/Und BPMs
-    if ~(all(iok28Und))                       
+    if ~(all(iok28Und))
         %dispStr('Error reading Sector 28/Und BPMs');
         %dispStr(handles.tstr);
-        %logStatus('No beam in sector 28/Und'); 
+        %logStatus('No beam in sector 28/Und');
         status28Und = 0;
         countUnd = 0;
         countLTU = 0;
-        count28 = 0;        
+        count28 = 0;
     end
 
 
- 
+
 
     % Update register with new inj XY jitter values
     %1 XsInj = circshift(XsInj,[-1,0]);
-    %1 YsInj = circshift(YsInj,[-1,0]);      
-    %1 ioksInj = circshift(ioksInj,[-1,0]);        
-    XsInj  =  XInj';                
-    YsInj  =  YInj';                
-    ioksInj = iokInj';  
+    %1 YsInj = circshift(YsInj,[-1,0]);
+    %1 ioksInj = circshift(ioksInj,[-1,0]);
+    XsInj  =  XInj';
+    YsInj  =  YInj';
+    ioksInj = iokInj';
 
     % Update sector 28/Und jitters only if beam seen there
     if status28Und
         if statusUnd
             %1 XsUnd = circshift(XsUnd,[-1,0]);
-            %1 YsUnd = circshift(YsUnd,[-1,0]);      
-            %1 ioksUnd = circshift(ioksUnd,[-1,0]);        
-            XsUnd  =  X28Und';                
-            YsUnd  =  Y28Und';                
-            ioksUnd = iok28Und'; 
+            %1 YsUnd = circshift(YsUnd,[-1,0]);
+            %1 ioksUnd = circshift(ioksUnd,[-1,0]);
+            XsUnd  =  X28Und';
+            YsUnd  =  Y28Und';
+            ioksUnd = iok28Und';
             % Count successful run in sector 28/Und
-            countUnd = RunNum; %Using BSA! countUnd + status28Und;   
+            countUnd = RunNum; %Using BSA! countUnd + status28Und;
         elseif statusLTU
             %1 XsLTU = circshift(XsLTU,[-1,0]);
-            %1 YsLTU = circshift(YsLTU,[-1,0]);      
-            %1 ioksLTU = circshift(ioksLTU,[-1,0]);        
-            XsLTU  =  X28Und';                
-            YsLTU  =  Y28Und';                
-            ioksLTU = iok28Und';         
+            %1 YsLTU = circshift(YsLTU,[-1,0]);
+            %1 ioksLTU = circshift(ioksLTU,[-1,0]);
+            XsLTU  =  X28Und';
+            YsLTU  =  Y28Und';
+            ioksLTU = iok28Und';
             % Count successful run in sector 28/Und
-            countLTU = RunNum; % Using BSA! countLTU + status28Und;             
-        else   
+            countLTU = RunNum; % Using BSA! countLTU + status28Und;
+        else
             %1Xs28 = circshift(Xs28,[-1,0]);
-            %1 Ys28 = circshift(Ys28,[-1,0]);      
-            %1 ioks28 = circshift(ioks28,[-1,0]);        
-            Xs28  =  X28Und';                
-            Ys28  =  Y28Und';                
-            ioks28 = iok28Und';  
+            %1 Ys28 = circshift(Ys28,[-1,0]);
+            %1 ioks28 = circshift(ioks28,[-1,0]);
+            Xs28  =  X28Und';
+            Ys28  =  Y28Und';
+            ioks28 = iok28Und';
             % Count successful run in sector 28/Und
-            count28 = RunNum; %1 Using BSA! count28 + status28Und;             
+            count28 = RunNum; %1 Using BSA! count28 + status28Und;
         end
     end
 
 
     %dat_time1 = toc;
-    
+
     % If register not full yet, restart loop
     count = RunNum; %Using BSA!
     if count < RunNum
         dispStr(RunNum - count)
-        logStatus(['Loading buffer. Runs left: ',num2str(RunNum-count)]);            
+        logStatus(['Loading buffer. Runs left: ',num2str(RunNum-count)]);
         pause(handles.wait)
-        pause(1/rate)        
+        pause(1/rate)
         continue
     else
         pause(handles.wait + 1/(rate+1))
@@ -504,26 +504,26 @@ while(1)
 
     % Update status in GUI
     if ~status28Und
-        logStatus('Running in injector, no beam in sector 28/Und'); 
-    elseif count28Und<RunNum 
-        logStatus('Running in injector, buffering in sector 28/Und');    
+        logStatus('Running in injector, no beam in sector 28/Und');
+    elseif count28Und<RunNum
+        logStatus('Running in injector, buffering in sector 28/Und');
     else
-        logStatus('Running...');             
+        logStatus('Running...');
     end
 
     %'Inj XY Mark'
 
     % Calculate injector XY jitter
     try
-    [XInjRMS,YInjRMS,uvxInj,duxInj,dvxInj,uvyInj,duyInj,dvyInj] = XYJitter_loop(XYInjBPM_pvs,RunNum,XsInj,YsInj,ioksInj,JSetInj);  
-    catch 
+    [XInjRMS,YInjRMS,uvxInj,duxInj,dvxInj,uvyInj,duyInj,dvyInj] = XYJitter_loop(XYInjBPM_pvs,RunNum,XsInj,YsInj,ioksInj,JSetInj);
+    catch
         keyboard
     end
 
 
     %'28Und XY Mark'
 
-    % If buffer full in sector 28/Und, calculate 28/Und jitter        
+    % If buffer full in sector 28/Und, calculate 28/Und jitter
 
     if statusUnd && countUnd>= RunNum
         [X28UndRMS,Y28UndRMS,uvx28Und,dux28Und,dvx28Und,uvy28Und,duy28Und,dvy28Und] = ...
@@ -535,8 +535,8 @@ while(1)
         count28Und = RunNum;
     elseif count28>= RunNum
         [X28UndRMS,Y28UndRMS,uvx28Und,dux28Und,dvx28Und,uvy28Und,duy28Und,dvy28Und] = ...
-            XYJitter_loop(XY28BPM_pvs,RunNum,Xs28,Ys28,ioks28,JSet28);            
-        count28Und = RunNum;          
+            XYJitter_loop(XY28BPM_pvs,RunNum,Xs28,Ys28,ioks28,JSet28);
+        count28Und = RunNum;
     end
 
 
@@ -544,9 +544,9 @@ while(1)
     % total time to read BPMs, etc.
     %dat_time = toc;
 
-    % times for measurements in register 
-    %mytime = (-(RunNum-1)*(handles.wait+dat_time):(handles.wait+dat_time):0);           
-    mytime = (-(RunNum-1)*handles.wait:handles.wait:0);       
+    % times for measurements in register
+    %mytime = (-(RunNum-1)*(handles.wait+dat_time):(handles.wait+dat_time):0);
+    mytime = (-(RunNum-1)*handles.wait:handles.wait:0);
 
 
 
@@ -556,10 +556,10 @@ while(1)
     TRMS = TRMS*100;    % Convert TRMS to percent
     XUVLasRMS = XUVLasRMS*100;
     YUVLasRMS = YUVLasRMS*100;
-    UVLasPowRMS = UVLasPowRMS*100;    
+    UVLasPowRMS = UVLasPowRMS*100;
     XIRLasRMS = XIRLasRMS*100;
-    YIRLasRMS = YIRLasRMS*100;    
-    IRLasPowRMS = IRLasPowRMS*100;        
+    YIRLasRMS = YIRLasRMS*100;
+    IRLasPowRMS = IRLasPowRMS*100;
     XInjRMS = XInjRMS*100;
     YInjRMS = YInjRMS*100;
     LBC1RMS = LBC1RMS*100;
@@ -567,28 +567,28 @@ while(1)
     FEEGD1RMS = FEEGD1RMS*100;
     FEEGD2RMS = FEEGD2RMS*100;
     PhotonEngyRMS = PhotonEngyRMS*100;
-    
-    if count28Und>=RunNum 
+
+    if count28Und>=RunNum
         X28UndRMS = X28UndRMS*100;
         Y28UndRMS = Y28UndRMS*100;
     end
-    % History register used to make strip chart          
+    % History register used to make strip chart
     EHist = circshift(EHist,[0,-1]);        % shift history register of Energy RMS values
     EHist(:,RunNum) = ERMS;                 % update latest ERMS value in register
     THist = circshift(THist,[0,-1]);        % shift history register of Charge RMS values
     THist(RunNum) = TRMS;                   % update latest TRMS value in register
-    XUVLasHist = circshift(XUVLasHist,[0,-1]);       
-    XUVLasHist(:,RunNum) = XUVLasRMS;   
-    YUVLasHist = circshift(YUVLasHist,[0,-1]);       
-    YUVLasHist(:,RunNum) = YUVLasRMS;        
-    UVLasPowHist = circshift(UVLasPowHist,[0,-1]);       
-    UVLasPowHist(:,RunNum) = UVLasPowRMS;   
-    XIRLasHist = circshift(XIRLasHist,[0,-1]);       
-    XIRLasHist(:,RunNum) = XIRLasRMS;   
-    YIRLasHist = circshift(YIRLasHist,[0,-1]);       
-    YIRLasHist(:,RunNum) = YIRLasRMS;        
-    IRLasPowHist = circshift(IRLasPowHist,[0,-1]);       
-    IRLasPowHist(:,RunNum) = IRLasPowRMS;       
+    XUVLasHist = circshift(XUVLasHist,[0,-1]);
+    XUVLasHist(:,RunNum) = XUVLasRMS;
+    YUVLasHist = circshift(YUVLasHist,[0,-1]);
+    YUVLasHist(:,RunNum) = YUVLasRMS;
+    UVLasPowHist = circshift(UVLasPowHist,[0,-1]);
+    UVLasPowHist(:,RunNum) = UVLasPowRMS;
+    XIRLasHist = circshift(XIRLasHist,[0,-1]);
+    XIRLasHist(:,RunNum) = XIRLasRMS;
+    YIRLasHist = circshift(YIRLasHist,[0,-1]);
+    YIRLasHist(:,RunNum) = YIRLasRMS;
+    IRLasPowHist = circshift(IRLasPowHist,[0,-1]);
+    IRLasPowHist(:,RunNum) = IRLasPowRMS;
     LBC1Hist = circshift(LBC1Hist,[0,-1]);
     LBC1Hist(RunNum) = LBC1RMS;
     LBC2Hist = circshift(LBC2Hist,[0,-1]);
@@ -596,54 +596,54 @@ while(1)
     XHistInj = circshift(XHistInj,[0,-1]);
     XHistInj(RunNum) = XInjRMS;
     YHistInj = circshift(YHistInj,[0,-1]);
-    YHistInj(RunNum) = YInjRMS;    
-    if count28Und>=RunNum 
+    YHistInj(RunNum) = YInjRMS;
+    if count28Und>=RunNum
         XHist28Und = circshift(XHist28Und,[0,-1]);
         XHist28Und(RunNum) = X28UndRMS;
         YHist28Und = circshift(YHist28Und,[0,-1]);
-        YHist28Und(RunNum) = Y28UndRMS;    
+        YHist28Und(RunNum) = Y28UndRMS;
     end
-    
- 
-    handles.mytime = mytime; 
+
+
+    handles.mytime = mytime;
     handles.EHist = EHist;
     handles.THist = THist;
     handles.XUVLasHist = XUVLasHist;
-    handles.YUVLasHist = YUVLasHist; 
-    handles.UVLasPowHist = UVLasPowHist;   
+    handles.YUVLasHist = YUVLasHist;
+    handles.UVLasPowHist = UVLasPowHist;
     handles.XIRLasHist = XIRLasHist;
-    handles.YIRLasHist = YIRLasHist; 
-    handles.IRLasPowHist = IRLasPowHist;       
+    handles.YIRLasHist = YIRLasHist;
+    handles.IRLasPowHist = IRLasPowHist;
     handles.LBC1Hist = LBC1Hist;
     handles.XHistInj = XHistInj;
     handles.YHistInj = YHistInj;
     handles.XHist28Und = XHist28Und;
-    handles.YHist28Und = YHist28Und;    
+    handles.YHist28Und = YHist28Und;
     handles.uvxInj = uvxInj;
     handles.duxInj = duxInj;
     handles.dvxInj = dvxInj;
     handles.uvyInj = uvyInj;
     handles.duyInj = duyInj;
     handles.dvyInj = dvyInj;
-        handles.LBC2Hist = LBC2Hist;     
-    if count28Und>=RunNum 
+        handles.LBC2Hist = LBC2Hist;
+    if count28Und>=RunNum
         handles.uvx28Und = uvx28Und;
         handles.dux28Und = dux28Und;
         handles.dvx28Und = dvx28Und;
         handles.uvy28Und = uvy28Und;
         handles.duy28Und = duy28Und;
-        handles.dvy28Und = dvy28Und;    
-   
+        handles.dvy28Und = dvy28Und;
+
     end
 
     % Add to handles (all digits used for PV)
-    handles.ERMS = ERMS;     
-    handles.TRMS = TRMS;   
+    handles.ERMS = ERMS;
+    handles.TRMS = TRMS;
     if isnan(XUVLasRMS), XUVLasRMS = 0; end
     handles.XUVLasRMS = XUVLasRMS;
     if isnan(YUVLasRMS), YUVLasRMS = 0; end
     handles.YUVLasRMS = YUVLasRMS;
-    
+
     handles.UVLasPowRMS = UVLasPowRMS;
     handles.UVLasPowMean = UVLasPowMean;
     if isnan(XIRLasRMS), XIRLasRMS = 0; end
@@ -651,249 +651,249 @@ while(1)
     if isnan(YIRLasRMS), YIRLasRMS = 0; end
     handles.YIRLasRMS = YIRLasRMS;
     handles.IRLasPowRMS = IRLasPowRMS;
-    handles.IRLasPowMean = IRLasPowMean;       
+    handles.IRLasPowMean = IRLasPowMean;
     handles.XInjRMS = XInjRMS;
     handles.YInjRMS = YInjRMS;
     handles.LBC1RMS = LBC1RMS;
     handles.LBC2RMS = LBC2RMS;
-    handles.LBC1Mean = LBC1Mean; 
-    handles.LBC2Mean = LBC2Mean;      
+    handles.LBC1Mean = LBC1Mean;
+    handles.LBC2Mean = LBC2Mean;
     handles.FEEGD1RMS = FEEGD1RMS;
     handles.FEEGD2RMS = FEEGD2RMS;
-    handles.PhotonEngyRMS = PhotonEngyRMS; 
-    if count28Und>=RunNum 
+    handles.PhotonEngyRMS = PhotonEngyRMS;
+    if count28Und>=RunNum
         handles.X28UndRMS = X28UndRMS;
         handles.Y28UndRMS = Y28UndRMS;
- 
+
     end
-    
+
     handles.count28Und = count28Und;
     handles.RunNum = RunNum;
     %SetWarnings(hObject, eventdata, handles)
-    
-    
+
+
     % Pare down digits for GUI
     ERMS = round(ERMS*1000)/1000;
     TRMS = round(TRMS*100)/100;
-    LasRMS = round(LasRMS*1000)/1000;    
+    LasRMS = round(LasRMS*1000)/1000;
     XUVLasRMS = round(XUVLasRMS*100)/100;
     YUVLasRMS = round(YUVLasRMS*100)/100;
-    UVLasPowRMS = round(UVLasPowRMS*100)/100; 
+    UVLasPowRMS = round(UVLasPowRMS*100)/100;
     XIRLasRMS = round(XIRLasRMS*100)/100;
     YIRLasRMS = round(YIRLasRMS*100)/100;
-    IRLasPowRMS = round(IRLasPowRMS*100)/100;     
+    IRLasPowRMS = round(IRLasPowRMS*100)/100;
     XInjRMS = round(XInjRMS*100)/100;
     YInjRMS = round(YInjRMS*100)/100;
-    LBC1RMS = round(LBC1RMS*100)/100; 
+    LBC1RMS = round(LBC1RMS*100)/100;
     LBC1Mean = round(LBC1Mean);
         LBC2RMS = round(LBC2RMS*100)/100;
         LBC2Mean = round(LBC2Mean);
-    if count28Und>=RunNum     
+    if count28Und>=RunNum
         X28UndRMS = round(X28UndRMS*100)/100;
-        Y28UndRMS = round(Y28UndRMS*100)/100;    
+        Y28UndRMS = round(Y28UndRMS*100)/100;
 
     end
-    
+
 %     %MMM
 %     loop_time = toc;
-%     
+%
 %     % Pause before taking more data.  Subtract off read time from total
 %     % wait time
-%     pause(handles.wait-loop_time);   
+%     pause(handles.wait-loop_time);
 % continue  %MMM
 
     %----------------------- write values to GUImytime,XUVLasHist,mytime,YUVLasHist,
 %     set(handles.DLRMS,'String',num2str(ERMS(2)));
-%     set(handles.BC1RMS,'String',num2str(ERMS(3)));    
+%     set(handles.BC1RMS,'String',num2str(ERMS(3)));
 %     set(handles.BC2RMS,'String',num2str(ERMS(4)));
 %     set(handles.BSYRMS,'String',num2str(ERMS(5)));
-%     set(handles.DLTMIT,'String',num2str(TRMS));  
-%     set(handles.LASRMS,'String',num2str(LasRMS));      
-%     set(handles.XUV_RMS,'String',num2str(XUVLasRMS));  
-%     set(handles.YUV_RMS,'String',num2str(YUVLasRMS)); 
-%     set(handles.UVLASPOWRMS,'String',num2str(UVLasPowRMS));   
-%     set(handles.XIR_RMS,'String',num2str(XIRLasRMS));  
-%     set(handles.YIR_RMS,'String',num2str(YIRLasRMS)); 
-%     set(handles.IRLASPOWRMS,'String',num2str(IRLasPowRMS));       
+%     set(handles.DLTMIT,'String',num2str(TRMS));
+%     set(handles.LASRMS,'String',num2str(LasRMS));
+%     set(handles.XUV_RMS,'String',num2str(XUVLasRMS));
+%     set(handles.YUV_RMS,'String',num2str(YUVLasRMS));
+%     set(handles.UVLASPOWRMS,'String',num2str(UVLasPowRMS));
+%     set(handles.XIR_RMS,'String',num2str(XIRLasRMS));
+%     set(handles.YIR_RMS,'String',num2str(YIRLasRMS));
+%     set(handles.IRLASPOWRMS,'String',num2str(IRLasPowRMS));
 %     set(handles.XINJ_RMS,'String',num2str(XInjRMS));
-%     set(handles.YINJ_RMS,'String',num2str(YInjRMS));    
-%     set(handles.LBC1_RMS,'String',num2str(LBC1RMS));    
-%     set(handles.LBC1MEAN,'String',num2str(LBC1Mean));        
+%     set(handles.YINJ_RMS,'String',num2str(YInjRMS));
+%     set(handles.LBC1_RMS,'String',num2str(LBC1RMS));
+%     set(handles.LBC1MEAN,'String',num2str(LBC1Mean));
 %         set(handles.LBC2_RMS,'String',num2str(LBC2RMS));
-%         set(handles.LBC2MEAN,'String',num2str(LBC2Mean));  
-%     if count28Und>=RunNum 
+%         set(handles.LBC2MEAN,'String',num2str(LBC2Mean));
+%     if count28Und>=RunNum
 %         set(handles.X28_RMS,'String',num2str(X28UndRMS));
-%         set(handles.Y28_RMS,'String',num2str(Y28UndRMS));         
-%        
+%         set(handles.Y28_RMS,'String',num2str(Y28UndRMS));
+%
 %     end
 
-   
+
     %'lcaPut Mark'
 
     % write Energy RMS and TMIT with corresponding times to PVs
-    % Change PV precision in MATLAB using, for example: 
+    % Change PV precision in MATLAB using, for example:
     % lcaPut('SIOC:SYS0:ML00:AO170.PREC',3)
     try  lcaPut('SIOC:SYS0:ML00:AO170',handles.ERMS(2));
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO170');
-          dispStr(['Val: ',num2str(handles.ERMS(2))]);         
+          dispStr(['Val: ',num2str(handles.ERMS(2))]);
     end
     try lcaPut('SIOC:SYS0:ML00:SO0170',handles.tstr)
-    catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0170');        
+    catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0170');
     end
     try lcaPut('SIOC:SYS0:ML00:AO171',handles.ERMS(3));
     catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:AO171');
-           dispStr(['Val: ',num2str(handles.ERMS(3))]);           
+           dispStr(['Val: ',num2str(handles.ERMS(3))]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0171',handles.tstr)    
+    try lcaPut('SIOC:SYS0:ML00:SO0171',handles.tstr)
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0171');
     end
     try lcaPut('SIOC:SYS0:ML00:AO172',handles.ERMS(4));
     catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:AO172');
-           dispStr(['Val: ',num2str(handles.ERMS(4))]);           
+           dispStr(['Val: ',num2str(handles.ERMS(4))]);
     end
     try lcaPut('SIOC:SYS0:ML00:SO0172',handles.tstr)
     catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0172');
-    end        
-    try lcaPut('SIOC:SYS0:ML00:AO173',handles.ERMS(5));  
+    end
+    try lcaPut('SIOC:SYS0:ML00:AO173',handles.ERMS(5));
     catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:AO173');
-           dispStr(['Val: ',num2str(handles.ERMS(5))]);         
+           dispStr(['Val: ',num2str(handles.ERMS(5))]);
     end
     try lcaPut('SIOC:SYS0:ML00:SO0173',handles.tstr)
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0173');
     end
-    try lcaPut('SIOC:SYS0:ML00:AO174',handles.TRMS);   
+    try lcaPut('SIOC:SYS0:ML00:AO174',handles.TRMS);
     catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:AO174');
-          dispStr(['Val: ',num2str(handles.TRMS)]);         
+          dispStr(['Val: ',num2str(handles.TRMS)]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0174',handles.tstr)    
+    try lcaPut('SIOC:SYS0:ML00:SO0174',handles.tstr)
     catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0174');
     end
-    try lcaPut('SIOC:SYS0:ML00:AO175',1.602E-10*handles.Tmean)    % Charge in pC         
+    try lcaPut('SIOC:SYS0:ML00:AO175',1.602E-10*handles.Tmean)    % Charge in pC
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO175');
-          dispStr(['Val: ',num2str(handles.Tmean)]);         
+          dispStr(['Val: ',num2str(handles.Tmean)]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0175',handles.tstr)    
+    try lcaPut('SIOC:SYS0:ML00:SO0175',handles.tstr)
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0175');
     end
-    try  lcaPut('SIOC:SYS0:ML00:AO176',handles.XInjRMS);   
+    try  lcaPut('SIOC:SYS0:ML00:AO176',handles.XInjRMS);
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO176');
-          dispStr(['Val: ',num2str(handles.XInjRMS)]);          
+          dispStr(['Val: ',num2str(handles.XInjRMS)]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0176',handles.tstr)    
+    try lcaPut('SIOC:SYS0:ML00:SO0176',handles.tstr)
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0176');
     end
-    try  lcaPut('SIOC:SYS0:ML00:AO177',handles.YInjRMS);   
+    try  lcaPut('SIOC:SYS0:ML00:AO177',handles.YInjRMS);
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO177');
-          dispStr(['Val: ',num2str(handles.YInjRMS)]);  
+          dispStr(['Val: ',num2str(handles.YInjRMS)]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0177',handles.tstr)    
+    try lcaPut('SIOC:SYS0:ML00:SO0177',handles.tstr)
     catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0177');
-    end    
-    if count28Und>=RunNum 
-        try lcaPut('SIOC:SYS0:ML00:AO178',min(handles.X28UndRMS,123.45));   
+    end
+    if count28Und>=RunNum
+        try lcaPut('SIOC:SYS0:ML00:AO178',min(handles.X28UndRMS,123.45));
         catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO178');
               dispStr(['Val: ',num2str(handles.X28UndRMS)]);
         end
         try lcaPut('SIOC:SYS0:ML00:SO0178',handles.tstr), catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0178');  end
-        try  lcaPut('SIOC:SYS0:ML00:AO179',min(handles.Y28UndRMS,123.45));   
+        try  lcaPut('SIOC:SYS0:ML00:AO179',min(handles.Y28UndRMS,123.45));
         catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO179');
               dispStr(['Val: ',num2str(handles.Y28UndRMS)]);
         end
-        try lcaPut('SIOC:SYS0:ML00:SO0179',handles.tstr) ,catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0179'); end    
+        try lcaPut('SIOC:SYS0:ML00:SO0179',handles.tstr) ,catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0179'); end
     end
-    try lcaPut('SIOC:SYS0:ML00:AO180',handles.LBC1RMS);   
+    try lcaPut('SIOC:SYS0:ML00:AO180',handles.LBC1RMS);
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO180');
           dispStr(['Val: ',num2str(handles.LBC1RMS)]);
     end
-    try  lcaPut('SIOC:SYS0:ML00:SO0180',handles.tstr), catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0180');  end  
-    try  lcaPut('SIOC:SYS0:ML00:AO181',handles.LBC1Mean);   
+    try  lcaPut('SIOC:SYS0:ML00:SO0180',handles.tstr), catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0180');  end
+    try  lcaPut('SIOC:SYS0:ML00:AO181',handles.LBC1Mean);
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO181');
           dispStr(['Val: ',num2str(handles.LBC1Mean)]);
     end
     try lcaPut('SIOC:SYS0:ML00:SO0181',handles.tstr), catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0181');  end
-%     if (count28Und>=RunNum && isfinite(LBC2RMS))  
+%     if (count28Und>=RunNum && isfinite(LBC2RMS))
     try
-        lcaPut('SIOC:SYS0:ML00:AO182',handles.LBC2RMS);   
+        lcaPut('SIOC:SYS0:ML00:AO182',handles.LBC2RMS);
     catch
         dispStr('Error writing to PV: SIOC:SYS0:ML00:AO182');
         dispStr(['Val: ',num2str(handles.LBC2RMS)]);
     end
-    try  lcaPut('SIOC:SYS0:ML00:SO0182',handles.tstr); catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0182');  end  
-    try lcaPut('SIOC:SYS0:ML00:AO183',handles.LBC2Mean);   
+    try  lcaPut('SIOC:SYS0:ML00:SO0182',handles.tstr); catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0182');  end
+    try lcaPut('SIOC:SYS0:ML00:AO183',handles.LBC2Mean);
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO183');
-          dispStr(['Val: ',num2str(handles.LBC2Mean)]); 
+          dispStr(['Val: ',num2str(handles.LBC2Mean)]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0183',handles.tstr) ; catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0183');  end         
+    try lcaPut('SIOC:SYS0:ML00:SO0183',handles.tstr) ; catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0183');  end
 %     end
-    
+
     % FEE gas detectors
     try lcaPut('SIOC:SYS0:ML00:AO640',FEEGD1RMS), catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO640 FEEGD1RMS'), end
     try lcaPut('SIOC:SYS0:ML00:AO641',FEEGD2RMS), catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO641 FEEGD2RMS'), end
     % Photon Energy
     try lcaPut('SIOC:SYS0:ML00:AO642',PhotonEngyRMS), catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO642 PhotonEngyRMS) '), end
     % Laser
-    try lcaPut('SIOC:SYS0:ML00:AO184',handles.XUVLasRMS);   
+    try lcaPut('SIOC:SYS0:ML00:AO184',handles.XUVLasRMS);
     catch
         dispStr('Error writing to PV: SIOC:SYS0:ML00:AO184');
         dispStr(['Val: ',num2str(handles.XUVLasRMS)]);
     end
     try lcaPut('SIOC:SYS0:ML00:SO0184',handles.tstr), catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0184'); end
-    try lcaPut('SIOC:SYS0:ML00:AO185',handles.YUVLasRMS);  
+    try lcaPut('SIOC:SYS0:ML00:AO185',handles.YUVLasRMS);
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO185');
           dispStr(['Val: ',num2str(handles.YUVLasRMS)]);
     end
-    try  lcaPut('SIOC:SYS0:ML00:SO0185',handles.tstr),  catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0185'); end      
-    try lcaPut('SIOC:SYS0:ML00:AO186',handles.UVLasPowRMS); 
+    try  lcaPut('SIOC:SYS0:ML00:SO0185',handles.tstr),  catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0185'); end
+    try lcaPut('SIOC:SYS0:ML00:AO186',handles.UVLasPowRMS);
     catch dispStr('Error writing to PV: SIOC:SYS0:ML00:AO186');
           dispStr(['Val: ',num2str(handles.UVLasPowRMS)]);
     end
-    try  lcaPut('SIOC:SYS0:ML00:SO0186',handles.tstr) ; catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0186');end    
-    try  lcaPut('SIOC:SYS0:ML00:AO187',handles.UVLasPowMean);   
+    try  lcaPut('SIOC:SYS0:ML00:SO0186',handles.tstr) ; catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0186');end
+    try  lcaPut('SIOC:SYS0:ML00:AO187',handles.UVLasPowMean);
     catch
         dispStr('Error writing to PV: SIOC:SYS0:ML00:AO187');
         dispStr(['Val: ',num2str(handles.UVLasPowMean)]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0187',handles.tstr); catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0187'); end      
-    try lcaPut('SIOC:SYS0:ML00:AO501',handles.XIRLasRMS);   
+    try lcaPut('SIOC:SYS0:ML00:SO0187',handles.tstr); catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0187'); end
+    try lcaPut('SIOC:SYS0:ML00:AO501',handles.XIRLasRMS);
     catch
         dispStr('Error writing to PV: SIOC:SYS0:ML00:AO501');
         dispStr(['Val: ',num2str(handles.XIRLasRMS)]);
     end
     try lcaPut('SIOC:SYS0:ML00:SO0501',handles.tstr); catch dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0501');  end
-    try lcaPut('SIOC:SYS0:ML00:AO502',handles.YIRLasRMS);   
+    try lcaPut('SIOC:SYS0:ML00:AO502',handles.YIRLasRMS);
     catch
         dispStr('Error writing to PV: SIOC:SYS0:ML00:AO502');
         dispStr(['Val: ',num2str(handles.YIRLasRMS)]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0502',handles.tstr); catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0502'); end      
-    try lcaPut('SIOC:SYS0:ML00:AO503',handles.IRLasPowRMS);   
+    try lcaPut('SIOC:SYS0:ML00:SO0502',handles.tstr); catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0502'); end
+    try lcaPut('SIOC:SYS0:ML00:AO503',handles.IRLasPowRMS);
     catch
         dispStr('Error writing to PV: SIOC:SYS0:ML00:AO503');
         dispStr(['Val: ',num2str(handles.IRLasPowRMS)]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0503',handles.tstr); catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0503');  end    
-    try lcaPut('SIOC:SYS0:ML00:AO504',handles.IRLasPowMean);   
+    try lcaPut('SIOC:SYS0:ML00:SO0503',handles.tstr); catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0503');  end
+    try lcaPut('SIOC:SYS0:ML00:AO504',handles.IRLasPowMean);
     catch
         dispStr('Error writing to PV: SIOC:SYS0:ML00:AO504');
         dispStr(['Val: ',num2str(handles.IRLasPowMean)]);
     end
-    try lcaPut('SIOC:SYS0:ML00:SO0504',handles.tstr); catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0504'); end      
-    
-    
-    %--guidata(hObject, handles);    
-    
+    try lcaPut('SIOC:SYS0:ML00:SO0504',handles.tstr); catch  dispStr('Error writing to PV: SIOC:SYS0:ML00:SO0504'); end
+
+
+    %--guidata(hObject, handles);
+
     loop_time = toc;
-    
+
     % Pause before taking more data.  Subtract off read time from total
     % wait time
-    pause(handles.wait-loop_time);   
-    
+    pause(handles.wait-loop_time);
+
 
     %'finished loop'
 end
 end
 
-    
+
 function JSet = XYJitter_Setup(BPM_pvs,Nsamp, destinationFlag)
 if ~exist('rate','var')
   try
@@ -932,7 +932,7 @@ etax   = zeros(nbpms,1);
 %err = Err.getInstance('xalModelDemo');
 %d = DaObject();
 %d.setParam('TYPE','DATABASE');
-  
+
 global modelSource;
 modelSource='MATLAB';
 
@@ -946,15 +946,15 @@ for j = 1:nbpms
     %twiss2 = aidaget([BPM_SLC_name '//twiss'],'doublea',{'TYPE=DATABASE'});
     twiss = model_rMatGet(BPM_pvs{j},[],'TYPE=DESIGN','twiss');
   catch
-    dispStr(['You have angered the EPICS Gods by asking for twiss params from ',BPM_pvs{j}]); 
+    dispStr(['You have angered the EPICS Gods by asking for twiss params from ',BPM_pvs{j}]);
   end
-  %twiss = cell2mat(twiss); 
+  %twiss = cell2mat(twiss);
   switch destinationFlag
       case 'INJ_SET', energy(j) = twiss(1,:);
       case 'BSY_SET', energy(j) = lemEnergy; %twiss(1,:);
       otherwise fprintf('%s XYJitter_Setup: Wrong Destination Flag\n', datestr(now));
   end
- 
+
   betax(j)  = twiss(3,:);
   alfax(j)  = twiss(4,:);
   betay(j)  = twiss(8,:);
@@ -965,7 +965,7 @@ end
 
 
 
-r=model_rMatGet(BPM_pvs{end},BPM_pvs);    
+r=model_rMatGet(BPM_pvs{end},BPM_pvs);
 JSet.R1s = permute(r(1,[1 2 3 4 6],:),[3 2 1]);
 JSet.R3s = permute(r(3,[1 2 3 4 6],:),[3 2 1]);
 
@@ -985,7 +985,7 @@ JSet.ay = alfay(end);
 
 
 
-    
+
 % JSet.R1s = zeros(nbpms,5);
 % JSet.R3s = zeros(nbpms,5);
 % d.setParam('TYPE','DATABASE');
@@ -993,19 +993,19 @@ JSet.ay = alfay(end);
 %   try
 %     R = d.geta([BPM_pvs{j} '//R'], 54);
 %   catch
-%     dispStr(['You have angered the AIDA Gods by asking for the R matrix from',BPM_pvs{j}]); 
+%     dispStr(['You have angered the AIDA Gods by asking for the R matrix from',BPM_pvs{j}]);
 %   end
 %   Rm       = reshape(double(R),6,6);
 %   Rm       = Rm';
 %   JSet.R1s(j,:) = Rm(1,[1:4,6]);
 %   JSet.R3s(j,:) = Rm(3,[1:4,6]);
 % end
-% d.reset();   
+% d.reset();
 
 
-     
-    
-   
+
+
+
 navg = 1;
 % [X0,Y0,T0] = read_BPMsSmart(BPM_pvs,navg,rate);  % read all BPMs, X, Y, & TMIT with averaging
 % %Xs0  =  X0;                 % mean X-position for all BPMs [mm]
@@ -1072,7 +1072,7 @@ for j = 1:Nsamp
     try
     [Xf,Yf,p,dp,chisq,Q,Vv] = ...
       xy_traj_fit(dXs(j,ioks(j,:)&1),1,dYs(j,ioks(j,:)&1),1,0*dXs(j,ioks(j,:)&1),0*dYs(j,ioks(j,:)&1),R1s(ioks(j,:)&1,:),R3s(ioks(j,:)&1,:),ifit);	% fit trajectory
-    
+
     Xsf(j,ioks(j,:)&1) = Xf;
     Ysf(j,ioks(j,:)&1) = Yf;
     ps(j,:)  = p;
@@ -1082,9 +1082,9 @@ for j = 1:Nsamp
     dps34(j,:) = V(3,4);
     catch
         %fprintf('%s bad fit in xy_traj_fit\n', datestr(now));
-        
+
     end
-    
+
 end
 
 
@@ -1142,7 +1142,7 @@ switch Xax,
                           lcaPutSmart('CUD:MCC0:WFRM:JITTER3',uvy(1,1:20)); lcaPutSmart('CUD:MCC0:WFRM:JITTER4',uvy(2,1:20));
     case 'XJITTERAX_28' , lcaPutSmart('CUD:MCC0:WFRM:JITTER5',uvx(1,1:20)); lcaPutSmart('CUD:MCC0:WFRM:JITTER6',uvx(2,1:20));
                           lcaPutSmart('CUD:MCC0:WFRM:JITTER7',uvy(1,1:20)); lcaPutSmart('CUD:MCC0:WFRM:JITTER8',uvy(2,1:20));
-    otherwise, logStatus(['Warning: Bad value for Xax: "', Xax, '" Ellipse plots not updated']); 
+    otherwise, logStatus(['Warning: Bad value for Xax: "', Xax, '" Ellipse plots not updated']);
 end
 
 
@@ -1154,13 +1154,13 @@ Ystd = util_stdNan(ry);
 end
 
 function logStatus(statString)
-persistent oldStatString 
+persistent oldStatString
 if (~exist('oldStatString','var')), oldStatString = 'none'; end
 
 if (~strcmp(statString, oldStatString))
     msgStr = sprintf('%s %s',datestr(now), statString);
     disp(msgStr)
-    lcaPutSmart('SIOC:SYS0:ML00:CA003' ,double(int8(msgStr))); 
+    lcaPutSmart('SIOC:SYS0:ML00:CA003' ,double(int8(msgStr)));
 end
 oldStatString = statString;
 end
@@ -1232,7 +1232,7 @@ end
 %for jj = 1:navg
 % Get BSA data
   try
-    data = lcaGetSmart(pvlist,0,'double');    % read X, Y, and TMIT of all BPMs 
+    data = lcaGetSmart(pvlist,0,'double');    % read X, Y, and TMIT of all BPMs
   catch
     disp('Error with lcaGetSmart in read_BPMsSmart')
   end

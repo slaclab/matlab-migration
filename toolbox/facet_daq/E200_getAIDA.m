@@ -1,66 +1,55 @@
 function buffAcqData = E200_getAIDA(dgrp, device_list, nrpos)
 % Read FACET SLC buffered Data Orbit with Aida - Zelazny
 
-import java.util.Vector;
+% AIDA-PVA imports
+global pvaRequest;
 
-persistent da;
-    
 try
 
     disp(['I NEED A PITA! ' datestr(clock,'HH:MM:SS')]);
-    aidainit;
 
-    if isempty(da)
-        import edu.stanford.slac.aida.lib.da.DaObject;
-        da = DaObject();
-    end
+    aida_command = [ dgrp ':BUFFACQ' ];
 
-    da.reset();
+    requestBuilder = pvaRequest(aida_command);
+    requestBuilder.with('BPMD', getBPMD(dgrp));
+    requestBuilder.with('NRPOS', nrpos);
+    requestBuilder.with('BPMS', device_list);
 
-    aida_command = [ dgrp '//BUFFACQ' ];
-
-    da.setParam(sprintf('BPMD=%d',getBPMD(dgrp)));
-    da.setParam(sprintf('NRPOS=%d',nrpos));
-
-    for i = 1:length(device_list)
-        da.setParam(sprintf('BPM%d=%s',i,char(device_list(i))));
-    end
-
-    vDeviceData = da.getDaValue(aida_command);
+    vDeviceData = ML(requestBuilder.get());
     disp(['FINITA! ' datestr(clock,'HH:MM:SS')]);
 
-    names = Vector(vDeviceData.get(0));
-    data(1) = Vector(vDeviceData.get(1));
-    data(2) = Vector(vDeviceData.get(2));
-    data(3) = Vector(vDeviceData.get(3));
-    data(4) = Vector(vDeviceData.get(4));
-    data(5) = Vector(vDeviceData.get(5));
-    data(6) = Vector(vDeviceData.get(6));
+    names = vDeviceData.values.name;
+    id = vDeviceData.values.pulseId;
+    x = vDeviceData.values.x;
+    y = vDeviceData.values.y;
+    tmits = vDeviceData.values.tmits;
+    stat = vDeviceData.values.stat;
+    goodmeas = vDeviceData.values.goodmeas;
 
-    for i = 1:names.size()
+    for i = 1:vDeviceData.size
         if isequal(1,i)
-            buffAcqData(i).pulse_id = data(1).elementAt(i-1);
+            buffAcqData(i).pulse_id = id(i);
         end
         for indx = 1:length(buffAcqData)
-            if isequal(buffAcqData(indx).pulse_id, data(1).elementAt(i-1))
+            if isequal(buffAcqData(indx).pulse_id, id(i))
                 break;
             end
             indx = 1 + length(buffAcqData);
         end
-        buffAcqData(indx).pulse_id = data(1).elementAt(i-1);
-        name = names.elementAt(i-1);
+        buffAcqData(indx).pulse_id = id(i);
+        name = names(i);
         if strcmp('BPMS',name(1:4))
             if isfield(buffAcqData(indx),'bpms')
                 idev = 1 + length(buffAcqData(indx).bpms);
             else
                 idev = 1;
             end
-            buffAcqData(indx).bpms(idev).name = names.elementAt(i-1);
-            buffAcqData(indx).bpms(idev).x = data(2).elementAt(i-1);
-            buffAcqData(indx).bpms(idev).y = data(3).elementAt(i-1);
-            buffAcqData(indx).bpms(idev).tmit = data(4).elementAt(i-1);
-            buffAcqData(indx).bpms(idev).stat = data(5).elementAt(i-1);
-            buffAcqData(indx).bpms(idev).goodmeas = data(6).elementAt(i-1);
+            buffAcqData(indx).bpms(idev).name = names(i);
+            buffAcqData(indx).bpms(idev).x = x(i);
+            buffAcqData(indx).bpms(idev).y = y(i);
+            buffAcqData(indx).bpms(idev).tmit = tmits(i);
+            buffAcqData(indx).bpms(idev).stat = stat(i);
+            buffAcqData(indx).bpms(idev).goodmeas = goodmeas(i);
         end
         if strcmp('TORO',name(1:4))
             if isfield(buffAcqData(indx),'toro')
@@ -68,10 +57,10 @@ try
             else
                 idev = 1;
             end
-            buffAcqData(indx).toro(idev).name = names.elementAt(i-1);
-            buffAcqData(indx).toro(idev).tmit = data(4).elementAt(i-1);
-            buffAcqData(indx).toro(idev).stat = data(5).elementAt(i-1);
-            buffAcqData(indx).toro(idev).goodmeas = data(6).elementAt(i-1);
+            buffAcqData(indx).toro(idev).name = names(i);
+            buffAcqData(indx).toro(idev).tmit = tmits(i);
+            buffAcqData(indx).toro(idev).stat = stat(i);
+            buffAcqData(indx).toro(idev).goodmeas = goodmeas(i);
         end
         if strcmp('KLYS',name(1:4))
             if isfield(buffAcqData(indx),'klys')
@@ -79,9 +68,9 @@ try
             else
                 idev = 1;
             end
-            buffAcqData(indx).klys(idev).name = names.elementAt(i-1);
-            buffAcqData(indx).klys(idev).phase = data(2).elementAt(i-1);
-            buffAcqData(indx).klys(idev).stat = data(5).elementAt(i-1);
+            buffAcqData(indx).klys(idev).name = names.(i);
+            buffAcqData(indx).klys(idev).phase = x(i);
+            buffAcqData(indx).klys(idev).stat = stat(i);
         end
         if strcmp('SBST',name(1:4))
             if isfield(buffAcqData(indx),'sbst')
@@ -89,9 +78,9 @@ try
             else
                 idev = 1;
             end
-            buffAcqData(indx).sbst(idev).name = names.elementAt(i-1);
-            buffAcqData(indx).sbst(idev).phase = data(2).elementAt(i-1);
-            buffAcqData(indx).sbst(idev).stat = data(5).elementAt(i-1);
+            buffAcqData(indx).sbst(idev).name = names(i);
+            buffAcqData(indx).sbst(idev).phase = x(i);
+            buffAcqData(indx).sbst(idev).stat = stat(i);
         end
     end
 

@@ -1,4 +1,6 @@
 function [R1s,R3s,Zs,Zs0] = xy_traj_fit_setup(prim0,micr0,unit0,BPM_micrs,BPM_units)
+% AIDA-PVA imports
+global pvaRequest;
 
 name=[prim0 ':' micr0 ':' int2str(unit0)];
 nameList=strcat('BPMS:',cellstr(char(BPM_micrs)),':',cellstr(int2str(BPM_units(:))));
@@ -14,19 +16,24 @@ R1s = zeros(nbpms,5);
 R3s = zeros(nbpms,5);
 Zs  = zeros(nbpms,1);
 try
-  Zs0 = aidaget([prim0 ':' micr0 ':' int2str(unit0) '//Z']);
-catch
+  Zs0 = pvaGet([prim0 ':' micr0 ':' int2str(unit0) ':Z']);
+catch e
+  handleExceptions(e);
   errordlg('Fatal error on AIDAGET for database Z-values.','AIDAGET ERROR');
 end
 for j = 1:nbpms
   try
-    Zs(j)    = aidaget(['BPMS:' BPM_micrs(j,:) ':' int2str(BPM_units(j)) '//Z']);
+    Zs(j)    = pvaGet(['BPMS:' BPM_micrs(j,:) ':' int2str(BPM_units(j)) ':Z']);
   catch
     errordlg('Fatal error on AIDAGET for database Z-values.','AIDAGET ERROR');
   end
   try
-    R        = aidaget({[prim0 ':' micr0 ':' int2str(unit0) '//R']},'doublea',{['B=BPMS:' BPM_micrs(j,:) ':' int2str(BPM_units(j))]});
-  catch
+    requestBuilder = pvaRequest({[prim0 ':' micr0 ':' int2str(unit0) ':R']});
+    requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+    requestBuilder.with('B', ['BPMS:' BPM_micrs(j,:) ':' int2str(BPM_units(j))]);
+    R        = ML(requestBuilder.get());
+  catch e
+    handleExceptions(e);
     errordlg('Fatal error on AIDAGET for database R-matrices.','AIDAGET ERROR');
   end
   Rm       = reshape(R,6,6);

@@ -88,7 +88,7 @@ try
     gBunchLength.screen.blen_phase.value{1} = lcaGet(gBunchLength.screen.blen_phase_pv.name);
 catch
 end
-    
+
 gBunchLength.screen.blen_phase.desc = cell(1);
 gBunchLength.screen.blen_phase.desc_pv.name = {gBunchLength.screen.blen_phase.desc_pv.a{gBunchLength.screen.i}};
 gBunchLength.screen.blen_phase.desc_pv.connected = 0;
@@ -143,7 +143,7 @@ gBunchLength.screen.maxImgs.value = cell(1);
 gBunchLength.screen.maxImgs_pv.name = {gBunchLength.screen.maxImgs_pv.a{gBunchLength.screen.i}};
 gBunchLength.screen.maxImgs_pv.connected = 0;
 gBunchLength.screen.maxImgs_pv.force = {1};
- 
+
 gBunchLength.screen.image.resolution = cell(1);
 gBunchLength.screen.image.resolution_pv.name = {gBunchLength.screen.image.resolution_pv.a{gBunchLength.screen.i}};
 gBunchLength.screen.image.resolution_pv.connected = 0;
@@ -173,7 +173,7 @@ gBunchLength.rate.egu_pv.force = {1};
 gBunchLength.tcav = [];
 gBunchLength.tcav.name = 'TCAV3';
 gBunchLength.tcav.bgrp_variable = 'T_CAV3';
-gBunchLength.tcav.aida = 'KLYS:LI24:81//TACT';
+gBunchLength.tcav.aida = 'KLYS:LI24:81:TACT';
 gBunchLength.tcav.pv.format = 'TCAV:LI24:800:%s';
 
 gBunchLength.tcav.pdes.ts = cell(1);
@@ -229,7 +229,7 @@ gBunchLength.tcav.aact.egu_pv.force = {1};
 
 gBunchLength.tcav.cal.start_phase.ts = cell(1);
 gBunchLength.tcav.cal.start_phase.value = cell(1);
-gBunchLength.tcav.cal.start_phase.pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_CSP'); 
+gBunchLength.tcav.cal.start_phase.pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_CSP');
 gBunchLength.tcav.cal.start_phase.pv.connected = 0;
 gBunchLength.tcav.cal.start_phase.pv.force = {1};
 try
@@ -239,7 +239,7 @@ end
 
 gBunchLength.tcav.cal.end_phase.ts = cell(1);
 gBunchLength.tcav.cal.end_phase.value = cell(1);
-gBunchLength.tcav.cal.end_phase.pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_CEP'); 
+gBunchLength.tcav.cal.end_phase.pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_CEP');
 gBunchLength.tcav.cal.end_phase.pv.connected = 0;
 gBunchLength.tcav.cal.end_phase.pv.force = {1};
 try
@@ -249,7 +249,7 @@ end
 
 gBunchLength.tcav.cal.num_phase.ts = cell(1);
 gBunchLength.tcav.cal.num_phase.value = cell(1);
-gBunchLength.tcav.cal.num_phase.pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_CN'); 
+gBunchLength.tcav.cal.num_phase.pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_CN');
 gBunchLength.tcav.cal.num_phase.pv.connected = 0;
 gBunchLength.tcav.cal.num_phase.pv.force = {1};
 try
@@ -258,23 +258,23 @@ catch
 end
 
 gBunchLength.tcav.cal.num_phase.desc = cell(1);
-gBunchLength.tcav.cal.num_phase.desc_pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_CN.DESC'); 
+gBunchLength.tcav.cal.num_phase.desc_pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_CN.DESC');
 gBunchLength.tcav.cal.num_phase.desc_pv.connected = 0;
 gBunchLength.tcav.cal.num_phase.desc_pv.force = {1};
 
 gBunchLength.tcav.settle_time.ts = cell(1);
 gBunchLength.tcav.settle_time.value = cell(1);
-gBunchLength.tcav.settle_time.pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_ST'); 
+gBunchLength.tcav.settle_time.pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_ST');
 gBunchLength.tcav.settle_time.pv.connected = 0;
 gBunchLength.tcav.settle_time.pv.force = {1};
 
 gBunchLength.tcav.settle_time.egu = cell(1);
-gBunchLength.tcav.settle_time.egu_pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_ST.EGU'); 
+gBunchLength.tcav.settle_time.egu_pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_ST.EGU');
 gBunchLength.tcav.settle_time.egu_pv.connected = 0;
 gBunchLength.tcav.settle_time.egu_pv.force = {1};
 
 gBunchLength.tcav.settle_time.desc = cell(1);
-gBunchLength.tcav.settle_time.desc_pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_ST.DESC'); 
+gBunchLength.tcav.settle_time.desc_pv.name{1} = sprintf (gBunchLength.blen.pv.format, 'TCAV_ST.DESC');
 gBunchLength.tcav.settle_time.desc_pv.connected = 0;
 gBunchLength.tcav.settle_time.desc_pv.force = {1};
 
@@ -304,7 +304,7 @@ gBunchLength.bpm.pv.fmtslc = {'LI25:BPMS:301:%s', ...
                               'LI25:BPMS:401:%s', ...
                               'LI25:BPMS:501:%s', ...
                               'LI25:BPMS:901:%s'};
-                              
+
 gBunchLength.bpm.desc = gBunchLength.bpm.a{gBunchLength.bpm.i};
 
 gBunchLength.bpm.x.egu_pv.a = cell(0);
@@ -364,11 +364,11 @@ gBunchLength.bpm.tmit.egu_pv.connected = 0;
 gBunchLength.bpm.tmit.egu_pv.force = {1};
 
 % Special for CAMAC controlled BPMS
-gBunchLength.bpm.x.egu = {'mm'}; % BPM X&Y EGU 
-gBunchLength.bpm.x.egu_pv.connected = {1}; 
-gBunchLength.bpm.x.egu_slc = 1; 
-gBunchLength.bpm.tmit.egu = {'Nel'}; % BPM TMIT EGU 
-gBunchLength.bpm.tmit.egu_pv.connected = {1}; 
+gBunchLength.bpm.x.egu = {'mm'}; % BPM X&Y EGU
+gBunchLength.bpm.x.egu_pv.connected = {1};
+gBunchLength.bpm.x.egu_slc = 1;
+gBunchLength.bpm.tmit.egu = {'Nel'}; % BPM TMIT EGU
+gBunchLength.bpm.tmit.egu_pv.connected = {1};
 gBunchLength.bpm.tmit.egu_slc = 1;
 
 gBunchLength.bpm.blen_phase.ts = cell(1);
@@ -489,8 +489,8 @@ gBunchLength.bpm.blen_phase.y_ref.egu_pv.connected = 0;
 gBunchLength.bpm.blen_phase.y_ref.egu_pv.force = {1};
 
 % Special for CAMAC controlled BPMS
-gBunchLength.bpm.blen_phase.y_ref.egu = {'mm'}; % BPM y reference reading engineering units 
-gBunchLength.bpm.blen_phase.y_ref.egu_pv.connected = {1}; 
+gBunchLength.bpm.blen_phase.y_ref.egu = {'mm'}; % BPM y reference reading engineering units
+gBunchLength.bpm.blen_phase.y_ref.egu_pv.connected = {1};
 gBunchLength.bpm.blen_phase.y_ref.egu_slc = 1;
 
 gBunchLength.bpm.blen_phase.y_tol.value = cell(1); % BPM y reference reading tolerance
@@ -514,10 +514,10 @@ gBunchLength.bpm.blen_phase.y_tol.egu_pv.connected = 0;
 gBunchLength.bpm.blen_phase.y_tol.egu_pv.force = {1};
 
 % Special for CAMAC controlled BPMS
-gBunchLength.bpm.blen_phase.y_tol.egu = {'mm'}; % BPM y reference reading tolerance engineering units 
-gBunchLength.bpm.blen_phase.y_tol.egu_pv.connected = {1}; 
+gBunchLength.bpm.blen_phase.y_tol.egu = {'mm'}; % BPM y reference reading tolerance engineering units
+gBunchLength.bpm.blen_phase.y_tol.egu_pv.connected = {1};
 gBunchLength.bpm.blen_phase.y_tol.egu_slc = 1;
-                                 
+
 % The Number of background images per TCAV phase step
 gBunchLength.blen.num_bkg.ts = cell(1);
 

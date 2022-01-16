@@ -25,10 +25,8 @@
 
 function [errstring] = SET_VDES(prim,micro,unit,invalue,func)
 
-aidainit;
-import java.util.Vector;
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
+% AIDA-PVA imports
+global pvaRequest AidaPvaStruct;
 
 instring = strcat(upper(prim),':',upper(micro),':',int2str(unit'));
 
@@ -38,7 +36,7 @@ deviceArray = javaArray ('java.lang.String', length(invalue));
 valueArray = javaArray ('java.lang.Float', length(invalue));
 
 for j=1:length(invalue),
-     
+
      ans3=isStatusBits(prim(j,:),micro(j,:),unit(j),'hsta','0040');
      if ans3 == 1
          errstring=strcat(upper(prim(j,:)),'.',upper(micro(j,:)),'.',...
@@ -53,19 +51,14 @@ for j=1:length(invalue),
 
 end
 
-inData1 = DaValue(deviceArray);
-inData2 = DaValue(valueArray);
-
-inData = DaValue();
-inData.type=0;
-
-inData.addElement(inData1);
-inData.addElement(inData2);
-
-
 disp('Attempting to set VDES');
-da.setParam('MAGFUNC', func);
-outData = da.setDaValue('MAGNETSET//VDES',inData);
+requestBuilder = pvaRequest('MAGNETSET:VDES');
+indata = AidaPvaStruct();
+indata.put('names', deviceArray);
+indata.put('values', valueArray);
+requestBuilder.with('MAGFUNC', func);
+outData = requestBuilder.set(inData);
+
 %disp('Wait 10 seconds for VDES to track');
 %pause_MPI(10);
 

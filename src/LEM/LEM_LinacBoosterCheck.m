@@ -4,9 +4,6 @@ function stat=LEM_LinacBoosterCheck()
 
 debug=0;
 
-global da
-da.reset
-
 global MAGNET PS
 
 % set up list of micros
@@ -28,13 +25,13 @@ for n=1:length(isect)
 
   % get QUAD IVBU polynomial
 
-    Query=strcat(dbname,'//IVBU');
+    Query=strcat(dbname,':IVBU');
     try
-      d=da.getDaValue(Query);
+      d=ML(pvaGet(Query));
     catch
       error('*** %s',Query)
     end
-    ivb=flipud(d.getFloats);
+    ivb=flipud(d);
 
   % evaluate the IVBU polynomial to get desired current
 
@@ -43,25 +40,25 @@ for n=1:length(isect)
 
 % LGPS current is lowest QUAD current (boosters provide the rest ... one
 % booster is always, by definition, zero)
-  
+
   Ilgps=min(Iquad);
-  
+
 % check the LGPS current
 
-  Query=sprintf('LGPS:LI%02d:1//IMMO',imicr);
+  Query=sprintf('LGPS:LI%02d:1:IMMO',imicr);
   try
-    d=da.getDaValue(Query);
+    d=ML(pvaGet(Query));
   catch
     error('*** %s',Query)
   end
-  immo=d.getFloats;
+  immo=d;
   bad=((Ilgps<min(immo))|(Ilgps>max(immo)));
 
   if (debug)
     disp(sprintf('LGPS:LI%02d:1 %+f %+f %+f',imicr, ...
       Ilgps,min(immo),max(immo)))
   end
-  
+
 % check the booster currents and set status
 
   for m=1:length(idm)
@@ -69,13 +66,13 @@ for n=1:length(isect)
     name=MAGNET(id).name;
     dbname=MAGNET(id).dbname;
     dbname=[dbname(6:10),dbname(1:5),dbname(11:end)]; % unmunge
-    Query=strcat(dbname,'//IMMO');
+    Query=strcat(dbname,':IMMO');
     try
-      d=da.getDaValue(Query);
+      d=ML(pvaGet(Query));
     catch
       error('*** %s',Query)
     end
-    immo=d.getFloats;
+    immo=d;
     Iboost=Iquad(m)-Ilgps;
     bad=(bad&&(Iboost>max(immo))); % if the LGPS is bad, QUADs are bad as well
     idps=strmatch(name,char(PS.name));

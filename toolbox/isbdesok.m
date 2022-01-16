@@ -13,38 +13,30 @@ function [returnval] = isbdesok(prim,micro,unit,value)
 %
 %        Returns a integer 1 if value is ok, 0 if value is not okay.
 
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
-
 % Deal with IVBU vs. IVBD (HSTA bit 2000 tells you which to use)
 ans=isStatusBits(prim,micro,unit,'HSTA','2000');
 if ans==1
-    ivbstring = strcat(upper(prim),':',upper(micro),':',int2str(unit),'//IVBD');
+    ivbstring = strcat(upper(prim),':',upper(micro),':',int2str(unit),':IVBD');
 else
-    ivbstring = strcat(upper(prim),':',upper(micro),':',int2str(unit),'//IVBU');
+    ivbstring = strcat(upper(prim),':',upper(micro),':',int2str(unit),':IVBU');
 end
-javaivb = da.getDaValue(ivbstring);
-ivb = javaivb.getAsDoubles;
+ivb = pvaGetM(ivbstring);
 
-immostring = strcat(upper(prim),':',upper(micro),':',int2str(unit),'//IMMO');
-javaimmo = da.getDaValue(immostring);
-immo = javaimmo.getAsDoubles;
+immostring = strcat(upper(prim),':',upper(micro),':',int2str(unit),':IMMO');
+immo = pvaGetM(immostring);
 
 % Deal with possible shunt/boost (if HSTA bit 4000 is set then magnet is shunt/boost)
 ans=isStatusBits(prim,micro,unit,'HSTA','4000');
 if ans==1
-    pscpstring = strcat(upper(prim),':',upper(micro),':',int2str(unit),'//PSCP');
-    javapscp = da.getDaValue(pscpstring);
-    blkIstring = strcat('LGPS',':',upper(micro),':',int2str(javapscp.getAsDoubles),'//IACT');
-    javablkI = da.getDaValue(blkIstring);
-    blkI = javablkI.getAsDoubles;
-    
+    pscpstring = strcat(upper(prim),':',upper(micro),':',int2str(unit),':PSCP');
+    scp = pvaGetM(pscpstring);
+    blkIstring = strcat('LGPS',':',upper(micro),':',int2str(scp),':IACT');
+    blkI = pvaGetM(blkIstring);
+
     %Check if magnet is single unit or part of string
     if immo(2) == 0
-        immostring = strrep(blkIstring,'//IACT','//IMMO');  %If single unit, use LGPS IMMO value and solve for req. current
-        javaimmo = da.getDaValue(immostring);
-        immo = javaimmo.getAsDoubles;
+        immostring = strrep(blkIstring,':IACT',':IMMO');  %If single unit, use LGPS IMMO value and solve for req. current
+        immo = pvaGetM(immostring);
         ireq = polyval(flipud(ivb),value);
     else % If part of a string take difference of bulk current from calculated current
         ireq=polyval(flipud(ivb),value)-blkI;

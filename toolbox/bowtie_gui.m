@@ -87,7 +87,7 @@ if get(handles.checkbox_auto_quad, 'Value')
     oldtxt = get(handles.text_sel_quad, 'String');
     set(handles.text_sel_quad, 'String', 'Finding...', 'ForegroundColor', 'red');  drawnow;
     set(handles.popupmenu_quad, 'Enable', 'off');
-    
+
     % find the nearest QUAD
     bpm_sel = get(handles.popupmenu_bpms, 'Value');
     bpm_name = handles.bpms.name{bpm_sel};
@@ -101,11 +101,11 @@ if get(handles.checkbox_auto_quad, 'Value')
         handles.quad.name{min_i}, min_d * 1e3, bpm_name));
     set(handles.popupmenu_quad, 'Enable', 'on');
     handles = popupmenu_quad_Callback(handles.popupmenu_quad, [], handles);
-    
+
     % reset the GUI string
     set(handles.text_sel_quad, 'String', oldtxt, 'ForegroundColor', 'black');
     drawnow;
-    
+
 
 end
 
@@ -117,7 +117,7 @@ if get(handles.checkbox_auto_qrange, 'Value')
     drawnow;
 
     frac = 0.01 * str2num(get(handles.edit_quad_frac, 'String'));
-    
+
     % get the LGPS if controlled by one
     name = get(handles.text_quad_lgps, 'String');
 
@@ -128,7 +128,7 @@ if get(handles.checkbox_auto_qrange, 'Value')
     maxb = control_magnetGet(name, 'BMAX');
     bmax = maxb;
     brange = [0 bmax];
-    
+
     if strcmp(handles.accelerator, 'LCLS')
         % LCLS database handles BMAX different from SLC
         minb = control_magnetGet(name, 'BMIN');
@@ -136,49 +136,49 @@ if get(handles.checkbox_auto_qrange, 'Value')
         [d, ibmax] = max(abs(brange));
         bmax = brange(ibmax);
     end
-    
-    % calculate how much to change BDES    
+
+    % calculate how much to change BDES
     s = sign(bmax);
-    delta = abs(frac * bdes);    
+    delta = abs(frac * bdes);
     blo = bdes - delta;
     bhi = bdes + delta;
-    
+
     % constrain BDES to within PS range
     blow = max([blo, brange(1)]) * 0.98;
     bhigh = min([bhi, brange(2)]) * 0.98;
-    
+
     if strcmp(handles.accelerator, 'FACET')
-        
+
         % special code for handling linac bulk-boosts
         hsta = control_deviceGet(name, 'HSTA');
         pscp = control_deviceGet(name, 'PSCP');
-        
+
         if bitget(hsta, 15) && pscp == 1 % bit 15 ('4000') flags LGPS
-            
+
             %%%%% this is not done %%%%%
             micros = textscan(num2str(2:19, 'LI%02d\n'), '%s'); micros = micros{:};
             [m, p, u] = model_nameSplit(name);
-            
+
             ivb = control_magnetIVBGet(name);
             immo = control_deviceGet(name, 'IMMO');
             brange = linspace(0, bmax, 200);
             irange = polyval(ivb, brange);
             bvi = polyfit(irange, brange, numel(ivb));
-            
+
             lgps = strcat(m, ':LGPS:', num2str(pscp));
             lgps_bact = control_deviceGet(lgps, 'BACT');
-            
+
             immrange = immo(2) - immo(1);
-            
+
             imin = lgps_bact + 0.1 * sign(immo(2)) * (immo(2) - immo(1));
             imax = lgps_bact + 0.9 * sign(immo(2)) * (immo(2) - immo(1));
-            
+
             blow = polyval(bvi, imin);
             bhigh = polyval(bvi, imax);
-            
+
         end
     end
-    
+
     set(handles.edit_quad_low, 'String', num2str(blow));
     set(handles.edit_quad_high, 'String', num2str(bhigh));
 
@@ -188,14 +188,14 @@ end
 
 function handles = auto_corr_sel(handles)
 
-if get(handles.checkbox_auto_corr, 'Value')    
-    
+if get(handles.checkbox_auto_corr, 'Value')
+
     % set the GUI string
     oldtxt = get(handles.text_sel_corr, 'String');
     set(handles.text_sel_corr, 'String', 'Finding...', 'ForegroundColor', 'red');  drawnow;
     set(handles.popupmenu_corr, 'Enable', 'off');
     drawnow;
-    
+
     % find the N nearest upstream corrs
     N = 10;
     bpm_sel = get(handles.popupmenu_bpms, 'Value');
@@ -219,22 +219,22 @@ if get(handles.checkbox_auto_corr, 'Value')
             rmat = model_rMatGet(upstream, bpm_name, {'TYPE=DESIGN', ['BEAMPATH=' handles.beamPath]}, 'RMAT');
             kick = squeeze(rmat(3,4,:));
     end
-    
+
     [max_k, max_i] = max(abs(kick));
     max_name = upstream{max_i};
     cor_names = get(handles.popupmenu_corr, 'String');
     cor_i = find(strcmpi(cor_names, max_name));
-    
+
     % change the dropdown box to this corr
     set(handles.popupmenu_corr, 'Value', cor_i);
     gui_statusDisp(handles, sprintf('%s selected, R12 = %.2f to %s', ...
         max_name, max_k, bpm_name));
-    
+
 %     handles.rmat = rmat(:,:,cor_i);
-    
+
     set(handles.popupmenu_corr, 'Enable', 'on');
     handles = popupmenu_corr_Callback(handles.popupmenu_corr, [], handles);
-    
+
     set(handles.text_sel_corr, 'String', oldtxt, 'ForegroundColor', 'black');
     drawnow;
 end
@@ -242,24 +242,24 @@ end
 function handles = auto_corr_range(handles)
 
 if get(handles.checkbox_auto_crange, 'Value')
-    
+
     set(handles.checkbox_auto_crange, 'String', 'Finding...', 'ForegroundColor', 'red');  drawnow;
-    
+
     % get amplitude of scan (beam movement in quad)
     ampl = str2num(get(handles.edit_corr_ampl, 'String'));
-    
+
     corr_sel = get(handles.popupmenu_corr, 'Value');
     corr_str = get(handles.popupmenu_corr, 'String');
     corr = corr_str{corr_sel};
-    
+
     quad_sel = get(handles.popupmenu_quad, 'Value');
     quad_str = get(handles.popupmenu_quad, 'String');
     quad = quad_str{quad_sel};
 
     rmat = model_rMatGet(corr, quad, {'TYPE=DESIGN', 'BEAMPATH=' handles.beamPath}, 'RMAT');
-    
+
     [bact, bdes, bmax, edes] = control_magnetGet(corr);
-        
+
     if edes == 0
         if strncmpi(corr, 'DR13', 4), edes = 1.19;end
     end
@@ -270,27 +270,27 @@ if get(handles.checkbox_auto_crange, 'Value')
         case 'y'
             r = rmat(3,4);
     end
-    
+
     dbdes = ampl * 1e-3 * 33.356 * edes / r;
-    
+
     bhigh = bdes + dbdes;
     blow = bdes - dbdes;
-    
-    % check for bmax and truncate range 
+
+    % check for bmax and truncate range
     if abs(bhigh) > abs(bmax)
         bhigh = bmax * sign(bhigh) *.98;
     end
-    
+
     if abs(blow) > abs(bmax)
         blow = bmax * sign(blow) * .98;
     end
-    
+
     set(handles.edit_corr_low, 'String', num2str(blow));
     set(handles.edit_corr_high, 'String', num2str(bhigh));
-    
+
     set(handles.checkbox_auto_crange, 'String', 'Auto Range:', 'ForegroundColor', 'black');
     drawnow;
-    
+
 end
 
 
@@ -299,7 +299,7 @@ end
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = bowtie_gui_OutputFcn(hObject, eventdata, handles) 
+function varargout = bowtie_gui_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -318,7 +318,7 @@ switch handles.system
         handles.dgrp = 'NDRFACET';
         ms = model_init('source', 'SLC');
         gui_modelSourceControl(handles.modelSource_btn, handles, ms);
-        
+
     otherwise
     handles.accelerator = '';
     handles.dgrp = '';
@@ -519,23 +519,23 @@ end
 if ~abort
     nsamp = handles.data.bpm.nsamp;
     for ix = 1:numel(quad.range)
-        
+
         if get(handles.togglebutton_abort, 'Value'), abort = 1; break; end
         % set quad
         gui_statusDisp(handles, sprintf('Setting %s to %.6f', char(quad.name), quad.range(ix)));
         setQuad(handles, quad.name, quad.range(ix));
-        
+
         for jx = 1:numel(corr.range)
-            
+
             if get(handles.togglebutton_abort, 'Value'), abort = 1; break; end
-            
+
             % set corrector
             gui_statusDisp(handles, sprintf('Setting %s to %.6f', char(corr.name), corr.range(jx)));
             b = corr.range(jx);
             setCorr(handles, char(corr.name), b, 'action', 'PERTURB');
             handles.data.corr.bact(ix, jx) = control_magnetGet(corr.name);
             handles.data.quad.bact(ix, jx) = control_magnetGet(quad.name);
-            
+
             % get BPM data
             if strcmp(handles.accelerator, 'FACET')
                 gui_statusDisp(handles, sprintf('Acquiring %d samples on %s', handles.data.bpm.nsamp, char(handles.dgrp)));
@@ -557,9 +557,9 @@ if ~abort
                 handles.data.bpms.x(ix,jx,:,:) = squeeze(pvdata(1,:,:));
                 handles.data.bpms.y(ix,jx,:,:) = squeeze(pvdata(2,:,:));
                 handles.data.bpms.tmit(ix,jx,:,:) = squeeze(pvdata(3,:,:));
-                
+
             end
-            
+
             % % fake data for debug with no rate
             %             [handles.data.bpms.x(ix, jx, :, :), ...
             %             handles.data.bpms.y(ix, jx, :, :), ...
@@ -567,7 +567,7 @@ if ~abort
             %             handles.data.bpms.pulseid(ix, jx, :, :), ...
             %             handles.data.bpms.stat(ix, jx, :, :)] = ...
             %             deal(randn(numel(names), handles.data.bpm.nsamp));
-            
+
             handles.data.points = (ix-1) * numel(quad.range) + jx;
             % plot data as scan runs
             handles = fit_and_plot(handles);
@@ -578,9 +578,9 @@ if ~abort
     setCorr(handles, char(corr.name),corr.bdes0, 'action', 'TRIM');
     setQuad(handles, quad.name, quad.bdes0);
     handles.data.tsend = now;
-    
+
     eDefRelease(edef);
-    
+
     if abort
         gui_statusDisp(handles, 'Scan aborted.');
     else
@@ -655,7 +655,7 @@ for ix = 1:numel(ibpm)
         pfit = squeeze(bpms.(plane)(jx, :, ibpm(ix), :));
         xFits(ix,jx,:) = linspace(min(min(tfit)), max(max(tfit)), 100);
         if all(all(isnan(tfit))) || all(all(isnan(pfit)))
-            [yFits(ix,jx,:) yFitStds(ix,jx,:)] = deal(nan(size(xFits(ix,jx,:))));  
+            [yFits(ix,jx,:) yFitStds(ix,jx,:)] = deal(nan(size(xFits(ix,jx,:))));
             [pars(ix,jx,:) parstds(ix,jx,:)] = deal(nan([1 2]));
         else
         [pars(ix,jx,:), yFits(ix,jx,:), parstds(ix,jx,:), yFitStds(ix,jx,:)] = ...
@@ -699,7 +699,7 @@ if ax == handles.axes1
             %     vl(offset(ix)-offsetstd(ix), '--', 'Color', cmap(ix,:));
     end
 else
-    
+
     subplot(2,1,1);
     cla reset; hold all;
     for ix = 1:numel(ibpm)
@@ -715,8 +715,8 @@ else
     end
     axis tight;
     title(sprintf('BBA offset %s %s', upper(plane), datestr(handles.data.ts)));
-    xlabel(handles.data.bpm.name);  
-    
+    xlabel(handles.data.bpm.name);
+
     if numel(offset) < 1, return; end
 
     [par, yFit, parstd, yFitStd] = ...
@@ -730,8 +730,8 @@ else
         case 'y'
             offsi = 2;
     end
-    
-    subplot(2,1,2);    
+
+    subplot(2,1,2);
     cla reset; hold all;
     for ix = 1:numel(offset)
         h = errorbar(ix, offset(ix), offsetstd(ix), 'o');
@@ -741,7 +741,7 @@ else
     hor_line(par+parstd, 'k--');
     hor_line(par-parstd, 'k--');
     axis tight;
-    
+
     handles.data.offset = offset;
     handles.data.offsetstd = offsetstd;
     offs = handles.data.bpm.offset(offsi);
@@ -757,9 +757,9 @@ else
     end
     xlabel('BPM Number');
     ylabel(sprintf('%s Offset [mm]', upper(plane)));
-    
+
     handles.data.fitok = ~isnan(handles.data.newoffs);
-    
+
 end
 
 
@@ -778,6 +778,9 @@ set(gca,'NextPlot',hold_state);    % restore original hold state
 
 function bact = setQuad(handles, name, bdes)
 
+% AIDA-PVA imports
+global pvaRequest AidaPvaStruct;
+
 % LCLS stuff just works
 if strcmp(handles.accelerator, 'LCLS')
 % DEBUG
@@ -788,7 +791,7 @@ return; end
 [m, p, u] = model_nameSplit(name);
 if strcmp(m, 'LI20')
 % DEBUG
-    bact = control_magnetSet(name, bdes);  
+    bact = control_magnetSet(name, bdes);
 return; end
 
 % FACET linac bulk-boost quads need the whole sector trimmed
@@ -808,33 +811,33 @@ bact = sbact(qindex);
 
 function bact = setCorr(handles, name, bdes, varargin)
 
+% AIDA-PVA imports
+global pvaRequest AidaPvaStruct;
+
 % LCLS stuff just works
 if strcmp(handles.accelerator, 'LCLS')
 % DEBUG
-         %bact = control_magnetSet(name, bdes, varargin);  
-         bact = control_magnetSet(name, bdes);  
+         %bact = control_magnetSet(name, bdes, varargin);
+         bact = control_magnetSet(name, bdes);
 
 return; end
 
 % If not LCLS use AIDA perturb
-global da_cor;
-aidainit;  
-if isempty(da_cor), 
-   %import edu.stanford.slac.aida.lib.da.DaObject;
-   da_cor=DaObject; 
+global corRequestBuilder;
+if isempty(corRequestBuilder),
+    corRequestBuilder = pvaRequest('MAGNETSET:BDES');
 end
 name = model_nameConvert(name, 'SLC');
-dname = DaValue(java.lang.String(name));
-dbdes = DaValue(java.lang.Float(bdes));
 
-inData = DaValue();  inData.type = 0;
-inData.addElement(dname);
-inData.addElement(dbdes);
+inData = AidaPvaStruct();
+inData.put("names", { name });
+inData.put("values", { bdes });
 
-da_cor.setParam('MAGFUNC', 'PTRB');
-da_cor.setParam('LIMITCHECK','SOME');
+corRequestBuilder.with('MAGFUNC', 'PTRB');
+corRequestBuilder.with('LIMITCHECK','SOME');
+
 % DEBUG
-%outData = da_cor.setDaValue('MAGNETSET//BDES',inData);
+%outData = corRequestBuilder.set(inData);
 
 
 function togglebutton_abort_Callback(hObject, eventdata, handles)
@@ -978,11 +981,11 @@ ry = get(handles.radiobutton_y, 'Value');
 if rx && ~ry
     handles.plane = 'x';
     set(handles.text_sel_corr, 'String', 'Select XCOR:');
-    set(handles.popupmenu_corr, 'String', handles.xcor.name);    
+    set(handles.popupmenu_corr, 'String', handles.xcor.name);
 elseif ry && ~rx
     handles.plane = 'y';
     set(handles.text_sel_corr, 'String', 'Select YCOR:');
-    set(handles.popupmenu_corr, 'String', handles.ycor.name); 
+    set(handles.popupmenu_corr, 'String', handles.ycor.name);
 else
     handles.plane = '';
 end
@@ -1021,7 +1024,7 @@ if get(hObject, 'Value')
     end
 end
 guidata(hObject, handles);
-        
+
 
 function edit_quad_nstep_Callback(hObject, eventdata, handles)
 
@@ -1218,16 +1221,16 @@ else
     end
 
     offspv = strcat(handles.data.bpm.name, ':', upper(handles.data.plane), 'AOFF');
-    
+
     qans = questdlg(sprintf('This will change %s from %.3f to %.3f.  Are you sure?', ...
         offspv, handles.data.oldoffs, handles.data.newoffs));
     if strcmp(qans, 'Yes')
 
         lcaPutSmart(offspv, handles.data.newoffs);
-        
+
         gui_statusDisp(handles, sprintf('Changed %s from %.3f to %.3f.', ...
         offspv, handles.data.oldoffs, handles.data.newoffs));
-    
+
         handles = pushbutton_print_Callback(handles.pushbutton_save, [], handles);
     end
 end

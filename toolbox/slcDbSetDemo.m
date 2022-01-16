@@ -15,18 +15,9 @@ function slcDbSetDemo(query, value)
   % value - new float value.
   %
 
-aidainit;
-import java.util.Vector;
+% AIDA-PVA imports
+global pvaSet;
 
-err = getLogger('slcDbSetDemo');
-
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
-
-inData = DaValue(java.lang.Float(value));
-
-da.setDaValue(query, inData);
-
-da.reset();
+pvaSet(query, value);
 
 return;

@@ -18,7 +18,11 @@ function PVName = AssignMultiknob(mkbfilename, mkbpath, showDlg)
 % Author: Jeff Rzepiela, SLAC
 
 % --------------------------------------------------------------------
-global da_mkb;
+global mkbRequestBuilder;
+
+% AIDA-PVA imports
+global pvaRequest;
+
 if nargin < 3, showDlg=0;end
 if nargin < 2, mkbpath='/u1/lcls/physics/mkb';end
 if nargin < 1, showDlg=1;end
@@ -31,11 +35,11 @@ end
 
 
 if strncmpi(mkbfilename,'mkb:',4) %SCP MKB file
-    aidainit;
-    if isempty(da_mkb), import edu.stanford.slac.aida.lib.da.DaObject; da_mkb=DaObject;end
-    da_mkb.reset;
-    da_mkb.setParam('MKB', mkbfilename);
-    PVName='MKB//VAL';
+    PVName='MKB:VAL';
+    if isempty(mkbRequestBuilder)
+        mkbRequestBuilder = pvaRequest(PVName);
+    end
+    mkbRequestBuilder.with('MKB', mkbfilename);
 else %EPICS MKB file
     if ~exist(fullfile(mkbpath, mkbfilename))
         disp_log('File not found');

@@ -1,7 +1,7 @@
 function energy = fbGet_ActEnergy(act)
 %	energy = fbGet_ActEnergy(config.act);
 %
-%	get the MAD energy parameter of the device 
+%	get the MAD energy parameter of the device
 %
 %	INPUTS:	act:		the structure that contains all actuator info
 %
@@ -10,6 +10,9 @@ function energy = fbGet_ActEnergy(act)
 %==========================================================================
 % get the SLC names of the actuators
 %
+% AIDA-PVA imports
+global AIDA_DOUBLE_ARRAY;
+
 %actuator PVs
 numactPVs = length(act.allactPVs);
 
@@ -24,10 +27,10 @@ if ( ~isempty(strfind(epicsActs{1,1}, 'XCOR')) || ~isempty(strfind(epicsActs{1,1
 
 
    for i=1:numactPVs
-      tws = aidaget([epicsActs{i,1},'//twiss'], 'doublea');
+      tws = pvaGetM([epicsActs{i,1},':twiss'], AIDA_DOUBLE_ARRAY);
       energy(i) = cell2mat(tws(1));
    end
-   
+
    %for i=1:numactPVs
    %   energy(i) = lcaGet([epicsActs{i,1},':EACT']); % convert to MeV
    %end

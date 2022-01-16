@@ -26,7 +26,8 @@ function [values,times] = get_archive_facet(name,starttime,endtime,show_plot,mrk
 
 %=====================================================================
 
-persistent da;
+% AIDA-PVA imports
+global pvaRequest;
 
 tn = get_time;
 if ~exist('starttime','var')    % if start date/time not input
@@ -58,28 +59,25 @@ if ~exist('show_plot','var')
   show_plot = 1;
 end
 
-namel = [name '//HIST.facet'];
+namel = [name ':HIST.facet'];
+disp 'Acquisition begins.'
 
-aidainit;
-
-if(isempty(da))
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    da = DaObject();  
-else
-    da.reset;
+try
+    requestBuilder = pvaRequest(namel);
+    requestBuilder.with('STARTTIME', starttime);
+    requestBuilder.with('ENDTIME', endtime);
+    if density
+        requestBuilder.with('DENSITY','NORMAL');
+    end
+    hist = ML(requestBuilder.get());
+    disp ('Acquisition ends successfully');
+catch e
+    handleExceptions(e);
 end
-disp 'Acquisition begins ...'
-da.setParam('STARTTIME',starttime);  
-da.setParam('ENDTIME',endtime);   
-if density, da.setParam('DENSITY','NORMAL');end
-hist = da.getDaValue(namel);                          
-disp 'Acquisition ends successfully'
 
-pts = hist.get(0).size();                        
-dblArray = javaArray('java.lang.Double',pts);   
-values1 = double(hist.get(0).toArray(dblArray));                      
-StringArray = javaArray('java.lang.String',pts);
-times1 = char(hist.get(1).toArray(StringArray));                      
+pts = hist.size;
+values1 = hist.values.values;
+times1 = hist.values.times;
 
 if show_plot==1
   egu = lcaGet([name '.EGU']);

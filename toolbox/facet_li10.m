@@ -1,8 +1,11 @@
-function facet_li10() 
+function facet_li10()
 % FACET e+ LBCC energy feedback.
 % N Lipkowitz, SLAC
 % modify Dec-10-2015 for e-
 % revert 3-mar-2016
+
+% AIDA-PVA imports
+global pvaRequest;
 
 %% boilerplate
 mf = strcat(mfilename, '.m');
@@ -51,7 +54,7 @@ dgrp = 'SDRFACET';     % for e+
 
 model_init('source', 'SLC');
 % twiss = model_rMatGet(bpms, [], 'TYPE=DESIGN', 'twiss');
-% energy = twiss(1);  
+% energy = twiss(1);
 % etax = twiss(5);
 energy = 9;
 
@@ -77,22 +80,20 @@ pvs.out.tmitok = script_setupPV('SIOC:SYS1:ML00:AO186', 'LI10 TMIT OK', 'bool', 
 pvs.out.bpmok = script_setupPV('SIOC:SYS1:ML00:AO187', 'LI10 BPM OK', 'bool', 0, mf);
 pvs.out.actok = script_setupPV('SIOC:SYS1:ML00:AO188', 'LI10 Actuators OK', 'bool', 0, mf);
 
-aidainit;
-import edu.stanford.slac.aida.lib.da.DaObject;
-d = DaObject();
-d.setParam('MKB', knob);
+d = pvaRequest('MKB:VAL');
+d.with('MKB', knob);
 
 %% main loop
 
 while 1
 
     pause(0.1);
-    
+
     W = watchdog_run(W);
     switch get_watchdog_error(W)
         case 0
             % do nothing, this is OK
-        case 1           
+        case 1
             disp_log(strcat({'Another '}, mf, {' is running - exiting'}));
             return;
         case 2
@@ -100,42 +101,42 @@ while 1
         otherwise
             disp_log(strcat({'Unexpected watchdog error'}));
     end
-    
+
     data = lcaGetStruct(pvs);
 %     if data.in.rate < 1, continue; end
-    
+
     [x,y,tmit,pid,stat] = control_bpmAidaGet(bpms, 1, dgrp);
-    
+
     eerr = energy * x / etax; % energy error in MeV
-    data.out.eerr = eerr;  
+    data.out.eerr = eerr;
     err_E = data.in.setpoint - eerr;
 
     [phase, gain, total] = get_engy(paus);
     slope = total * -1 * sind(phase) / 90;
     d_phase = (err_E / slope) * data.in.gain;
     set_phase = phase + d_phase;
-    
+
     ok = 1;
     if ~stat, ok = 0; end
     if isnan(x) || isnan(y) || isnan(tmit), ok = 0; end
-    
+
     if tmit <= tmit_min
         disp('TMIT too low');
         data.out.tmitok = 0;
-        ok = 0; 
+        ok = 0;
     else
         data.out.tmitok = 1;
     end
-    
+
     if abs(x) > xmax || abs(y) > ymax
         disp('BPM value outside limits');
         data.out.bpmok = 0;
-        ok = 0; 
+        ok = 0;
     else
         data.out.bpmok = 1;
     end
 
-        
+
     if -set_phase > phase_max || ...
        -set_phase < phase_min
         disp(sprintf('I am railed, want %.2f', -set_phase));
@@ -146,12 +147,12 @@ while 1
     end
 
     lcaPutStruct(pvs.out, data.out);
-    
+
     if ok && data.in.enable
         out_phase = set_engy(d_phase, knob);
         disp(out_phase);
     end
-        
+
     pause(1);
 end
 
@@ -161,8 +162,8 @@ klys = {'KLYS:LI09:11'; 'KLYS:LI09:21'};
 [m,p,u] = model_nameSplit(paus);
 paus = strcat(p, ':', m, ':', u);
 
-p1 = aidaget(strcat(paus{1}, '//VDES'));
-p2 = aidaget(strcat(paus{2}, '//VDES'));
+p1 = pvaGetM(strcat(paus{1}, ':VDES'));
+p2 = pvaGetM(strcat(paus{2}, ':VDES'));
 
 fphas = [p1; p2];
 
@@ -178,19 +179,19 @@ gain = sum(ampl);
 
 function new_phase = set_engy(phase, knob)
 
+    % AIDA-PVA imports
+    global pvaRequest;
+
     persistent d;
     if isempty(d)
-        aidainit;
-        import edu.stanford.slac.aida.lib.da.DaObject;
-        d = DaObject();
-        d.setParam('MKB', knob);        
+        d = pvaRequest('MKB:VAL');
+        d.with('MKB', knob);
     end
-    
+
     try
-        answer = d.setDaValue('MKB//VAL', ...
-        edu.stanford.slac.aida.lib.util.common.DaValue(java.lang.Float(phase)));
-        ansstr = answer.getAsStrings();
-        new_phase = eval(ansstr(2,:));
+        answer = ML(d.set(phase));
+        values = answer.values.value;
+        new_phase = values(:);
     catch
         disp_log(strcat('AIDA error when setting ', knob));
         %new_phase = phase;

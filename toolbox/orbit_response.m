@@ -1,27 +1,30 @@
 function simple_orbit_response
 % Measure first order transfer matrix elements
 
- 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE_ARRAY;
+
    %  Create and then hide the GUI as it is being constructed.
    f = figure('Visible','off','Position',[360,500,809,550]);
- 
+
    %  Construct the components.
    all_corrx = {'XC02','XC03','XC04','XC05','XC06','XC07','XC08','XC09',...
           'XC10','XC11','XCA11','XCA12','XCM11','XCM13',...
           }; %'XC21302','XCM14'
    all_corry = {'YC02','YC03','YC04','YC05','YC06','YC07','YC08','YC09',...
           'YC10','YC11','YCA11','YCA12','YCM11','YCM12'};%'YC21303',,'YCM15'
-        
+
    all_bpm = {'BPM5','BPM6','BPM8','BPM9','BPM10','BPM11','BPM12','BPM13',...
           'BPM14','BPM15','BPMA11','BPMA12','BPM21201','BPMS11','BPMM12',...
           'BPM21301',...
           'BPM21401','BPM21501','BPM21601','BPM21701','BPM21801',...
           'BPM21901'};
 
-        
-% Establish  default settings 
+
+% Establish  default settings
    current_dim_choice = 'hor'
-   dim='hor' 
+   dim='hor'
    max_bpm_diff=2;
    nsteps=9   %number of steps per corrector
    plot_diff = 0
@@ -45,11 +48,11 @@ function simple_orbit_response
    sigmax = orbitx;
    sigmay = orbity;
    sigma_orx(length(all_bpm)) =0;
-   sigma_ory(length(all_bpm)) =0; 
+   sigma_ory(length(all_bpm)) =0;
    bpm_pos(length(all_bpm)) =0;
    en_corrx(length(all_corrx)) =0;
    en_corry(length(all_corry)) =0;
-   
+
    hDo_Measurement = uicontrol('Style','pushbutton',...
           'String',{'MEASURE'},...
           'Position',[10,475,100,60],...
@@ -65,15 +68,15 @@ function simple_orbit_response
           'Callback',{@Y_Corrector_Selection_Callback});
    hDisplay_Selection = uicontrol('Style','text',...
           'String','none',...
-           'Position',[10,250,75,25]);     
-        
+           'Position',[10,250,75,25]);
+
    hMax_orbit_change = uicontrol('Style','edit',...
           'String',{num2str(max_bpm_diff)},...
           'Position',[85, 200, 25, 25],...
           'Callback',{@Max_orbit_change_Callback});
    htext_Max_orbit_change  = uicontrol('Style','text','String','Max [mm]',...
-           'Position',[10,200,75,25]);       
-        
+           'Position',[10,200,75,25]);
+
    htext_samples  = uicontrol('Style','text','String','Samples',...
            'Position',[10,175,75,25]);
    hNumber_of_Samples = uicontrol('Style','edit',...
@@ -85,13 +88,13 @@ function simple_orbit_response
    hsample_delay_time = uicontrol('Style','edit',...
           'String',{'.05'},...
           'Position',[85, 150, 25, 25],...
-          'Callback',{@sample_delay_time_callback});      
-   
+          'Callback',{@sample_delay_time_callback});
+
 
    hMeasurement2Ref = uicontrol('Style','pushbutton',...
           'String',{'Save Ref'},...
           'Position',[10,100,100,25],...
-          'Callback',{@Measurement2Ref}); 
+          'Callback',{@Measurement2Ref});
    hSave_Data = uicontrol('Style', 'pushbutton',...
        'String','Save Data',...
        'Position',[10,70,100,25],...
@@ -99,9 +102,9 @@ function simple_orbit_response
    hLoad_Data = uicontrol('Style', 'pushbutton',...
        'String','Load Data',...
        'Position',[10,40,100,25],...
-       'Callback',{@Load_Data_Callback});   
+       'Callback',{@Load_Data_Callback});
 
-% Rightmost column of components        
+% Rightmost column of components
    hPlot_Response = uicontrol('Style','pushbutton',...
           'String','PLOT Response',...
           'Position', [690,500,100,35],...
@@ -123,7 +126,7 @@ function simple_orbit_response
    hPlot_Bpm_data = uicontrol('Style','pushbutton',...
           'String','PLOT BPM',...
           'Position', [690,330,100,25],...
-          'Callback',{@Plot_Bpm_data_Callback});      
+          'Callback',{@Plot_Bpm_data_Callback});
    hSelect_Bpm_to_plot =  uicontrol('Style','listbox',...
           'String',all_bpm,...
           'Position',[690,230,100,100],...
@@ -141,13 +144,13 @@ function simple_orbit_response
           'String',{'-> Logbook'},...
           'Position',[690,80,100,25],'BackgroundColor',[.501 1 1],...
           'Callback',{@Print_logBook_Callback});
-      
+
    hmain_plot_window = axes('Units','Pixels','Position',[170,150,500,325]);
-      
+
    %align([hsurf,hmesh,hcontour,htext,hpopup],'Center','None');
-   
+
    %%%%%%%   END OF GUI Component construction
-   
+
 %%%%%%%     Initialize common variables so they are in the scope of all nested
 %%%%%%%     functios
  debug = 0  %set debug to 0 to run normally
@@ -166,7 +169,7 @@ lim_corry=0;
    curr0 = ini_currx(corrx_ind )
    lim=lim_corrx
    ind=corrx_ind
-   corr_names=corry_names;    
+   corr_names=corry_names;
    curr0=ini_curry(corry_ind );
    lim=lim_corry;
    ind=corry_ind;
@@ -174,10 +177,10 @@ lim_corry=0;
    sigma_x=0
    y=0
    sigma_y=0
-   
 
-  
-   
+
+
+
 %Convert to SLC and EPICs names for AIDA
 [all_bpm_SLC, stat] = model_nameConvert(all_bpm, 'SLC');
 [all_bpm_EPICS, stat] = model_nameConvert(all_bpm, 'EPICS');
@@ -190,25 +193,28 @@ lim_corry=0;
 
 %Get data from AIDA
 bpm_ind=1;
-% 
+%
 % RespMatH/V is a matrix of R12 elements connecting correctors and bpms
 % e.g. RespmatH(bpm_index, corrector_index
 RespMatH = ones(length(all_bpm), length(all_corrx));
 RespMatV = ones(length(all_bpm), length(all_corrx));
 %corrx_pos =[0:length(all_corrx)];%for testing
 %en_corrx = [0:length(all_corrx)];%for testing
-    
+
 for j = 1:length(all_bpm)
-    bpm_pos(j)    = aidaget([all_bpm_SLC{j} '//Z'])-2015;
+    bpm_pos(j)    = pvaGet([all_bpm_SLC{j} ':Z'])-2015;
 end
 
 for j = 1:length(all_corrx)
-    corrx_pos(j)    = aidaget([all_corrx_SLC{j} '//Z'])-2015;
+    corrx_pos(j)    = pvaGet([all_corrx_SLC{j} ':Z'])-2015;
     for i=1:length(all_bpm_SLC)
         if bpm_pos(i)<corrx_pos(j)
             RespMatH(i,j)=0;
         else
-            R        = aidaget({[all_corrx_SLC{j} '//R']},'doublea',{['B=' all_bpm_SLC{i}]});
+            requestBuilder = pvaRequest({[all_corrx_SLC{j} ':R']});
+            requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+            requestBuilder.with('B',all_bpm_SLC{i});
+            R        = ML(requestBuilder.get());
             Rm       = reshape(R,6,6);
             Rm = cell2mat(Rm)';
             RespMatH(i,j)=Rm(1,2);
@@ -217,12 +223,15 @@ for j = 1:length(all_corrx)
 end
 
 for j = 1:length(all_corry)
-    corry_pos(j)    = aidaget([all_corry_SLC{j} '//Z'])-2015;
+    corry_pos(j)    = pvaGet([all_corry_SLC{j} ':Z'])-2015;
     for i=1:length(all_bpm_SLC)
         if bpm_pos(i)<corry_pos(j)
             RespMatV(i,j)=0;
         else
-            R        = aidaget({[all_corry_SLC{j} '//R']},'doublea',{['B=' all_bpm_SLC{i}]});
+            requestBuilder = pvaRequest({[all_corry_SLC{j} ':R']});
+            requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+            requestBuilder.with('B',all_bpm_SLC{i});
+            R        = ML(requestBuilder.get());
             Rm       = reshape(R,6,6);
             Rm = cell2mat(Rm)';
             RespMatV(i,j)=Rm(3,4);
@@ -230,28 +239,28 @@ for j = 1:length(all_corry)
     end
 end
  RespMatV
- 
+
 
 for i=1:length(all_corrx_SLC)
-    twiss = cell2mat(aidaget([all_corrx_SLC{i} '//twiss'],'doublea'));
+    twiss = cell2mat(pvaGetM([all_corrx_SLC{i} ':twiss'],AIDA_DOUBLE_ARRAY));
     en_corrx(i)=twiss(1)*1000;
 end
 
 for i=1:length(all_corry_SLC)
-    twiss = cell2mat(aidaget([all_corry_SLC{i} '//twiss'],'doublea'));
+    twiss = cell2mat(pvaGetM([all_corry_SLC{i} ':twiss'],AIDA_DOUBLE_ARRAY));
     en_corry(i)=twiss(1)*1000;
 end
-% 
-% 
+%
+%
 %READ initial corrector strengths and limits
 %global ini_currx ini_curry lim_corrx lim_corry
 for j = 1:length(all_corrx_EPICS)
     pvlist_corrx{j} = [all_corrx_EPICS{j} ':BACT'];
-    pvlist_lim_corrx{j} = [all_corrx_EPICS{j} ':BACT.HOPR'];    
+    pvlist_lim_corrx{j} = [all_corrx_EPICS{j} ':BACT.HOPR'];
 end
 for j = 1:length(all_corry_EPICS)
     pvlist_corry{j} = [all_corry_EPICS{j} ':BACT'];
-    pvlist_lim_corry{j} = [all_corry_EPICS{j} ':BACT.HOPR']; 
+    pvlist_lim_corry{j} = [all_corry_EPICS{j} ':BACT.HOPR'];
 end
 ini_currx = lcaGet(pvlist_corrx(:), 0, 'double')';
 ini_curry = lcaGet(pvlist_corry(:), 0, 'double')';
@@ -263,15 +272,15 @@ lim_corry = lcaGet(pvlist_lim_corry(:), 0, 'double')';
 [sys,accelerator]=getSystem();
 pv = ['EVNT:' sys ':1:' accelerator 'BEAMRATE'];
 rep = lcaGet(pv, 0, 'double')
-% 
+%
 
-   
-   
-%%%%%%%     Done with initializing common variables 
+
+
+%%%%%%%     Done with initializing common variables
 
 %%%%%%%     Initialize the GUI.
 
-   % Change units to normalized so components resize 
+   % Change units to normalized so components resize
    % automatically.
    set([f,hmain_plot_window,hX_Corrector_Selection,hY_Corrector_Selection,...
        hDo_Measurement,hMeasurement2Ref, hPlot_Response, hNormal_or_Skew,hWhat_to_plot,...
@@ -287,15 +296,15 @@ rep = lcaGet(pv, 0, 'double')
    movegui(f,'center')
    % Make the GUI visible.
    set(f,'Visible','on');
- 
+
    %  Callbacks for simple_gui. These callbacks automatically
-   %  have access to component handles and initialized data 
+   %  have access to component handles and initialized data
    %  because they are nested at a lower level.
- 
+
 %    %  Pop-up menu callback. Read the pop-up menu Value property
 %    %  to determine which item is currently displayed and make it
 %    %  the current data.
-%       function popup_menu_Callback(source,eventdata) 
+%       function popup_menu_Callback(source,eventdata)
 %          % Determine the selected data set.
 %          str = get(source, 'String');
 %          val = get(source,'Value');
@@ -309,26 +318,26 @@ rep = lcaGet(pv, 0, 'double')
 %             current_data = sinc_data;
 %          end
 %       end
-%  
-   
-   
+%
+
+
 %%%%%%% Callback Functions
- 
- 
-%    function surfbutton_Callback(source,eventdata) 
+
+
+%    function surfbutton_Callback(source,eventdata)
 %    % Display surf plot of the currently selected data.
 %       surf(current_data);
 %    end
-%  
-%    function meshbutton_Callback(source,eventdata) 
+%
+%    function meshbutton_Callback(source,eventdata)
 %    % Display mesh plot of the currently selected data.
 %       mesh(current_data);
 %    end
-%  
-%    function contourbutton_Callback(source,eventdata) 
+%
+%    function contourbutton_Callback(source,eventdata)
 %    % Display contour plot of the currently selected data.
 %       contour(current_data);
-%   end 
+%   end
 %%%%%%%%%
 
    function X_Corrector_Selection_Callback(source,eventdata)
@@ -377,7 +386,7 @@ rep = lcaGet(pv, 0, 'double')
            orm_ref = ory;
        end
    end
-   
+
    function Normal_or_Skew_Callback(source,eventdata)
        normal_skew = get(source,'Value')
    end
@@ -400,8 +409,8 @@ rep = lcaGet(pv, 0, 'double')
                 orm = orx;
             end
         end
-        
-        switch plottype            
+
+        switch plottype
             case 1 %plot measurement
                 plot(bpm_pos,orm,'-r')
                 grid on;
@@ -413,17 +422,17 @@ rep = lcaGet(pv, 0, 'double')
                  plot_title = ...
                     ['Orbit response to ' last_measured_corrector_name '(skew)'];
                 end
-                title(plot_title) 
+                title(plot_title)
             case 2 %plot measurement and model
                 if dim=='hor'
                     or_t=RespMatH(:,current_corrector_choice_ind)';
                 elseif dim=='ver'
                     or_t=RespMatV(:,current_corrector_choice_ind)';
-                end 
-                if normal_skew == 2
-                    or_t(length(all_bpm)) = 0; 
                 end
-                
+                if normal_skew == 2
+                    or_t(length(all_bpm)) = 0;
+                end
+
                 plot(bpm_pos,orm,'-r')
                 hold on
                 plot(bpm_pos,or_t,'-b')
@@ -436,11 +445,11 @@ rep = lcaGet(pv, 0, 'double')
                  plot_title = ...
                     ['Orbit response to ' last_measured_corrector_name '(skew)'];
                 end
-                title(plot_title)                 
+                title(plot_title)
                 legend('Measured','Model')
                 hold off
 
-                
+
             case 3 % plot Measurement - Reference
                 plot(bpm_pos,orm - orm_ref,'-r')
                 grid on;
@@ -452,7 +461,7 @@ rep = lcaGet(pv, 0, 'double')
                  plot_title = ...
                     ['Measured - Reference response to ' last_measured_corrector_name '(skew)'];
                 end
-                title(plot_title)                
+                title(plot_title)
             case 4 % plot Reference response
                 plot(bpm_pos,orm_ref,'-r')
                 grid on;
@@ -464,15 +473,15 @@ rep = lcaGet(pv, 0, 'double')
                  plot_title = ...
                     ['Reference response to ' last_measured_corrector_name '(skew)'];
                 end
-                title(plot_title)                   
+                title(plot_title)
             case 5 % plot Integrated gradient error
                  contour(hmain_plot_window,current_data);
-                
+
         end
-        
+
     end
-        
-       
+
+
 
     function Select_Bpm_to_plot(source,eventdata)
        bpm2plotind = get(source,'Value')
@@ -516,7 +525,7 @@ rep = lcaGet(pv, 0, 'double')
                 iscellstr(corrector_label)
                 title(sprintf('Orbit at %s as a function of %s strength',all_bpm{bpm2plotind},corrector_label) )
         end
-        
+
         if normal_skew == 2
                 if dim=='ver'
                     h_bpm(1) = errorbar(1000*kicks', 1000*orbitx(:,bpm2plotind)  ,sigmax(:,bpm2plotind),'o-b');
@@ -545,7 +554,7 @@ rep = lcaGet(pv, 0, 'double')
 
 
 
-   function Plot_Energy_Profile(source,eventdata) 
+   function Plot_Energy_Profile(source,eventdata)
        plot(corrx_pos,en_corrx,'-b')
        grid on
        xlabel('s [m]')
@@ -554,13 +563,13 @@ rep = lcaGet(pv, 0, 'double')
    end
 
 
-   function Do_Measurement_Callback(source,eventdata) 
+   function Do_Measurement_Callback(source,eventdata)
        %Change corrector strengths and record the data
        %Originally called do_or_meas
-       
+
        display('I am doing the measurement!')
        set(gcbo, 'BackgroundColor','y');
-       
+
 %     set(handles.save,'Visible','off')
 %     drawnow
 %     set(handles.plotting,'Visible','off')
@@ -579,17 +588,17 @@ rep = lcaGet(pv, 0, 'double')
         lim=lim_corry;
         %ind=corry_ind;
        end
-       
-%Calculate maximum kick for the currently chosen corrector  
+
+%Calculate maximum kick for the currently chosen corrector
 
 % for i=1:length(corr_names)
 %     actual=current_corrector_name
  %   set(handles.info_text,'String',sprintf('measuring orbit response for %s ...',actual));
   %  drawnow
     ini_curr = curr0;
-    
+
     max_kick=get_corrector_field(max_bpm_diff,dim,current_corrector_choice_ind)
-    
+
     if dim=='hor'
         max_field = max_kick*10*3.3356*en_corrx(current_corrector_choice_ind)/1000;
     else
@@ -608,7 +617,7 @@ rep = lcaGet(pv, 0, 'double')
             max_field=-max_field;
         end
     end
-    
+
     % kick calculated  for each step
     field=max_field/nsteps;
     fields = ([ini_curr:field:(ini_curr+max_field)]);
@@ -652,7 +661,7 @@ rep = lcaGet(pv, 0, 'double')
         [orbitx(j,:),sigmax(j,:),orbity(j,:),sigmay(j,:)]...
             = measure_orbit(all_bpm,Nsamples, sample_delay_time );
         display('I just measured the orbit')
-        
+
     end %Done with changing corrector and measuring orbit.
 
     % Going back to the initial current value
@@ -672,7 +681,7 @@ rep = lcaGet(pv, 0, 'double')
         end
         display('Restore Corrector Strength');
     end
-    
+
 
 %     %response from the model
 %     if dim=='hor'
@@ -680,7 +689,7 @@ rep = lcaGet(pv, 0, 'double')
 %     elseif dim=='ver'
 %         or_t=RespMatV(:,corry_ind(i))';
 %     end
-    
+
 %getting the measured orbit response
 
 if dim =='hor'
@@ -695,7 +704,7 @@ orbitx
 display('I just got orm')
 orx
 
-% 
+%
 %     %store data
 %     ORBITX{i}=orbitx;
 %     ORBITY{i}=orbity;
@@ -704,16 +713,16 @@ orx
 %     ORX{i}=orx;
 %     ORY{i}=ory;
 %     SIGMA_ORX{i} = sigma_orx;
-%     SIGMA_ORY{i} = sigma_ory; 
+%     SIGMA_ORY{i} = sigma_ory;
 %     CORR_NAMES{i} = actual;
 %     KICKS{i} = kicks;
 %     FIELDS{i} = fields;
 %     OR_T{i} = or_t;
-%        
-% end       
+%
+% end
 
 % Finish up
-display('Done with measurement')   
+display('Done with measurement')
        set(gcbo, 'BackgroundColor',[.1,.7,.2]);
        Plot_Response_Callback
  %  end
@@ -796,7 +805,7 @@ display('Done with measurement')
     function Print_main_window_Callback(source,eventdata)
       figure
       Plot_Response_Callback
-      
+
     end
 
     function Print_logBook_Callback(source,eventdata)
@@ -804,7 +813,7 @@ display('Done with measurement')
       Plot_Response_Callback
       util_appFonts(h,'fontName','Times','lineWidth',1,'fontSize',14);
       util_printLog(h);
-      
+
     end
 
 
@@ -814,7 +823,7 @@ end
 %%%%%%%% Functions that are not nested follow
 
    function [x,sigma_x,y,sigma_y]=get_orbit()
-       
+
        x=0;
        sigma_x=1;
        y=2;
@@ -851,7 +860,7 @@ end
 %         I(j) = mean(Ts(:,j));
 %         sigma_I(j) = std(Ts(:,j));
    end
-   
+
 function    [orx,sigma_orx,ory,sigma_ory]=get_orm(orbitx,sigmax,orbity,sigmay,kicks,all_bpm_EPICS )
 
 for j=1:length(all_bpm_EPICS)

@@ -24,6 +24,10 @@
 xalImport
 global scenario
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_FLOAT_ARRAY;
+
 % some control flags
 
 testModel=0; % run XAL from test area
@@ -31,9 +35,6 @@ useIdeal=1; % use ideal LEM fudge factors
 localFiles=0; % XML files to working directory
 
 % initialize (1): AIDA
-
-aidainit
-da=edu.stanford.slac.aida.lib.da.DaObject();
 clc
 
 % initialize (2): path and file definitions
@@ -82,11 +83,10 @@ if (syncMode>1)
 
 % get initial Twiss ...
 
-  da.reset
-  da.setParam('MODE=5')
-  query=sprintf('MARK:VX00:%d//twiss',markBeg(seqIdList(1)));
-  twssv=da.geta(query,55);
-  Twissi=double(twssv);
+  query=sprintf('MARK:VX00:%d:twiss',markBeg(seqIdList(1)));
+  requestBuilder = pvaRequest(query);
+  requestBuilder.with('MODE', 5);
+  Twissi=pvGetM(query, AIDA_FLOAT_ARRAY);
   Twissi=Twissi(2:end);
 
 % ... and provide abort opportunity

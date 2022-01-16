@@ -2,6 +2,9 @@ function [val, ts] = epicsSimul_lcaGet(pv, varargin)
 
 global epicsDataBase epicsUseAida epicsVerbose
 
+% AIDA-PVA imports
+global AIDA_DOUBLE_ARRAY;
+
 if isempty(epicsDataBase), epicsSimul_clear;end
 
 pvList=cellstr(pv);
@@ -10,12 +13,12 @@ if epicsUseAida
     val=cell(size(pvList));ts=zeros(size(pvList));
     for j=1:length(pvList)
         if ~any(strcmp(pvList{j},'.'))
-            str=[pvList{j} '//VAL'];
+            str=[pvList{j} ':VAL'];
         else
-            str=strrep(pvList{j},'.','//');
+            str=strrep(pvList{j},'.',':');
         end
         try
-            val(j,:)=aidaget(str,'doublea');
+            val(j,:)=pvaGetM(str,AIDA_DOUBLE_ARRAY);
         catch
             val(j,:)={NaN};
         end

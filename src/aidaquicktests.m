@@ -1,44 +1,60 @@
 echo on
 
-
 % Test service
-aidaget('TEST//VAL')
+pvaGet('TEST:VAL')
 
 % XAL Model Service Twiss
-aidaget('QUAD:LI21:221//twiss','doublea')
+pvaGet('QUAD:LI21:221:twiss',AIDA_DOUBLE_ARRAY)
 
 % XAL Model Service Rmat
-aidaget('QUAD:LI21:221//R','doublea')
+pvaGet('QUAD:LI21:221:R',AIDA_DOUBLE_ARRAY)
 
 % XAL Model Service Rmat A->B
-aidaget('QUAD:LI21:221//R','doublea',{'B=BPMS:LI21:701'})
+requestBuilder = pvaRequest('QUAD:LI21:221:R')
+requestBuilder.with('B','BPMS:LI21:701')
+requestBuilder.returning(AIDA_DOUBLE_ARRAY)
+requestBuilder.get()
 
 % Full model data". Isn't done with aidaget
-% aidaget('modelTwiss//Extant.FullMachine')
+% aidaget('modelTwiss:Extant.FullMachine')
 
 % Symbol service"
-aidaget('QUAD:LI21:221//element.effective_length')
+pvaGet('QUAD:LI21:221:element.effective_length')
 
 % BSA Elements. Not done with aidaget
-% aidaget('LCLS//BSA.elements.byZ')
+% aidaget('LCLS:BSA.elements.byZ')
 
 % SLC Db service"
-aidaget('XCOR:LI21:900//TOLF')
+pvaGet('XCOR:LI21:900:TOLF')
 
 % SLC RF Service"
-aidaget('KLYS:LI21:41//KPHR','double',{'BEAM=1'})
+requestBuilder = pvaRequest('KLYS:LI21:41:KPHR')
+requestBuilder.with('BEAM',1)
+requestBuilder.returning(AIDA_DOUBLE)
+requestBuilder.get()
 
-aidaget('KLYS:LI21:41//PHAS','double', {'BEAM=1'})
+requestBuilder = pvaRequest('KLYS:LI21:41:PHAS')
+requestBuilder.with('BEAM',1)
+requestBuilder.returning(AIDA_DOUBLE)
+requestBuilder.get()
 
-aidaget('KLYS:LI24:21//TACT','string',{'BEAM=1'})
+requestBuilder = pvaRequest('KLYS:LI21:41:TACT')
+requestBuilder.with('BEAM',1)
+requestBuilder.returning(AIDA_STRING)
+requestBuilder.get()
 
 % SLC History.
-aidaGetHistory('KLYS:LI29:81//EACT.HIST', ...
+requestBuilder = pvaRequest('KLYS:LI29:81:EACT.HIST')
+requestBuilder.with('BEAM',1)
+requestBuilder.returning(AIDA_DOUBLE)
+requestBuilder.get()
+
+aidaGetHistory('KLYS:LI29:81:EACT.HIST', ...
                {'11/24/2009 00:00:00';'11/25/2009 00:00:00'})
 
 % EPICS CA data
-aidaget('QUAD:LI21:221:Z//VAL')
+pvaGet('QUAD:LI21:221:Z:VAL')
 
-% EPICS Archiver 
-aidaGetHistory('QUAD:LI21:221:BDES//HIST.lcls',...
+% EPICS Archiver
+aidaGetHistory('QUAD:LI21:221:BDES:HIST.lcls',...
                {'11/24/2009 00:00:00'; '11/25/2009 00:00:00'})

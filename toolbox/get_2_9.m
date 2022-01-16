@@ -10,21 +10,20 @@ function state = get_2_9(beamcode)
 %
 % Author: Nate Lipkowitz, SLAC
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_SHORT;
+
 if nargin < 1
     beamcode = 10;  % BC10 is FACET
 end
 
-global da;
-aidainit;
-if isempty(da), 
-   import edu.stanford.slac.aida.lib.da.DaObject; 
-   da=DaObject; 
-end
 
-da.reset;
-da.setParam('BEAM', num2str(beamcode));
 try
-    state = da.get('TRIG:LI02:813//TACT', 9);
+    requestBuilder = pvaRequest('TRIG:LI02:813:TACT');
+    requestBuilder.with('BEAM', beamcode);
+    requestBuilder.returning(AIDA_SHORT);
+    state = requestBuilder.get();
 catch
     state = NaN;
 end

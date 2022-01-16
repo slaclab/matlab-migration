@@ -7,16 +7,16 @@ function stat=LEM_ScaleMagnets()
 %    Write magnet EDES values to EPICS PVs on completion
 % ------------------------------------------------------------------------------
 
-aidainit
-da=DaObject;
-da.reset
-
 global debugFlags
 debug=debugFlags(4);
 
 global lemPVs
 global MAGNET PS unLEM
 global lemFudge lemScaleTime noFudgeCalc
+
+% AIDA-PVA imports
+global pvaSet;
+global AIDA_DOUBLE;
 
 % check for old data ... provide abort option
 
@@ -60,11 +60,11 @@ for m=1:length(id)
       ic=strfind(dbname,':');ic1=ic(1);ic2=ic(2);
       dbname=strcat(dbname(ic1+1:ic2),dbname(1:ic1),dbname(ic2+1:end)); % unmunge
     end
-    Query=strcat(dbname,':EDES//VAL');
+    Query=strcat(dbname,':EDES:VAL');
     try
-      da.setDaValue(Query,DaValue(MAGNET(n).energy0));
-    catch
-      error('*** %s',Query)
+        pvaSet(Query, MAGNET(n).energy0)
+    catch e
+        handleExceptions(e);
     end
   end
 end
@@ -83,11 +83,11 @@ if (~noFudgeCalc)
   Fudge=zeros(4,1);
   try
     for n=1:4
-      Query=strcat(lemPVs(n),'//VAL');
-      Fudge(n)=da.get(Query,4);
+      Query=strcat(lemPVs(n),':VAL');
+      Fudge(n)=pvaGet(Query, AIDA_DOUBLE);
     end
-  catch
-    error('Failed to get fudge factor softIOC values')
+  catch e
+    handleExceptions(e, 'Failed to get fudge factor softIOC values');
   end
   unLEM.Fudge=Fudge;
   if (debug)
@@ -95,11 +95,11 @@ if (~noFudgeCalc)
   else
     try
       for n=1:4
-        Query=strcat(lemPVs(n),'//VAL');
-        da.setDaValue(Query,DaValue(lemFudge(n)));
+        Query=strcat(lemPVs(n),':VAL');
+        pvaSet(Query, lemFudge(n));
       end
-    catch
-      error('Failed to set fudge factor softIOC values')
+    catch e
+        handleExceptions(e, 'Failed to set fudge factor softIOC values');
     end
   end
 end

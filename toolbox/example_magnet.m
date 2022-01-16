@@ -47,22 +47,23 @@ end
 %
 if 0
     try
-        inData = DaValue();
-        inData.type = 0; % DaValue.Type.STRUCT;
+        inData = AidaPvaStruct();
         magnet = cell(0);
+
         magnet{end+1} = 'XCOR:IM20:381';
         magnet{end+1} = 'XCOR:LI23:402';
-        inData.addElement(DaValue(magnet));
-        bdesValue(1) = java.lang.Float(vals(1));
-        bdesValue(2) = java.lang.Float(vals(2));
-        inData.addElement(DaValue(bdesValue));
+        inData.put('names', magnet);
 
-        import edu.stanford.slac.aida.lib.da.DaObject;
-        d = DaObject;
-        d.setParam('MAGFUNC=TRIM');
-        d.setDaValue('MAGNETSET//BDES', inData);
+        bdesValue(1) = vals(1);
+        bdesValue(2) = vals(2);
+        inData.put('values', bdesValue);
+
+        d = pvaRequest('MAGNETSET:BDES');
+        d.with('MAGFUNC', 'TRIM');
+        d.set(inData);
         put2log(sprintf('Sucessful trim of XCOR:LI23:402 %f', bdes));
-    catch
+    catch e
+        handleExceptions(e);
         put2log('Unable to trim XCOR:LI23:402');
     end
 end

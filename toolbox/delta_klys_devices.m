@@ -49,15 +49,15 @@
 
 function iok = delta_klys_devices(prim,micro,unit,secn,delta,trimflag)
 
-aidainit;
-import java.util.Vector;
-import edu.stanford.slac.aida.lib.da.DaObject;
-da = DaObject();
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_FLOAT;
 
+TRIM=''
 if nargin==6,
   ans1 = trimflag(1);
   if (upper(ans1)) == 'N',
-    da.setParam('TRIM','NO');
+    TRIM='NO';
   end;
 end;
 
@@ -66,9 +66,9 @@ end;
 
 %for j=1:length(unit),
 %  string = strcat(upper(prim(j,:)),':',upper(micro(j,:)),':',...
-%                        int2str(unit(j)),'//',upper(secn(j,:)));
-%  try                    
-%    oldval=da.get(string,5);
+%                        int2str(unit(j)),':',upper(secn(j,:)));
+%  try
+%    oldval=pvaGet(string, AIDA_FLOAT);
 %  catch
 %    errordlg('Error caught on "da.get" in "delta_klys_devices.m"','da.get error!');
 %    iok = 0;
@@ -90,12 +90,17 @@ end;
 % Now do it for real.
 
 for j=1:length(unit),
-  string = strcat(upper(prim(j,:)),':',upper(micro(j,:)),':',...
-                        int2str(unit(j)),'//',upper(secn(j,:)));
+  channel = strcat(upper(prim(j,:)),':',upper(micro(j,:)),':',...
+                        int2str(unit(j)),':',upper(secn(j,:)));
+  requestBuilder = pvaRequest(channel);
+  requestBuilder.returning(AIDA_FLOAT);
+  if ~empty(TRIM)
+      requestBuilder.with('TRIM', TRIM);
+  end
   try
-    oldval=da.get(string,5);
-  catch
-    errordlg('Error caught on "da.get" in "delta_klys_devices.m"','da.get error!');
+    oldval=requestBuilder.get();
+  catch e
+    handleExceptions(e, 'in delta_klys_devices.m')
     iok = 0;
     return
   end
@@ -106,11 +111,11 @@ for j=1:length(unit),
      newval=newval+360;
   end;
   try
-    da.setDaValue(string,DaValue(java.lang.Float(newval)));
-  catch
+    requestBuilder.set(newval);
+  catch e
 %    warndlg('Unknown error caught on phase set in "delta_klys_devices.m" - may not be a real problem.','da.setDaValue error');
-    disp('Unknown error caught on phase set in "delta_klys_devices.m" - may not be a real problem.');
-    put2log('Unknown error caught on phase set in "delta_klys_devices.m" - may not be a real problem. - da.setDaValue error');
+    handleExceptions(e, 'Unknown error caught on phase set in "delta_klys_devices.m" - may not be a real problem.')
+    put2log('Unknown error caught on phase set in "delta_klys_devices.m" - may not be a real problem.');
     merr = lasterror;
     merr.message
     iok = 0;

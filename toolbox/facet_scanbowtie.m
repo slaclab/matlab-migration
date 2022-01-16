@@ -66,7 +66,7 @@ answ(2)=isbdesok(sweep_corr(6:9),sweep_corr(1:4),str2double(sweep_corr(11:end)),
 %For the SLC quad, this gets tricky due to the boost/bulk business.
 %If change to bulk happens, the measurement technique fails.
 %I setup "isbdesok.m" to return bad if a proposed bdes needs to
-%tweak the bulk from it's present operation. 
+%tweak the bulk from it's present operation.
 
 %Try for "stronger".
 if abs(oldquadval)==oldquadval         %If oldquadval is positive...
@@ -84,7 +84,7 @@ else                                   %We have to try "weaker"
     else                               %else oldquadval is negative.
         try_quadval = oldquadval+quad_range;
     end
-    
+
     answ(4)=isbdesok(targetquad(6:9),targetquad(1:4),str2double(targetquad(11:end)),try_quadval);
     if answ(4)==1                      %"Weaker" will work.
         secondquadval = try_quadval;
@@ -131,7 +131,7 @@ end
 for j=1:n_corsteps;
     corval=corvals(j);
     disp(['Setting ',sweep_corr,' to ',num2str(corval)])
-    
+
     %Trim sweep corrector
 %    control_magnetSet(sweep_corr,corval);
     try
@@ -146,10 +146,10 @@ for j=1:n_corsteps;
         return
     end
     pause(1)
-    
+
     [pos, good, errstring] = getBPMs(model_nameConvert([targetbpms;analyzebpm']), plane, n_averages);
     if ~isempty(errstring), return; end
-    
+
     data.target1(j) =mean(pos(good(:,1)==1,1));
     data.dtarget1(j)=std(pos(good(:,1)==1,1));
     for i=1:numel(analyzebpm)
@@ -157,7 +157,7 @@ for j=1:n_corsteps;
         data.danal1(i,j)  =std(pos(good(:,i+1)==1,i+1));
     end
 end
-if ~isempty(errstring), 
+if ~isempty(errstring),
     restoreMagnets(targetquad, sweep_corr)
     return
 end
@@ -182,7 +182,7 @@ end
 for j=1:n_corsteps
     corval=corvals(j);
     disp(['Setting ',sweep_corr,' to ',num2str(corval)])
-    
+
     %Trim sweep corrector
 %    control_magnetSet(sweep_corr,corval);
     try
@@ -200,7 +200,7 @@ for j=1:n_corsteps
 
     [pos, good, errstring] = getBPMs(model_nameConvert([targetbpms;analyzebpm']), plane, n_averages);
     if ~isempty(errstring), return; end
-    
+
     data.target2(j) =mean(pos(good(:,1)==1,1));
     data.dtarget2(j)=std(pos(good(:,1)==1,1));
     for i=1:numel(analyzebpm)
@@ -238,7 +238,7 @@ control_magnetSet(corr,oldcorval);
 function [errstring] = setbdestrim(mag_name,new_bdes)
 %        Function sets BDES and trims (list of) magnets.
 %
-%        ex:        
+%        ex:
 %        errdstring = setbdestrim('QUAD','LI00',440, 2.365);
 %
 %        'prim' must be a four character string.
@@ -247,26 +247,19 @@ function [errstring] = setbdestrim(mag_name,new_bdes)
 %        'invalue' is a float.
 %
 %        This function also works for a list of arguements where
-%        each of the above is a vector (vector lengths need to 
+%        each of the above is a vector (vector lengths need to
 %        match) of whose lengths are the list length.
 %
 %        Returns a string indicating:
-%        ok  
+%        ok
 %        BDES out of range
 %        Device feedback control
 %        Device does not exist
 %
 %        HVS 11/1/07
 
-% Initialize aida
-global da
-
-aidainit;
-import java.util.Vector;
-if isempty(da),
-   import edu.stanford.slac.aida.lib.da.DaObject;
-   da=DaObject; 
-end
+% AIDA-PVA imports
+global pvaRequest AidaPvaStruct;
 
 errstring=[];
 mag_name = model_nameConvert(mag_name,'SLC');
@@ -275,9 +268,8 @@ if isStatusBits(mag_name(1:4),mag_name(6:9),str2double(mag_name(11:end)),'hsta',
     return
 end
 
-immostring = strcat(mag_name,'//IMMO');
-javaimmo = da.getDaValue(immostring);
-immo = javaimmo.getAsDoubles;
+immostring = strcat(mag_name,':IMMO');
+immo = pvaGetM(immostring);
 
 %If before sector 5 or single LGPS quad supply use trim, otherwise perturb
 if (str2double(mag_name(8:9)) <= 4) || immo(2) == 0
@@ -285,20 +277,14 @@ if (str2double(mag_name(8:9)) <= 4) || immo(2) == 0
 else
     mag_func = 'PTRB';
 end
-magdevice=java.lang.String(mag_name);
-magvalue=java.lang.Float(new_bdes);
 
-inData1 = DaValue(magdevice);
-inData2 = DaValue(magvalue);
+inData = AidaPvaStruct();
+inData.put('names', { mag_name });
+inData.put('values', { new_bdes });
 
-inData = DaValue();
-inData.type=0;
-
-inData.addElement(inData1);
-inData.addElement(inData2);
-
-da.setParam('MAGFUNC',mag_func);
-outData = da.setDaValue('MAGNETSET//BDES',inData);
+requestBuilder = pvaRequest('MAGNETSET:BDES');
+requestBuilder.with('MAGFUNC', mag_func);
+outData = requestBuilder.set(inData);
 
 
 function [pos, good, errstring] = getBPMs(bpms, plane, n_averages)
@@ -340,7 +326,7 @@ data.center =0.0;
 data.dcenter=0.0;
 
 for j=1:numel(analyzebpm)
-    [A1(j),B1(j),dA1(j),dB1(j),chisq1(j)]=fitline(data.target1,data.anal1(j,:),data.danal1(j,:));    
+    [A1(j),B1(j),dA1(j),dB1(j),chisq1(j)]=fitline(data.target1,data.anal1(j,:),data.danal1(j,:));
     [A2(j),B2(j),dA2(j),dB2(j),chisq2(j)]=fitline(data.target2,data.anal2(j,:),data.danal2(j,:));
     fit1(j,:)=data.target1*A1(j) + B1(j);
     fit2(j,:)=data.target2*A2(j) + B2(j);
@@ -363,7 +349,7 @@ for j=1:numel(analyzebpm)
     errorbar(data.target2,data.anal2(j,:),data.danal2(j,:),'k*');
     xlabel(strcat(targetbpms,':',plane));
     ylabel(strcat(char(analyzebpm{j}),':',plane));
-    
+
     %Create Title string with BPM offset
     if strcmp(plane,'X')
         ind = 1;

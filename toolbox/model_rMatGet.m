@@ -24,7 +24,7 @@ function [rMat, zPos, lEff, twiss, energy, n] = model_rMatGet(nameList, nameTo, 
 
 % Output arguments:
 %    RMAT: Transport matrix(es) to NAMELIST or from NAMELIST to NAMETO
-%    ZPOS: z-position of element(s) in NAMELIST (element.S from XAL, //Z from SCP
+%    ZPOS: z-position of element(s) in NAMELIST (element.S from XAL, :Z from SCP
 %    LEFF: Effective length of element(s) in NAMELIST
 %    TWISS: Twiss parameters a element(s) in NAMELIST
 %    ENERGY: Energy at element(s) in NAMELIST
@@ -36,6 +36,10 @@ function [rMat, zPos, lEff, twiss, energy, n] = model_rMatGet(nameList, nameTo, 
 % Author: Henrik Loos, SLAC
 
 % --------------------------------------------------------------------
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE_ARRAY;
+
 [modelSource,modelOnline,~,~,modelBeamPath]=model_init;
 
 
@@ -47,7 +51,7 @@ mode={};if strcmp(accel,'FACET'), mode={'MODE=1'};zLCLS=0;end
 if nargin < 4, param=[];end
 [param,idPar]=util_parseParams(param,{'R' 'Z' 'LEFF' 'twiss' 'EN' 'n'},nargout);
 if nargin < 3, opts={['BEAMPATH=' modelBeamPath]};end
-if nargin < 2, nameTo={};end    
+if nargin < 2, nameTo={};end
 if isempty(opts), opts={['BEAMPATH=' modelBeamPath]};end
 if isempty(nameTo), nameTo={};end
 
@@ -124,7 +128,7 @@ if modelOnline && ~ismember(modelSource,{'MATLAB'})
         rzDone=1;
         if nargout < 3, nList=0;end % Skip to the end
     end
-    
+
     % Get twiss and/or LEFF from table.
     if useTable && any(ismember(param,{'LEFF' 'twiss' 'EN'}))
         resList=0;
@@ -144,7 +148,7 @@ if modelOnline && ~ismember(modelSource,{'MATLAB'})
         rzDone=1;
         if nargout < 6, nList=0;end % Skip to the end
     end
-    
+
     % Different default for XAL (A-B)
     if ~isempty(nameTo) && strcmp(modelSource,'EPICS')
         opts(:,3:end+2)=opts;
@@ -163,8 +167,12 @@ if modelOnline && ~ismember(modelSource,{'MATLAB'})
 %        if isempty(param) && ~rzDone
         if ismember('R',param) && ~rzDone
             try
-                rMat(:,:,j)=reshape(cell2mat(aidaget([name '//R'],'doublea',[nT opt])),6,6)';
-            catch
+                requestBuilder = pvaRequest([name ':R']);
+                requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+%                requestBuilder.with([nT opt]);  % TODO - make options - this is complicated so I'll leave it to the experts :)
+                rMat(:,:,j)=reshape(cell2mat(requestBuilder.get()),6,6);
+            catch e
+                requestBuilder.get(e)
                 disp(['AIDA Error: No R matrix available for ' name]);
             end
         end
@@ -172,7 +180,7 @@ if modelOnline && ~ismember(modelSource,{'MATLAB'})
 %        if (nargout > 1 || strcmp(param,'Z')) && ~rzDone
         if ismember('Z',param) && ~rzDone
             try
-                zPos(j)=getLen([name '//' str])-zLCLS;
+                zPos(j)=getLen([name ':' str])-zLCLS;
             catch
                 disp(['AIDA Error: No Z location available for ' name]);
             end
@@ -181,7 +189,7 @@ if modelOnline && ~ismember(modelSource,{'MATLAB'})
         if ismember('LEFF',param) && ...
                 (any(strncmp(name,{'SOLN' 'QUAD' 'QUAS' 'BEND' 'BNDS'},4)) || strcmp(modelSource,'EPICS')) && ~rzDone
             try
-                lEff(j)=getLen([name '//' str]);
+                lEff(j)=getLen([name ':' str]);
             catch
                 disp(['AIDA Error: No effective length available for ' name]);
             end
@@ -189,7 +197,10 @@ if modelOnline && ~ismember(modelSource,{'MATLAB'})
         if any(ismember({'twiss' 'EN'},param)) && ~strncmp(name,'SOLN',4)
             % Twiss parameters are [En (mu b a D Dp)_x (mu b a D Dp)_y]
             try
-                t=cell2mat(aidaget([name '//twiss'],'doublea',opt));
+                requestBuilder = pvaRequest([name ':twiss']);
+                requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+%                requestBuilder.with(opt);  % TODO put in options
+                t=cell2mat(ML(requestBuilder.get()));
                 twiss(:,j)=t(1:11);energy(j)=t(1);
             catch
                 disp(['AIDA Error: No twiss parameters available for ' name]);
@@ -235,24 +246,16 @@ val={rMat,zPos,lEff,twiss,energy,n};
 
 function len = getLen(name)
 
-global da
-aidainit;
-if isempty(da), 
-%   import edu.stanford.slac.aida.lib.da.DaObject;
-   import edu.stanford.slac.aida.lib.da.*;
-   da=DaObject;
-end
-
 %
 % Connect to message log
 %
 Logger = getLogger('model_rMatGet.m');
 
-da.reset;
 try
-    len=da.getDaValue(name).elementAt(0);
+    o = pvaGetM(name);
+    len = o.size;
 catch
-    put2log(sprintf('Aida getDaValue(%s) failure in function getLen(%s).',name,name));
+    put2log(sprintf('Aida pvaGet(%s) failure in function getLen(%s).',name,name));
 end
 if ~strcmp(class(len),'double')
     len=len.getDouble;
@@ -261,14 +264,6 @@ end
 
 function [nameEpics, pos, r, zPos, nameMad] = getAllR(name, opts)
 
-global da
-aidainit;
-if isempty(da), 
-   import edu.stanford.slac.aida.lib.da.*;
-%   import edu.stanford.slac.aida.lib.da.DaObject;
-   da=DaObject;
-end
-
 %
 % Connect to message log
 %
@@ -276,14 +271,23 @@ Logger = getLogger('model_rMatGet.m');
 
 type='extant';
 typOpt=[opts{find(strncmp(opts,'TYPE=',5),1,'last')}];
-if ~isempty(typOpt), type=lower(typOpt(6:end));end
-if strcmp(type,'database'), type='extant';end
+if ~isempty(typOpt)
+    type=lower(typOpt(6:end));
+end
+
+if strcmp(type,'database')
+    type='extant';
+end
 type(1)=upper(type(1));
 
-da.reset;
-for opt=opts(:)', da.setParam(opt);end
+requestBuilder = pvaRequest(['modelRmats:' type '.' name]);
+for opt=opts(:)
+    nv = split(opt,"=")
+    requestBuilder.with(nv(1), nv(2));
+end
+
 try
-    tbl=da.getDaValue(['modelRmats//' type '.' name]);
+    tbl=ML(requestBuilder.get());
 %{
     num=tbl.get(0).getDoubles;
     nameMad=cellstr(char(tbl.get(1).getStrings));
@@ -291,58 +295,59 @@ try
     pos=cellstr(char(tbl.get(3).getStrings));
     zPos=tbl.get(4).getDoubles;
 %}
-    num=cell2mat(cell(tbl.get(0).toArray));
-    nameMad=cellstr(char(tbl.get(1).toArray));
-    nameEpics=cellstr(char(tbl.get(2).toArray));
-    pos=cellstr(char(tbl.get(3).toArray));
-    zPos=cell2mat(cell(tbl.get(4).toArray));
+    num=cell2mat(cell(tbl.values.num));
+    nameMad=cellstr(char(tbl.values.nameMad));
+    nameEpics=cellstr(char(tbl.values.nameEpics));
+    pos=cellstr(char(tbl.values.pos));
+    zPos=cell2mat(cell(tbl.values.zPos));
 
     r=zeros(36,length(num));
     for j=1:36
 %        r(j,:)=tbl.get(4+j).getDoubles;
-        r(j,:)=cell2mat(cell(tbl.get(4+j).toArray));
+        r(j,:)=cell2mat(cell(tbl.get(4+j).toArray)); %%% TODO support annonymous vectors in aida-pva or find the names
     end
 catch
     [nameEpics,pos,nameMad]=deal(cell(0,1));
     [r,zPos]=deal(zeros(0,1));
-    put2log(sprintf('Aida getDaValue(%s) failure in function getAllR.',['modelRmats//' type '.' name]));
+    put2log(sprintf('Aida pvaGet(%s) failure in function getAllR.',['modelRmats:' type '.' name]));
 end
 r=permute(reshape(r,6,6,[]),[2 1 3]);
 
 
 function [nameEpics, pos, twiss, lEff, nameMad, zPos] = getAllTwiss(name, opts)
-model = eget('SIMULACRUM:SYS0:1:CU_HXR:DESIGN:TWISS');  %TODO parse name= beamPath and opts for DESIGN
+model = pvaGetM('SIMULACRUM:SYS0:1:CU_HXR:DESIGN:TWISS');  %TODO parse name= beamPath and opts for DESIGN
 nameEpics = model.device_name;
 pos = ones(size(nameEpics)); %TODO Don't knwo what this is
-twiss = [model.p0c model.psi_x model.beta_x model.alpha_x model.eta_x model.etap_x model.psi_y model.beta_y model.alpha_y model.eta_y model.etap_y]; 
+twiss = [model.p0c model.psi_x model.beta_x model.alpha_x model.eta_x model.etap_x model.psi_y model.beta_y model.alpha_y model.eta_y model.etap_y];
 lEff = model.length;
 nameMad = model.element;
 zPos = model.s;
 return
 
-global da
-aidainit;
-if isempty(da), 
-   %import edu.stanford.slac.aida.lib.da.DaObject;
-   import edu.stanford.slac.aida.lib.da.*;
-   da=DaObject;
-end
-
 %
 % Connect to message log
 %
+
 Logger = getLogger('model_rMatGet.m');
 
 type='extant';
-typOpt=[opts{find(strncmp(opts,'TYPE=',5),1,'last')}];
-if ~isempty(typOpt), type=lower(typOpt(6:end));end
-if strcmp(type,'database'), type='extant';end
+typOpt = [opts{find(strncmp(opts,'TYPE=',5),1,'last')}];
+if ~isempty(typOpt)
+    type=lower(typOpt(6:end));
+end
+
+if strcmp(type,'database')
+    type='extant';
+end
 type(1)=upper(type(1));
 
-da.reset;
-for opt=opts(:)', da.setParam(opt);end
+requestBuilder = pvaRequest(['modelTwiss:' type '.' name]);
+for opt=opts(:)
+    nv = split(opt,"=")
+    requestBuilder.with(nv(1), nv(2));
+end
 try
-    tbl=da.getDaValue(['modelTwiss//' type '.' name]);
+    tbl=ML(requestBuilder.get());
 %{
     num=tbl.get(0).getDoubles;
     nameMad=cellstr(char(tbl.get(1).getStrings));
@@ -351,22 +356,22 @@ try
     zPos=tbl.get(3).getDoubles;
     lEff=tbl.get(5).getDoubles;
 %}
-    num=cell2mat(cell(tbl.get(0).toArray));
-    nameMad=cellstr(char(tbl.get(1).toArray));
-    nameEpics=cellstr(char(tbl.get(2).toArray));
-    pos=cellstr(char(tbl.get(4).toArray));
-    zPos=cell2mat(cell(tbl.get(3).toArray));
-    lEff=cell2mat(cell(tbl.get(5).toArray));
+    num=cell2mat(cell(tbl.values.num));
+    nameMad=cellstr(char(tbl.values.nameMad));
+    nameEpics=cellstr(char(tbl.values.nameEpics));
+    pos=cellstr(char(tbl.values.pos));
+    zPos=cell2mat(cell(tbl.values.zPos));
+    lEff=cell2mat(cell(tbl.values.lEff));
 
     twiss=zeros(11,length(num));
     for j=1:11
 %        twiss(j,:)=tbl.get(5+j).getDoubles;
-        twiss(j,:)=cell2mat(cell(tbl.get(5+j).toArray));
+        twiss(j,:)=cell2mat(cell(tbl.get(5+j).toArray)); % TODO support anonymous vectors or find names
     end
 catch
     [nameEpics,pos,nameMad]=deal(cell(0,1));
     [twiss,lEff,zPos]=deal(zeros(0,1));
-    put2log(sprintf('Aida getDaValue(%s) failure in function getAllTwiss.',['modelTwiss//' type '.' name]));
+    put2log(sprintf('Aida pvaGet(%s) failure in function getAllTwiss.',['modelTwiss:' type '.' name]));
 end
 
 
@@ -380,7 +385,7 @@ res=logical(res);
 % Loop through names.
 for j=1:nList
     opt=opts;if ~isempty(opt), opt=opt(min(end,j),:);end
-    
+
     [res(j),idB,idZ(j),idE,lEff(j)]=findId(beamLine,name{min(end,j)});
     if ~res(j), continue, end
     % Default position is 'END'

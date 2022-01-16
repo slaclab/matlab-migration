@@ -28,6 +28,10 @@ function [act, stat, swrd, hdsc, dsta, enld] = control_klysStatGet(name, beamCod
 % Modified 28-May-2021 to always report 26-3 as DEACT'd as missing PVs and
 % nonfunctional. See lines 113-121 (v 1.36->1.37) --T. Maxwell
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_SHORT;
+
 % --------------------------------------------------------------------
 % Check input arguments
 if nargin < 2
@@ -143,9 +147,12 @@ else
             if isnan(bc) || bc < 0, continue, end
             bcStr=num2str(bc,'BEAM=%d');
             try
-                act(j,k)=aidaget([name{j} '//TACT'],'short',{bcStr ['DGRP=' dgrpStr]});
-%            stat(j)=aidaget([name{j} '//STAT'],'short');
-%            swrd(j)=aidaget([name{j} '//SWRD'],'short');
+                requestBuilder = pvaRequest([name{j} ':TACT']);
+                requestBuilder.returning(AIDA_SHORT);
+                requestBuilder.with('DGRP',dgrpStr);
+                act(j,k) = requestBuilder.get();
+%            stat(j)=aidaget([name{j} ':STAT'],'short');
+%            swrd(j)=aidaget([name{j} ':SWRD'],'short');
             catch
             end
         end

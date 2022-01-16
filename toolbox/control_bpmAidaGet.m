@@ -26,6 +26,9 @@ function [x, y, tmit, pulseId, stat] = control_bpmAidaGet(name, num, bpmd)
 
 % --------------------------------------------------------------------
 
+% AIDA-PVA imports
+global pvaRequest;
+
 % Check input arguments.
 if nargin < 3, bpmd='57';end
 
@@ -49,36 +52,31 @@ switch bpmd
     case 'ELECEP01'
         dgrp=bpmd;bpmd='8';
     case 'SCAVSPPS'
-        dgrp=bpmd;bpmd='19';        
+        dgrp=bpmd;bpmd='19';
 end
 
 % Set up Aida acquisition.
-global da;
-aidainit; 
-if isempty(da)
-    import edu.stanford.slac.aida.lib.da.DaObject;
-    da = DaObject();
-end
-da.reset();
-da.setParam('BPMD',bpmd);
-da.setParam('NRPOS',num2str(num));
-for j=1:nBPM
-    da.setParam(num2str(j,'BPM%d'),name{j});
-end
+requestBuilder = pvaRequest([dgrp ':BUFFACQ']);
+requestBuilder.with('BPMD', bpmd);
+requestBuilder.with('NRPOS', num);
+requestBuilder.with('BPMS', name);
 
 % Read BPM data.
 try
-    out=da.getDaValue([dgrp '//BUFFACQ']);
-    nameOut=reshape(cell(out.get(0).toArray),[],nBPM)';
-    pulseId=reshape(cell2mat(cell(out.get(1).toArray)),[],nBPM)';
-    x=reshape(cell2mat(cell(out.get(2).toArray)),[],nBPM)';
-    y=reshape(cell2mat(cell(out.get(3).toArray)),[],nBPM)';
-    tmit=reshape(cell2mat(cell(out.get(4).toArray)),[],nBPM)';
-    stat=reshape(cell2mat(cell(out.get(6).toArray)),[],nBPM)';
+    out=ML(requestBuilder.get());
+    nameOut=reshape(cell(vBPMS.values.name), [], nBPM)';
+    pulseId=reshape(cell2mat(cell(vBPMS.values.id)),[],nBPM)';
+    x=reshape(cell2mat(cell(vBPMS.values.x)),[],nBPM)';
+    y=reshape(cell2mat(cell(vBPMS.values.y)),[],nBPM)';
+    tmit=reshape(cell2mat(cell(vBPMS.values.tmits)),[],nBPM)';
+    stat=reshape(cell2mat(cell(vBPMS.values.stat)),[],nBPM)';
     [isOut,idOut]=ismember(name,nameOut(:,1));
-    pulseId=pulseId(idOut,:);x=x(idOut,:);y=y(idOut,:);
-    tmit=tmit(idOut,:);stat=stat(idOut,:);
-catch
-    disp('Aida time out or other error');
+    pulseId=pulseId(idOut,:);
+    x=x(idOut,:);
+    y=y(idOut,:);
+    tmit=tmit(idOut,:);
+    stat=stat(idOut,:);
+catch e
+    handleExceptions(e);
     [x,y,tmit,pulseId,stat]=deal(zeros(nBPM,num));
 end

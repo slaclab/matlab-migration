@@ -75,11 +75,6 @@ et=clock;ct=cputime;
 
 % external packages (AIDA, XAL, and jca)
 
-global da dav
-aidainit
-da=edu.stanford.slac.aida.lib.da.DaObject;da.reset
-dav=edu.stanford.slac.aida.lib.util.common.DaValue;dav.reset
-
 xalImport
 
 % control flags

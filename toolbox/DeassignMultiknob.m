@@ -15,19 +15,13 @@ function PVName = DeassignMultiknob(PV)
 % Author: Jeff Rzepiela, SLAC
 
 % --------------------------------------------------------------------
-global da_mkb
-if strcmpi(PV, 'MKB//VAL')
-    disp_log ('reset da_mkb')
-    try
-        da_mkb.reset();
-    catch
-        disp_log('AIDA da_mkb.reset failed');
-    end
+global mkbRequestBuilder
+if strcmpi(PV, 'MKB:VAL')
     return
 end
 disp_log ('reset MKB')
 idx=strfind(PV,'FILE');
-if isempty(idx) 
+if isempty(idx)
     PV=[PV ':FILE'];
 end
 lcaPut(PV,0);

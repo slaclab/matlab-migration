@@ -4,11 +4,14 @@
 
 
 function out = get_energy()
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_SHORT;
+
 BSY_energy_factor = 1000/.5794666;
 BC2_energy_factor = 4300 * 361.6275 / 4.98009; % energy * position / field
 persistent initialized
 persistent P %Pv structure,
-aidainit;
 if isempty(initialized)
     P = generate_names();
     initialized = 1;
@@ -47,11 +50,15 @@ for sector = 20:30
         if (sector == 20) && (station == 1)
             continue;
         end
-        klysname = ['KLYS:LI', num2str(sector),':', num2str(station),'1//TACT'];
+        klysname = ['KLYS:LI', num2str(sector),':', num2str(station),'1:TACT'];
         try
-            out.klystrons.act(sector,station) = aidaget(klysname, 'short', {'BEAM=1' 'DGRP=LIN_KLYS'});
-        catch
-            disp('aidaget error');
+            requestBuilder = pvaRequest(klysname);
+            requestBuilder.returning(AIDA_SHORT);
+            requestBuilder.with('BEAM',1);
+            requestBuilder.with('DGRP','LIN_KLYS');
+            out.klystrons.act(sector,station) = ML(requestBuilder.get());
+        catch e
+            handleExceptions(e)
         end
         hsta = dat(P.map.hsta(sector, station));
         stat = dat(P.map.stat(sector, station));
@@ -59,7 +66,7 @@ for sector = 20:30
         act = out.klystrons.act(sector,station);
         egain(sector, station) = station_gain(out.klystrons.enld(sector, station), hsta, stat, swrd, act);
         % % % gain, without phas
-        
+
         if ~isfinite(out.klystrons.pdes(sector,station)) || ~isfinite(sbstpdes(sector))
             phase(sector,station) = 0; % what else to do if invalid
         else

@@ -1,4 +1,6 @@
 function [status, summary] = SetKlysTact(query, beam, dgrp, value)
+global pvaRequest;
+
 
 % Author: Bob Hall, Greg White
 %
@@ -7,7 +9,7 @@ function [status, summary] = SetKlysTact(query, beam, dgrp, value)
 %
 % Aida Klystron Set function.  This deactivates
 % or reactivates a specified klystron on a specified beam code.
-% It also returns a status code indicating the resulting status 
+% It also returns a status code indicating the resulting status
 % after the operation (the bit interpretation of the status code
 % can be found in the VMS file slctxt:linklysta.txt).
 %
@@ -27,7 +29,7 @@ function [status, summary] = SetKlysTact(query, beam, dgrp, value)
 % value - integer flag indicating whether the specified klystron
 % is to be deactivated or reactivated on the specified beam code
 % (0 => deactivate, 1 => reactivate).
-%  
+%
 % OUTPUT:
 %
 % status - returned integer status code of the klystron given in the
@@ -39,9 +41,9 @@ function [status, summary] = SetKlysTact(query, beam, dgrp, value)
 %
 % summary - returned string summary of the status of the klystron
 % given in the query argument, at the time of exit of this procedure.
-% summary = 
+% summary =
 %      'ACCEL' if the klystron is in ACCELerate at exit of this script.
-%      'STANDBY' if the klystron is in STANDBY at exit of this script.     
+%      'STANDBY' if the klystron is in STANDBY at exit of this script.
 %      'BAD' if the klystron is in maintenance, offline, check
 %      phase (CKP), To Be Replaced (TBR), or Awaiting Run Up (ARU).
 %
@@ -51,9 +53,6 @@ function [status, summary] = SetKlysTact(query, beam, dgrp, value)
 %      20-Nov-08, Greg White (greg)
 %      Significant update to add condition handling.
 %
-
-aidainit;
-import java.util.Vector;
 
 status = 0;
 summary = 'INVALID';
@@ -77,17 +76,17 @@ DSTA_MKSUTRIGGERFAULT =  uint32(hex2dec('10000000'));
 DSTA_MODULATORON      =  uint32(hex2dec('20000000'));
 STAT_BADCAMAC         =  uint16(hex2dec('0010'));
 
-if (value == ACTIVATE) 
+if (value == ACTIVATE)
     valuestring = 'reactivate';
 elseif (value == DEACTIVATE)
     valuestring = 'deactivate';
-else 
+else
     disp(['Invalid Klys activate/deactivate argument to ' ...
               'SetKlysTact']);
 end
 
-% Extract the device name from the query (ie minus //TACT).
-device = strtok(query,'//');
+% Extract the device name from the query (ie minus :TACT).
+device = getInstance(query);
 
 % Get Klystron Status. Are we assuming all Klystrons are SLC?
 [linklysta,stat,swrd, hdsc, dstaback] = control_klysStatGet(device);
@@ -97,7 +96,7 @@ dsta = dstaback(1);
 % Check for device being in STAT = MAINT or STAT = OFFLINE, or any
 % of the conditions rolled up into LINKLYSTA [1] (CheckPhase (CKP),
 % TBR, ARV, OFFLINE, MAINT).
-% 
+%
 if bitand(linklysta, LINKLYSTA_BAD)
     disp([ device ' is in MAINT, OFFLINE, CKP, TBR or ARU.']);
     summary = 'BAD';
@@ -112,12 +111,12 @@ if value == ACTIVATE
         % ... and there must not be an MKSU Trigger fault
         if bitand(dsta,DSTA_MKSUTRIGGERFAULT) == false
             % the modulator really should be be on
-            if bitand(dsta, DSTA_MODULATORON)      
+            if bitand(dsta, DSTA_MODULATORON)
                 % ... and there must not be a CAMAC fault
                 if bitand(stat, STAT_BADCAMAC) == false
                     activateAllowed = true;
                 else
-                    disp([ device ' has STAT Bad Camac' CANTACTIVATE]); 
+                    disp([ device ' has STAT Bad Camac' CANTACTIVATE]);
                 end
             else
                 disp([ device ' modulator not available' CANTACTIVATE]);
@@ -141,12 +140,12 @@ if value == DEACTIVATE
          if bitand(stat, STAT_BADCAMAC) == false
              deactivateAllowed = true;
          else
-             disp([ device ' has STAT Bad Camac' CANTDEACTIVATE]); 
+             disp([ device ' has STAT Bad Camac' CANTDEACTIVATE]);
          end
     else
         disp([ device ' is in not in accelerate' CANTDEACTIVATE]);
     end
-    
+
     % Having checked for show stoppers, and being allowed to
     % proceed, now check for warning conditions.
     if deactivateAllowed
@@ -167,29 +166,17 @@ end
 % The action is permitted, so go ahead and implement the state change.
 %
 if activateAllowed || deactivateAllowed
-     
+
     try
         % initialize aida
-        import edu.stanford.slac.aida.lib.da.DaObject; 
-        da = DaObject();
-        da.setParam('BEAM', beam)
-        da.setParam('DGRP', dgrp);
-
+        requestBuilder = pvaRequest(query);
+        requestBuilder.with('BEAM', beam);
+        requestBuilder.with('DGRP', dgrp);
         % Actually do the activate or deactivate
-        if ( value == ACTIVATE )
-            outData = DaValue(java.lang.Short(ACTIVATE));
-            status = da.setDaValue(query, outData);
-        elseif ( value == DEACTIVATE )
-            outData = DaValue(java.lang.Short(DEACTIVATE));
-            status = da.setDaValue(query, outData);
-        end
-        da.reset();
-
-    catch
-        disp(['Error occurred during ' valuestring ' of '...
-            device '. Please see cmlog.']);
+        status = requestBuilder.set(value);
+    catch e
+        handleExceptions(e, ['Error occurred during ' valuestring ' of ' device '.']);
     end
-    
 end
 
 % Return the present status

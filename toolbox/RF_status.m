@@ -112,12 +112,12 @@ handles.pv_list = {
                     'LASR:IN20:1:LSR_S_PS'       0
                                             };
 handles.klys_pv_list = {
-                    'KLYS:LI20:51//TACT' 'TC0'
-                    'KLYS:LI20:61//TACT' 'GN1'
-                    'KLYS:LI20:71//TACT' 'L0A'
-                    'KLYS:LI20:81//TACT' 'L0B'
-                    'KLYS:LI21:11//TACT' 'L1S'
-                    'KLYS:LI21:21//TACT' 'L1X'
+                    'KLYS:LI20:51:TACT' 'TC0'
+                    'KLYS:LI20:61:TACT' 'GN1'
+                    'KLYS:LI20:71:TACT' 'L0A'
+                    'KLYS:LI20:81:TACT' 'L0B'
+                    'KLYS:LI21:11:TACT' 'L1S'
+                    'KLYS:LI21:21:TACT' 'L1X'
                                             };      % TCAV must be first in list
 handles.Nsystems = round(length(handles.pv_list(:,1))/8);
 handles.SysNames = '   ';
@@ -144,7 +144,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = RF_status_OutputFcn(hObject, eventdata, handles) 
+function varargout = RF_status_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -321,6 +321,10 @@ end
 
 
 function STARTSTOP_Callback(hObject, eventdata, handles)
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_STRING;
+
 tags={'Start' 'Stop'};
 colr={'green' 'white '};
 set(hObject,'String',tags{get(hObject,'Value')+1});
@@ -397,7 +401,10 @@ while get(hObject,'Value')
   for j = 1:handles.Nklys
     try
       set(handles.MSG,'String',' ')
-      actstr = aidaget(handles.klys_pv_list(j,1),'string',{'BEAM=1'}); % returns 'activated' when on beam code #1 (LCLS)
+      requestBuilder = pvaRequest(handles.klys_pv_list(j,1));
+      requestBuilder.returning(AIDA_STRING);
+      requestBuilder.with('BEAM',1);
+      actstr = requestBuilder.get();  % returns 'activated' when on beam code #1 (LCLS)
     catch
       set(handles.MSG,'String','aidaGet error on klys PV list')
       drawnow
@@ -460,5 +467,5 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-system('firefox https://confluence.slac.stanford.edu/display/LCLSHELP/RF+Status+GUI')
+system('firefox https::confluence.slac.stanford.edu/display/LCLSHELP/RF+Status+GUI')
 

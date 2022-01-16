@@ -63,7 +63,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = quad_align_OutputFcn(hObject, eventdata, handles) 
+function varargout = quad_align_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -252,7 +252,7 @@ set(handles.bpm_plot_selection,'Visible','off')
 global plot_bpm_ind plot_quad_ind
 plot_bpm_ind=1;
 plot_quad_ind=1;
- 
+
 
 for i=1:length(quad_names)
     actual=quad_names{i};
@@ -305,7 +305,7 @@ for i=1:length(quad_names)
                         while status
                             status=lcaGet([quad_EPICS{i} ':RAMPSTATE'],0,'double');
                         end
-%             if you want to trim  
+%             if you want to trim
 %             lcaPut([quad_EPICS{i} ':BDES'],fields(j))
 %             lcaPut([quad_EPICS{i} ':CTRL'],'TRIM');
 %             status=1;
@@ -321,7 +321,7 @@ for i=1:length(quad_names)
 
     %going back to the initial current value (triming)
     lcaPut([quad_EPICS{i} ':BDES'],ini_field(quad_ind(i)))
-    lcaPut([quad_EPICS{i} ':CTRL'],'TRIM');  
+    lcaPut([quad_EPICS{i} ':CTRL'],'TRIM');
     status=1;
     while status
         temp=lcaGet([quad_EPICS{i} ':CTRLSTATE']);
@@ -332,17 +332,17 @@ for i=1:length(quad_names)
     %function to get the relation orbit/integrated_quad_field for all BPMs
     %and orbit0
     [orqx,sigma_orqx,orqy,sigma_orqy,orbitx0,sigmax0,orbity0,sigmay0]=get_orbit_over_gl(orbitx,sigmax,orbity,sigmay,fields);
-    
+
     %R12 and R34 from the model
     R12=RespMatH(:,quad_ind(i))';
     R34=RespMatV(:,quad_ind(i))';
 
     %function to get the misalignment of the quadrupole
     [mis_x,sigma_mis_x,mis_y,sigma_mis_y] = get_mis(R12,R34,orqx,sigma_orqx,orqy,sigma_orqy,en_quad,bpm_ind,quad_ind(i));
-    
+
     %function to get the offset
     [offset_x,sigma_offsetx,offset_y,sigma_offsety,pos_offset] = get_offset(mis_x,sigma_mis_x,mis_y,sigma_mis_y,quad_ind(i));
-    
+
     %store stuff
     ORBITX{i}=orbitx;
     ORBITY{i}=orbity;
@@ -431,7 +431,10 @@ grid on
 % --- Executes during object creation, after setting all properties.
 function quad_alignment_CreateFcn(hObject, eventdata, handles)
 clear global
-aidainit;
+
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE_ARRAY;
 
 global all_quad all_bpm quad_names all_quad_EPICS quad_EPICS
 global all_bpm_SLC all_bpm_EPICS all_quad_EPICS bpm_ind
@@ -454,19 +457,22 @@ bpm_ind=1;
 global RespMatH RespMatV
 %get the orbit response and z positions from aida
 for j = 1:length(all_bpm)
-    bpm_pos(j)    = aidaget([all_bpm_SLC{j} '//Z'])-2015;
+    bpm_pos(j)    = pvaGet([all_bpm_SLC{j} ':Z'])-2015;
 end
 
 for j = 1:length(all_quad)
-    quad_pos(j)    = aidaget([all_quad_SLC{j} '//Z'])-2015;
+    quad_pos(j)    = pvaGet([all_quad_SLC{j} ':Z'])-2015;
     for i=1:length(all_bpm_SLC)
         if bpm_pos(i)<quad_pos(j)
             RespMatH(i,j)=0;
         else
             try
-                R = aidaget({[all_quad_SLC{j} '//R']},'doublea',{['B=' all_bpm_SLC{i}]});
+                requestBuilder = pvaRequest({[all_quad_SLC{j} ':R']});
+                requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+                requestBuilder.with('B',all_bpm_SLC{i});
+                R = ML(requestBuilder.get());
             catch
-                disp(sprintf('aidaget failure for %s//R', all_quad_SLC{j}));
+                disp(sprintf('aidaget failure for %s:R', all_quad_SLC{j}));
             end
             Rm       = reshape(R,6,6);
             Rm = cell2mat(Rm)';
@@ -479,9 +485,9 @@ end
 
 for i=1:length(all_quad_SLC)
     try
-        twiss = cell2mat(aidaget([all_quad_SLC{i} '//twiss'],'doublea'));
+        twiss = cell2mat(pvaGetM([all_quad_SLC{i} ':twiss'],AIDA_DOUBLE_ARRAY));
     catch
-        disp(sprintf('aidaget failure for %s//twiss', all_quad_SLC{i}));
+        disp(sprintf('pvaGet failure for %s:twiss', all_quad_SLC{i}));
     end
     en_quad(i)=twiss(1)*1000;
 end
@@ -495,7 +501,7 @@ Nsamples=50;
 global ini_field lim_field
 for j = 1:length(all_quad_EPICS)
     pvlist_quad{j} = [all_quad_EPICS{j} ':BACT'];
-    pvlist_lim_quad{j} = [all_quad_EPICS{j} ':BACT.HOPR'];   
+    pvlist_lim_quad{j} = [all_quad_EPICS{j} ':BACT.HOPR'];
     pvlist_trim{j}=[all_quad_EPICS{j} ':CTRL'];
     pvlist_trim_value{j}=['TRIM'];
 end
@@ -504,7 +510,7 @@ ini_field = lcaGet(pvlist_quad(:), 0, 'double')';
 lim_field = lcaGet(pvlist_lim_quad(:), 0, 'double')';
 
 %trim the quads
-% lcaPut(pvlist_trim',pvlist_trim_value');  
+% lcaPut(pvlist_trim',pvlist_trim_value');
 % status=1;
 % while status
 %     for i=1:length(all_quad_EPICS)
@@ -729,7 +735,7 @@ if ~isempty(orbitx)
     global mis_x sigma_mis_x mis_y sigma_mis_y
     global offset_x sigma_offsetx offset_y sigma_offsety pos_offset
 
-    
+
 
     actual=quad_names{plot_quad_ind};
     quadpos=quad_pos(quad_ind(plot_quad_ind));

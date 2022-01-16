@@ -64,7 +64,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = corrPlot_gui_OutputFcn(hObject, eventdata, handles) 
+function varargout = corrPlot_gui_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -137,7 +137,7 @@ switch accelerator
     case 'FACET'
         handles.profmonList={ ...
                     'CAMR:LT10:200' 'CAMR:LT10:380' 'CAMR:LT10:450' 'CAMR:LT10:500' ...
-                    'CAMR:LT10:600' 'CAMR:LT10:700' 'CAMR:LT10:800' 'CAMR:LT10:900' ...  
+                    'CAMR:LT10:600' 'CAMR:LT10:700' 'CAMR:LT10:800' 'CAMR:LT10:900' ...
                     'CTHD:IN10:111' 'PROF:IN10:241' 'PROF:IN10:571' 'PROF:IN10:711' ...
                     'PROF:IN10:770' 'PROF:IN10:921' 'PROF:LI11:335' 'PROF:LI11:375' ...
                     'PROF:LI14:803' 'PROF:LI15:944' ...
@@ -145,7 +145,7 @@ switch accelerator
                     'CAMR:LI20:101' 'CAMR:LI20:102' 'CAMR:LI20:103' 'CAMR:LI20:104' ...
                     'CAMR:LI20:105' 'CAMR:LI20:106' 'CAMR:LI20:107' 'CAMR:LI20:108' ...
                     };
-        handles.profmonMap=0:numel(handles.profmonList);   
+        handles.profmonMap=0:numel(handles.profmonList);
 
 %         handles.profmonList={ ...
 %             '' '' '' '' ...
@@ -176,10 +176,10 @@ switch accelerator
 %             'EXPT:LI20:3300' 'EXPT:LI20:3301' 'EXPT:LI20:3302' 'EXPT:LI20:3303' ...
 %             'EXPT:LI20:3304' 'EXPT:LI20:3305' 'EXPT:LI20:3306' 'CMOS:LI20:3490' ...
 %             'CMOS:LI20:3491' 'CMOS:LI20:3492' ...
-%             'CAMR:LT10:450'  'CAMR:LT10:380'  'CAMR:LT10:200'  'CAMR:LT10:900' ... % 
+%             'CAMR:LT10:450'  'CAMR:LT10:380'  'CAMR:LT10:200'  'CAMR:LT10:900' ... %
 %             'CTHD:IN10:111'  'PROF:IN10:241'};
 %         handles.profmonMap=[0 109:114 96 98 53 75 45 54 47 55 78 48 79 56:59 ...
-%             106:108 99:105 91:97]; 
+%             106:108 99:105 91:97];
         % nate 5/22/14 update PVs, put things in Z order and remove duplicates
         % handles.profmonMap=[0 46 53 75 45 54 47 76 48 55 77:79 56:59 74 60 80:82 91:98];
     otherwise
@@ -213,7 +213,7 @@ switch accelerator
             'CAMR:LR20:320'  'CAMR:IN20:423' ... % New laser cams
             'YAGS:GUNB:753'  'CAMR:LGUN:210' 'CAMR:LGUN:390' ... % LCLS-II EIC
             'CAMR:LGUN:400' 'CAMR:LGUN:430' 'CAMR:LGUN:460' ...% LCLS-II/Inj west laser cameras
-            'CAMR:LGUN:490' 'CAMR:LGUN:750' ... 
+            'CAMR:LGUN:490' 'CAMR:LGUN:750' ...
             'CAMR:LGUN:850' 'CAMR:LGUN:950' 'OTRS:DMPS:695' 'IM1K4:XTES:CAM'};
 
         handles.profmonMap=[0 102:110 101 63 64 65 1 95:100 67 66 2:5 21 20 22 7:12 14:16 44 ...
@@ -473,7 +473,7 @@ handles.ctrlPV(num)=util_readPV(handles.ctrlPVName(num),1);
 handles.ctrlPVNum=sum(~cellfun('isempty',handles.ctrlPVName));
 str={'' '2'};
 
-if strcmpi(handles.ctrlPVName(num), 'MKB//VAL')
+if strcmpi(handles.ctrlPVName(num), 'MKB:VAL')
     handles.ctrlPV(num).val = 0;
 end
 
@@ -877,27 +877,23 @@ handles=acquirePlot(hObject,handles,prescan);
 % ------------------------------------------------------------------------
 function pvSet(pv, val)
 
-global da
-global da_mkb
+global mkbRequestBuilder
+
+% AIDA-PVA imports
+global pvaSet;
+
 [micro, prim, unit, secn] = model_nameSplit(pv);
-if strncmp(pv,'LI',2) || strncmp(pv,'TA',2) || strncmp(pv,'DR12',4) || strncmp(pv,'MKB//VAL',8)
+if strncmp(pv,'LI',2) || strncmp(pv,'TA',2) || strncmp(pv,'DR12',4) || strncmp(pv,'MKB:VAL',8)
 %    if strcmp(secn,'BDES') || strcmp(secn,'VDES')
     if strcmp(secn,'BDES')
         control_magnetSet(strcat(micro, ':', prim, ':', unit), val);
     else
         if ~ispc
-            aidainit;
-            if isempty(da), 
-              import edu.stanford.slac.aida.lib.da.DaObject;            
-              da=DaObject;
-            end
-            in=DaValue(java.lang.Float(val));
             try
-                if strncmp(pv,'MKB//VAL',8)
-                    da_mkb.setDaValue(pv,in);
+                if strncmp(pv,'MKB:VAL',8)
+                    mkbRequestBuilder.set(val);
                 else
-                    da.reset;
-                    da.setDaValue(strcat(prim, ':', micro, ':',unit,'//',secn),in);
+                    pvaSet(strcat(prim, ':', micro, ':',unit,':',secn),val);
                 end
             catch
                 disp(['Error in setting value for ' pv]);
@@ -1150,9 +1146,9 @@ handles.process.saved=0;
 iVal=handles.dataDevice.iVal;
 isQuasiBSA=strncmp(handles.readPVNameList,'SIOC:SYS0:ML00:FWF',18);
 isFELeLoss=strncmp(handles.readPVNameList,'PHYS:SYS0:1:ELOSSENERGY',20);
-if strcmp(handles.ctrlPV(1).name, 'MKB//VAL')
+if strcmp(handles.ctrlPV(1).name, 'MKB:VAL')
     handles.data.ctrlPV(:,iVal) = util_readPV('');
-    handles.data.ctrlPV(:,iVal).name = 'MKB//VAL';
+    handles.data.ctrlPV(:,iVal).name = 'MKB:VAL';
     handles.data.ctrlPV(:,iVal).desc = handles.ctrlMKBName;
     handles.data.ctrlPV(:,iVal).val = handles.ctrlPVValList{handles.ctrlPVNum}(iVal);
 else
@@ -1417,7 +1413,6 @@ handles=acquireUpdate(hObject,handles,prescan);
 
 % ------------------------------------------------------------------------
 function handles = acquireStart(hObject, handles, prescan)
-global da
 if nargin < 3, prescan=0;end
 % Set running or return if already running.
 if gui_acquireStatusSet(hObject,handles,1);return, end
@@ -1437,12 +1432,12 @@ if ~isempty(mkb_name)
     else
         mkbPV = AssignMultiknob(mkb_name);
     end
-    if ~isempty(mkbPV) && ~strcmpi(mkbPV, 'MKB//VAL')
+    if ~isempty(mkbPV) && ~strcmpi(mkbPV, 'MKB:VAL')
         set(handles.ctrlPVName_txt,'String',[mkbPV ':VAL']);
         handles=ctrlPVControl(hObject,handles,[mkbPV ':VAL'],1);
-    elseif ~isempty(mkbPV) && strcmpi(mkbPV, 'MKB//VAL')
-        set(handles.ctrlPVName_txt,'String','MKB//VAL');
-        handles=ctrlPVControl(hObject,handles,'MKB//VAL',1);
+    elseif ~isempty(mkbPV) && strcmpi(mkbPV, 'MKB:VAL')
+        set(handles.ctrlPVName_txt,'String','MKB:VAL');
+        handles=ctrlPVControl(hObject,handles,'MKB:VAL',1);
         relative=1;
     end
 end
@@ -1612,7 +1607,7 @@ end
 function handles = plotData(hObject, handles, prescan)
 if nargin<3
     if isfield (handles.data, 'prescan')
-        prescan=handles.data.prescan; 
+        prescan=handles.data.prescan;
     else
     prescan=0;
     end
@@ -1752,7 +1747,7 @@ xFit=linspace(min(xValList(:)),max(xValList(:)),100);
 par=[];
 for j=1:size(yPVVal,1)
     xVal=xValList(min(j,end),:);yVal=yValList(j,:);yStd=yStdList(j,:);
-    
+
     switch handles.showFit
         case 0 % No Fit
             yFit(j,:)=NaN*xFit;
@@ -2054,7 +2049,7 @@ end
 if isfield(data,'twissPV')
     if ~isfield(data,'twissStd'), keyboard;end
 end
-    
+
 emitName='';emitId=0;
 if isfield(data,'twissPV')
     emitName=data.twissPV(1).name(1:end-6);emitId=1;
@@ -2454,7 +2449,7 @@ acquirePlot(hObject,handles);
 
 % --- Executes on button press in showLogY_box.
 function showLogY_box_Callback(hObject, eventdata, handles)
-prescan=0; 
+prescan=0;
 if isfield(handles.data,'prescan')
     prescan=1;
 end
@@ -2465,7 +2460,7 @@ acquirePlot(hObject,handles,prescan);
 
 % --- Executes on button press in showLogX_box.
 function showLogX_box_Callback(hObject, eventdata, handles)
-prescan=0; 
+prescan=0;
 if isfield(handles.data,'prescan')
     prescan=1;
 end
@@ -2693,8 +2688,8 @@ function handles=ctrlMKBControl(hObject,handles,val)
 handles=gui_textControl(hObject,handles,'ctrlMKBName',val);
 if cancd, return, end
 if strncmpi(handles.ctrlMKBName, 'MKB:', 4)
-    set(handles.ctrlPVName_txt,'String','MKB//VAL');
-    handles=ctrlPVControl(hObject,handles,'MKB//VAL',1);
+    set(handles.ctrlPVName_txt,'String','MKB:VAL');
+    handles=ctrlPVControl(hObject,handles,'MKB:VAL',1);
 end
 
 
@@ -2739,7 +2734,7 @@ function [slowList, fastList]=acquireZigzagList(handles,slowList,fastList)
 
 for num=1:2
     nmax=handles.ctrlPVValNum(num);
-    
+
     if mod(nmax,2)
         scan_array=[nmax:-2:1 2:2:nmax-1];
     else

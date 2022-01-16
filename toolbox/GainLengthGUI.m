@@ -64,6 +64,9 @@ function GainLengthGUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to GainLengthGUI (see VARARGIN)
 
 
+% AIDA-PVA imports
+global pvaRequest;
+global AIDA_DOUBLE_ARRAY;
 
 % Choose default command line output for GainLengthGUI
 handles.output = hObject;
@@ -149,8 +152,16 @@ handles.meas_f = [];
 handles.meas_gl = 0;
 
 if handles.online
-  twiss(:,1) = aidaget('BPMS:LTU1:250//twiss','doublea',{'TYPE=DESIGN'}); 
-  twiss(:,2) = aidaget('BPMS:LTU1:450//twiss','doublea',{'TYPE=DESIGN'}); 
+  requestBuilder = pvaRequest('BPMS:LTU1:250:twiss');
+  requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+  requestBuilder.with('TYPE','DESIGN');
+  twiss(:,1) = ML(requestBuilder.get());
+
+  requestBuilder = pvaRequest('BPMS:LTU1:450:twiss');
+  requestBuilder.returning(AIDA_DOUBLE_ARRAY);
+  requestBuilder.with('TYPE','DESIGN');
+  twiss(:,2) = ML(requestBuilder.get());
+
   twiss = cell2mat(twiss);
   handles.dl2_eta = twiss(5,:)*1000;
 end
@@ -165,14 +176,14 @@ for j=1:handles.und_num
 end
 
 % make magnet pv names
-for j=1:handles.und_num    
+for j=1:handles.und_num
     % X/Y MAG BDES
     handles.xmag_names{j} = ['XCOR:UND1:' num2str(j) '80'];
     handles.ymag_names{j} = ['YCOR:UND1:' num2str(j) '80'];
-    
+
     handles.xmag_bdes{j} = ['XCOR:UND1:' num2str(j) '80:BDES'];
     handles.ymag_bdes{j} = ['YCOR:UND1:' num2str(j) '80:BDES'];
-         
+
 end
 
 
@@ -186,7 +197,7 @@ end
 
 
 % Undulator insertion status pvs
-for j=1:handles.und_num   
+for j=1:handles.und_num
   handles.und_insert_pvs{j} = ['USEG:UND1:' num2str(j) '50:INSTALTNSTAT'];
 end
 
@@ -201,46 +212,46 @@ handles.HXRSS_feedback = {'SIOC:SYS0:ML00:AO818'};
 % PVs for filtering data
 handles.event_pvs =   {'BPMS:LTU1:250'
                        'BPMS:LTU1:450'
-                       'BPMS:LTU1:910'                       
-                       'BPMS:LTU1:960'                       
-                       'BPMS:UND1:100'                       
+                       'BPMS:LTU1:910'
+                       'BPMS:LTU1:960'
+                       'BPMS:UND1:100'
                        'BPMS:UND1:190'
-                       'BPMS:UND1:290'   
-                       'BPMS:UND1:390'                          
+                       'BPMS:UND1:290'
+                       'BPMS:UND1:390'
                        'BPMS:UND1:490'
-                       'BPMS:UND1:590'   
-                       'BPMS:UND1:690' 
-                       'BPMS:UND1:790'                          
+                       'BPMS:UND1:590'
+                       'BPMS:UND1:690'
+                       'BPMS:UND1:790'
                        'BPMS:UND1:890'
-                       'BPMS:UND1:990'   
-                       'BPMS:UND1:1090' 
+                       'BPMS:UND1:990'
+                       'BPMS:UND1:1090'
                        'BPMS:UND1:1190'
                        'BPMS:UND1:1290'
-                       'BPMS:UND1:1390'   
-                       'BPMS:UND1:1490'                          
+                       'BPMS:UND1:1390'
+                       'BPMS:UND1:1490'
                        'BPMS:UND1:1590'
-                       'BPMS:UND1:1690'   
-                       'BPMS:UND1:1790' 
-                       'BPMS:UND1:1890'                          
+                       'BPMS:UND1:1690'
+                       'BPMS:UND1:1790'
+                       'BPMS:UND1:1890'
                        'BPMS:UND1:1990'
-                       'BPMS:UND1:2090'   
-                       'BPMS:UND1:2190'                        
+                       'BPMS:UND1:2090'
+                       'BPMS:UND1:2190'
                        'BPMS:UND1:2290'
                        'BPMS:UND1:2390'
-                       'BPMS:UND1:2490'   
-                       'BPMS:UND1:2590'                          
+                       'BPMS:UND1:2490'
+                       'BPMS:UND1:2590'
                        'BPMS:UND1:2690'
-                       'BPMS:UND1:2790'   
-                       'BPMS:UND1:2890' 
-                       'BPMS:UND1:2990'                          
+                       'BPMS:UND1:2790'
+                       'BPMS:UND1:2890'
+                       'BPMS:UND1:2990'
                        'BPMS:UND1:3090'
-                       'BPMS:UND1:3190'   
-                       'BPMS:UND1:3290' 
-                       'BPMS:UND1:3390' 
-                       };  
+                       'BPMS:UND1:3190'
+                       'BPMS:UND1:3290'
+                       'BPMS:UND1:3390'
+                       };
 
 handles.curr_pvs =    {'BLEN:LI24:886:BIMAX'};
-                   
+
 handles.eloss_pvs =    {'SIOC:SYS0:ML00:AO562'};
 
 
@@ -270,18 +281,18 @@ handles.eloss_bpm_pvs =   {'BPMS:LTU0:190'
                            'BPMS:DMP1:398'
                            'BPMS:DMP1:502'
                            'BPMS:DMP1:693'};
-%                                                 
+%
 
 % % Near FOV Direct Image PVs
 % handles.ndir_img_pvs =  {'DIAG:FEE1:481:RawMax'
-%                          'DIAG:FEE1:481:RoiMax'  
+%                          'DIAG:FEE1:481:RoiMax'
 %                          'DIAG:FEE1:481:FitPulseE'
 %                          'DIAG:FEE1:481:RoiPulseE'
 %                          'DIAG:FEE1:481:FitAttnPulseE'
 %                          'DIAG:FEE1:481:RoiAttnPulseE'
 %                          'DIAG:FEE1:481:FitAbsorbPulseE'
 %                          'DIAG:FEE1:481:RoiAbsorbPulseE'};
-% 
+%
 % % Wide FOV Direct Image PVs
 % handles.wdir_img_pvs =  {'DIAG:FEE1:482:RawMax'
 %                          'DIAG:FEE1:482:RoiMax'
@@ -290,11 +301,11 @@ handles.eloss_bpm_pvs =   {'BPMS:LTU0:190'
 %                          'DIAG:FEE1:482:FitAttnPulseE'
 %                          'DIAG:FEE1:482:RoiAttnPulseE'
 %                          'DIAG:FEE1:482:FitAbsorbPulseE'
-%                          'DIAG:FEE1:482:RoiAbsorbPulseE'}; 
+%                          'DIAG:FEE1:482:RoiAbsorbPulseE'};
 
 % Near FOV Direct Image PVs
 handles.ndir_img_pvs =  {'DIAG:FEE1:481:RawMax'
-                         'DIAG:FEE1:481:RoiMax'  
+                         'DIAG:FEE1:481:RoiMax'
                          'DIAG:FEE1:481:FitPulseE'
                          'DIAG:FEE1:481:RawSumGrays'%'DIAG:FEE1:481:RoiPulseE'
                          'DIAG:FEE1:481:RawXCent'
@@ -310,94 +321,94 @@ handles.wdir_img_pvs =  {'DIAG:FEE1:482:RawMax'
                          'DIAG:FEE1:482:RawXCent'
                          'DIAG:FEE1:482:RawYCent'
                          'DIAG:FEE1:482:RoiXCentSigma'
-                         'DIAG:FEE1:482:RoiYCentSigma'};                        
+                         'DIAG:FEE1:482:RoiYCentSigma'};
 
 % Processing for NFOV Camera
 handles.nfov_process = {'DIAG:FEE1:481:ClusterOPT'
                         'DIAG:FEE1:481:FitOPT'
                         'DIAG:FEE1:481:PulseEOPT'};
-                       
+
 % Gas Detector PVs
 handles.gdet_pvs =  {'GDET:FEE1:241:ENRC'
                      'GDET:FEE1:242:ENRC'
                      'GDET:FEE1:361:ENRC'
-                     'GDET:FEE1:362:ENRC'}; 
-                   
-                   
+                     'GDET:FEE1:362:ENRC'};
+
+
 % Total Energy Detector PVs
 handles.tedet_pvs =  {'ELEC:FEE1:452:DATA'
-                      'ELEC:FEE1:453:DATA'};                      
-                   
-                   
-                   
+                      'ELEC:FEE1:453:DATA'};
+
+
+
 handles.fee_atten_pvs = {'SATT:FEE1:320:RACT'
                          'GATT:FEE1:310:R_ACT'};
-                       
+
 handles.atten_control_pvs = {'SATT:FEE1:320:RDES'
                              'SATT:FEE1:320:GO'
-                             'SATT:FEE1:320:RACT'};    
+                             'SATT:FEE1:320:RACT'};
 
 handles.attens_status_pvs = {'SATT:FEE1:321:STATE'
                            'SATT:FEE1:322:STATE'
                            'SATT:FEE1:323:STATE'
-                           'SATT:FEE1:324:STATE'                           
+                           'SATT:FEE1:324:STATE'
                            'SATT:FEE1:325:STATE'
                            'SATT:FEE1:326:STATE'
-                           'SATT:FEE1:327:STATE'                             
+                           'SATT:FEE1:327:STATE'
                            'SATT:FEE1:328:STATE'
-                           'SATT:FEE1:329:STATE'}; 
-% Direct imager PVs                           
-                       
+                           'SATT:FEE1:329:STATE'};
+% Direct imager PVs
+
 handles.di_cw_pvs =   {'STEP:FEE1:484:MOVECW'
-                           'STEP:FEE1:485:MOVECW'};                                                
-                                                  
+                           'STEP:FEE1:485:MOVECW'};
+
 handles.di_ccw_pvs =  {'STEP:FEE1:484:MOVECCW'
-                           'STEP:FEE1:485:MOVECCW'};                        
+                           'STEP:FEE1:485:MOVECCW'};
 
 handles.ndi_pos_pvs = {'STEP:FEE1:484:POSITION0'
                        'STEP:FEE1:484:POSITION1'
-                       'STEP:FEE1:484:POSITION2'                       
-                       'STEP:FEE1:484:POSITION3'  
+                       'STEP:FEE1:484:POSITION2'
+                       'STEP:FEE1:484:POSITION3'
                        'STEP:FEE1:484:POSITION4'};
-                     
+
 handles.wdi_pos_pvs = {'STEP:FEE1:485:POSITION0'
                        'STEP:FEE1:485:POSITION1'
-                       'STEP:FEE1:485:POSITION2'                       
-                       'STEP:FEE1:485:POSITION3'  
+                       'STEP:FEE1:485:POSITION2'
+                       'STEP:FEE1:485:POSITION3'
                        'STEP:FEE1:485:POSITION4'};
 
-                     
+
 handles.di_OD_pos_pvs = {'STEP:FEE1:484:POSITION'
-                         'STEP:FEE1:485:POSITION'};  
-                            
-% K-Mono   
-handles.kmono_pvs = {'KMON:FEE1:421:ENRC'};                     
-                     
-                           
-handles.gen_pvs =   {handles.energy_pvs  
-                     handles.curr_softpvs  
+                         'STEP:FEE1:485:POSITION'};
+
+% K-Mono
+handles.kmono_pvs = {'KMON:FEE1:421:ENRC'};
+
+
+handles.gen_pvs =   {handles.energy_pvs
+                     handles.curr_softpvs
                      handles.bl_softpvs
                      handles.IN20_emitx
                      handles.IN20_emity
                      handles.IN20_bmagx
-                     handles.IN20_bmagy}; 
+                     handles.IN20_bmagy};
 
 handles.num_pvs = length(handles.event_pvs);
-                                      
-for j=1:length(handles.event_pvs)  
+
+for j=1:length(handles.event_pvs)
   handles.event_x_pvs{j} = [handles.event_pvs{j} ':X'];
   handles.event_dat_pvs{3*j-2} = [handles.event_pvs{j} ':X'];
-  handles.event_y_pvs{j} = [handles.event_pvs{j} ':Y'];  
+  handles.event_y_pvs{j} = [handles.event_pvs{j} ':Y'];
   handles.event_dat_pvs{3*j-1} = [handles.event_pvs{j} ':Y'];
-  handles.event_tmit_pvs{j} = [handles.event_pvs{j} ':TMIT'];  
-  handles.event_dat_pvs{3*j} = [handles.event_pvs{j} ':TMIT'];  
-end                                      
-     
-for j=1:length(handles.eloss_bpm_pvs)  
+  handles.event_tmit_pvs{j} = [handles.event_pvs{j} ':TMIT'];
+  handles.event_dat_pvs{3*j} = [handles.event_pvs{j} ':TMIT'];
+end
+
+for j=1:length(handles.eloss_bpm_pvs)
   handles.eloss_xbpm_pvs{j} = [handles.eloss_bpm_pvs{j} ':X'];
   handles.eloss_ybpm_pvs{j} = [handles.eloss_bpm_pvs{j} ':Y'];
-end                                      
-     
+end
+
 
 % parameters for a closed orbit kick
 handles.closed_orbit = 1; % for now hard code in closed orbit
@@ -434,7 +445,7 @@ handles.sig_curr = 0.1;
 handles.sig_orbit = 0.5;
 handles.min_charge = 1e7; %10^7
 %handles.min_charge=1e1;
-                    
+
 % Misc PVs
 
 handles.xpp_spec = 'XPP:OPAL1K:1';  % replace DI with XPP Opal
@@ -462,9 +473,9 @@ handles.TDUND_pause = 3;
 % use xpp spectrometer (for self seeding)
 acq_types = get(handles.ACQ_METHOD,'String');
 curr_type = get(handles.ACQ_METHOD,'Value');
-handles.acq_method = acq_types(curr_type);  
+handles.acq_method = acq_types(curr_type);
 
-if strcmp(handles.acq_method,'FEE Spectrometer') || strcmp(handles.acq_method,'XPP Spectrometer') || strcmp(handles.acq_method,'SXR Spectrometer')   
+if strcmp(handles.acq_method,'FEE Spectrometer') || strcmp(handles.acq_method,'XPP Spectrometer') || strcmp(handles.acq_method,'SXR Spectrometer')
     set(handles.DETECTOR,'Value',7)
     handles.use_yag=0;
 elseif strcmp(handles.acq_method,'YAGXRAY/DIR_IMG')
@@ -474,7 +485,7 @@ end
 
 % optical density filters for yagx camera and Ni Foil
 handles.OD_pvs =     {'YAGS:DMP1:500:FLT1_PNEU'
-                      'YAGS:DMP1:500:FLT2_PNEU'};                    
+                      'YAGS:DMP1:500:FLT2_PNEU'};
 
 handles.yagxray_status_pvs = {'YAGS:DMP1:500:PNEUMATIC'};
 
@@ -492,7 +503,7 @@ if handles.online
 else
     handles.kicked_mag = 33;
     handles.und_pos=ones(1,33);
-    handles.saved_config_und = handles.und_pos';        
+    handles.saved_config_und = handles.und_pos';
 end
 
 temp16pos=handles.saved_config_und(16); handles.saved_config_und(16)=handles.out_pos;    % don't count und16
@@ -527,8 +538,8 @@ if ~handles.online
   handles.in_pos = 1;
   handles.out_pos = 3;
   handles.out_enough = 2.5;
-  handles.move_in_wait = 3; 
-  
+  handles.move_in_wait = 3;
+
   handles.saved_config_xmag = zeros(33,1);
   handles.saved_config_ymag = zeros(33,1);
 end
@@ -549,14 +560,14 @@ handles.currmethod = get(handles.MEASMETHOD,'Value');
 handles.llnl_nightmare=0;     % set to 1 to engage nightmare of llnl DI software
 
 
-% variables for gas detector 
+% variables for gas detector
 % FINISH FINISH FINISH
 handles.last_gdet1_power=1;     % last measured power in mJ
 handles.gdet_cutoff_power=5e-2; % power cutoff in mJ to when signal considered low
-handles.gdet_data1_1_pv = 'DIAG:FEE1:202:241:Data';       % pv for data from gdet1, PMT1 
-handles.gdet_data1_2_pv = 'DIAG:FEE1:202:242:Data';       % pv for data from gdet1, PMT2 
-handles.gdet_data2_1_pv = 'DIAG:FEE1:202:361:Data';       % pv for data from gdet2, PMT1 
-handles.gdet_data2_2_pv = 'DIAG:FEE1:202:362:Data';       % pv for data from gdet2, PMT2 
+handles.gdet_data1_1_pv = 'DIAG:FEE1:202:241:Data';       % pv for data from gdet1, PMT1
+handles.gdet_data1_2_pv = 'DIAG:FEE1:202:242:Data';       % pv for data from gdet1, PMT2
+handles.gdet_data2_1_pv = 'DIAG:FEE1:202:361:Data';       % pv for data from gdet2, PMT1
+handles.gdet_data2_2_pv = 'DIAG:FEE1:202:362:Data';       % pv for data from gdet2, PMT2
 handles.gain_gdet2_1_pv = 'HVCH:FEE1:361:VoltageSet';     % pv for gain of gdet2, PMT1
 handles.gain_gdet2_2_pv = 'HVCH:FEE1:362:VoltageSet';     % pv for gain of gdet2, PMT2
 handles.gain_gdet2_1_status = 'HVCH:FEE1:361:STATUS';      % status for gain of gdet2
@@ -596,15 +607,15 @@ guidata(hObject, handles);
 % %%
 % % --- Executes when user attempts to close GainLengthGUI.
 % function GainLengthGUI_CloseRequestFcn(hObject, eventdata, handles)
-% 
+%
 % %util_appClose(hObject);
-% % Put below into properties of GUI fig file 
+% % Put below into properties of GUI fig file
 % GainLengthGUI('GainLengthGUI_CloseRequestFcn',gcbf,[],guidata(gcbf))
 
 
 %%
 % --- Outputs from this function are returned to the command line.
-function varargout = GainLengthGUI_OutputFcn(hObject, eventdata, handles) 
+function varargout = GainLengthGUI_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -635,7 +646,7 @@ if handles.abort == 0
     return;
 else
     disp('Startup')
-end    
+end
 
 handles.fail = 0;
 
@@ -670,19 +681,19 @@ last_und = str2num(get(handles.LOOPEND,'String'));
 n_steps=1;      % now hard coded in to step 1 undulator at a time.
 kick_size = str2num(get(handles.MAGDIST,'String'))*handles.orbit_to_kick;  % convert orbit distortion to mag strength
 if abs(kick_size)>handles.max_kick
-  handles.fail = 1;  
+  handles.fail = 1;
   set(handles.STATUS,'String',['Error: kick size must be smaller than ' ...
       num2str(handles.max_kick/handles.orbit_to_kick) 'um']); drawnow;
   questdlg(['Kick size (' num2str(kick_size) ') is too large. Setting kick to -' ...
       num2str(handles.max_kick) ' and aborting'] ...
       ,'Kick Amplitude','OK','OK');
-  kick_size = -handles.max_kick;  
+  kick_size = -handles.max_kick;
 elseif abs(kick_size) < handles.mag_diff
   questdlg(['Kick size (' num2str(kick_size) ') is too small. Setting kick to -' ...
       num2str(handles.mag_diff) ' and aborting'] ...
       ,'Kick Amplitude','OK','OK');
   handles.fail = 1;
-  kick_size = -handles.mag_diff;  
+  kick_size = -handles.mag_diff;
 end
 
 % force negative kick so that 'restore' automatically standardizes magnet
@@ -725,16 +736,16 @@ if handles.online
   dirimg_filter_status = di_OD_init;
 
   % Wait if BYKick on
-  while (~lcaGet(handles.BYKick,1,'double')) 
+  while (~lcaGet(handles.BYKick,1,'double'))
       set(handles.STATUS,'String','BYKick on, Waiting for beam in Undulators');
       drawnow
       handles.abort = get(hObject,'Value');
       if handles.abort == 0
           disp('User abort');
-          set(handles.STATUS,'String','Aborting');  drawnow;  
+          set(handles.STATUS,'String','Aborting');  drawnow;
           handles.fail=1;
           break;
-      end    
+      end
       pause(1);
   end
 else
@@ -745,7 +756,7 @@ else
   OD_init = [1 1];
   di_OD_init = [1 1];
   attens_init = .1;
-  dirimg_filter_status = di_OD_init;  
+  dirimg_filter_status = di_OD_init;
 end
 handles.OD_init=OD_init;
 
@@ -765,7 +776,7 @@ if strcmp(last_ipk,'Heroically Abort to Calibrate')
   handles.fail = 1;
   set(handles.STATUS,'String','Ready'); drawnow;
 end
-    
+
 
 % Request new calibrations
 handles.need_gdet2_cal = 1;     % flag for gdet2 calibration: recalibrate whenever gdet settings change
@@ -783,7 +794,7 @@ opts.doProcess=0;
 %opts.doPlot=get(handles.SHOWIMG,'Value');
 opts.doPlot=1;
 if handles.yag_tag
-  dat=profmon_measure(handles.xray_profmon,1,opts);     
+  dat=profmon_measure(handles.xray_profmon,1,opts);
   roi = size(dat.img);
   if handles.nom_e > 10
       rec_roi = handles.rec_roi;
@@ -801,7 +812,7 @@ if handles.yag_tag
   if strcmp(camera_roi,'Abort')
       handles.fail = 1;
       set(handles.STATUS,'String','Ready'); drawnow;
-  end 
+  end
 elseif handles.llnl_nightmare  && handles.online
   init_nfov_process = lcaGetSmart(handles.nfov_process,1,'double');
   lcaPutSmart(handles.nfov_process,1)
@@ -811,7 +822,7 @@ end
 % use xpp spectrometer (for self seeding)
 acq_types = get(handles.ACQ_METHOD,'String');
 curr_type = get(handles.ACQ_METHOD,'Value');
-handles.acq_method = acq_types(curr_type);  
+handles.acq_method = acq_types(curr_type);
 
 
 % turn off HXRSS feedback
@@ -854,37 +865,37 @@ else
       % UNDULATOR CASE
       % Save current undulator status
       handles = UndStatusCheck(hObject, handles);
-      handles.saved_config_und = handles.und_pos';   
+      handles.saved_config_und = handles.und_pos';
     end
-    
+
     % Load magnet names
     mag_names_x = handles.xmag_names;
-    mag_names_y = handles.ymag_names;  
+    mag_names_y = handles.ymag_names;
     mag_bdes_x = handles.xmag_bdes;
-    mag_bdes_y = handles.ymag_bdes;      
+    mag_bdes_y = handles.ymag_bdes;
     if strcmp(handles.methods(handles.currmethod),'Move Y Corr')
         % Y magnets
         mag_names = handles.ymag_names;
-        mag_bdes  = handles.ymag_bdes;   
+        mag_bdes  = handles.ymag_bdes;
         mag_names2 = handles.ymag_names;  % if using 2 kicks
         mag_bdes2  = handles.ymag_bdes;
-    else    
+    else
         % X magnets for X Corr and for measuring spontaneous in
         % Undulator case
         mag_names = handles.xmag_names;
-        mag_bdes  = handles.xmag_bdes;     
+        mag_bdes  = handles.xmag_bdes;
         mag_names2 = handles.xmag_names;
-        mag_bdes2  = handles.xmag_bdes;           
+        mag_bdes2  = handles.xmag_bdes;
     end
 
     % Define current magnet positions as undisturbed orbit
-    if handles.online      
+    if handles.online
       handles.saved_config_xmag = lcaGetSmart(handles.xmag_bdes);
-      handles.saved_config_ymag = lcaGetSmart(handles.ymag_bdes);   
-    end      
+      handles.saved_config_ymag = lcaGetSmart(handles.ymag_bdes);
+    end
 
 
-    
+
     % identify first magnet (used for supressing FEL in spontaneous
     % background function in all move methods)
     handles.firstmag = mag_names(1);
@@ -897,10 +908,10 @@ else
     handles.firstmag_kick = kick_size;
 
 
-    
-    % Check filters and attenuators          
+
+    % Check filters and attenuators
     if handles.online && handles.use_atten
-      temp = lcaGetSmart(handles.OD_pvs,1,'double'); 
+      temp = lcaGetSmart(handles.OD_pvs,1,'double');
       attens_status = lcaGetSmart(handles.attens_status_pvs,1,'Double');
     else
       temp = [1 1];
@@ -910,35 +921,35 @@ else
 
     toc
     disp('starting loop')
-    
+
     % Take data for n_points  (START OF LOOP)
     for j=1:n_points
-      
+
         % If abort called end program
         handles.abort = get(hObject,'Value');
-        if handles.abort == 0               
+        if handles.abort == 0
             handles = abort_loop(handles);
             break;
         end
 
         j
         tic
-        
+
         curr_pos = und_pos(end-j+1);
         handles.curr_pos=curr_pos;
-          % turn off und_launch feedback for first 10 unds        
+          % turn off und_launch feedback for first 10 unds
         if curr_pos < 10 && handles.online
           lcaPutSmart(handles.feedback,0);
         end
 
 
-           
-        if strcmp(handles.methods(handles.currmethod),'Move Undulators')  
+
+        if strcmp(handles.methods(handles.currmethod),'Move Undulators')
           % UNDULATOR CASE
           % Undulator method is ready
         else
           % MAGNET CASE
-          
+
           % Move corrector after last und
           curr_mag = mag_names(curr_pos);
           curr_mag_bdes = mag_bdes(curr_pos);
@@ -946,12 +957,12 @@ else
           curr_mag_y = mag_names_y(curr_pos);
           curr_mag_bdes_x = mag_bdes_x(curr_pos);
           curr_mag_bdes_y = mag_bdes_y(curr_pos);
-        
-          
+
+
 
           % wait for a bit more than a pi/2 phase advance, then kick again
           % adjust number of undulators for energy dependence of beta func
-          mag_delay = round(handles.phase_advance*handles.nom_e/handles.max_e);    
+          mag_delay = round(handles.phase_advance*handles.nom_e/handles.max_e);
           handles.mag_delay=mag_delay;
 
           % check if second kick will be before last undulator
@@ -961,20 +972,20 @@ else
             curr_pos2 = handles.und_num;
           end
           curr_mag2 = mag_names(curr_pos2);
-          curr_mag_bdes2 = mag_bdes2(curr_pos2); 
+          curr_mag_bdes2 = mag_bdes2(curr_pos2);
 
           % initial values of magnets
           if handles.online
             start_pos = lcaGetSmart(curr_mag_bdes);
             start_pos_x = lcaGetSmart(curr_mag_bdes_x);
             start_pos_y = lcaGetSmart(curr_mag_bdes_y);
-            start_pos2 = lcaGetSmart(curr_mag_bdes2);        
+            start_pos2 = lcaGetSmart(curr_mag_bdes2);
           else
             start_pos = 1;
             start_pos_x=1; start_pos_y=1;
             start_pos2=1;
           end
-          set(handles.STATUS,'String',['Moving corrector for position: ' num2str(j)]);    
+          set(handles.STATUS,'String',['Moving corrector for position: ' num2str(j)]);
           drawnow
 
           % make even corrector kick smaller to account for beta function
@@ -985,11 +996,11 @@ else
           end
 
           % save values to handles
-          handles.curr_mag=curr_mag; handles.curr_mag2=curr_mag2; 
+          handles.curr_mag=curr_mag; handles.curr_mag2=curr_mag2;
           handles.start_pos=start_pos; handles.start_pos2=start_pos2;
           handles.curr_mag_x=curr_mag_x; handles.curr_mag_y=curr_mag_y;
 
-          
+
           % FINISH FINISH FINISH
           % check if starting corrector position is already large
           if abs(new_pos-start_pos) < 0.9*abs(new_pos)
@@ -1000,26 +1011,26 @@ else
 %                 new_pos=-start_pos+kick_size;
 %               end
           end
-          
+
           % move multiple magnets to suppress low energy FEL or just one
           % magnet for high energy FEL (now using 2 for both)
           % FINISH FINISH FINISH
           if curr_pos < handles.und_num-mag_delay && handles.nom_e/handles.max_e < handles.low_energy && handles.online
             MoveMag(handles,[curr_mag curr_mag2],[new_pos new_pos],'perturb');
           elseif handles.closed_orbit && curr_pos<=handles.last_closed_corr && handles.nom_e<handles.max_E_closed
-              
-           
+
+
             % FINISH FINISH FINISH
             % calculate change
             [mymags,mag_coeffs,r_cu,s_cu]=control_undCloseOsc_fast(curr_mag_x,kick_size,handles.kick_plane,handles.r_cu,handles.s_cu);
             handles.r_cu=r_cu; handles.s_cu=s_cu;
-            mags_to_change_x=mag_names_x(mymags); 
+            mags_to_change_x=mag_names_x(mymags);
             mags_to_change_y=mag_names_y(mymags);
-            mags_to_change_bdes_x=mag_bdes_x(mymags);  
-            mags_to_change_bdes_y=mag_bdes_y(mymags);  
+            mags_to_change_bdes_x=mag_bdes_x(mymags);
+            mags_to_change_bdes_y=mag_bdes_y(mymags);
             mag_coeffs_x=mag_coeffs(:,1);
             mag_coeffs_y=mag_coeffs(:,2);
-            
+
             % make sure kicks aren't above max allowed value
             if any(abs(mag_coeffs_x) > abs(kick_size))
                 mag_coeffs_x = mag_coeffs_x*kick_size/max(abs(mag_coeffs_x));
@@ -1027,7 +1038,7 @@ else
             if any(abs(mag_coeffs_y) > abs(kick_size))
                 mag_coeffs_y = mag_coeffs_y*kick_size/max(abs(mag_coeffs_y));
             end
-            
+
             % record starting values
             ref_mag_coeffs_x = lcaGetSmart(mags_to_change_bdes_x);
             ref_mag_coeffs_y = lcaGetSmart(mags_to_change_bdes_y);
@@ -1039,21 +1050,21 @@ else
           else
             MoveMag(handles,curr_mag,new_pos,'perturb');
           end
-          handles.kicked_mag = und_pos(end-j+1);     
+          handles.kicked_mag = und_pos(end-j+1);
         end
-                
+
         % Turn on beam (turned off in previous loop to protect camera)
         % FINISH FINISH FINISH
-        if j > 1 && handles.online 
+        if j > 1 && handles.online
           lcaPut(handles.BYKick,1);
         end
 
         % wait for magnets and BYKick to finish moving
         pause(.5);
-                
+
         toc
         tic
-        
+
         % increase gain/pressure of gdet2
         if handles.last_gdet1_power<handles.gdet_cutoff_power && strcmp(handles.gdet2_set,'initial_gain');
             set(handles.STATUS,'String','Changing Gas Detector Settings'); drawnow;
@@ -1061,9 +1072,9 @@ else
             handles.gdet2_set = 'high_gain';
             %handles = ScrambleUnd(hObject, eventdata, handles, curr_pos+1,last_und);
         end
-        
 
-        
+
+
         % Check for beam again
         if handles.online
           check_beam = lcaGetSmart(handles.event_tmit_pvs{end});
@@ -1075,14 +1086,14 @@ else
 
             % If abort called end program
             handles.abort = get(hObject,'Value');
-            if handles.abort == 0                     
+            if handles.abort == 0
               break;
-            end           
-          end            
+            end
+          end
         end
 
-        
-        
+
+
         % If abort called end program
         handles.abort = get(hObject,'Value');
         if handles.abort == 0
@@ -1090,98 +1101,98 @@ else
             break;
 
         end
-        
-        
+
+
         toc
         tic
-        
+
         disp('Taking Data')
-        
+
         % TAKE DATA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        set(handles.STATUS,'String','Taking data'); drawnow;               
-        handles = TakeData(hObject, eventdata, handles);   
+        set(handles.STATUS,'String','Taking data'); drawnow;
+        handles = TakeData(hObject, eventdata, handles);
 
 
         toc
-        
+
         disp('Taking Data')
-        
+
         tic
-        
+
         % Insert filter for yagxray if necessary
-        while(handles.yagcam_sat ~= 0) && handles.abort~=0  && handles.use_atten            
+        while(handles.yagcam_sat ~= 0) && handles.abort~=0  && handles.use_atten
           inserted = OD_filter(handles);
-          if inserted ~= filter_status            
+          if inserted ~= filter_status
             set(handles.STATUS,'String','Retaking data'); drawnow;
             handles = TakeData(hObject, eventdata, handles);                  % retake data
           else
             break
-          end       
-          filter_status = inserted;     
+          end
+          filter_status = inserted;
           handles.abort = get(hObject,'Value');
-        end  
-        
+        end
+
         if strcmp(handles.acq_method,'YAGXRAY/DIR_IMG') && handles.use_atten
             % Insert attenuator for direct imager YAG if necessary
-            while handles.dirimg_sat == 1 || ((handles.dirimg_sat == -1) && any(attens_status==1)) && handles.abort~=0              
+            while handles.dirimg_sat == 1 || ((handles.dirimg_sat == -1) && any(attens_status==1)) && handles.abort~=0
               inserted = Move_Attens(handles);
-              if any(inserted ~= attens_status)         
+              if any(inserted ~= attens_status)
                 set(handles.STATUS,'String','Retaking data'); drawnow;
                 handles = TakeData(hObject, eventdata, handles);                  % retake data
               else
                 break
-              end                 
-              attens_status = inserted;    
+              end
+              attens_status = inserted;
               handles.abort = get(hObject,'Value');
-            end  
+            end
 
             % Insert filters for direct imager cameras if necessary
     %        while(handles.ncam_dirimg_sat ~= 0 || handles.wcam_dirimg_sat ~= 0)
-            while(handles.ncam_dirimg_sat ~= 0) && handles.abort~=0            
+            while(handles.ncam_dirimg_sat ~= 0) && handles.abort~=0
               inserted = Move_DirImg_Filters(handles);
-              if any(inserted ~= dirimg_filter_status)       
+              if any(inserted ~= dirimg_filter_status)
                 set(handles.STATUS,'String','Retaking data'); drawnow;
                 handles = TakeData(hObject, eventdata, handles);                  % retake data
               else
-                break;            
-              end 
-              dirimg_filter_status = inserted;  
-              handles.abort = get(hObject,'Value');
-            end    
-
-            % change filters and attens for next round if getting low (unless filters already at minimum)      
-            if handles.abort~=0  
-              if handles.ncam_di_getting_low        
-                dirimg_filter_status = Rotate_di_filters(handles,'near','ccw'); 
+                break;
               end
-              if handles.wcam_di_getting_low 
-                dirimg_filter_status = Rotate_di_filters(handles,'wide','ccw');   
-              end        
+              dirimg_filter_status = inserted;
+              handles.abort = get(hObject,'Value');
+            end
+
+            % change filters and attens for next round if getting low (unless filters already at minimum)
+            if handles.abort~=0
+              if handles.ncam_di_getting_low
+                dirimg_filter_status = Rotate_di_filters(handles,'near','ccw');
+              end
+              if handles.wcam_di_getting_low
+                dirimg_filter_status = Rotate_di_filters(handles,'wide','ccw');
+              end
               if handles.diyag_getting_low && any(attens_status==1)
-                attens_status = Move_Attens(handles);       
-              end        
+                attens_status = Move_Attens(handles);
+              end
               if handles.yag_getting_low
-                filter_status = OD_filter(handles);       
-              end     
+                filter_status = OD_filter(handles);
+              end
             end
         end
 
         % Clear plot, guess best undulator range for gain length fit, analyze data and re-plot measured data
         handles=ClearPlot(handles);
-        handles = AnalyzeMeas(hObject,  eventdata, handles);             
-        GuessGLRange(handles);               
-        handles = AnalyzeMeas(hObject,  eventdata, handles);        
+        handles = AnalyzeMeas(hObject,  eventdata, handles);
+        GuessGLRange(handles);
+        handles = AnalyzeMeas(hObject,  eventdata, handles);
         drawnow
-        
-        
+
+
         % If abort called end program
         handles.abort = get(hObject,'Value');
         if handles.abort == 0
             handles = abort_loop(handles);
-            
+
             % reset magnets
             if curr_pos < handles.und_num-mag_delay && handles.nom_e/handles.max_e < handles.low_energy
-                MoveMag(handles,[curr_mag curr_mag2],[start_pos start_pos2],'trim');                
+                MoveMag(handles,[curr_mag curr_mag2],[start_pos start_pos2],'trim');
             elseif handles.closed_orbit && curr_pos<=handles.last_closed_corr && handles.nom_e<handles.max_E_closed
                 MoveMag(handles,mags_to_change_x,ref_mag_coeffs_x,'trim');
                 MoveMag(handles,mags_to_change_y,ref_mag_coeffs_y,'trim');
@@ -1189,19 +1200,19 @@ else
             break;
         end
 
-        
+
         % Move undulators/magnets to set up next data point
-        if strcmp(handles.methods(handles.currmethod),'Move Undulators')        
-          %UNDULATOR CASE          
+        if strcmp(handles.methods(handles.currmethod),'Move Undulators')
+          %UNDULATOR CASE
           % remove jth undulator
-          set(handles.STATUS,'String',['Moving undulator #',num2str(j)]); drawnow;         
+          set(handles.STATUS,'String',['Moving undulator #',num2str(j)]); drawnow;
 
           if j < n_points && handles.online
             % Desired undulator positions
-            handles = UndStatusCheck(hObject, handles);              
+            handles = UndStatusCheck(hObject, handles);
             %und_des = handles.und_status;
-            %und_des(und_pos(end-j)+1:und_pos(end)) = 0;                
-            
+            %und_des(und_pos(end-j)+1:und_pos(end)) = 0;
+
             % turn off beam
             lcaPut(handles.BYKick,0);
 
@@ -1209,36 +1220,36 @@ else
             new_pos = segmentTranslate();
             new_pos(und_pos(end-j)+1:und_pos(end-j+1)) = handles.out_pos;
             segmentTranslate(new_pos);
-            segmentTranslateWait_GL(hObject,handles);            
-          end     
-          
+            segmentTranslateWait_GL(hObject,handles);
+          end
+
           % turn on beam again
           lcaPut(handles.BYKick,1); pause(handles.BYKick_pause)
-          
-        else       
+
+        else
           % MAGNET CASE
 
           % Turn off beam until next magnet into position (to protect camera -- ignore for gdet)
           if ~strcmp(handles.acq_method,'Gas Detectors')
-            if j < n_points && handles.online              
+            if j < n_points && handles.online
                 lcaPut(handles.BYKick,0);       % turn off beam
               elseif handles.online && handles.use_atten
-                reset_filters(handles,OD_init,di_OD_init,attens_init)         
+                reset_filters(handles,OD_init,di_OD_init,attens_init)
                 pause(1);
             end
           end
 
-          % Move magnet back to starting position        
-          set(handles.STATUS,'String',['Restoring corrector for position: ' num2str(j)]); drawnow;       
-          
- 
-          
-          % FINISH FINISH FINISH (turned off for now)
-          if curr_pos < handles.und_num-mag_delay && handles.nom_e/handles.max_e < handles.low_energy   
-              MoveMag(handles,[curr_mag curr_mag2],[start_pos start_pos2],'trim');
-             
+          % Move magnet back to starting position
+          set(handles.STATUS,'String',['Restoring corrector for position: ' num2str(j)]); drawnow;
 
-          elseif handles.closed_orbit && curr_pos<=handles.last_closed_corr && handles.nom_e<handles.max_E_closed                          
+
+
+          % FINISH FINISH FINISH (turned off for now)
+          if curr_pos < handles.und_num-mag_delay && handles.nom_e/handles.max_e < handles.low_energy
+              MoveMag(handles,[curr_mag curr_mag2],[start_pos start_pos2],'trim');
+
+
+          elseif handles.closed_orbit && curr_pos<=handles.last_closed_corr && handles.nom_e<handles.max_E_closed
               % x magnets
               MoveMag(handles,mags_to_change_x,ref_mag_coeffs_x,'trim');
 
@@ -1246,14 +1257,14 @@ else
               MoveMag(handles,mags_to_change_y,ref_mag_coeffs_y,'trim');
           else
               MoveMag(handles,curr_mag,start_pos,'trim');
-          end    
-                  
+          end
+
 
         end
 
 
         guidata(hObject, handles);
-        
+
         toc
     end
 
@@ -1270,8 +1281,8 @@ if ~handles.fail && strcmp(handles.methods(handles.currmethod),'Move Undulators'
   if strcmp(reset,'Reset') && handles.online && handles.use_atten
 
     % reset filters to initial position
-    reset_filters(handles,OD_init,di_OD_init,attens_init)   
-    handles = UndStatusCheck(hObject, handles);              
+    reset_filters(handles,OD_init,di_OD_init,attens_init)
+    handles = UndStatusCheck(hObject, handles);
 
     % turn off beam
     if handles.online
@@ -1288,7 +1299,7 @@ if ~handles.fail && strcmp(handles.methods(handles.currmethod),'Move Undulators'
 
     % turn on beam
     if handles.online
-      lcaPut(handles.BYKick,1); 
+      lcaPut(handles.BYKick,1);
     end
   end
 end
@@ -1309,7 +1320,7 @@ if handles.online
 
   % reset HXRSS feedback
   % FINISH FINISH FINISH
-  lcaPutSmart(handles.HXRSS_feedback,handles.HXRSS_feedback_status);  
+  lcaPutSmart(handles.HXRSS_feedback,handles.HXRSS_feedback_status);
 end
 
 
@@ -1321,7 +1332,7 @@ if handles.gain_mult ~=1 || handles.pressure_mult ~= 1
     lcaPutSmart(handles.pressure_gdet2_pv,init_pressure_gdet2);
     gdet_count=0;
     while lcaGetSmart(handles.pressure_gdet2_status)~=0 || ~strcmp(lcaGetSmart(handles.gain_gdet2_1_status),'ON') || ~strcmp(lcaGetSmart(handles.gain_gdet2_2_status),'ON')
-        pause(1); 
+        pause(1);
         set(handles.STATUS,'String','Waiting for GDet2'); drawnow;
         gdet_count=gdet_count+1;    if gdet_count>20; break; end;
     end
@@ -1339,11 +1350,11 @@ segmentTranslate(handles.start_config_und');
 % if ~handles.yag_tag && handles.online
 %   lcaPutSmart(handles.nfov_process,init_nfov_process)
 % end
-  
+
 % Don't bother with analysis if abort called or failure found
 if handles.abort == 0 || handles.fail
   set(handles.STARTMEAS,'String','Start');
-  set(handles.STARTMEAS,'Value',0);  
+  set(handles.STARTMEAS,'Value',0);
   set(hObject,'BackgroundColor',handles.start_col);
   if handles.fail == 0
     set(handles.STATUS,'String','Ready'); drawnow;
@@ -1366,7 +1377,7 @@ MingXieGL(hObject, eventdata, handles);
 %TAKE OUT (or add in)
 % Write data to archives
 
-handles = AnalyzeMeas(hObject,  eventdata, handles);        
+handles = AnalyzeMeas(hObject,  eventdata, handles);
 drawnow
 
 
@@ -1458,13 +1469,13 @@ drawnow
 handles.abort = get(hObject,'Value');
 if handles.abort == 0
   return;
-end    
+end
 
 
 set(handles.STATUS,'String','Taking Orbit Reference');
 drawnow
 
-    
+
 handles = TakeReference(hObject,eventdata,handles);
 
 set(handles.STATUS,'String','Taking Data');
@@ -1532,7 +1543,7 @@ mag_diff=handles.mag_diff*ones(1,handles.und_num);
 for j=2:2:handles.und_num
     mag_diff(j)=mag_diff(j)/handles.kick_fudge;
 end
-    
+
 
 % Check for kicked beam
 if handles.online
@@ -1566,12 +1577,12 @@ if strcmp(meas_method,'Move Undulators')
 else
     und_end = min(mag_end,und_end)*handles.und_length;
 end
-handles.und_end = und_end;      
+handles.und_end = und_end;
 
 
 % For gdet case, measure offset with beam OFF
 %FINISH FINISH FINISH
-if strcmp(handles.acq_method,'Gas Detectors') && handles.online && (handles.need_gdet1_offset || handles.need_gdet2_offset)     
+if strcmp(handles.acq_method,'Gas Detectors') && handles.online && (handles.need_gdet1_offset || handles.need_gdet2_offset)
     handles = MeasureGDetOffset(hObject,handles);
     handles.gdet1_offset=[0 0];         % for now forcing GDet1 offset to 0 so we always have one good data set if offset function fails
     %handles.gdet2_offset=[0 0];
@@ -1592,11 +1603,11 @@ end
 
 % calculate energy loss in undulators
 eloss_in.navg = handles.num_shots;                     % number of points to average
-eloss_in.Loss_per_Ipk = handles.eloss_Loss_per_Ipk;     
+eloss_in.Loss_per_Ipk = handles.eloss_Loss_per_Ipk;
 
 
 % check for initialization
-if isfield(handles,'eloss_static')                      
+if isfield(handles,'eloss_static')
   eloss_in.initialize = 0;
   eloss_in.static_data = handles.eloss_static;
 else
@@ -1605,7 +1616,7 @@ end
 
 
 % initialize in case of failure
-handles.eloss.dE = 0; 
+handles.eloss.dE = 0;
 handles.eloss.ddE = 0;
 handles.eloss.Ipk = 0;
 
@@ -1658,23 +1669,23 @@ if handles.need_gdet2_cal
     handles.need_gdet2_cal=0;
 end
 
-% Update data registry     
+% Update data registry
 handles.data(myindex).pos = und_end;
-handles.data(myindex).raw_yag = outstruc.yag_data;   
-handles.data(myindex).yag_tot_pix = outstruc.yag_tot_pix;   
-handles.data(myindex).di_raw_yag = outstruc.di_data;      % near direct imager data with henrik's profmon   
-handles.data(myindex).raw_eloss = raw_eloss;     
-handles.data(myindex).tmit = outstruc.tmit;           
-handles.data(myindex).delta_e = outstruc.delta_e;   
-handles.data(myindex).curr = outstruc.curr;  
-handles.data(myindex).xorb_max = outstruc.xorb_max;           
-handles.data(myindex).yorb_max = outstruc.yorb_max;  
+handles.data(myindex).raw_yag = outstruc.yag_data;
+handles.data(myindex).yag_tot_pix = outstruc.yag_tot_pix;
+handles.data(myindex).di_raw_yag = outstruc.di_data;      % near direct imager data with henrik's profmon
+handles.data(myindex).raw_eloss = raw_eloss;
+handles.data(myindex).tmit = outstruc.tmit;
+handles.data(myindex).delta_e = outstruc.delta_e;
+handles.data(myindex).curr = outstruc.curr;
+handles.data(myindex).xorb_max = outstruc.xorb_max;
+handles.data(myindex).yorb_max = outstruc.yorb_max;
 handles.data(myindex).raw_orbit = outstruc.orbit;
 handles.data(myindex).OD = outstruc.OD;                  % Yagxray ODs
 handles.data(myindex).di_OD = outstruc.di_OD;                  % direct imager ODs
 handles.data(myindex).attens = outstruc.attens;          % attenuator
-handles.data(myindex).n_dir_img = outstruc.n_dir_img;    % linda's near direct imager data  
-handles.data(myindex).w_dir_img = outstruc.w_dir_img;    % linda's wide direct imager data   
+handles.data(myindex).n_dir_img = outstruc.n_dir_img;    % linda's near direct imager data
+handles.data(myindex).w_dir_img = outstruc.w_dir_img;    % linda's wide direct imager data
 handles.data(myindex).gdet1 = outstruc.gdet1;             % gas detector
 handles.data(myindex).gdet2 = outstruc.gdet2;             % gas detector
 handles.data(myindex).tot_energy = outstruc.tot_energy;   % total energy detector
@@ -1738,11 +1749,11 @@ OD_init = lcaGetSmart(handles.OD_pvs,1,'double');
 
 if handles.yagcam_sat == 1
   if ~OD_init(1)
-    lcaPutSmart(handles.OD_pvs(1),1);             % if no OD1, put in OD1   
+    lcaPutSmart(handles.OD_pvs(1),1);             % if no OD1, put in OD1
   elseif ~OD_init(2)
     lcaPutSmart(handles.OD_pvs(2),1);             % if just OD1, put in OD2, take out OD1
     lcaPutSmart(handles.OD_pvs(1),0);
-  end  
+  end
 elseif handles.yagcam_sat == -1
   if OD_init(1)
     lcaPutSmart(handles.OD_pvs(1),0);             % if OD1 in, take out OD1
@@ -1752,7 +1763,7 @@ elseif handles.yagcam_sat == -1
   end
 end
 
-temp = lcaGetSmart(handles.OD_pvs,1,'double'); 
+temp = lcaGetSmart(handles.OD_pvs,1,'double');
 inserted = temp(1) + 2*temp(2);      % number of filters in (double counting OD2)
 
 
@@ -1777,15 +1788,15 @@ if handles.dirimg_sat == -1
     new_atten = 1;
   end
   lcaPutSmart(handles.atten_control_pvs{1},new_atten);
-  lcaPutSmart(handles.atten_control_pvs{2},3);    
+  lcaPutSmart(handles.atten_control_pvs{2},3);
   %Rotate_di_filters(handles,'near','cw');
   %Rotate_di_filters(handles,'wide','cw');
 elseif handles.dirimg_sat == 1                     % increase attenuation
   new_atten =  attens_init(1)/atten_change;
   lcaPutSmart(handles.atten_control_pvs{1},new_atten);
-  lcaPutSmart(handles.atten_control_pvs{2},3);  
+  lcaPutSmart(handles.atten_control_pvs{2},3);
   %Rotate_di_filters(handles,'near','ccw');
-  %Rotate_di_filters(handles,'wide','ccw');  
+  %Rotate_di_filters(handles,'wide','ccw');
 end
 
 
@@ -1807,7 +1818,7 @@ if ~handles.online
   return
 end
 
-inserted = lcaGetSmart(handles.di_OD_pos_pvs,1,'double'); 
+inserted = lcaGetSmart(handles.di_OD_pos_pvs,1,'double');
 
 if handles.ncam_dirimg_sat == 1
   inserted = Rotate_di_filters(handles,'near','cw');
@@ -1845,24 +1856,24 @@ if strcmp(camera,'near')
     if filters_init(near) < 4                  % don't Rotate if at end
 %      lcaPutSmart(handles.di_cw_pvs(near),1);
       lcaPutSmart(handles.ndi_pos_pvs(filters_init(near)+1+1),1)
-    end    
+    end
   else
     if filters_init(near) ~= 0 && filters_init(near) < 5                 % don't Rotate if at begining
-%      lcaPutSmart(handles.di_ccw_pvs(near));   
-      lcaPutSmart(handles.ndi_pos_pvs(filters_init(near)+1-1),1)      
-    end  
+%      lcaPutSmart(handles.di_ccw_pvs(near));
+      lcaPutSmart(handles.ndi_pos_pvs(filters_init(near)+1-1),1)
+    end
   end
 else
 %   if strcmp(direction,'cw')
 %     if filters_init(wide) < 5
 % %      lcaPutSmart(handles.di_cw_pvs(wide));
-%       lcaPutSmart(handles.wdi_pos_pvs(filters_init(wide)+1+1),1)      
-%     end    
+%       lcaPutSmart(handles.wdi_pos_pvs(filters_init(wide)+1+1),1)
+%     end
 %   else
 %     if filters_init(wide) ~= 0 && filters_init(wide) < 6
 % %      lcaPutSmart(handles.di_ccw_pvs(wide));
-%       lcaPutSmart(handles.wdi_pos_pvs(filters_init(wide)+1-1),1)      
-%     end  
+%       lcaPutSmart(handles.wdi_pos_pvs(filters_init(wide)+1-1),1)
+%     end
 %   end
 end
 
@@ -1945,7 +1956,7 @@ function handles=ClearPlot(handles)
 % Clear Plot
 hold(handles.GLAX,'off');
 a = [0 0];
-semilogy(a(1),a(2),'w','Parent',handles.GLAX);    
+semilogy(a(1),a(2),'w','Parent',handles.GLAX);
 
 
 %%
@@ -1967,14 +1978,14 @@ type = get(handles.MAGTYPE,'Value');
 mag_type = mag_options(type);
 
 
-  
+
 if strcmp(mag_type,'X Corr')
     mag_name = handles.xmag_names(last_und);
     kick_size = kick_size + handles.saved_config_xmag(last_und);
 else
     mag_name = handles.ymag_names(last_und);
     kick_size = kick_size + handles.saved_config_ymag(last_und);
-end   
+end
 
 if kick_size>handles.max_kick
   set(handles.STATUS,'String',['Error: kick size must be smaller than ' ...
@@ -1984,7 +1995,7 @@ end
 
 % if kick_size>handles.max_kick/(handles.max_e/handles.nom_e)
 %   set(handles.STATUS,'String',['Error: kick size must be smaller than ' ...
-%     num2str(handles.max_kick/(handles.max_e/handles.nom_e)/handles.orbit_to_kick) 'um']);   
+%     num2str(handles.max_kick/(handles.max_e/handles.nom_e)/handles.orbit_to_kick) 'um']);
 %   return
 % end
 
@@ -2000,7 +2011,7 @@ MoveMag(handles,mag_name,kick_size,'trim');
 handles = find_kicked_mag(handles);
 
 handles = UndStatusCheck(hObject, handles);
-  
+
 
 set(handles.STATUS,'String','Ready'); drawnow;
 
@@ -2018,7 +2029,7 @@ n = length(curr_mag);
 % First perturb
 for j=1:n
   % TAKE OUT WHEN AIDA FIXED
-  lcaPutSmart(strcat(curr_mag(j),':BCTRL'),mag_strength(j));  
+  lcaPutSmart(strcat(curr_mag(j),':BCTRL'),mag_strength(j));
   %trim_magnet(curr_mag(j),mag_strength(j),'P');
 end
 
@@ -2053,15 +2064,15 @@ return;
 for j=1:n
   [outoftol(j)] = check_magnet(curr_mag(j));
 end
-while any(outoftol)  
+while any(outoftol)
   pause(1)
   % If abort called end program
   handles.abort = get(handles.STARTMEAS,'Value');
   if handles.abort == 0
-      set(handles.STATUS,'String','Aborting');  
+      set(handles.STATUS,'String','Aborting');
       drawnow
       return;
-  end    
+  end
   for j=1:n
     [outoftol(j)] = check_magnet(curr_mag(j));
   end
@@ -2089,7 +2100,7 @@ mag_diff=handles.mag_diff*ones(1,handles.und_num);
 for j=2:2:handles.und_num
     mag_diff(j)=mag_diff(j)/handles.kick_fudge;
 end
-    
+
 % Check for kicked beam
 curr_xmag = lcaGetSmart(handles.xmag_bdes);
 curr_ymag = lcaGetSmart(handles.ymag_bdes);
@@ -2108,7 +2119,7 @@ if ~isempty(xdiff) || ~isempty(ydiff)
         mag_end = min(xdiff(1),ydiff(1));
     end
 end
-        
+
 if mag_end < und_end
   handles.kicked_mag = mag_end;
 else
@@ -2152,20 +2163,20 @@ end
 
 % turn off beam
 lcaPut(handles.BYKick,0);
- 
+
 set(handles.STATUS,'String','Moving undulators'); drawnow;
 
 handles = get_in_pos(handles,first_und,last_und);
 new_pos = segmentTranslate();
 new_pos(first_und:last_und) = handles.config_pos;
 segmentTranslate(new_pos);
-segmentTranslateWait_GL(hObject,handles) 
+segmentTranslateWait_GL(hObject,handles)
 
 %handles = MoveUnd(hObject, eventdata, handles,first_und,last_und,'in');
 %MovingUndCheck(hObject, handles, und_des);
 
-% Wait an extra seconds when returning magnets to in position.  
-% (check only makes sure undulator is less than 6mm, not actually previous position) 
+% Wait an extra seconds when returning magnets to in position.
+% (check only makes sure undulator is less than 6mm, not actually previous position)
 % pause(handles.move_in_wait);
 
 % turn on beam
@@ -2214,7 +2225,7 @@ set(handles.STATUS,'String','Moving undulators'); drawnow;
 new_pos = segmentTranslate();
 new_pos(first_und:last_und) = handles.out_pos;
 segmentTranslate(new_pos);
-segmentTranslateWait_GL(hObject,handles);     
+segmentTranslateWait_GL(hObject,handles);
 
 %handles = MoveUnd(hObject, eventdata, handles,first_und,last_und,'out');
 %MovingUndCheck(hObject, handles, und_des);
@@ -2250,7 +2261,7 @@ end
 
 
 function handles = get_in_pos(handles,first_und,last_und)
-% Gets desired in positions 
+% Gets desired in positions
 
 config_pos = handles.saved_config_und(first_und:last_und)';
 
@@ -2289,7 +2300,7 @@ if strcmp(in_or_out,'in')
         final_pos(j) = 0;
       end
     end
-    
+
     check_in = 0;
     check_in = find(final_pos >= handles.out_enough);
     if check_in > 0
@@ -2307,18 +2318,18 @@ und_num = handles.und_num;
 if (first_und < 1 || first_und > und_num) || (last_und < 1 || last_und > und_num) || (first_und > last_und)
         set(handles.UNDSTATUS,'String','Illegal undulator range');
         set(handles.UNDSTATUS,'ForegroundColor','r');
-        return;   
+        return;
 else
     set(handles.UNDSTATUS,'String','');
 end
-   
+
 
 
 set(handles.STATUS,'String','Moving Undulators: Please Wait');
 drawnow
 
 lcaPutSmart(handles.und_names(first_und:last_und),final_pos);
-   
+
 
 
 guidata(hObject, handles);
@@ -2326,7 +2337,7 @@ guidata(hObject, handles);
 
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function MovingUndCheck(hObject, handles, und_des)
 % Check if undulators are still moving
 
@@ -2352,7 +2363,7 @@ end
 
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function handles = AnalyzeMeas(hObject, eventdata, handles)
 % Analyze measurement and write to GUI
 
@@ -2379,7 +2390,7 @@ filt_pts = {};
 good_frac = 0;
 for j=1:num_points
   [handles,outstruc]= CheckTol_ParseData(handles,hObject,j);
-  
+
   avg_power(j) = outstruc.avg_power*handles.yag_conv_norm;
   peak_power(j) = outstruc.peak_power*handles.yag_conv_norm;
   rms_power(j) = outstruc.rms_power*handles.yag_conv_norm;
@@ -2395,9 +2406,9 @@ for j=1:num_points
   eloss(j) = outstruc.eloss;
   eloss_rms(j) = outstruc.eloss_rms;
   filter_stat(j) = outstruc.filter_stat;
-  
+
   gdet2_cal(j) = handles.data(j).gdet2_cal;
-  
+
   good_frac = good_frac + handles.good_fraction;
 end
 good_frac = round(100*good_frac/num_points)/100;
@@ -2415,10 +2426,10 @@ if isfield(handles,'most_recent')
   [rms_power_str,parg,pexp] = ExpFormat(rms_power(handles.most_recent),3);
 
 end
-  
+
 % number of shots per data point
-if isfield(handles.data,'tmit')  
-  for j=1:num_points   
+if isfield(handles.data,'tmit')
+  for j=1:num_points
     %num_shots(j) = length(handles.data(j).tmit);
     num_shots(j) = max(length(handles.data(j).tmit),length(handles.data(j).gdet1));
   end
@@ -2480,10 +2491,10 @@ end
 for j=1:num_points
     handles.data(j).plot.power = avg_power(j);
     handles.data(j).plot_power = avg_power(j);    % easier to read by vertcat
-    handles.data(j).plot.power_sig = rms_power(j);   
+    handles.data(j).plot.power_sig = rms_power(j);
     handles.data(j).plot.eloss = eloss(j);
     handles.data(j).plot_eloss = eloss(j);        % easier to read by vertcat
-    handles.data(j).plot.eloss_sig = eloss_rms(j);    
+    handles.data(j).plot.eloss_sig = eloss_rms(j);
     handles.data(j).plot.xrms = xrms(j);
     handles.data(j).plot.yrms = yrms(j);
     handles.data(j).plot.xrms_sig = xrms_rms(j)/sig_norm(j);
@@ -2491,7 +2502,7 @@ for j=1:num_points
     handles.data(j).plot.xpos = xpos(j);
     handles.data(j).plot.ypos = ypos(j);
     handles.data(j).plot.xpos_sig = xpos_rms(j)/sig_norm(j);
-    handles.data(j).plot.ypos_sig = ypos_rms(j)/sig_norm(j);    
+    handles.data(j).plot.ypos_sig = ypos_rms(j)/sig_norm(j);
 end
 
 % Calculate measured gain length, with fit
@@ -2503,35 +2514,35 @@ if num_points > 1
   handles.chisq = chisq;
 end
 handles.meas_gl = meas_gl;
-handles.meas_gl_sig = meas_gl_sig; 
+handles.meas_gl_sig = meas_gl_sig;
 
 
 
 % plot measured power with gain length fit
-GLax=handles.GLAX; 
+GLax=handles.GLAX;
 hold(GLax,'off');
-  
+
 
 
 % Plot Data
-if strcmp(det,'ELoss (e-)')  
-  eloss = sortrows(cat(1,und_pos',eloss-min(eloss),eloss_rms./sig_norm')');   
+if strcmp(det,'ELoss (e-)')
+  eloss = sortrows(cat(1,und_pos',eloss-min(eloss),eloss_rms./sig_norm')');
   errorbar(z_plot,eloss(:,2),eloss(:,3),'*b','MarkerSize',7,'Parent',GLax);
-  ylabel(GLax,'Energy Loss (MeV)');   
-  handles.eloss_val = eloss;  
+  ylabel(GLax,'Energy Loss (MeV)');
+  handles.eloss_val = eloss;
 elseif strcmp(curr_data_type,'RMS Size')
   rms = sortrows(cat(1,und_pos',xrms,yrms,xrms_rms./sig_norm',yrms_rms./sig_norm')');
   errorbar(z_plot,rms(:,2),rms(:,4),'*b','MarkerSize',7,'Parent',GLax);
   hold(GLax,'on');
-  errorbar(z_plot,rms(:,3),rms(:,5),'*r','MarkerSize',7,'Parent',GLax);  
+  errorbar(z_plot,rms(:,3),rms(:,5),'*r','MarkerSize',7,'Parent',GLax);
   ylabel(GLax,'RMS (um)');
   legend(GLax,'X RMS','Y RMS','Location','Best');
   %ylim(GLax,[min(min(rms(:,2)),min(rms(:,3)))-100
-  %max(max(rms(:,2)),max(rms(:,3)))+150]);  
+  %max(max(rms(:,2)),max(rms(:,3)))+150]);
   handles.rms_plot = rms;
 elseif strcmp(curr_data_type,'Position')
-  pos = sortrows(cat(1,und_pos',xpos,ypos,xpos_rms./sig_norm',ypos_rms./sig_norm')');  
-  errorbar(z_plot,pos(:,2),pos(:,4),'*b','MarkerSize',7,'Parent',GLax);  
+  pos = sortrows(cat(1,und_pos',xpos,ypos,xpos_rms./sig_norm',ypos_rms./sig_norm')');
+  errorbar(z_plot,pos(:,2),pos(:,4),'*b','MarkerSize',7,'Parent',GLax);
   hold(GLax,'on');
   errorbar(z_plot,pos(:,3),pos(:,5),'*r','MarkerSize',7,'Parent',GLax);
   ylabel(GLax,'Position (um)');
@@ -2539,29 +2550,29 @@ elseif strcmp(curr_data_type,'Position')
   %ylim(GLax,[min(min(pos(:,2)),min(pos(:,3)))-100 max(max(pos(:,2)),max(pos(:,3)))+500]);
   handles.pos_plot = pos;
 elseif strcmp(curr_data_type,'Position Jitter')
-  pos = sortrows(cat(1,und_pos',xpos,ypos,xpos_rms./sig_norm',ypos_rms./sig_norm')');  
+  pos = sortrows(cat(1,und_pos',xpos,ypos,xpos_rms./sig_norm',ypos_rms./sig_norm')');
   x=pos(:,2)-mean(pos(:,2));
-  y=pos(:,3)-mean(pos(:,3));  
-  errorbar(z_plot,x,pos(:,4),'*b','MarkerSize',7,'Parent',GLax);  
+  y=pos(:,3)-mean(pos(:,3));
+  errorbar(z_plot,x,pos(:,4),'*b','MarkerSize',7,'Parent',GLax);
   hold(GLax,'on');
-  errorbar(z_plot,y,pos(:,5),'*r','MarkerSize',7,'Parent',GLax); 
+  errorbar(z_plot,y,pos(:,5),'*r','MarkerSize',7,'Parent',GLax);
   ylabel(GLax,'Position Jitter (um)');
   legend(GLax,'X Jitter','Y Jitter','Location','Best');
-  %ylim(GLax,[min(min(x),min(y))-100 max(max(x),max(y))+200]);   
-  handles.pos_plot = pos;  
+  %ylim(GLax,[min(min(x),min(y))-100 max(max(x),max(y))+200]);
+  handles.pos_plot = pos;
 elseif strcmp(curr_data_type,'Power Jitter')
-  plot(z_plot,power_data(:,4)./handles.meas_p,'*b','MarkerSize',7,'Parent',GLax);    
-  ylabel(GLax,'Power Jitter (rel)');  
-  handles.powerrms_plot = power_data(:,4);  
+  plot(z_plot,power_data(:,4)./handles.meas_p,'*b','MarkerSize',7,'Parent',GLax);
+  ylabel(GLax,'Power Jitter (rel)');
+  handles.powerrms_plot = power_data(:,4);
 elseif any(isfinite(avg_power) == 0)
-  set(handles.STATUS,'String','Bad data');  drawnow; 
+  set(handles.STATUS,'String','Bad data');  drawnow;
 else
-  
+
   handles=ClearPlot(handles);
-  hold(GLax,'on');  
+  hold(GLax,'on');
 
   % Plot all data points if desired.  otherwise plot average/peak
-  if strcmp(curr_data_type,'Power (All)')    
+  if strcmp(curr_data_type,'Power (All)')
       for j=1:num_points
           all_points = filt_pts{j};
           z=handles.data(j).pos*ones(1,length(all_points));
@@ -2572,8 +2583,8 @@ else
           if get(handles.LOGSCALE,'Value')
               set(GLax,'YScale','log');
           else
-              set(GLax,'YScale','linear');              
-          end          
+              set(GLax,'YScale','linear');
+          end
           if strcmp(det,'Gas Det Both') && (handles.plot.gdet2_cal(j) == max(vertcat(handles.data.gdet2_cal))  || handles.plot.gdet2_cal(j)>0.95)   % for gdet1 case
               mycolor = [1 0 0];
           elseif strcmp(det,'Gas Det Both')    % for gdet2 case
@@ -2582,54 +2593,54 @@ else
               mycolor = [0 1 0];
           else
               mycolor = [0.33*power_data(j,5) .65-.2*power_data(j,5) 0];
-          end          
-          errorbar(z_plot(j),handles.meas_p(j),sig_w(j),'or','MarkerSize',7,'Color',mycolor,'Parent',GLax);  
+          end
+          errorbar(z_plot(j),handles.meas_p(j),sig_w(j),'or','MarkerSize',7,'Color',mycolor,'Parent',GLax);
           handles.filter_color(j,:) = mycolor;
       end
   end
 
-  
-  
+
+
   % plot fit
   if num_points > 1  && get(handles.LOGSCALE,'Value')
-    
+
     % plot fit range
     fit_low = [handles.gl_fit_range(1) handles.gl_fit_range(1)];
-    fit_high = [handles.gl_fit_range(2) handles.gl_fit_range(2)];    
+    fit_high = [handles.gl_fit_range(2) handles.gl_fit_range(2)];
     vertline = [10^-20 10^20];
-    plot(fit_low,vertline,'--k',fit_high,vertline,'--k','Parent',GLax);    
-    
+    plot(fit_low,vertline,'--k',fit_high,vertline,'--k','Parent',GLax);
+
     % plot fit
     bad_points = find(meas_f<=-50);
     fit_z = z_plot;
     fit_f = handles.meas_f;
     if isempty(bad_points)
-      semilogy(z_plot,exp(meas_f),'-g','Parent',GLax);   
+      semilogy(z_plot,exp(meas_f),'-g','Parent',GLax);
     else
       set(handles.STATUS,'String',['Error: invalid power at position ' num2str(z_plot(bad_points(1)))]); drawnow;
       meas_f(bad_points) = 1;
-      semilogy(z_plot,exp(meas_f),'-g','Parent',GLax);     
+      semilogy(z_plot,exp(meas_f),'-g','Parent',GLax);
     end
   end
 
-  if num_points > 1 && max(handles.meas_p)*5 > min(handles.meas_p)/5    
-    temp_p = sort(handles.meas_p);    
+  if num_points > 1 && max(handles.meas_p)*5 > min(handles.meas_p)/5
+    temp_p = sort(handles.meas_p);
     mymin = temp_p(find(temp_p>0,1));
     mymax = max(handles.meas_p);
-    if get(handles.LOGSCALE,'Value') && mymin ~= 0 
+    if get(handles.LOGSCALE,'Value') && mymin ~= 0
       ylim(GLax,[mymin/5 mymax*5]);
       logrange = floor(log10(mymin)):1:ceil(log10(mymax));
-      set(GLax,'YTick',10.^logrange);      
-    elseif ~get(handles.LOGSCALE,'Value')   
+      set(GLax,'YTick',10.^logrange);
+    elseif ~get(handles.LOGSCALE,'Value')
       mymin = min(temp_p);
-      ylim(GLax,[min(mymin*1.1,-mymax/5) mymax*1.2]);   
+      ylim(GLax,[min(mymin*1.1,-mymax/5) mymax*1.2]);
     end
-  end  
-  
+  end
+
   xlabel(GLax,'z (m)');
   %ylabel(GLax,'Energy (mJ) Rough Estimate');
-  
-  if strcmp(det,'Gas Det1') || strcmp(det,'Gas Det2') || strcmp(det,'Gas Det Both') 
+
+  if strcmp(det,'Gas Det1') || strcmp(det,'Gas Det2') || strcmp(det,'Gas Det Both')
       ylabel(GLax,'Energy (mJ)');
   else
       ylabel(GLax,'Energy (arb. units)');
@@ -2644,9 +2655,9 @@ else
 end
 
 if get(handles.LOGSCALE,'Value')
-  set(GLax,'YScale','log'); 
+  set(GLax,'YScale','log');
 else
-  set(GLax,'YScale','linear');    
+  set(GLax,'YScale','linear');
 end
 
 grid(GLax,'on');
@@ -2664,7 +2675,7 @@ guidata(hObject, handles);
 
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function gen_gl = AnalyzeGenesis(hObject, eventdata,  handles)
 % Analyze genesis data and write to GUI
 
@@ -2673,7 +2684,7 @@ function gen_gl = AnalyzeGenesis(hObject, eventdata,  handles)
 set(handles.STATUS,'String','Waiting for Genesis run to finish'); drawnow;
 task = 'check run';
 perl('GainLengthPerl.pl',task,handles.gen_result_file,handles.mystatus);
-gen_status = load(handles.mystatus);    
+gen_status = load(handles.mystatus);
 
 if gen_status
     set(handles.STATUS,'String','Processing data'); drawnow;
@@ -2693,18 +2704,18 @@ if gen_status
         set(handles.STATUS,'String','Genesis run failed'); drawnow;
         genStatus = 0;
     else
-        genZ = A(1,:); genP = A(2,:);        
+        genZ = A(1,:); genP = A(2,:);
         genZ = genZ*handles.und_length/handles.seg_length;  % convert to undulator length (removes drifts)
     end
 end
 
 if gen_status
-    
+
     % Calculate Genesis gain length, with fit
     cutoff_high = 0;
-    cutoff_low = 0;  
+    cutoff_low = 0;
     %cutoff_high = max(genP)/10;
-    %cutoff_low = min(genP)*10;      
+    %cutoff_low = min(genP)*10;
     sig = ones(size(genZ));
     [gen_gl,gen_f] = CalcGainLength(handles,genZ',genP',sig',cutoff_high,cutoff_low);
 
@@ -2718,11 +2729,11 @@ if gen_status
     handles.genZ = genZ;
     handles.genP = genP;
     handles.gen_fit = gen_f;
-    
+
     % normalize genesis power to measured signal
     if isempty(handles.data.plot.power)
       mynorm = 1;
-    else      
+    else
       meas_pow = vertcat(handles.data.plot.power);
       meas_z = vertcat(handles.data.pos);
       j = find(min(meas_pow));
@@ -2730,11 +2741,11 @@ if gen_status
       gen_j = find(genZ>=zstart,1);
       mynorm = meas_pow(j)/genP(gen_j);
     end
-    
+
     % plot genesis power with gain length fit
-    GLax=handles.GLAX; 
-    hold(GLax,'on');      
-    semilogy(genZ,genP*mynorm,'.',genZ,exp(gen_f)*mynorm,'-','Parent',GLax);    
+    GLax=handles.GLAX;
+    hold(GLax,'on');
+    semilogy(genZ,genP*mynorm,'.',genZ,exp(gen_f)*mynorm,'-','Parent',GLax);
     xlabel(GLax,'z (m)');
     ylabel(GLax,'Power (A.U.)');
     set(GLax,'yscale','log');
@@ -2758,7 +2769,7 @@ guidata(hObject, handles);
 
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function handles = UndStatusCheck(hObject, handles)
 % Read and Plot Undulator Status
 
@@ -2780,7 +2791,7 @@ UndOut = [];
 
 % Jim Welch's position function
 % if handles.online
-%   und_pos = segmentTranslate();  
+%   und_pos = segmentTranslate();
 % else
 %   und_pos = zeros(33,1);
 % end
@@ -2798,16 +2809,16 @@ if handles.online
   end
 end
 
-for j=1:und_num    
+for j=1:und_num
     if abs(und_pos(j)) <= handles.in_pos
-        in_j = in_j+1;        
+        in_j = in_j+1;
         und_status(j) = 1;
         UndIn(in_j,1) = j;
         UndIn(in_j,2) = und_pos(j)/handles.out_pos;
     elseif und_pos(j) >= handles.out_enough
-        out_j = out_j+1;           
+        out_j = out_j+1;
         UndOut(out_j,1) = j;
-        UndOut(out_j,2) = 1;     
+        UndOut(out_j,2) = 1;
     else
         % illegal position
         ill_j = ill_j+1;
@@ -2819,26 +2830,26 @@ end
 
 
 
-USax=handles.UNDSTATAX; 
+USax=handles.UNDSTATAX;
 hold(USax,'off');
 my_x=(0:35);
 my_y=zeros(size(my_x));
 plot(my_x,my_y,'k','linewidth',2,'Parent',USax);
 hold(USax,'on');
-%stem(und_status,'Parent',USax);   
+%stem(und_status,'Parent',USax);
 % Plot 'in' undulators
 if in_j > 0
-    plot(UndIn(:,1),UndIn(:,2),'sg','markersize',10,'Parent',USax);  
+    plot(UndIn(:,1),UndIn(:,2),'sg','markersize',10,'Parent',USax);
 end
 
 % Plot 'out' undulators
 if out_j > 0
-    plot(UndOut(:,1),UndOut(:,2),'sk','markersize',10,'Parent',USax);  
+    plot(UndOut(:,1),UndOut(:,2),'sk','markersize',10,'Parent',USax);
 end
 
 % Plot bad undulators
 if ill_j > 0
-    plot(UndIll(:,1),UndIll(:,2),'sr','markersize',10,'Parent',USax);  
+    plot(UndIll(:,1),UndIll(:,2),'sr','markersize',10,'Parent',USax);
 end
 
 if handles.kicked_mag > 0
@@ -2879,7 +2890,7 @@ handles.und_pos = und_pos;
 
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function [powerGL,f,chisq,powerGL_sig,handles] = CalcGainLength(handles,z,p,sig,cutoff_high,cutoff_low)
 % Calculate fit parameters
 
@@ -2894,7 +2905,7 @@ limitH = find(z==cutoff_high*handles.und_length);
 limitL = find(z==cutoff_low*handles.und_length);
 
 if isempty(limitL)
-  limitL = 1;  
+  limitL = 1;
 end
 
 if isempty(limitH)
@@ -2951,7 +2962,7 @@ handles.gl_fit_range = [z(limitL) z(limitH)];
 
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function MingXieGL(hObject, eventdata, handles)
 % Read and write Ming Xie data to GUI
 
@@ -2974,7 +2985,7 @@ handles.mx_gl = mx_struc.L_G3D;
 set(handles.MXGAINL,'String',num2str(handles.mx_gl));
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function handles = ReadFromGUI(hObject, eventdata,  handles)
 % Read in current values from GUI
 handles.x_emit = str2double(get(handles.XEMIT,'String'));
@@ -2992,7 +3003,7 @@ handles.e_spread = e_spread*handles.energy/handles.e_rest/100;
 guidata(hObject, handles);
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function handles = UpdateGUI(hObject,eventdata,handles)
 % Writes new PV values to GUI
 
@@ -3036,7 +3047,7 @@ x_out = round(x*10^n)/10^n;
 
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function [mystring,myarg,myexp] = ExpFormat(num,prec)
 
 if num <= 0
@@ -3070,7 +3081,7 @@ function INCLUDEGEN_Callback(hObject, eventdata, handles)
 
 
 %%
-% ---------------------------------------- 
+% ----------------------------------------
 function XEmit_Callback(hObject, eventdata, handles)
 % hObject    handle to XEmit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -3633,7 +3644,7 @@ lcaPut(handles.BYKick,0);
 
 % restore undulator positions
 lcaPutSmart(handles.und_names(1:end),config);
-   
+
 und_des = ones(1,und_num);
 for j=1:und_num
   if config(j)>=handles.out_enough
@@ -3665,13 +3676,13 @@ RestoreMag(hObject, eventdata, handles);
 handles = find_kicked_mag(handles);
 
 handles = UndStatusCheck(hObject, handles);
-  
+
 AnalyzeMeas(hObject, eventdata, handles);
 
 % reset HXRSS feedback
 % FINISH FINISH FINISH
 if isfield(handles,'HXRSS_feedback_status')
-    lcaPutSmart(handles.HXRSS_feedback,handles.HXRSS_feedback_status);  
+    lcaPutSmart(handles.HXRSS_feedback,handles.HXRSS_feedback_status);
 end
 
 set(handles.STATUS,'String','Ready'); drawnow;
@@ -3690,9 +3701,9 @@ if strcmp(mag_type,'X Corr')
     mag_name = handles.xmag_names(last_und);
     myconfig = handles.saved_config_xmag;
 else
-    mag_name = handles.ymag_names(last_und);   
-    myconfig = handles.saved_config_ymag;    
-end    
+    mag_name = handles.ymag_names(last_und);
+    myconfig = handles.saved_config_ymag;
+end
 
 set(handles.STATUS,'String','Changing Corrector: Please Wait'); drawnow;
 
@@ -3839,7 +3850,7 @@ if strcmp(det,'ELoss (e-)') %|| strcmp(det,'Gas Det1') || strcmp(det,'Gas Det2')
 elseif strfind(data_type{curr_type},'Power')
   set(handles.LOGSCALE,'Value',1);
 else
-  set(handles.LOGSCALE,'Value',0);  
+  set(handles.LOGSCALE,'Value',0);
 end
 
 if strcmp(det,'Spectrometer')
@@ -4008,7 +4019,7 @@ function LOG_Callback(hObject, eventdata, handles)
 % hObject    handle to LOG (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-      
+
 
 tic
 
@@ -4022,22 +4033,22 @@ else
     first_und=1;
     last_und=33;
 end
-    
+
 % if data is new, save data
 if ~handles.saved_data
   und_in = find(handles.und_status);
   handles.data(1).inserted_und = und_in;
-    
+
   save_data = handles.data;
   mydate = clock;
   [save_file] = util_dataSave(save_data,'GainLength','',mydate);
   handles.saved_data = 1;
-  handles.file_name = save_file;    
+  handles.file_name = save_file;
 else
   save_file = handles.file_name;
 end
-  
-  
+
+
 
 
 
@@ -4054,7 +4065,7 @@ hold off
 %LogGen = get(handles.LOGGEN,'Value');
 LogGen = 0;
 if ~isempty(handles.genZ) && LogGen
-  semilogy(handles.genZ,handles.genP,'.',handles.genZ,exp(handles.gen_f),'-');    
+  semilogy(handles.genZ,handles.genP,'.',handles.genZ,exp(handles.gen_f),'-');
   hold off
 end
 
@@ -4081,11 +4092,11 @@ filt_pts = {};
 good_frac = 0;
 for j=1:num_points
   [handles,outstruc]= CheckTol_ParseData(handles,hObject,j);
-  
+
   filt_pts{j} = outstruc.power_hist*handles.yag_conv_norm;
   eloss(j) = outstruc.eloss;
   eloss_rms(j) = outstruc.eloss_rms;
-  filter_stat(j) = outstruc.filter_stat;  
+  filter_stat(j) = outstruc.filter_stat;
 
   good_frac = good_frac + handles.good_fraction;
 end
@@ -4100,63 +4111,63 @@ end
 
 
 % Plot Data
-if strcmp(det,'ELoss (e-)')  
+if strcmp(det,'ELoss (e-)')
   % plot eloss
   eloss = handles.eloss;
   errorbar(z_plot,eloss(:,2),eloss(:,3),'*b','MarkerSize',7);
   hold('on');
-  
+
   % plot undulator range
 
   h = min(eloss(:,2))-1;
   my_x=(0:34)*handles.und_length;
   my_y=ones(size(my_x))*h;
   plot(my_x,my_y,'k','linewidth',2);
-  hold('on');  
+  hold('on');
   % plot undulator range
   if isfield(handles.data(1),'inserted_und')
-      z = handles.data(1).inserted_und*handles.und_length;  
-      plot(z,h,'sg','markersize',10);    
-  end  
-  title('Energy loss from DL2 to dump');     
-  ylim([h-.5 max(eloss(:,2))+1]); 
-  ylabel('Energy Loss (MeV)');    
-  set(gca,'YScale','linear');  
+      z = handles.data(1).inserted_und*handles.und_length;
+      plot(z,h,'sg','markersize',10);
+  end
+  title('Energy loss from DL2 to dump');
+  ylim([h-.5 max(eloss(:,2))+1]);
+  ylabel('Energy Loss (MeV)');
+  set(gca,'YScale','linear');
 elseif strcmp(curr_data_type,'RMS Size')
   rms = handles.rms_plot;
   h1=errorbar(z_plot,rms(:,2),rms(:,4),'*b','MarkerSize',7);
   hold('on');
-  h2=errorbar(z_plot,rms(:,3),rms(:,5),'*r','MarkerSize',7);  
+  h2=errorbar(z_plot,rms(:,3),rms(:,5),'*r','MarkerSize',7);
   set(gca,'YScale','linear');
   legend([h1 h2],'X RMS','Y RMS','Location','Best');
-  %ylim(gca,[min(min(rms(:,2)),min(rms(:,3)))-100 max(max(rms(:,2)),max(rms(:,3)))+150]);    
+  %ylim(gca,[min(min(rms(:,2)),min(rms(:,3)))-100 max(max(rms(:,2)),max(rms(:,3)))+150]);
   ylabel('RMS (microns)');
 elseif strcmp(curr_data_type,'Position')
   pos = handles.pos_plot;
-  set(gca,'YScale','linear');    
-  h1=errorbar(z_plot,pos(:,2),pos(:,4),'*b','MarkerSize',7);  
+  set(gca,'YScale','linear');
+  h1=errorbar(z_plot,pos(:,2),pos(:,4),'*b','MarkerSize',7);
   hold('on');
   h2=errorbar(z_plot,pos(:,3),pos(:,5),'*r','MarkerSize',7);
   ylabel(gca,'Position (um)');
   legend([h1 h2],'X Position','Y Position','Location','Best');
   %ylim(GLax,[min(min(pos(:,2)),min(pos(:,3)))-100 max(max(pos(:,2)),max(pos(:,3)))+500]);
-elseif strcmp(curr_data_type,'Position Jitter')  
+elseif strcmp(curr_data_type,'Position Jitter')
   pos = handles.pos_plot;
   x=pos(:,2)-mean(pos(:,2));
-  y=pos(:,3)-mean(pos(:,3));   
-  h1=errorbar(z_plot,x,pos(:,4),'*b','MarkerSize',7);  
+  y=pos(:,3)-mean(pos(:,3));
+  h1=errorbar(z_plot,x,pos(:,4),'*b','MarkerSize',7);
   hold('on')
   h2=errorbar(z_plot,y,pos(:,5),'*r','MarkerSize',7);
-  set(gca,'YScale','linear');  
+  set(gca,'YScale','linear');
   legend([h1 h2],'X Jitter','Y Jitter','Location','Best');
-  %ylim(gca,[min(min(pos(:,2)),min(pos(:,3)))-100 max(max(pos(:,2)),max(pos(:,3)))+300]);  
+  %ylim(gca,[min(min(pos(:,2)),min(pos(:,3)))-100 max(max(pos(:,2)),max(pos(:,3)))+300]);
   ylabel('Position Jitter');
 elseif strcmp(curr_data_type,'Power Jitter')
   power_rms = handles.powerrms_plot;
-  plot(z_plot,power_rms./handles.meas_p,'*','MarkerSize',7);    
-  hold('on');  
+  plot(z_plot,power_rms./handles.meas_p,'*','MarkerSize',7);
+  hold('on');
   set(gca,'YScale','linear');
-  ylabel('Power Jitter (rel)');  
+  ylabel('Power Jitter (rel)');
 else
   % Plot all data points if desired.  otherwise plot average/peak
   if ~isempty(z_plot)
@@ -4167,16 +4178,16 @@ else
             z=handles.data(j).pos*ones(1,length(all_points));
             semilogy(z,all_points,'*r','MarkerSize',5,'MarkerFaceColor','r');
             hold on
-        end      
+        end
         semilogy(handles.measZ,exp(handles.meas_f),'-g');
     else
         for j=1:num_points
           mycolor = handles.filter_color(j,:);
-          errorbar(z_plot(j),handles.meas_p(j),handles.meas_err(j),'o','MarkerSize',9,'Color',mycolor);       
-          hold on          
+          errorbar(z_plot(j),handles.meas_p(j),handles.meas_err(j),'o','MarkerSize',9,'Color',mycolor);
+          hold on
         end
         if get(handles.LOGSCALE,'Value') && length(handles.meas_f) == length(handles.measZ)
-          semilogy(handles.measZ,exp(handles.meas_f),'-g');            
+          semilogy(handles.measZ,exp(handles.meas_f),'-g');
         end
         hold on
     end
@@ -4185,13 +4196,13 @@ else
   % plot fit range
   if isfield(handles,'gl_fit_range') && get(handles.LOGSCALE,'Value')
     fit_low = [handles.gl_fit_range(1) handles.gl_fit_range(1)];
-    fit_high = [handles.gl_fit_range(2) handles.gl_fit_range(2)];    
+    fit_high = [handles.gl_fit_range(2) handles.gl_fit_range(2)];
     vertline = [10^-20 10^20];
-    plot(fit_low,vertline,'--k',fit_high,vertline,'--k')  
+    plot(fit_low,vertline,'--k',fit_high,vertline,'--k')
   end
 
-  
-  
+
+
   % plot undulator range
   if isfield(handles.data(1),'inserted_und')
       z = handles.data(1).inserted_und*handles.und_length;
@@ -4202,7 +4213,7 @@ else
       my_x=(0:34)*handles.und_length;
       my_y=ones(size(my_x))*h;
       plot(my_x,my_y,'k','linewidth',2);
-      plot(z,h,'sg','markersize',10);  
+      plot(z,h,'sg','markersize',10);
 
   end
 
@@ -4212,41 +4223,41 @@ else
       ylabel('Energy (mJ)');
   else
       ylabel('Energy (arb. units)');
-  end      
-      
-  
+  end
 
-  temp_p = sort(handles.meas_p);    
-  mymin = temp_p(find(temp_p>0,1));   
+
+
+  temp_p = sort(handles.meas_p);
+  mymin = temp_p(find(temp_p>0,1));
   mymax = max(handles.meas_p);
   if get(handles.LOGSCALE,'Value') && mymin > 0
     ylim(gca,[mymin/5 mymax*5]);
-    logrange = floor(log10(mymin)):1:ceil(log10(mymax));    
-    set(gca,'YTick',10.^logrange);      
+    logrange = floor(log10(mymin)):1:ceil(log10(mymax));
+    set(gca,'YTick',10.^logrange);
   else
-    ylim(gca,[-mymax/5 mymax*1.2]);   
+    ylim(gca,[-mymax/5 mymax*1.2]);
   end
- 
-  
 
-  
+
+
+
   methods = get(handles.PROFMON_METHOD,'String');
   curr_method = get(handles.PROFMON_METHOD,'Value');
-  meas_method = methods(curr_method);  
-  
-  
+  meas_method = methods(curr_method);
+
+
 end
 
 xlim([0 (handles.und_num+1)*handles.und_length]);
 
 if get(handles.LOGSCALE,'Value')
-  set(gca,'YScale','log'); 
+  set(gca,'YScale','log');
 else
-  set(gca,'YScale','linear');    
+  set(gca,'YScale','linear');
 end
 
 grid on
-set(gca,'yminorgrid','on');  
+set(gca,'yminorgrid','on');
 
 methods = get(handles.MEASMETHOD,'String');
 curr_method = get(handles.MEASMETHOD,'Value');
@@ -4256,7 +4267,7 @@ meas_method = methods(curr_method);
 if strcmp(meas_method,'Move X Corr') || strcmp(meas_method,'Move Y Corr')
   meas_method = '';  % used to by XC or YC, but now use both
 else
-  meas_method = 'Und-'; 
+  meas_method = 'Und-';
 end
 
 
@@ -4267,18 +4278,18 @@ elseif any(strcmp(det,{'Dir Img Near'; 'Dir Img Wide'; 'Dir Img Henrik'}))
   detector = 'DirImg';
 elseif strcmp(det,'YAGXRAY Henrik')
   detector = 'YagX';
-elseif strcmp(det,'Gas Det1')  
+elseif strcmp(det,'Gas Det1')
   detector = 'GDet1';
-elseif strcmp(det,'Gas Det2')  
-  detector = 'GDet2';  
-elseif strcmp(det,'Gas Det Both')  
-  detector = 'GDet';  
+elseif strcmp(det,'Gas Det2')
+  detector = 'GDet2';
+elseif strcmp(det,'Gas Det Both')
+  detector = 'GDet';
 elseif strcmp(det,'Total Energy')
   detector = 'TotE';
 elseif strcmp(det,'ELoss (e-)')
-  detector = 'ELoss';  
+  detector = 'ELoss';
 elseif strcmp(det,'K-Mono')
-  detector = 'KMono';  
+  detector = 'KMono';
 end
 
 % gainlength
@@ -4289,7 +4300,7 @@ gl_sig = sprintf('%4.2f',handles.meas_gl_sig);
 if isfield(handles.data,'e_des')
   nom_e = num2str(sprintf('%4.2f',handles.data(1).e_des));            % desired energy dump
   curr_des = num2str(sprintf('%3.1f',handles.data(1).curr_des/1000));      % desired current from set point
-  lh_des = num2str(sprintf('%4.1f',handles.data(1).lh_energy_des));          % laser heater power  
+  lh_des = num2str(sprintf('%4.1f',handles.data(1).lh_energy_des));          % laser heater power
 else
   nom_e='--';
   curr_des='--';
@@ -4301,8 +4312,8 @@ str_end = length(save_file);
 filedate = save_file(str_n+2:str_end-4);
 
 %mytitle = ['Und:' num2str(first_und) 'to' num2str(last_und) ','...
-%    nom_e 'GeV,' curr_des 'kA,' 'LH=' lh_des 'uJ,'  meas_method '-' detector ',' filedate];  
-mytitle = [nom_e 'GeV,' curr_des 'kA,' 'LH=' lh_des 'uJ,'  meas_method detector ',' filedate];  
+%    nom_e 'GeV,' curr_des 'kA,' 'LH=' lh_des 'uJ,'  meas_method '-' detector ',' filedate];
+mytitle = [nom_e 'GeV,' curr_des 'kA,' 'LH=' lh_des 'uJ,'  meas_method detector ',' filedate];
 
 
 if ~strcmp(det,'ELoss (e-)')
@@ -4420,19 +4431,19 @@ handles.nom_e = lcaGetSmart('BEND:LTU0:125:BDES');
 while isnan(dl2_pos)
   set(handles.STATUS,'String','Cannot read energy: waiting for beam'); drawnow;
   pause(1);
-  dl2_pos = lcaGetSmart(ltu_bpms);  
-  
+  dl2_pos = lcaGetSmart(ltu_bpms);
+
   % If abort called end program
   handles.abort = max(get(handles.STARTMEAS,'Value'),get(handles.TAKEDATA,'Value'));
   if handles.abort == 0
-      set(handles.STATUS,'String','Aborting');  
+      set(handles.STATUS,'String','Aborting');
       drawnow
       return;
   end
-  
+
 end
 
-  
+
 delta_e = (dl2_pos(1)/handles.dl2_eta(1)+dl2_pos(2)/handles.dl2_eta(2))/2;
 my_energy = (1-delta_e)*handles.nom_e;
 
@@ -4497,12 +4508,12 @@ n_dir_img.power = 0;
 n_dir_img.x = 0;
 n_dir_img.y = 0;
 n_dir_img.xrms = 0;
-n_dir_img.yrms = 0; 
+n_dir_img.yrms = 0;
 w_dir_img.power = 0;
 w_dir_img.x = 0;
 w_dir_img.y = 0;
 w_dir_img.xrms = 0;
-w_dir_img.yrms = 0; 
+w_dir_img.yrms = 0;
 tot_energy = 0;
 tot_pix = zeros(1,handles.num_shots);
 kmono=0;
@@ -4523,13 +4534,13 @@ while ~isfinite(handles.ref_tmit) || handles.ref_tmit < handles.min_charge
   drawnow
   disp('NoCharge: waiting for beam');
   handles.ref_tmit = lcaGetSmart(handles.event_tmit_pvs{end});
-  
+
   % If abort called end program
   handles.abort = get(handles.STARTMEAS,'Value');
   if handles.abort == 0
-    handles.fail = 1;  
+    handles.fail = 1;
     return;
-  end   
+  end
 end
 
 
@@ -4545,7 +4556,7 @@ handles.di_roi_crop=get(handles.USEROI,'Value');
 % use xpp spectrometer (for self seeding)
 acq_types = get(handles.ACQ_METHOD,'String');
 curr_type = get(handles.ACQ_METHOD,'Value');
-handles.acq_method = acq_types(curr_type);  
+handles.acq_method = acq_types(curr_type);
 
 % get beam rate
 rate = lcaGetSmart('IOC:IN20:MC01:LCLSBEAMRATE');   % rep. rate % [Hz]
@@ -4559,7 +4570,7 @@ end
 %----------------------
 
 if strcmp(handles.acq_method,'Gas Detectors')
-  
+
   if ~handles.take_BSA
 
     gdet1=zeros(handles.num_shots,2);
@@ -4568,42 +4579,42 @@ if strcmp(handles.acq_method,'Gas Detectors')
     %y_eloss=zeros(handles.num_shots,length(handles.eloss_bpm_pvs));
     %curr=zeros(handles.num_shots,1);
     for j=1:handles.num_shots
-   
+
         % read in data
         gdet1(j,1:2)=lcaGetSmart(handles.gdet_pvs(1:2))' - handles.gdet1_offset(1:2);   % gdets
         gdet2(j,1:2)=lcaGetSmart(handles.gdet_pvs(3:4))' - handles.gdet2_offset(1:2);
         %x_eloss(j,:)=lcaGetSmart(handles.eloss_xbpm_pvs)';   % eloss
         %y_eloss(j,:)=lcaGetSmart(handles.eloss_xbpm_pvs)';
-        %curr(j)=lcaGetSmart(handles.curr_pvs);              % current        
-        
+        %curr(j)=lcaGetSmart(handles.curr_pvs);              % current
+
         % check that new data is different from last point.  if not, keep
         % checking until it is different
-        pause(1/rate-0.002)     % takes about 3ms to read data   
+        pause(1/rate-0.002)     % takes about 3ms to read data
         mycount=0;
         while j>1 && (any(gdet1(j,:)==gdet1(j-1,:)) || any(gdet2(j,:)==gdet2(j-1,:)))
             gdet1(j,1:2)=lcaGetSmart(handles.gdet_pvs(1:2))' - handles.gdet1_offset(1:2);
             gdet2(j,1:2)=lcaGetSmart(handles.gdet_pvs(3:4))' - handles.gdet2_offset(1:2);
             %x_eloss(j,:)=lcaGetSmart(handles.eloss_xbpm_pvs)';
             %y_eloss(j,:)=lcaGetSmart(handles.eloss_xbpm_pvs)';
-            %curr(j)=lcaGetSmart(handles.curr_pvs);              % current              
-            
+            %curr(j)=lcaGetSmart(handles.curr_pvs);              % current
+
             % stop infinite loop that happened once -- problem with GDet?
             mycount=mycount+1;
             if mycount>1e6
                 break
             end
         end
-        
+
         % or be lazy and just wait a little longer
         %pause(1.1/rate);
     end
 
 
 
-  else      
+  else
       % wait for beam;
-      pause(handles.num_shots/rate+0.1);    
-      
+      pause(handles.num_shots/rate+0.1);
+
       % check if data collection finished
       while eDefCount(handles.eDefNumber) < handles.num_shots
           pause(0.2);
@@ -4611,42 +4622,42 @@ if strcmp(handles.acq_method,'Gas Detectors')
           % If abort called end program
           handles.abort = get(handles.STARTMEAS,'Value');
           if handles.abort == 0
-            handles.fail = 1;  
+            handles.fail = 1;
             return;
-          end        
+          end
       end
 
       % turn eDef OFF
       eDefOff(handles.eDefNumber);
   end
-  
+
 %----------------------
 % K-Mono
 %----------------------
-  
+
 elseif strcmp(handles.acq_method,'K-Mono')
-  
+
   if ~handles.take_BSA
 
     gdet1=zeros(handles.num_shots,2);
     gdet2=zeros(handles.num_shots,2);
     kmono=zeros(1,handles.num_shots);
     for j=1:handles.num_shots
-   
+
         % read in data
-        kmono(j)=lcaGetSmart(handles.kmono_pvs);   % kmono    
+        kmono(j)=lcaGetSmart(handles.kmono_pvs);   % kmono
         gdet1(j,1:2)=lcaGetSmart(handles.gdet_pvs(1:2))' - handles.gdet1_offset(1:2);   % gdets
-        gdet2(j,1:2)=lcaGetSmart(handles.gdet_pvs(3:4))' - handles.gdet2_offset(1:2);        
-        
+        gdet2(j,1:2)=lcaGetSmart(handles.gdet_pvs(3:4))' - handles.gdet2_offset(1:2);
+
         % check that new data is different from last point.  if not, keep
         % checking until it is different
-        pause(1/rate)     
+        pause(1/rate)
         mycount=0;
         while j>1 && (kmono(j)==kmono(j-1) || any(gdet1(j,:)==gdet1(j-1,:)) || any(gdet2(j,:)==gdet2(j-1,:)))
-            kmono(j)=lcaGetSmart(handles.kmono_pvs);  
+            kmono(j)=lcaGetSmart(handles.kmono_pvs);
             gdet1(j,1:2)=lcaGetSmart(handles.gdet_pvs(1:2))' - handles.gdet1_offset(1:2);
             gdet2(j,1:2)=lcaGetSmart(handles.gdet_pvs(3:4))' - handles.gdet2_offset(1:2);
-            
+
             % stop infinite loop that happened once -- problem with GDet?
             mycount=mycount+1;
             if mycount>1e6
@@ -4655,10 +4666,10 @@ elseif strcmp(handles.acq_method,'K-Mono')
         end
     end
 
-  else      
+  else
       % wait for beam;
-      pause(handles.num_shots/rate+0.1);    
-      
+      pause(handles.num_shots/rate+0.1);
+
       % check if data collection finished
       while eDefCount(handles.eDefNumber) < handles.num_shots
           pause(0.2);
@@ -4666,26 +4677,26 @@ elseif strcmp(handles.acq_method,'K-Mono')
           % If abort called end program
           handles.abort = get(handles.STARTMEAS,'Value');
           if handles.abort == 0
-            handles.fail = 1;  
+            handles.fail = 1;
             return;
-          end        
+          end
       end
 
       % turn eDef OFF
       eDefOff(handles.eDefNumber);
-  end  
+  end
   % skip this step for speed
-  
+
 %----------------------
 % YAGXRAY
 %----------------------
-  
-elseif handles.yag_tag        % using YAGXRAY  
- 
+
+elseif handles.yag_tag        % using YAGXRAY
+
 
   % get data from yag xray
   % take background of spontaneous radiation
-  spont_bkgrnd = get(handles.SPONTBG,'Value');  
+  spont_bkgrnd = get(handles.SPONTBG,'Value');
   if spont_bkgrnd
     opts.nBG=0;
     opts.doProcess=0;
@@ -4695,34 +4706,34 @@ elseif handles.yag_tag        % using YAGXRAY
   opts.bufd=1;
   opts.doPlot=1;
   dataList=profmon_measure(handles.xray_profmon,handles.num_shots,opts);
-  
+
   eDefOff(handles.eDefNumber);
 
   if spont_bkgrnd
     handles = spont_background(hObject, handles);
   end
-  
-  
+
+
   % read out data
   yag_sat = zeros(1,handles.num_shots);
   for j=1:handles.num_shots
-      
+
     % subtract spontaneous background
-    if spont_bkgrnd     
-      opts.doProcess=1;      
+    if spont_bkgrnd
+      opts.doProcess=1;
       dataList(j).back=handles.spont_img;
-      dataList(j).beam=profmon_process(dataList(j),opts);  
+      dataList(j).beam=profmon_process(dataList(j),opts);
       %img = img - handles.spont_img;
     else
       % medfilt image
       %dataList(j).img = util_medfilt2(dataList(j).img);
     end
 
-    
-    img=util_medfilt2_DR(dataList(j).img);     
-    
-    yag_data{j} = dataList(j).beam;       % analyzed yag data    
-    
+
+    img=util_medfilt2_DR(dataList(j).img);
+
+    yag_data{j} = dataList(j).beam;       % analyzed yag data
+
     tot_pix(j) = sum(sum(img));     % total pixel sum (for intensity measurement)
     maxcount = max(max(img));       % maximum pixel (for yag saturation check)
     if maxcount > handles.camera_pixel_sat
@@ -4735,24 +4746,24 @@ elseif handles.yag_tag        % using YAGXRAY
           handles.yagcam_getting_low = 1;
         else
           handles.yagcam_getting_low = 0;
-        end        
+        end
     end
   end
-  handles.yagcam_sat = max(yag_sat);  
-  
+  handles.yagcam_sat = max(yag_sat);
+
 %----------------------
 % Direct Imager
 %----------------------
-  
+
 elseif use_henrik     %  using henrik's profmon GUI on the Direct Imager. set to 1 for time being
-  
+
   % get data from NFOV direct imager
-  
-  % take background of spontaneous radiation  
-  spont_bkgrnd = get(handles.SPONTBG,'Value');  
+
+  % take background of spontaneous radiation
+  spont_bkgrnd = get(handles.SPONTBG,'Value');
   if spont_bkgrnd
     opts.nBG=0;
-    opts.doProcess=0;    
+    opts.doProcess=0;
   else
     opts.nBG=1;
   end
@@ -4761,25 +4772,25 @@ elseif use_henrik     %  using henrik's profmon GUI on the Direct Imager. set to
   if strcmp(handles.acq_method,'XPP Spectrometer')
     dataList=profmon_measure(handles.xpp_spec,handles.num_shots,opts);
   elseif strcmp(handles.acq_method,'FEE Spectrometer')
-    dataList=profmon_measure(handles.fee_spec,handles.num_shots,opts); 
+    dataList=profmon_measure(handles.fee_spec,handles.num_shots,opts);
   elseif strcmp(handles.acq_method,'SXR Spectrometer')
-    dataList=profmon_measure(handles.sxr_spec,handles.num_shots,opts);     
+    dataList=profmon_measure(handles.sxr_spec,handles.num_shots,opts);
   else
     dataList=profmon_measure(handles.ndirimg_profmon,handles.num_shots,opts);
-  end      
+  end
   %dataList=profmon_measure(handles.wdirimg_profmon,handles.num_shots,opts)
 
   eDefOff(handles.eDefNumber);
 
   % find digital ROI if it doesn't already exist
-  if handles.di_roi_crop && (~isfield(handles,'pxl_roi') && ~strcmp(handles.acq_method,'Gas Detectors') || isempty(handles.pxl_roi)) 
+  if handles.di_roi_crop && (~isfield(handles,'pxl_roi') && ~strcmp(handles.acq_method,'Gas Detectors') || isempty(handles.pxl_roi))
     handles = find_roi(handles,dataList);
   end
-  
+
   % abort if roi is unacceptable
   if handles.abort==0
     handles.fail=1;
-    return    
+    return
   end
 
   % take background of spontaneous radiation
@@ -4787,45 +4798,45 @@ elseif use_henrik     %  using henrik's profmon GUI on the Direct Imager. set to
   if spont_bkgrnd
     handles = spont_background(hObject, handles);
   end
-   
-  
-  % read out data 
+
+
+  % read out data
   yag_sat = zeros(1,handles.num_shots);
   for j=1:handles.num_shots
-  
+
     % crop image digitally since ROI is unavailable
     if handles.di_roi_crop && (strcmp(handles.xpp_spec,'XPP:OPAL1K:1:LiveImage') || strcmp(handles.sxr_spec,'SXR:EXS:CVV:01:IMAGE_CMPX'))
         dataList(j).img = dataList(j).img(handles.pxl_roi(1):handles.pxl_roi(2));
     elseif handles.di_roi_crop
       dataList(j) = profmon_imgCrop(dataList(j),handles.pxl_roi);
     end
-    
+
 
     % subtract spontaneous background
     if spont_bkgrnd
-      opts.doProcess=1;      
+      opts.doProcess=1;
       dataList(j).back=handles.spont_img;
-      dataList(j).beam=profmon_process(dataList(j),opts);  
-      %img = img - handles.spont_img;  
+      dataList(j).beam=profmon_process(dataList(j),opts);
+      %img = img - handles.spont_img;
     else
       % medfilt image
-      % dataList(j).img = util_medfilt2(dataList(j).img);      
+      % dataList(j).img = util_medfilt2(dataList(j).img);
     end
-    
+
     if (strcmp(handles.acq_method,'XPP Spectrometer') || strcmp(handles.acq_method,'FEE Spectrometer') || strcmp(handles.acq_method,'SXR Spectrometer')) ...
             && (strcmp(handles.xpp_spec,'XPP:OPAL1K:1:LiveImage') || strcmp(handles.fee_spec,'CAMR:FEE1:441:IMAGE_CMPX') || strcmp(handles.sxr_spec,'SXR:EXS:CVV:01:IMAGE_CMPX'))
-        img = dataList(j).img;   
+        img = dataList(j).img;
     else
-        img=util_medfilt2(double(dataList(j).img));  
+        img=util_medfilt2(double(dataList(j).img));
     end
-    
-    di_yag_data{j} = dataList(j).beam;       % analyzed yag data  
-    
-    tot_pix(j) = sum(sum(img));  
-    
+
+    di_yag_data{j} = dataList(j).beam;       % analyzed yag data
+
+    tot_pix(j) = sum(sum(img));
+
     % CHECK IF RAWMAX WORKING YET OR TAKE OUT !!!!!
-    %maxcount = lcaGet('DIAG:FEE1:481:RawMax');      
-    maxcount = max(max(img));  
+    %maxcount = lcaGet('DIAG:FEE1:481:RawMax');
+    maxcount = max(max(img));
     if maxcount > handles.di_camera_pixel_sat
         yag_sat(j) = 1;
     elseif maxcount < handles.di_camera_pixel_sat/(1.5*handles.filter_strength)
@@ -4841,11 +4852,11 @@ elseif use_henrik     %  using henrik's profmon GUI on the Direct Imager. set to
   end
   handles.ncam_dirimg_sat = max(yag_sat);
 
-  
+
 %----------------------
 % Broken LLNL crap
 %----------------------
-  
+
 elseif handles.llnl_nightmare       % the LLNL nightmare software
 
   rate = lcaGetSmart('IOC:IN20:MC01:LCLSBEAMRATE');   % rep. rate % [Hz]
@@ -4853,13 +4864,13 @@ elseif handles.llnl_nightmare       % the LLNL nightmare software
     rate = 1;
   end
 
-  if ~di_bsa  
+  if ~di_bsa
       n_di_temp = zeros(handles.num_shots,8);
-      w_di_temp = zeros(handles.num_shots,8);  
+      w_di_temp = zeros(handles.num_shots,8);
       % TAKE OUT WHEN FEE WORKS (YEAH RIGHT!)
       for j=1:handles.num_shots
         n_di_temp(j,:) = lcaGetSmart(handles.ndir_img_pvs);
-        w_di_temp(j,:) = lcaGetSmart(handles.wdir_img_pvs);        
+        w_di_temp(j,:) = lcaGetSmart(handles.wdir_img_pvs);
         if rate ~=0 && rate > 1
           pause(.2)
         else
@@ -4867,17 +4878,17 @@ elseif handles.llnl_nightmare       % the LLNL nightmare software
         end
       end
   else
-      pause(handles.num_shots/rate+0.3);  % wait extra 0.3 seconds just in case...      
+      pause(handles.num_shots/rate+0.3);  % wait extra 0.3 seconds just in case...
   end
-  
+
 
 
   % no yagxray inserted to saturate
   handles.yagcam_sat = 0;
-  
-  eDefOff(handles.eDefNumber);  
+
+  eDefOff(handles.eDefNumber);
 end
-  
+
 % Record optical density filters on camera
 OD = lcaGetSmart(handles.OD_pvs,1,'double');
 di_OD = lcaGetSmart(handles.di_OD_pos_pvs,1,'double');
@@ -4903,7 +4914,7 @@ if handles.take_BSA
     if di_bsa
       [readPV_n_dir_img]=util_readPVHst(handles.ndir_img_pvs,handles.eDefNumber,1);     % near direct imager
       [readPV_w_dir_img]=util_readPVHst(handles.wdir_img_pvs,handles.eDefNumber,1);     % wide direct imager
-    end  
+    end
     [readPV_gdet]=util_readPVHst(handles.gdet_pvs,handles.eDefNumber,1);              % gas detector
     if strcmp(handles.acq_method,'K-Mono')
         [readPV_kmono]=util_readPVHst(handles.kmono_pvs,handles.eDefNumber,1);              % gas detector
@@ -4929,7 +4940,7 @@ if handles.take_BSA
           if isempty(idx), idx=1;id=1;end
           use(j)=idx(id);
       end
-    else  
+    else
       use = 1:handles.num_shots;    % if using DI acquisition (BSA broken), just use first 'handles.numshots' shots
     end
 
@@ -4939,7 +4950,7 @@ if handles.take_BSA
     % save event data from pulse IDs that matched
     for j=1:handles.num_shots
         % tolerance data (current, orbit and tmit)
-        if numel(readPV_curr.val)>use(j)        
+        if numel(readPV_curr.val)>use(j)
             curr(j)=readPV_curr.val(use(j));
         else
             curr(j)=0;
@@ -4952,34 +4963,34 @@ if handles.take_BSA
 
         % bpms for eloss
         for k=1:size(readPV_x_eloss,1)
-            x_eloss(j,k)=readPV_x_eloss(k).val(use(j));  
-            y_eloss(j,k)=readPV_y_eloss(k).val(use(j));          
+            x_eloss(j,k)=readPV_x_eloss(k).val(use(j));
+            y_eloss(j,k)=readPV_y_eloss(k).val(use(j));
         end
 
 
         % gas detector
         % FINISH FINISH FINISH
         for k=1:2
-            gdet1(j,k)=readPV_gdet(k).val(use(j)) - handles.gdet1_offset(k); 
+            gdet1(j,k)=readPV_gdet(k).val(use(j)) - handles.gdet1_offset(k);
             gdet2(j,k)=readPV_gdet(k+2).val(use(j)) - handles.gdet2_offset(k);
-        end  
+        end
 
         if strcmp(handles.acq_method,'K-Mono')
             kmono(j)=readPV_kmono.val(use(j));              % gas detector
-        end        
-        
-        
+        end
+
+
     %     % total energy detector
     %     for k=1:size(readPV_tedet,1)
-    %         tedet(j,k)=readPV_tedet(k).val(use(j));       
-    %     end      
+    %         tedet(j,k)=readPV_tedet(k).val(use(j));
+    %     end
 
-        % direct imager, saturation and power data      
-        if di_bsa      
+        % direct imager, saturation and power data
+        if di_bsa
           for k=1:size(readPV_n_dir_img,1)
-              n_di_temp(j,k)=readPV_n_dir_img(k).val(use(j));  
-              w_di_temp(j,k)=readPV_w_dir_img(k).val(use(j));        
-          end     
+              n_di_temp(j,k)=readPV_n_dir_img(k).val(use(j));
+              w_di_temp(j,k)=readPV_w_dir_img(k).val(use(j));
+          end
         end
     end
 
@@ -5030,7 +5041,7 @@ if handles.take_BSA
     n_dir_img.x = temp_dir(:,5);
     n_dir_img.y = temp_dir(:,6);
     n_dir_img.xrms = temp_dir(:,7);
-    n_dir_img.yrms = temp_dir(:,8); 
+    n_dir_img.yrms = temp_dir(:,8);
 
     temp_dir = w_di_temp;
     wcam_dirimg_sat = temp_dir(:,raw_or_roi);
@@ -5038,11 +5049,11 @@ if handles.take_BSA
     w_dir_img.x = temp_dir(:,5);
     w_dir_img.y = temp_dir(:,6);
     w_dir_img.xrms = temp_dir(:,7);
-    w_dir_img.yrms = temp_dir(:,8); 
+    w_dir_img.yrms = temp_dir(:,8);
 
 
 
-    % check saturation of camera for direct image software 
+    % check saturation of camera for direct image software
     if ~handles.yag_tag && ~use_henrik
 
       % Check for direct imager camera saturation
@@ -5056,11 +5067,11 @@ if handles.take_BSA
         handles.ncam_dirimg_sat = -1;
       else
         handles.ncam_dirimg_sat = 0;
-        if nmax < handles.di_camera_pixel_sat/(1.1*handles.di_filter_strength)    
-          handles.ncam_di_getting_low = 1;      
+        if nmax < handles.di_camera_pixel_sat/(1.1*handles.di_filter_strength)
+          handles.ncam_di_getting_low = 1;
         else
-          handles.ncam_di_getting_low = 0;      
-        end    
+          handles.ncam_di_getting_low = 0;
+        end
       end
 
       % check wide FOV
@@ -5070,10 +5081,10 @@ if handles.take_BSA
         handles.wcam_dirimg_sat = -1;
       else
         handles.wcam_dirimg_sat = 0;
-        if wmax < handles.di_camera_pixel_sat/(1.1*handles.di_filter_strength)    
-          handles.wcam_di_getting_low = 1;      
+        if wmax < handles.di_camera_pixel_sat/(1.1*handles.di_filter_strength)
+          handles.wcam_di_getting_low = 1;
         else
-          handles.wcam_di_getting_low = 0;      
+          handles.wcam_di_getting_low = 0;
         end
       end
     end
@@ -5154,12 +5165,12 @@ if  isfield(handles.data,'raw_data')
     OD = [0 0 0];
   else
     OD = handles.data(entry).OD;
-  end  
+  end
   if ~any(strcmp(detector,{'YAGXRAY Henrik'; 'ELoss (e-)'}))
-    set(handles.DETECTOR,'Value',1); 
+    set(handles.DETECTOR,'Value',1);
     detector = 'YAGXRAY Henrik';
   end
-elseif isfield(handles.data,'raw_pwr')  
+elseif isfield(handles.data,'raw_pwr')
   raw_pwr = handles.data(entry).raw_pwr;
   xpos = handles.data(entry).raw_x;
   ypos = handles.data(entry).raw_y;
@@ -5171,7 +5182,7 @@ elseif isfield(handles.data,'raw_pwr')
     detector = 'YAGXRAY Henrik';
   end
 elseif strcmp(detector,'YAGXRAY Henrik')
-  % read profmon analysis method of choice  
+  % read profmon analysis method of choice
   prof_meth = get(handles.PROFMON_METHOD,'Value');
   mydat = handles.data(entry).raw_yag;
   % check for null data
@@ -5183,73 +5194,73 @@ elseif strcmp(detector,'YAGXRAY Henrik')
             xpos(j) = 0;
             ypos(j) = 0;
             xrms(j) = 0;
-            yrms(j) = 0;            
+            yrms(j) = 0;
         else
             mystats = tempdat(prof_meth).stats;
             xpos(j) = mystats(1);
             ypos(j) = mystats(2);
             xrms(j) = mystats(3);
             yrms(j) = mystats(4);
-            raw_pwr(j) = mystats(6);    
+            raw_pwr(j) = mystats(6);
         end
     else
         xpos(j) = 0;
         ypos(j) = 0;
         xrms(j) = 0;
         yrms(j) = 0;
-        raw_pwr(j) = 0;          
+        raw_pwr(j) = 0;
     end
-    
-  end  
-  OD = handles.data(entry).OD; 
+
+  end
+  OD = handles.data(entry).OD;
 elseif strcmp(detector,'Dir Img Henrik') || strcmp(detector,'Spectrometer')
-  % read profmon analysis method of choice  
+  % read profmon analysis method of choice
   prof_meth = get(handles.PROFMON_METHOD,'Value');
   mydat = handles.data(entry).di_raw_yag;
   % check for null data
   for j=1:length(mydat)
     tempdat = mydat{j};
-    if isfield(tempdat(1),'stats') 
+    if isfield(tempdat(1),'stats')
         if prof_meth == 8                   % use total pixel count
             raw_pwr(j) = handles.data(entry).yag_tot_pix(j);
             xpos(j) = 0;
             ypos(j) = 0;
             xrms(j) = 0;
-            yrms(j) = 0;            
+            yrms(j) = 0;
         else
             mystats = tempdat(prof_meth).stats;
             xpos(j) = mystats(1);
             ypos(j) = mystats(2);
             xrms(j) = mystats(3);
             yrms(j) = mystats(4);
-            raw_pwr(j) = mystats(6);    
-        end        
+            raw_pwr(j) = mystats(6);
+        end
     else
         xpos(j) = 0;
         ypos(j) = 0;
         xrms(j) = 0;
         yrms(j) = 0;
-        raw_pwr(j) = 0;          
+        raw_pwr(j) = 0;
     end
-    
-    
-  end  
-  di_OD = handles.data(entry).di_OD;   
+
+
+  end
+  di_OD = handles.data(entry).di_OD;
   total_trans = handles.data(entry).attens(1)*handles.data(entry).attens(2);  % total attenuator transmission factor
 elseif strcmp(detector, 'Dir Img Near')
   raw_pwr = handles.data(entry).n_dir_img.power;
   xpos = handles.data(entry).n_dir_img.x;
   ypos = handles.data(entry).n_dir_img.y;
   xrms = handles.data(entry).n_dir_img.xrms;
-  yrms = handles.data(entry).n_dir_img.yrms;  
-  di_OD = handles.data(entry).di_OD;  
-  total_trans = handles.data(entry).attens(1)*handles.data(entry).attens(2);   
+  yrms = handles.data(entry).n_dir_img.yrms;
+  di_OD = handles.data(entry).di_OD;
+  total_trans = handles.data(entry).attens(1)*handles.data(entry).attens(2);
 elseif strcmp(detector, 'Dir Img Wide')
   raw_pwr = handles.data(entry).w_dir_img.power;
   xpos = handles.data(entry).w_dir_img.x;
   ypos = handles.data(entry).w_dir_img.y;
   xrms = handles.data(entry).w_dir_img.xrms;
-  yrms = handles.data(entry).w_dir_img.yrms;   
+  yrms = handles.data(entry).w_dir_img.yrms;
 elseif strcmp(detector, 'Gas Det1')
   gdet1 = handles.data(entry).gdet1;
   raw_pwr = mean(gdet1,2);
@@ -5257,35 +5268,35 @@ elseif strcmp(detector, 'Gas Det1')
 elseif strcmp(detector, 'Gas Det2')
   gdet2 = handles.data(entry).gdet2;
   raw_pwr = mean(gdet2,2);
-  total_trans = handles.data(entry).attens(1)*handles.data(entry).attens(2); 
+  total_trans = handles.data(entry).attens(1)*handles.data(entry).attens(2);
 elseif strcmp(detector, 'Gas Det Both')
   gdet1 = handles.data(entry).gdet1;
   gdet2 = handles.data(entry).gdet2;
   % for low pulse energies (lower gdet2_cal) use gdet2
   if handles.data(entry).gdet2_cal<max(vertcat(handles.data.gdet2_cal))
       gdetboth=gdet2;
-      total_trans = handles.data(entry).attens(1)*handles.data(entry).attens(2); 
+      total_trans = handles.data(entry).attens(1)*handles.data(entry).attens(2);
   else % otherwise use gdet1
       gdetboth=gdet1;
       total_trans=1;
-  end  
+  end
   raw_pwr = mean(gdetboth,2);
-  
-elseif strcmp(detector, 'Total Energy')  
+
+elseif strcmp(detector, 'Total Energy')
   tedet = handles.data(entry).tot_energy;
-  raw_pwr = mean(tedet,2);  
-  total_trans = handles.data(entry).attens(1)*handles.data(entry).attens(2);   
-elseif strcmp(detector, 'ELoss (e-)')  
-  eloss = handles.data(entry).raw_eloss; 
+  raw_pwr = mean(tedet,2);
+  total_trans = handles.data(entry).attens(1)*handles.data(entry).attens(2);
+elseif strcmp(detector, 'ELoss (e-)')
+  eloss = handles.data(entry).raw_eloss;
   raw_pwr = eloss;
 elseif strcmp(detector, 'K-Mono')
   kmono = handles.data(entry).kmono;
   raw_pwr = mean(kmono);
-  total_trans=1;  
+  total_trans=1;
 end
 
 if isempty(eloss)
-  eloss = handles.data(entry).raw_eloss;    
+  eloss = handles.data(entry).raw_eloss;
 end
 
 if isempty(xpos)
@@ -5304,42 +5315,42 @@ if strcmp(detector,'YAGXRAY Henrik')
   end
 
   if length(OD) < 3;
-    OD(3) = 0;  
+    OD(3) = 0;
   end
   OD_val1 = str2num(get(handles.ODFILTER1,'String'));
   OD_val2 = str2num(get(handles.ODFILTER2,'String'));
   Ni_val = str2num(get(handles.NIFOIL,'String'));
-  
+
   raw_pwr = raw_pwr*OD_val1^OD(1)*OD_val2^(OD(2))*Ni_val^(OD(3));
   filter_stat = OD(1)+2*OD(2);
 elseif strcmp(detector,'Dir Img Henrik') || strcmp(detector,'Spectrometer')
   if any(~isfinite(di_OD)) && ~handles.yag_tag && handles.use_yag
     errordlg('Cannot read Direct Imager OD filter status','di_OD error');
-  end  
-  
+  end
+
   raw_pwr = raw_pwr*handles.di_filter_strength^(di_OD(1))/total_trans;
   log_trans = -log(total_trans+eps);
   if log_trans > 3; log_trans = 3; end;
-  filter_stat = 3-log_trans;  
+  filter_stat = 3-log_trans;
   %filter_stat = 3;
 elseif strcmp(detector,'Dir Img Near')
   if any(~isfinite(di_OD)) && ~handles.yag_tag && handles.use_yag
     errordlg('Cannot read Direct Imager OD filter status','di_OD error');
-  end  
-  
+  end
+
   raw_pwr = raw_pwr*handles.di_filter_strength^(di_OD(1));
   log_trans = -log(total_trans+eps);
   if log_trans > 3; log_trans = 3; end;
-  filter_stat = 3-log_trans;  
-  %filter_stat = 3;  
+  filter_stat = 3-log_trans;
+  %filter_stat = 3;
 elseif any(strcmp(detector,{'Gas Det2';'Gas Det Both'; 'Total Energy'}))
-  
-  if isfield(handles.data,'gdet2_cal')    
-      raw_pwr = raw_pwr*handles.data(entry).gdet2_cal;      
+
+  if isfield(handles.data,'gdet2_cal')
+      raw_pwr = raw_pwr*handles.data(entry).gdet2_cal;
   else
-      raw_pwr = raw_pwr/total_trans;      
-  end    
-    
+      raw_pwr = raw_pwr/total_trans;
+  end
+
   log_trans = -log(total_trans+eps);
   if log_trans > 3; log_trans = 3; end;
   filter_stat = 3-log_trans;
@@ -5362,23 +5373,23 @@ if handles.tol_status && handles.online
 
     % Account for bug in orbit calculation
     if isfield(handles.data,'xorb_max')
-      if length(handles.data(entry).xorb_max) ~= length(tmit)        
+      if length(handles.data(entry).xorb_max) ~= length(tmit)
         x = handles.data(entry).raw_orbit(1:30,:);
         y = handles.data(entry).raw_orbit(31:60,:);
         xorb_max = max(x,[],2);
-        yorb_max = max(y,[],2); 
+        yorb_max = max(y,[],2);
       else
         xorb_max = handles.data(entry).xorb_max;
-        yorb_max = handles.data(entry).yorb_max;        
+        yorb_max = handles.data(entry).yorb_max;
       end
     else
       xorb_max = zeros(size(tmit));
-      yorb_max = zeros(size(tmit));      
+      yorb_max = zeros(size(tmit));
     end
-        
+
     % calculate average angular orbit jitter in urad;
     %d=x-circshift(x,[-1 0]); a=d/3.4; mean(std(a,[],2))*1e3
-        
+
     handles.sig_tmit = str2num(get(handles.SIGTMIT,'String'));
     handles.sig_energy = str2num(get(handles.SIGENERGY,'String'));
     handles.sig_curr = str2num(get(handles.SIGCURR,'String'));
@@ -5401,18 +5412,18 @@ if handles.tol_status && handles.online
       delta_e = ones(1,nval)*delta_e(1);
     end
     for j=1:nval;
-      if abs(tmit(j)-handles.ref_tmit)/handles.ref_tmit > handles.sig_tmit  
+      if abs(tmit(j)-handles.ref_tmit)/handles.ref_tmit > handles.sig_tmit
         handles.within_tol(j) = 0;
         %set(handles.STATUS,'String','Bad charge, skipping pulse');
         %drawnow
       elseif abs(delta_e(j)-handles.ref_e) > handles.sig_energy
         handles.within_tol(j) = 0;
         %set(handles.STATUS,'String','Bad energy, skipping pulse');
-        %drawnow    
+        %drawnow
       elseif abs(curr(j)-handles.ref_curr)/handles.ref_curr > handles.sig_curr
         handles.within_tol(j) = 0;
         %set(handles.STATUS,'String','Bad energy, skipping pulse');
-        %drawnow    
+        %drawnow
       elseif max([xorb_max(j) yorb_max(j)]) > handles.sig_orbit/1000
         handles.within_tol(j) = 0;
         %set(handles.STATUS,'String','Bad orbit, skipping pulse');
@@ -5420,7 +5431,7 @@ if handles.tol_status && handles.online
       end
     end
 
-    % fraction within tol    
+    % fraction within tol
     handles.good_fraction = sum(handles.within_tol)/num_shots;
     if handles.good_fraction < 1/2
       set(handles.STATUS,'String','Poor stability: throwing out most points'); drawnow;
@@ -5428,7 +5439,7 @@ if handles.tol_status && handles.online
 
 else
     handles.good_fraction = 1;
-    handles.within_tol = 1:num_shots;  
+    handles.within_tol = 1:num_shots;
 end
 
 
@@ -5446,8 +5457,8 @@ for p=1:num_shots
     xrms_hist(j) = xrms(p);
     yrms_hist(j) = yrms(p);
     xpos_hist(j) = xpos(p);
-    ypos_hist(j) = ypos(p);        
-    eloss_hist(j) = eloss(p);                
+    ypos_hist(j) = ypos(p);
+    eloss_hist(j) = eloss(p);
     j=j+1;
   end
 end
@@ -5491,7 +5502,7 @@ alfay  = zeros(nbpms,1);
 etax   = zeros(nbpms,1);
 
 
-  
+
 global modelSource;
 
 if isempty(strfind(BPM_pvs{1},'LTU')) && isempty(strfind(BPM_pvs{1},'UND'))
@@ -5505,12 +5516,12 @@ for j = 1:nbpms
   BPM_micrs(j,:) = BPM_SLC_name(6:9);
   BPM_units(j)   = str2int(BPM_SLC_name(11:end));
   try
-    %twiss2 = aidaget([BPM_SLC_name '//twiss'],'doublea',{'TYPE=DATABASE'});
+    %twiss2 = aidaget([BPM_SLC_name ':twiss'],'doublea',{'TYPE=DATABASE'});
     twiss = model_rMatGet(BPM_pvs{j},[],'TYPE=DESIGN','twiss');
   catch
-    disp(['You have angered the EPICS Gods by asking for twiss params from ',BPM_pvs{j}]); 
+    disp(['You have angered the EPICS Gods by asking for twiss params from ',BPM_pvs{j}]);
   end
-  %twiss = cell2mat(twiss);  
+  %twiss = cell2mat(twiss);
   energy(j) = twiss(1,:);
   betax(j)  = twiss(3,:);
   alfax(j)  = twiss(4,:);
@@ -5520,7 +5531,7 @@ for j = 1:nbpms
 end
 
 
-r=model_rMatGet(BPM_pvs{end},BPM_pvs);    
+r=model_rMatGet(BPM_pvs{end},BPM_pvs);
 JSet.R1s = permute(r(1,[1 2 3 4 6],:),[3 2 1]);
 JSet.R3s = permute(r(3,[1 2 3 4 6],:),[3 2 1]);
 
@@ -5652,19 +5663,19 @@ fail = handles.fail;
 % % reference charge
 % handles.ref_tmit = lcaGetSmart(handles.event_tmit_pvs{end});
 % while ~isfinite(handles.ref_tmit) || handles.ref_tmit < handles.min_charge
-%   set(handles.STATUS,'String','No charge: waiting for beam'); 
+%   set(handles.STATUS,'String','No charge: waiting for beam');
 %   disp('NoCharge: waiting for beam');
 %   pause(1)
 %   handles.ref_tmit = lcaGetSmart(handles.event_tmit_pvs{end});
-%   
+%
 %   % If abort called end program
 %   handles.abort = get(hObject,'Value');
 %   if handles.abort == 0
-%     fail = 1;  
+%     fail = 1;
 %     break;
-%   end   
+%   end
 % end
-% 
+%
 % % Take reference orbit
 % accept = 'Retake';
 % xpos = zeros(size(handles.event_x_pvs));
@@ -5678,44 +5689,44 @@ fail = handles.fail;
 %   handles.JSet = Fit_Setup(handles.event_pvs(3:last), hObject, handles);    % setup for fitting orbits
 %   xpos = lcaGetSmart(handles.event_x_pvs)';
 %   ypos = lcaGetSmart(handles.event_y_pvs)';
-%   
+%
 %   % reference charge
-%   handles.ref_tmit = lcaGetSmart(handles.event_tmit_pvs{end});  
-%   
+%   handles.ref_tmit = lcaGetSmart(handles.event_tmit_pvs{end});
+%
 %   % Reference energy
 %   dl2_pos = xpos(1:2);
 %   delta_e = (dl2_pos(1)/handles.dl2_eta(1)+dl2_pos(2)/handles.dl2_eta(2))/2;
 %   handles.ref_energy = delta_e;
-%   
+%
 %   % Reference current
 %   handles.ref_curr = lcaGetSmart(handles.curr_pvs);
-%   
+%
 %   [handles.ref_xlaunch,handles.ref_ylaunch] = Fit_Orbit(handles,xpos(3:last),ypos(3:last),handles.JSet);
 %   figure(100);
 %   subplot(2,1,1),stem(xpos(3:end));ylabel('x(mm)');xlabel('BPM');
 %   subplot(2,1,2),stem(ypos(3:end));ylabel('y(mm)');xlabel('BPM');
-%   
+%
 %   mycharge = ExpFormat(handles.ref_tmit,3);
 %   mycurr = ExpFormat(handles.ref_curr,3);
 %   subplot(2,1,1);title(['Charge=' mycharge ' Current=' mycurr]);
-%   
+%
 %   % Prompt user to OK reference orbit
 %   % Plot orbit
 %   accept = questdlg('Reference orbit OK?','Reference Orbit','Accept','Retake','Accept');
-% 
+%
 %   % Check for beam again
 %   check_beam = lcaGetSmart(handles.event_tmit_pvs{end});
 %   while ~isfinite(check_beam) || check_beam < handles.min_charge
-%     set(handles.STATUS,'String','No charge: waiting for beam'); 
-%     disp('NoCharge: waiting for beam');    
+%     set(handles.STATUS,'String','No charge: waiting for beam');
+%     disp('NoCharge: waiting for beam');
 %     pause(1)
 %     check_beam = lcaGetSmart(handles.event_tmit_pvs{end});
 %     % If abort called end program
 %     handles.abort = get(hObject,'Value');
 %     if handles.abort == 0
-%       fail = 1;  
+%       fail = 1;
 %       break;
-%     end   
+%     end
 %   end
 % end
 
@@ -5727,7 +5738,7 @@ handles.ref_ylaunch=[0;0];
 handles.ref_curr = lcaGetSmart(handles.curr_softpvs);
 handles.ref_energy = lcaGetSmart(handles.energy_pvs);
 handles.ref_tmit = lcaGetSmart(handles.tmit_softpvs)*handles.nC_to_ne;
-  
+
 % check if failed
 handles.fail = fail;
 
@@ -6083,19 +6094,19 @@ function LOAD_Callback(hObject, eventdata, handles)
 handles = dataOpen(hObject, handles);
 
 if isfield(handles.data,'use_gdet') && handles.data(1).use_gdet
-    set(handles.DETECTOR,'Value',5) 
+    set(handles.DETECTOR,'Value',5)
 elseif isfield(handles.data,'use_kmono') && handles.data(1).use_kmono
-    set(handles.DETECTOR,'Value',8)     
-elseif ~isfield(handles.data, 'di_raw_yag') || ~isfield(handles.data(1).di_raw_yag{1},'stats')  
+    set(handles.DETECTOR,'Value',8)
+elseif ~isfield(handles.data, 'di_raw_yag') || ~isfield(handles.data(1).di_raw_yag{1},'stats')
     set(handles.DETECTOR,'Value',5)
 elseif isfield(handles.data,'use_xpp_spec') && handles.data(1).use_xpp_spec
-    set(handles.DETECTOR,'Value',7)   
+    set(handles.DETECTOR,'Value',7)
 elseif isfield(handles.data,'use_sxr_spec') && handles.data(1).use_sxr_spec
-    set(handles.DETECTOR,'Value',7)   
+    set(handles.DETECTOR,'Value',7)
 elseif isfield(handles.data,'use_spec') && handles.data(1).use_spec
-    set(handles.DETECTOR,'Value',7)       
+    set(handles.DETECTOR,'Value',7)
 else
-    set(handles.DETECTOR,'Value',2)    
+    set(handles.DETECTOR,'Value',2)
 end
 
 
@@ -6128,7 +6139,7 @@ guidata(hObject,handles);
 
 
 % Guesses proper range for fitting gain length
-function GuessGLRange(handles) 
+function GuessGLRange(handles)
 
 %return
 
@@ -6187,8 +6198,8 @@ u2 = round(z(z2)/handles.und_length);
 
 
 % Don't let guess go around HXRSS chicane
-if (u1==15 || u1==16) && u2>17 
-    u1=17; 
+if (u1==15 || u1==16) && u2>17
+    u1=17;
 elseif u1<15 && u2>15
     u2=15;
 end
@@ -6197,9 +6208,9 @@ end
 if u2>13 && u1 < 10
     u1=10;
 elseif(u1==8 || u1==9) && u2>10
-    u1=10; 
+    u1=10;
 elseif u1<8 && u2>8
-    u2=8;    
+    u2=8;
 end
 
 
@@ -6388,19 +6399,19 @@ if ~handles.online
 end
 
 % reset YAGXRAY filter
-lcaPutSmart(handles.OD_pvs,OD_init);  % otherwise, reset filters                      
+lcaPutSmart(handles.OD_pvs,OD_init);  % otherwise, reset filters
 
-% reset di filters to initial positions 
+% reset di filters to initial positions
 if di_OD_init(1) < 6
   lcaPutSmart(handles.ndi_pos_pvs{di_OD_init(1)+1},1);
 end
 if di_OD_init(2) < 6
-  lcaPutSmart(handles.wdi_pos_pvs{di_OD_init(2)+1},1);   
+  lcaPutSmart(handles.wdi_pos_pvs{di_OD_init(2)+1},1);
 end
 
 %reset atten
 lcaPutSmart(handles.atten_control_pvs{1},attens_init);
-lcaPutSmart(handles.atten_control_pvs{2},3); 
+lcaPutSmart(handles.atten_control_pvs{2},3);
 
 
 
@@ -6430,7 +6441,7 @@ else
     OD = lcaGetSmart(handles.di_OD_pos_pvs,1,'double');
 end
 
-if isfield(handles,'spont_img') && handles.last_spont(1) == OD(1) && handles.last_spont(2)==OD(2) && ~strcmp(handles.methods(handles.currmethod),'Move Undulators') 
+if isfield(handles,'spont_img') && handles.last_spont(1) == OD(1) && handles.last_spont(2)==OD(2) && ~strcmp(handles.methods(handles.currmethod),'Move Undulators')
     return
 else
     handles.last_spont = OD;
@@ -6438,15 +6449,15 @@ end
 
 
 % Alert user
-curr_status=get(handles.STATUS,'String');  
+curr_status=get(handles.STATUS,'String');
 set(handles.STATUS,'String','Taking spontaneous background'); drawnow;
 
 % Record and Turn off und_launch feedback
-synch_feedback_status = lcaGetSmart(handles.feedback,0,'double');        
-lcaPutSmart(handles.feedback,0);      
+synch_feedback_status = lcaGetSmart(handles.feedback,0,'double');
+lcaPutSmart(handles.feedback,0);
 
 % Suppress FEL process by kicking first mag
-MoveMag(handles,handles.firstmag,handles.firstmag_kick,'perturb');        
+MoveMag(handles,handles.firstmag,handles.firstmag_kick,'perturb');
 
 
 opts.nBG=0;
@@ -6455,7 +6466,7 @@ opts.median=0;  % take median of nearest neighbors
 opts.doPlot=1;
 
 
-if handles.yag_tag  
+if handles.yag_tag
     dataList=profmon_measure(handles.xray_profmon,handles.num_shots,opts);
 elseif strcmp(handles.acq_method,'XPP Spectrometer')
     dataList=profmon_measure(handles.xpp_spec,handles.num_shots,opts);
@@ -6469,12 +6480,12 @@ end
 for j=1:handles.num_shots
 
 %     if j==1
-%         spont_img = util_medfilt2(dataList(j).img);        
+%         spont_img = util_medfilt2(dataList(j).img);
 %     else
 %         spont_img = spont_img + util_medfilt2(dataList(j).img);
 %     end
     if j==1
-        spont_img = dataList(j).img;        
+        spont_img = dataList(j).img;
     else
         spont_img = spont_img + dataList(j).img;
     end
@@ -6483,7 +6494,7 @@ handles.spont_img = spont_img/handles.num_shots;
 
 
 % Restore mag to revive FEL process
-MoveMag(handles,handles.firstmag,handles.firstmag_start_pos,'trim');         
+MoveMag(handles,handles.firstmag,handles.firstmag_start_pos,'trim');
 
 
 
@@ -6499,7 +6510,7 @@ lcaPutSmart(handles.feedback,synch_feedback_status);
 set(handles.STATUS,'String',curr_status); drawnow;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
+
 
 
 function handles = find_roi(handles,dataList)
@@ -6532,24 +6543,24 @@ roi(3)=max(round(fel_row-h/2),1);
 roi(4)=min(round(fel_row+h/2),Npy);
 
 % hard code ROI for spectrometer
-if (strcmp(handles.xpp_spec,'XPP:OPAL1K:1:LiveImage') || strcmp(handles.sxr_spec,'SXR:EXS:CVV:01:IMAGE_CMPX'))  % LiveImage and Hprj give only vector output 
+if (strcmp(handles.xpp_spec,'XPP:OPAL1K:1:LiveImage') || strcmp(handles.sxr_spec,'SXR:EXS:CVV:01:IMAGE_CMPX'))  % LiveImage and Hprj give only vector output
     roi(1) = 1; roi(2) = 1024;
     clim=[min(img(:)) max(img(:))];
     figure(102); imagesc(img(roi(1):roi(2)),clim);
-    roi_ans = questdlg('Is ROI of direct imager acceptable?','Spectrometer Digital ROI','Continue','Enter New ROI','Continue');   
+    roi_ans = questdlg('Is ROI of direct imager acceptable?','Spectrometer Digital ROI','Continue','Enter New ROI','Continue');
     % FINISH FINISH FINISH
     while strcmp(roi_ans,'Enter New ROI')
         roi(1) = str2num(char(inputdlg('Enter minimum X pixel','New ROI Input')));
-        roi(2) = str2num(char(inputdlg('Enter maximum X pixel','New ROI Input')));  
+        roi(2) = str2num(char(inputdlg('Enter maximum X pixel','New ROI Input')));
         if roi(2) > Npx; roi(2)=Npx; end
         if roi(1) < 1; roi(1) = 1; end
         xplot=roi(1):roi(2); yplot=0;
-        figure(102); imagesc(xplot,yplot,img(1,roi(1):roi(2)),clim);           
-        %figure(102); imagesc(img(roi(1):roi(2)));        
-        roi_ans = questdlg('Is ROI of direct imager acceptable?','HXSSS Spectrometer Digital ROI','Continue','Enter New ROI','Continue');        
-    end    
+        figure(102); imagesc(xplot,yplot,img(1,roi(1):roi(2)),clim);
+        %figure(102); imagesc(img(roi(1):roi(2)));
+        roi_ans = questdlg('Is ROI of direct imager acceptable?','HXSSS Spectrometer Digital ROI','Continue','Enter New ROI','Continue');
+    end
 elseif strcmp(handles.acq_method,'FEE Spectrometer') || strcmp(handles.acq_method,'XPP Spectrometer') || strcmp(handles.acq_method,'SXR Spectrometer')
-    %roi(1)=153; roi(2)=173; 
+    %roi(1)=153; roi(2)=173;
     %roi(3)=220; roi(4)=315;
     roi(1)=1; roi(2)=Npx; roi(3)=1; roi(4)=Npy;
     clim=[min(img(:)) max(img(:))];
@@ -6559,14 +6570,14 @@ elseif strcmp(handles.acq_method,'FEE Spectrometer') || strcmp(handles.acq_metho
         roi(1) = str2num(char(inputdlg('Enter minimum X pixel','New ROI Input')));
         roi(2) = str2num(char(inputdlg('Enter maximum X pixel','New ROI Input')));
         roi(3) = str2num(char(inputdlg('Enter minimum Y pixel','New ROI Input')));
-        roi(4) = str2num(char(inputdlg('Enter maximum Y pixel','New ROI Input')));          
-        if roi(4) > Npy; roi(4)=Npy; end   
+        roi(4) = str2num(char(inputdlg('Enter maximum Y pixel','New ROI Input')));
+        if roi(4) > Npy; roi(4)=Npy; end
         if roi(2) > Npx; roi(2)=Npx; end
         if roi(3) < 1; roi(3) = 1; end
         if roi(1) < 1; roi(1) = 1; end
         xplot=roi(1):roi(2); yplot=roi(3):roi(4);
-        figure(102); imagesc(xplot,yplot,img(roi(3):roi(4),roi(1):roi(2)),clim);                
-        roi_ans = questdlg('Is ROI of direct imager acceptable?','Spectrometer Digital ROI','Continue','Enter New ROI','Continue');        
+        figure(102); imagesc(xplot,yplot,img(roi(3):roi(4),roi(1):roi(2)),clim);
+        roi_ans = questdlg('Is ROI of direct imager acceptable?','Spectrometer Digital ROI','Continue','Enter New ROI','Continue');
     end
 else
 
@@ -6787,10 +6798,10 @@ function ACQ_METHOD_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from ACQ_METHOD
 
 
-  
+
 acq_types = get(handles.ACQ_METHOD,'String');
 curr_type = get(handles.ACQ_METHOD,'Value');
-handles.acq_method = acq_types(curr_type);  
+handles.acq_method = acq_types(curr_type);
 
 
 if strcmp(handles.acq_method,'FEE Spectrometer') || strcmp(handles.acq_method,'XPP Spectrometer') || strcmp(handles.acq_method,'SXR Spectrometer')
@@ -6804,17 +6815,17 @@ elseif strcmp(handles.acq_method,'YAGXRAY/DIR_IMG')
         set(handles.DETECTOR,'Value',2)
     end
     handles.use_yag=1;
-    set(handles.USEROI,'Value',0)    
+    set(handles.USEROI,'Value',0)
 elseif strcmp(handles.acq_method,'Gas Detectors')
-    set(handles.DETECTOR,'Value',5)    
+    set(handles.DETECTOR,'Value',5)
     handles.use_yag=1;
-    set(handles.USEROI,'Value',0)        
+    set(handles.USEROI,'Value',0)
 elseif strcmp(handles.acq_method,'K-Mono')
-    set(handles.DETECTOR,'Value',8)    
-    handles.use_yag=1;    
+    set(handles.DETECTOR,'Value',8)
+    handles.use_yag=1;
     set(handles.TAKE_BSA,'Value',0);
     handles.take_BSA=0;
-    set(handles.USEROI,'Value',0)            
+    set(handles.USEROI,'Value',0)
 end
 
 % turn on BSA (beam synchronous acquisition)
@@ -6910,27 +6921,27 @@ function handles = ChangeGDET(hObject, eventdata, handles)
 % changes GDET2 settings by value specified in handles.pressure_mult and
 % gain by value in handles.gain_mult.
 
-%FINISH FINISH FINISH   
+%FINISH FINISH FINISH
 
 % change gain
 if handles.gain_mult ~= 1
     gain_gdet2_1=lcaGetSmart(handles.gain_gdet2_1_pv);
     gain_gdet2_2=lcaGetSmart(handles.gain_gdet2_2_pv);
-    
+
     new_gain1 = gain_gdet2_1*handles.gain_mult;
     new_gain2 = gain_gdet2_2*handles.gain_mult;
-    
+
     % check for maximum gain
     if new_gain1 > handles.gain_max;
         new_gain1=handles.gain_max;
-    end    
+    end
     if new_gain2 > handles.gain_max;
         new_gain2=handles.gain_max;
-    end    
-    
+    end
+
     lcaPutSmart(handles.gain_gdet2_1_pv,new_gain1);
     lcaPutSmart(handles.gain_gdet2_2_pv,new_gain2);
-    
+
     % request new cal and offset
     handles.need_gdet2_offset = 1;
     handles.need_gdet2_cal = 1;
@@ -6941,16 +6952,16 @@ end
 if handles.pressure_mult ~= 1
     pressure_gdet2=lcaGetSmart(handles.pressure_gdet2_pv);
     new_press=pressure_gdet2*handles.pressure_mult;
-    
+
     % check for maximum pressure
     if new_press > handles.pressure_max;
         new_press=handles.pressure_max;
     end
-    
+
     lcaPutSmart(handles.pressure_gdet2_pv,new_press);
 
     % request new cal and offset
-    handles.need_gdet2_offset = 1;    
+    handles.need_gdet2_offset = 1;
     handles.need_gdet2_cal = 1;
 end
 
@@ -6958,9 +6969,9 @@ end
 gdet_count=0;
 
 while lcaGetSmart(handles.pressure_gdet2_status)~=0 || ~strcmp(lcaGetSmart(handles.gain_gdet2_1_status),'ON') || ~strcmp(lcaGetSmart(handles.gain_gdet2_2_status),'ON')
-    pause(0.5); 
+    pause(0.5);
     set(handles.STATUS,'String','Waiting for GDet2'); drawnow;
-    gdet_count=gdet_count+1;    if gdet_count>20; break; end;    
+    gdet_count=gdet_count+1;    if gdet_count>20; break; end;
 end
 
 gdet_count;
@@ -6999,7 +7010,7 @@ new_pos = handles.und_pos;
 new_pos(und_range) = scram_und_pos;
 new_pos(9)=handles.und_pos(9); new_pos(16)=handles.und_pos(16); % don't scramble self-seeding chicanes
 segmentTranslate(new_pos);
-segmentTranslateWait_GL(hObject,handles);  
+segmentTranslateWait_GL(hObject,handles);
 
 %lcaPutSmart(handles.und_names(und_range),scram_und_pos);
 
@@ -7022,10 +7033,10 @@ while ~strcmp(lcaGet(handles.BYKick),'Yes')
 
     % If abort called end program
     handles.abort = get(hObject,'Value');
-    if handles.abort == 0                     
+    if handles.abort == 0
       break;
-    end           
-end   
+    end
+end
 
 if handles.abort == 0
     return;
@@ -7043,25 +7054,25 @@ else
     % turn off und launch feedback
     feedback_status = lcaGetSmart(handles.feedback,0,'double');
     lcaPutSmart(handles.feedback,0);
-  
+
     mag_names_x = handles.xmag_names;
-    mag_names_y = handles.ymag_names;  
+    mag_names_y = handles.ymag_names;
     mag_bdes_x = handles.xmag_bdes;
-    mag_bdes_y = handles.ymag_bdes;  
-    
+    mag_bdes_y = handles.ymag_bdes;
+
     first_mag = mag_names_x(1);  % start orbit at beginning of undulator
-    
+
     kick_size = str2num(get(handles.MAGDIST,'String'))*handles.orbit_to_kick;
 
     r_cu=handles.r_cu;
     s_cu=handles.s_cu;
-    
+
     [mymags,mag_coeffs,r_cu,s_cu]=control_undCloseOsc_fast(first_mag,kick_size,handles.kick_plane,r_cu,s_cu);
     handles.r_cu=r_cu; handles.s_cu=s_cu;
-    mags_to_change_x=mag_names_x(mymags); 
+    mags_to_change_x=mag_names_x(mymags);
     mags_to_change_y=mag_names_y(mymags);
-    mags_to_change_bdes_x=mag_bdes_x(mymags);  
-    mags_to_change_bdes_y=mag_bdes_y(mymags);  
+    mags_to_change_bdes_x=mag_bdes_x(mymags);
+    mags_to_change_bdes_y=mag_bdes_y(mymags);
     mag_coeffs_x=mag_coeffs(:,1);
     mag_coeffs_y=mag_coeffs(:,2);
 
@@ -7071,9 +7082,9 @@ else
 
     % move magnets
     MoveMag(handles,mags_to_change_x,mag_coeffs_x,'perturb');
-    MoveMag(handles,mags_to_change_y,mag_coeffs_y,'perturb');         
+    MoveMag(handles,mags_to_change_y,mag_coeffs_y,'perturb');
 end
-    
+
 rate = lcaGetSmart('IOC:IN20:MC01:LCLSBEAMRATE');   % rep. rate % [Hz]
 if rate < 1; rate = 1;  end
 
@@ -7088,7 +7099,7 @@ for j=1:handles.num_shots
 
     % check that new data is different from last point.  if not, keep
     % checking until it is different
-    pause(1/rate-0.005)     % takes about 2ms to read data   
+    pause(1/rate-0.005)     % takes about 2ms to read data
     mycount=0;
     while j>1 && (any(gdet1(j,:)==gdet1(j-1,:)) || any(gdet2(j,:)==gdet2(j-1,:)))
         gdet1(j,1:2)=lcaGetSmart(handles.gdet_pvs(1:2))';
@@ -7129,18 +7140,18 @@ if handles.nom_e < handles.max_E_no_spont
     lcaPut(handles.BYKick,1);  pause(handles.BYKick_pause);
 
 else
-    
+
     % restore x magnets
     MoveMag(handles,mags_to_change_x,ref_mag_coeffs_x,'trim');
-    
+
     % restore y magnets
     MoveMag(handles,mags_to_change_y,ref_mag_coeffs_y,'trim');
 
     % reset und launch feedback to initial state
     lcaPutSmart(handles.feedback,feedback_status);
-    
+
 end
-    
+
 
 
 
@@ -7150,18 +7161,18 @@ end
 function handles = abort_loop(handles)
 % subfunction for aborting within a loop
 
-handles.fail = 1;  
+handles.fail = 1;
 disp('User abort');
-set(handles.STATUS,'String','Aborting'); drawnow;       
+set(handles.STATUS,'String','Aborting'); drawnow;
 
 % reset filters to initial position
 if handles.online && isfield(handles,'OD_init')
   lcaPutSmart(handles.OD_pvs,handles.OD_init);
 end
 
-% Move magnet back to starting position            
+% Move magnet back to starting position
 if ~strcmp(handles.methods(handles.currmethod),'Move Undulators') && isfield(handles,'curr_mag')
-  if handles.curr_pos < handles.und_num-handles.mag_delay && handles.nom_e/handles.max_e < handles.low_energy   
+  if handles.curr_pos < handles.und_num-handles.mag_delay && handles.nom_e/handles.max_e < handles.low_energy
     MoveMag(handles,[handles.curr_mag handles.curr_mag2],[handles.start_pos handles.start_pos2],'perturb');
   else
     MoveMag(handles,handles.curr_mag,handles.start_pos,'perturb');
@@ -7181,11 +7192,11 @@ function TAKE_BSA_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of TAKE_BSA
 
-handles.take_BSA = get(handles.TAKE_BSA,'Value'); 
+handles.take_BSA = get(handles.TAKE_BSA,'Value');
 
 if strcmp(handles.acq_method,'YAGXRAY/DIR_IMG')
     set(handles.TAKE_BSA,'Value',1);
-    handles.take_BSA = get(handles.TAKE_BSA,'Value'); 
+    handles.take_BSA = get(handles.TAKE_BSA,'Value');
 end
 
 guidata(hObject, handles);
@@ -7247,13 +7258,13 @@ function handles=GDET_signal(handles)
 Nshots=20;
 
 % record some data
-rate = lcaGetSmart('IOC:IN20:MC01:LCLSBEAMRATE'); 
+rate = lcaGetSmart('IOC:IN20:MC01:LCLSBEAMRATE');
 if rate==0; rate=1; end
 for j=1:Nshots
     data1_1(j,:)=lcaGet(handles.gdet_data1_1_pv);
-    data1_2(j,:)=lcaGet(handles.gdet_data1_2_pv);    
+    data1_2(j,:)=lcaGet(handles.gdet_data1_2_pv);
     data2_1(j,:)=lcaGet(handles.gdet_data2_1_pv);
-    data2_2(j,:)=lcaGet(handles.gdet_data2_2_pv);   
+    data2_2(j,:)=lcaGet(handles.gdet_data2_2_pv);
     gdet_energy(j)=lcaGetSmart(handles.gdet_pvs(1));
     pause(1/rate);
 end
@@ -7277,9 +7288,9 @@ end
 if min(data2_1_med) > handles.gdet_good_data || min(data2_2_med) > handles.gdet_good_data
     gdet2_bad=1;
 end
-    
+
 % If bad, check if user wants to abort
-if (gdet1_bad && gdet2_bad) 
+if (gdet1_bad && gdet2_bad)
     gdet_warn='Both gas detectors have low gain. ';
 elseif gdet1_bad
     gdet_warn='Gas detector 1 has low gain. ';

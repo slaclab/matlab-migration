@@ -28,7 +28,7 @@ for nParam = 1:length(OPctrl.order) % Use only paremeters specified in OPctrl
     nowVal = lcaGet(op{ii}.savActPV);
     annotation('textbox',[0.38 0.91-vOff .10 vStep], 'String', sprintf(op{ii}.Tfmt, '',nowVal ));
     annotation('textbox',[0.48 0.91-vOff .06 vStep], 'String',sprintf('%s',op{ii}.Unit) );
-    histVal = histValFn( [op{ii}.savActPV, '//HIST.lcls'], time);
+    histVal = histValFn( [op{ii}.savActPV, ':HIST.lcls'], time);
     if abs(nowVal - histVal) ~= 0, cStr = 'r'; else cStr = 'k'; end
     annotation('textbox',[0.54 0.91-vOff .15 vStep], 'String', sprintf(op{ii}.Tfmt,'',histVal ), 'Color', cStr );
 end
