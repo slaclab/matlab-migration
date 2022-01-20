@@ -20,7 +20,7 @@ function [x, y, tmit, bpms, pulseid, good] = scp_buffAcq(bpms, dgrp, num)
 % Author: Nate Lipkowitz, SLAC
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 % add more DGRPs here if desired
 switch char(dgrp)

@@ -35,7 +35,7 @@ function [pAct, pDes, aAct, aDes, kPhr, gold] = control_phaseGet(name, type, ds)
 % --------------------------------------------------------------------
 
 % AIDA-PVA imports
-global AIDA_DOUBLE;
+aidapva;
 
 % Defaults
 typeDef={'PHAS' 'PDES' 'AMPL' 'ADES' 'KPHR' 'GOLD'};

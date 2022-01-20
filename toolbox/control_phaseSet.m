@@ -24,7 +24,7 @@ function [pAct, iok] = control_phaseSet(name, pDes, trim, nTry, type, ds)
 % Author: Henrik Loos, SLAC
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 % --------------------------------------------------------------------
 % Check input arguments

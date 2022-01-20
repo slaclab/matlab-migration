@@ -322,8 +322,7 @@ end
 
 function STARTSTOP_Callback(hObject, eventdata, handles)
 % AIDA-PVA imports
-global pvaRequest;
-global AIDA_STRING;
+aidapva;
 
 tags={'Start' 'Stop'};
 colr={'green' 'white '};

@@ -10,7 +10,7 @@ function stat=LEM_Set30Q()
 % ------------------------------------------------------------------------------
 
 % AIDA-PVA imports
-global AIDA_DOUBLE;
+aidapva;
 
 debug=0;
 

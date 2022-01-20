@@ -433,8 +433,7 @@ function quad_alignment_CreateFcn(hObject, eventdata, handles)
 clear global
 
 % AIDA-PVA imports
-global pvaRequest;
-global AIDA_DOUBLE_ARRAY;
+aidapva;
 
 global all_quad all_bpm quad_names all_quad_EPICS quad_EPICS
 global all_bpm_SLC all_bpm_EPICS all_quad_EPICS bpm_ind

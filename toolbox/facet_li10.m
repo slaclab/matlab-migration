@@ -5,7 +5,7 @@ function facet_li10()
 % revert 3-mar-2016
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 %% boilerplate
 mf = strcat(mfilename, '.m');
@@ -180,7 +180,7 @@ gain = sum(ampl);
 function new_phase = set_engy(phase, knob)
 
     % AIDA-PVA imports
-    global pvaRequest;
+    aidapva;
 
     persistent d;
     if isempty(d)

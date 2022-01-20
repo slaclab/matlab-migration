@@ -37,8 +37,7 @@ function [kName,kStat,kAmpl,kPhas,kEerr,kFudge,kEGain,kPower,Eref,oldFudge,newFu
 % ------------------------------------------------------------------------------
 
 % AIDA-PVA imports
-global pvaRequest;
-global AIDA_DOUBLE AIDA_STRING;
+aidapva;
 
 % hard-wired for LCLS
 

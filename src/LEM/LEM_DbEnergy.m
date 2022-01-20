@@ -18,8 +18,7 @@ global MAGNET
 global theAccelerator
 
 % AIDA-PVA imports
-global pvaSet;
-global AIDA_DOUBLE;
+aidapva;
 
 % get pointers to MAGNETs that are in the selected LEM region(s)/groups
 

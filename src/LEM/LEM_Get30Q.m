@@ -3,7 +3,7 @@ function stat=LEM_Get30Q(scenario)
 % Compute and set XAL Field property for LI30 QUAD/QTRM pairs
 
 % AIDA-PVA imports
-global AIDA_DOUBLE;
+aidapva;
 
 debug=0;
 

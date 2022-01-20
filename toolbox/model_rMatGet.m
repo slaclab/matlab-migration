@@ -37,8 +37,7 @@ function [rMat, zPos, lEff, twiss, energy, n] = model_rMatGet(nameList, nameTo, 
 
 % --------------------------------------------------------------------
 % AIDA-PVA imports
-global pvaRequest;
-global AIDA_DOUBLE_ARRAY;
+aidapva;
 
 [modelSource,modelOnline,~,~,modelBeamPath]=model_init;
 

@@ -2,7 +2,7 @@ function fbLoadBLDPVs()
 %
 %
 % AIDA-PVA imports
-global AIDA_DOUBLE_ARRAY;
+aidapva;
 
 %
 % set up the BLD PV names

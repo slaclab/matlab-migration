@@ -15,8 +15,7 @@ global MAGNET PS unLEM
 global lemFudge lemScaleTime noFudgeCalc
 
 % AIDA-PVA imports
-global pvaSet;
-global AIDA_DOUBLE;
+aidapva;
 
 % check for old data ... provide abort option
 

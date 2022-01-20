@@ -4,7 +4,7 @@ function asset_elec(state)
 % auth. nate 11/26/14
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 requestBuilder = pvaRequest('BGRP:VAL');
 requestBuilder.with('BGRP', 'FACET_POSI');

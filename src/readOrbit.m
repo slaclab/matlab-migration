@@ -7,7 +7,7 @@ persistent sys;
 persistent accelerator;
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 if isempty(sys)
     [ sys , accelerator ] = getSystem();

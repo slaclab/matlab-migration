@@ -14,8 +14,7 @@ global lemPVs
 global MAGNET PS unLEM
 
 % AIDA-PVA imports
-global pvaRequest pvaSet AidaPvaStruct;
-global AIDA_STRING;
+aidapva;
 
 if (isempty(unLEM))
   disp('*** Nothing to unLEM')

@@ -3,7 +3,7 @@ function [val, ts] = epicsSimul_lcaGet(pv, varargin)
 global epicsDataBase epicsUseAida epicsVerbose
 
 % AIDA-PVA imports
-global AIDA_DOUBLE_ARRAY;
+aidapva;
 
 if isempty(epicsDataBase), epicsSimul_clear;end
 

@@ -16,7 +16,7 @@ function slcDbSetDemo(query, value)
   %
 
 % AIDA-PVA imports
-global pvaSet;
+aidapva;
 
 pvaSet(query, value);
 

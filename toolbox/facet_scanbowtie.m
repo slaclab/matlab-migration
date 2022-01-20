@@ -259,7 +259,7 @@ function [errstring] = setbdestrim(mag_name,new_bdes)
 %        HVS 11/1/07
 
 % AIDA-PVA imports
-global pvaRequest AidaPvaStruct;
+aidapva;
 
 errstring=[];
 mag_name = model_nameConvert(mag_name,'SLC');

@@ -43,8 +43,7 @@ global KLYS
 global lemEref lemFudge noFudgeCalc
 
 % AIDA-PVA imports
-global pvaRequest pvaSet;
-global AIDA_DOUBLE AIDA_STRING;
+aidapva;
 
 % hard-wired for LCLS
 

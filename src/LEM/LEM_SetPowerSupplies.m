@@ -9,8 +9,7 @@ debug=debugFlags(4);
 global PS unLEM
 
 % AIDA-PVA imports
-global pvaRequest pvaSet AidaPvaStruct;
-global AIDA_DOUBLE AIDA_STRING;
+aidapva;
 
 % extract lists of pointers to SLC and EPICS magnets to be set
 

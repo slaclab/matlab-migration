@@ -147,7 +147,7 @@ function Start_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 handles.issaved = 0;
 handles = update_gui(handles);

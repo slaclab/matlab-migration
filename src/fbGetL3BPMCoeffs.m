@@ -10,8 +10,7 @@ function [coeff1, coeff2] = fbGetL3BPMCoeffs(bpm_XPVs)
 %
 
 % AIDA-PVA imports
-global pvaRequest;
-global AIDA_DOUBLE_ARRAY;
+aidapva;
 
 dev0 = bpm_XPVs{1,1};
 nXs = length(bpm_XPVs);

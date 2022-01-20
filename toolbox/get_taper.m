@@ -64,7 +64,7 @@ mytime;
 function [values,times] = get_archive_multiple(pvs,start_time,end_time)
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 requestBuilder = pvaRequest(pvs);
 requestBuilder.with('STARTTIME', start_time);

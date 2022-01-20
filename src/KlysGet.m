@@ -25,8 +25,7 @@ function [status] = KlysGet(query, beam, dgrp)
   %
 
 % AIDA-PVA imports
-global pvaRequest;
-global AIDA_STRING;
+aidapva;
 
 requestBuilder = pvaRequest(query);
 requestBuilder.with('BEAM', beam);

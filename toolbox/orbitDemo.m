@@ -48,7 +48,7 @@ function [name,x,y,z,tmit,stat,hsta] = orbitDemo(query, bpmd, n, cnftype, ...
 %
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 err = getLogger('orbitDemo');
 

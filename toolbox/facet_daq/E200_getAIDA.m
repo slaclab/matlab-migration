@@ -2,7 +2,7 @@ function buffAcqData = E200_getAIDA(dgrp, device_list, nrpos)
 % Read FACET SLC buffered Data Orbit with Aida - Zelazny
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 try
 

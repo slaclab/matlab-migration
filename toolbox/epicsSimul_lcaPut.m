@@ -3,7 +3,7 @@ function epicsSimul_lcaPut(pv, val, varargin)
 global epicsDataBase epicsUseAida epicsVerbose
 
 % AIDA-PVA imports
-global pvaSet;
+aidapva;
 
 if isempty(epicsDataBase), epicsSimul_clear;end
 

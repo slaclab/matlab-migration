@@ -1,5 +1,5 @@
 function [status, summary] = SetKlysTact(query, beam, dgrp, value)
-global pvaRequest;
+aidapva;
 
 
 % Author: Bob Hall, Greg White

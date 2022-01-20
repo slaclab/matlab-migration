@@ -26,7 +26,7 @@
 function [errstring] = SET_VDES(prim,micro,unit,invalue,func)
 
 % AIDA-PVA imports
-global pvaRequest AidaPvaStruct;
+aidapva;
 
 instring = strcat(upper(prim),':',upper(micro),':',int2str(unit'));
 

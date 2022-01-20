@@ -7,7 +7,7 @@ function boolOut = isStatusBits(varargin)
 %    or    boolOut = isStatusBits('lgps:dr12:11:hsta','0100')
 % Author: Cyterski
 % AIDA-PVA imports
-global AIDA_LONG;
+aidapva;
 
 err = Err.getInstance('isStatusBits');    % Error Handling
 

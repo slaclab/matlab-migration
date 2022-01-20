@@ -879,7 +879,7 @@ function pvSet(pv, val)
 global mkbRequestBuilder
 
 % AIDA-PVA imports
-global pvaSet;
+aidapva;
 
 [micro, prim, unit, secn] = model_nameSplit(pv);
 if strncmp(pv,'LI',2) || strncmp(pv,'TA',2) || strncmp(pv,'DR12',4) || strncmp(pv,'MKB:VAL',8)

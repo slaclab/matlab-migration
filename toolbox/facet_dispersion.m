@@ -191,7 +191,7 @@ function pushbutton_acquire_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 set(hObject, 'String', 'Scanning...');
 set(hObject, 'Enable', 'off');

@@ -564,7 +564,7 @@ guidata(hObject,handles);
 
 function handles=SetPhaseRamp(handles)
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 requestBuilder = pvaRequest('MKB:VAL');
 requestBuilder.with('MKB',handles.knob);

@@ -948,8 +948,7 @@ guidata(hObject,handles)
 
 function [handles] = sbst_scan(hObject,handles)
 % AIDA-PVA imports
-global pvaSet;
-global AIDA_BOOLEAN;
+aidapva;
 
 handles.newtime = now;
 PAD_ID_check = lcaGetSmart([handles.process_variable ':SID']);

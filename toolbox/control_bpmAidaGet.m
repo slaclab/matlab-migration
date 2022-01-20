@@ -27,7 +27,7 @@ function [x, y, tmit, pulseId, stat] = control_bpmAidaGet(name, num, bpmd)
 % --------------------------------------------------------------------
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 % Check input arguments.
 if nargin < 3, bpmd='57';end

@@ -1,5 +1,5 @@
 function SetBgrpVariable(bgrp, variableName, value)
-global pvaRequest;
+aidapva;
 
 
 % Author: Bob Hall

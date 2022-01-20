@@ -27,7 +27,7 @@ function [values,times] = get_archive_facet(name,starttime,endtime,show_plot,mrk
 %=====================================================================
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 tn = get_time;
 if ~exist('starttime','var')    % if start date/time not input

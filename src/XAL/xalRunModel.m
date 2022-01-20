@@ -25,8 +25,7 @@ xalImport
 global scenario
 
 % AIDA-PVA imports
-global pvaRequest;
-global AIDA_FLOAT_ARRAY;
+aidapva;
 
 % some control flags
 

@@ -1,7 +1,7 @@
 function aidaBPMspeedTest()
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 [sys,accelerator]=getSystem();
 rate_pv = ['EVNT:' sys ':1:' accelerator 'BEAMRATE'];

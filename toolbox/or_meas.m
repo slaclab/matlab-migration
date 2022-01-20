@@ -86,8 +86,7 @@ function orbit_response_measurement_CreateFcn(hObject, eventdata, handles)
 clear global;
 
 % AIDA-PVA imports
-global pvaRequest;
-global AIDA_DOUBLE_ARRAY;
+aidapva;
 
 global all_corrx all_corry all_bpm corrx_names corry_names all_bpm
 global all_bpm_SLC all_bpm_EPICS all_corrx_EPICS all_corry_EPICS corrx_EPICS corry_EPICS bpm_ind

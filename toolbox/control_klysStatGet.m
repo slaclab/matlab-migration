@@ -29,8 +29,7 @@ function [act, stat, swrd, hdsc, dsta, enld] = control_klysStatGet(name, beamCod
 % nonfunctional. See lines 113-121 (v 1.36->1.37) --T. Maxwell
 
 % AIDA-PVA imports
-global pvaRequest;
-global AIDA_SHORT;
+aidapva;
 
 % --------------------------------------------------------------------
 % Check input arguments

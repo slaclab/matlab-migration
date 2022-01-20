@@ -11,7 +11,7 @@
 function facet_BPM_repeater()
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 % determine script name
 scr = strcat(mfilename, {'.m'});

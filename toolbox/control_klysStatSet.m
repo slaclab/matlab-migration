@@ -24,7 +24,7 @@ function act = control_klysStatSet(name, stat, beamCode)
 % --------------------------------------------------------------------
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 % Check input arguments
 if nargin < 3

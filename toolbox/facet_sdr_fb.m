@@ -2,7 +2,7 @@ function facet_sdr_fb()
 % FACET SDR charge feedback
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 %% basic initialization
 mf = strcat(mfilename, '.m');

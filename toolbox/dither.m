@@ -251,7 +251,7 @@ function pushbutton_start_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % AIDA-PVA imports
-global pvaRequest;
+aidapva;
 
 oldstr = get(hObject, 'String');
 set(hObject, 'String', 'Dithering...');
